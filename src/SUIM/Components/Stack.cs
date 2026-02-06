@@ -1,9 +1,9 @@
 namespace SUIM;
 
-public class Stack : UIElement
+public class Stack : LayoutElement
 {
     public Orientation Orientation { get; set; } = Orientation.Vertical;
-    public int Spacing { get; set; } = 0;
+    public bool Clip { get; set; }
 }
 
 public enum Orientation

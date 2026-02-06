@@ -2,7 +2,7 @@ namespace SUIM;
 
 using System.Xml.Linq;
 
-public class Dock : UIElement
+public class Dock : LayoutElement
 {
     public bool LastChildFill { get; set; } = true;
     public List<DockChild> DockChildren { get; } = [];

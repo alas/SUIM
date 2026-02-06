@@ -119,7 +119,7 @@ Interactive element for triggering actions.
 
 Data entry field.
 
-* `type`: `string` - text, number, date, time, datetime, datetime-local, month, week, button.
+* `type`: `string` - text, password, number, range, date, time, datetime, datetime-local, checkbox, radio, button.
 * `mask`: `string` - C# regex.
 * `placeholder`: `string` - placeholder.
 * `step`: `integer` - step for number slider.

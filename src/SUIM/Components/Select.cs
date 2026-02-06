@@ -4,6 +4,7 @@ public class Select : UIElement
 {
     public string? SelectedValue { get; set; }
     public int SelectedIndex { get; set; }
+    public bool Multiple { get; set; }
     public List<Option> Options { get; set; } = [];
 }
 

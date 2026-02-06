@@ -5,21 +5,28 @@ using System.Xml.Linq;
 public abstract class UIElement
 {
     public string? Id { get; set; }
+    public string? Class { get; set; }
     public UIElement? Parent { get; set; }
     public HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.Left;
     public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.Top;
-    public int? Width { get; set; }
-    public int? Height { get; set; }
-    public int Margin { get; set; } = 0;
-    public int Padding { get; set; } = 0;
+    public int X { get; set; }
+    public int Y { get; set; }
+    public string? Width { get; set; }
+    public string? Height { get; set; }
+    public string? Margin { get; set; }
+    public string? Padding { get; set; }
     public Anchor? Anchor { get; set; }
     public string? Background { get; set; }
-    public int ZIndex { get; set; } = 0;
-    public bool IsVisible { get; set; } = true;
-    public bool IsEnabled { get; set; } = true;
+    public string? Color { get; set; }
+    public float Opacity { get; set; } = 1.0f;
+    public int ZIndex { get; set; }
+    public string? Visibility { get; set; }
+    public bool ReadOnly { get; set; }
     public List<PropertyBinding> Bindings { get; } = [];
+    public string? Sprite { get; set; }
+    public string? HoverSprite { get; set; }
+    public string? PressedSprite { get; set; }
     public Dictionary<string, List<Action<UIElement>>> EventHandlers { get; set; } = [];
-
     public List<UIElement> Children { get; } = [];
 
     public virtual void AddChild(UIElement child, XElement element)
@@ -34,7 +41,7 @@ public abstract class UIElement
         Children.Remove(child);
     }
 
-    public virtual void On(string eventName, Action<UIElement> handler)
+    public virtual void On(string eventName, Action<UIElement>? handler)
     {
         if (!EventHandlers.TryGetValue(eventName, out List<Action<UIElement>>? value))
         {
@@ -42,7 +49,8 @@ public abstract class UIElement
             EventHandlers[eventName] = value;
         }
 
-        value.Add(handler);
+        if (handler != null)
+            value.Add(handler);
     }
 
     public virtual void Trigger(string eventName)
@@ -55,21 +63,16 @@ public abstract class UIElement
             }
         }
     }
+}
 
-    public UIElement? FindById(string id)
-    {
-        if (Id == id)
-            return this;
+public class LayoutElement : UIElement
+{
+    public int Spacing { get; set; }
+}
 
-        foreach (var child in Children)
-        {
-            var found = child.FindById(id);
-            if (found != null)
-                return found;
-        }
-
-        return null;
-    }
+public interface IPlaceholder
+{
+    string? Placeholder { get; set; }
 }
 
 public enum HorizontalAlignment

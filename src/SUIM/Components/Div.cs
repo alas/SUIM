@@ -1,5 +1,5 @@
 namespace SUIM;
 
-public class Div : UIElement
+public class Div : LayoutElement
 {
 }

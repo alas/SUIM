@@ -2,10 +2,13 @@ namespace SUIM;
 
 public class BaseText : UIElement
 {
-    public string Text { get; set; } = string.Empty;
+    public string? Text { get; set; }
+    public string? Font { get; set; }
+    public int FontSize { get; set; }
+    public bool Wrap { get; set; }
 }
 
-public class TextAreaElement : UIElement
+public class TextArea : UIElement, IPlaceholder
 {
     public string? Placeholder { get; set; }
     public int Rows { get; set; }
