@@ -1,5 +1,6 @@
 namespace SUIM;
 
+using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -246,7 +247,7 @@ public class SUIMControlFlowParser(Dictionary<string, object> model)
 
         var (blockContent, blockLen) = ExtractBlock(markup, blockStart);
 
-        IEnumerable<object> items;
+        IEnumerable items;
         if (collectionName.Contains(".."))
         {
              var rangeParts = collectionName.Split("..");
@@ -256,7 +257,7 @@ public class SUIMControlFlowParser(Dictionary<string, object> model)
         }
         else
         {
-            items = GetValue(collectionName) as IEnumerable<object> ?? Array.Empty<object>();
+            items = GetValue(collectionName) as IEnumerable ?? Array.Empty<object>();
         }
 
         var sb = new StringBuilder();

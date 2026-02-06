@@ -1,6 +1,5 @@
 namespace SUIM;
 
-using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
 using System.Globalization;
 
