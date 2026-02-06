@@ -1,5 +1,6 @@
 namespace SUIM;
 
+using System;
 using System.Xml.Linq;
 using System.Globalization;
 
@@ -36,21 +37,77 @@ public class SUIMMarkupParser(Dictionary<string, object> model)
         }
 
         // Handle both text nodes and element children
-        foreach (var node in element.Nodes())
+        if (uiElement is Grid grid)
         {
-            if (node is XText textNode)
+            int rowIndex = 0;
+            int columnIndex = 0;
+            foreach (var node in element.Elements())
             {
-                var text = textNode.Value.Trim();
-                if (!string.IsNullOrEmpty(text))
+                if (node.Name.LocalName.Equals("row", StringComparison.OrdinalIgnoreCase))
                 {
-                    var textElement = new Label { Text = text };
-                    uiElement.AddChild(textElement, element);
+                    var heightAttr = node.Attribute("height");
+                    if (heightAttr != null)
+                    {
+                        grid.Rows = string.IsNullOrEmpty(grid.Rows) ? heightAttr.Value : grid.Rows + ", " + heightAttr.Value;
+                    }
+
+                    int colIdx = 0;
+                    foreach (var child in node.Elements())
+                    {
+                        child.SetAttributeValue("grid.row", rowIndex.ToString());
+                        child.SetAttributeValue("grid.column", colIdx.ToString());
+                        var childElement = ParseElement(child, model);
+                        grid.AddChild(childElement, child);
+                        colIdx++;
+                    }
+
+                    rowIndex++;
+                }
+                else if (node.Name.LocalName.Equals("column", StringComparison.OrdinalIgnoreCase))
+                {
+                    var widthAttr = node.Attribute("width");
+                    if (widthAttr != null)
+                    {
+                        grid.Columns = string.IsNullOrEmpty(grid.Columns) ? widthAttr.Value : grid.Columns + ", " + widthAttr.Value;
+                    }
+
+                    int rowIdx = 0;
+                    foreach (var child in node.Elements())
+                    {
+                        child.SetAttributeValue("grid.column", columnIndex.ToString());
+                        child.SetAttributeValue("grid.row", rowIdx.ToString());
+                        var childElement = ParseElement(child, model);
+                        grid.AddChild(childElement, child);
+                        rowIdx++;
+                    }
+
+                    columnIndex++;
+                }
+                else
+                {
+                    var childElement = ParseElement(node, model);
+                    grid.AddChild(childElement, node);
                 }
             }
-            else if (node is XElement childXElement)
+        }
+        else
+        {
+            foreach (var node in element.Nodes())
             {
-                var childElement = ParseElement(childXElement, model);
-                uiElement.AddChild(childElement, childXElement);
+                if (node is XText textNode)
+                {
+                    var text = textNode.Value.Trim();
+                    if (!string.IsNullOrEmpty(text))
+                    {
+                        var textElement = new Label { Text = text };
+                        uiElement.AddChild(textElement, element);
+                    }
+                }
+                else if (node is XElement childXElement)
+                {
+                    var childElement = ParseElement(childXElement, model);
+                    uiElement.AddChild(childElement, childXElement);
+                }
             }
         }
 
