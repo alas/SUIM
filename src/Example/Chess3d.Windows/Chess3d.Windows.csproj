@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Chess3d</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <OutputPath>..\Bin\Windows\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+    <!-- Force msbuild to check to rebuild this assembly instead of letting VS IDE guess -->
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Chess3d\Chess3d.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net10.0-windows</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.0.2" />
+    <PackageReference Include="Stride.BepuPhysics" Version="4.3.0.2507" />
+    <PackageReference Include="Stride.Engine" Version="4.3.0.2507" />
+    <PackageReference Include="Stride.Video" Version="4.3.0.2507" />
+    <PackageReference Include="Stride.Physics" Version="4.3.0.2507" />
+    <PackageReference Include="Stride.Navigation" Version="4.3.0.2507" />
+    <PackageReference Include="Stride.Particles" Version="4.3.0.2507" />
+    <PackageReference Include="Stride.UI" Version="4.3.0.2507" />
+    <PackageReference Include="Stride.Core.Assets.CompilerApp" Version="4.3.0.2507" IncludeAssets="build;buildTransitive" />
+  </ItemGroup>
+</Project>

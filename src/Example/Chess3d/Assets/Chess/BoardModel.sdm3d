@@ -1,0 +1,15 @@
+!Model
+Id: aa9f2117-1167-4567-ad01-6171276f3cfa
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file Board.obj
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    89e020fae8e5021ea2513552a2a35f97:
+        Name: 01
+        MaterialInstance:
+            Material: f80be969-e4e1-4b91-8d77-0e0f6bb9fe44:Chess/BoardMaterial
+Modifiers: {}
+~SourceHashes:
+    f7df76cad25aceae22d666e14ae82f50~Board.obj: 4e5e2f2d010dd1c3ff0fcc5bb11b6dce

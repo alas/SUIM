@@ -1,0 +1,15 @@
+!Model
+Id: 7beb5baf-4d88-41c0-95cf-39112570a9d8
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file Queen01.obj
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    c5bc5a899b85289ea7cf6fcfda7edd91:
+        Name: wooddark4.002
+        MaterialInstance:
+            Material: 42c3ab54-57c3-4ef5-a469-c716f3ab4743:Chess/wooddark4.002
+Modifiers: {}
+~SourceHashes:
+    ea9dc2a6cdde90843f553f6011f8a0d9~Queen01.obj: 4e90b244a7eae5a62695bcab9864c777

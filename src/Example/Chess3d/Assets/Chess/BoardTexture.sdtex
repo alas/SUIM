@@ -1,0 +1,8 @@
+!Texture
+Id: 79007ed0-1f01-43e9-befe-7588c0410cb1
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file Board.jpg
+Type: !ColorTextureType
+    ColorKeyColor: {R: 255, G: 0, B: 255, A: 255}
+    PremultiplyAlpha: false

@@ -1,0 +1,8 @@
+!Texture
+Id: 87ddb442-996e-491e-96c7-0d99989e9fc5
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file woodlight1.jpg
+Type: !ColorTextureType
+    ColorKeyColor: {R: 255, G: 0, B: 255, A: 255}
+    PremultiplyAlpha: false

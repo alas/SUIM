@@ -1,0 +1,15 @@
+!Model
+Id: 996de5ee-cf08-48b9-8e72-42c516d72934
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file Rook01.obj
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    8629565449896208add39f090a3841c0:
+        Name: wooddark1.002
+        MaterialInstance:
+            Material: a853a8a6-5048-4a20-9dfd-3535b06afbe8:Chess/wooddark1.002_3
+Modifiers: {}
+~SourceHashes:
+    252177306bf8d603347fd5a4c1da8c92~Rook01.obj: 16f86277f4624ff72280f77ec2b749b3

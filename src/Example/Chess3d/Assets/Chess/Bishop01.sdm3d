@@ -1,0 +1,15 @@
+!Model
+Id: c8cb9dca-8fb7-4afd-9e6c-2a188ce62315
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file Bishop01.obj
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    3a67f160e650f6063cbb5f8b8c5e639d:
+        Name: wooddark3.001
+        MaterialInstance:
+            Material: 4af77c3f-0292-47d0-ae80-a70d626fb176:Chess/wooddark3.001
+Modifiers: {}
+~SourceHashes:
+    f2431355f43b6dc32c300d1ce35ffb74~Bishop01.obj: c84dd1a80cd8b1c66ad27cbe31f31f88

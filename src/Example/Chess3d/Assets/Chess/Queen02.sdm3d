@@ -1,0 +1,15 @@
+!Model
+Id: 41e28788-44a4-4e60-823e-c2eb1e6ae55f
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file Queen02.obj
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    56c10178fa602571f907227173a66aea:
+        Name: woodlight4.002
+        MaterialInstance:
+            Material: c725b111-90a7-403b-ae67-2a75e2cc0b87:Chess/woodlight4.002
+Modifiers: {}
+~SourceHashes:
+    0f4119450c6aba06b638b24f728c7d5c~Queen02.obj: c232e5976e765f657c161a582e696057

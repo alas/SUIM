@@ -1,0 +1,15 @@
+!Model
+Id: 63f052b8-ec4d-4acb-b430-dfcc8320a05f
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file Pawn01.obj
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    19b7a083ba881d0185b36b9a72d6eae4:
+        Name: wooddark0.002
+        MaterialInstance:
+            Material: 9a8cda8b-43be-4f9b-bbd0-d2f655e5c2dd:Chess/wooddark0.002
+Modifiers: {}
+~SourceHashes:
+    d80336a637376806fdfdd4ee3d29c973~Pawn01.obj: 2f6802b0f9733703c8148bfd7922fe07

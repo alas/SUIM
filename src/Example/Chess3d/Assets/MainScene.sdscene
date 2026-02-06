@@ -1,0 +1,841 @@
+!SceneAsset
+Id: d4a5008e-554f-4b52-a345-81378db5a406
+SerializedVersion: {Stride: 3.1.0.1}
+Tags: []
+ChildrenIds: []
+Offset: {X: 0.0, Y: 0.0, Z: 0.0}
+Hierarchy:
+    RootParts:
+        - ref!! b0977f02-1132-4115-ae73-67bdba75e743
+        - ref!! cd66500c-29a5-4566-9f75-035564040cf6
+        - ref!! 1e0a19f2-c7df-421a-9233-e6de0888ee62
+        - ref!! b2aa0065-3a99-40f0-8fb3-7e580ad2b1d3
+        - ref!! f52f6c85-fd6d-47e2-a5ee-f62a643d5be0
+        - ref!! 55c12a42-0c6d-4989-ac16-8d94d8f7f2f1
+    Parts:
+        -   Folder: null
+            Entity:
+                Id: 00826c98-c77f-4268-ab13-c0fcda85727e
+                Name: Marker_0_3
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: c48fe9d2-dbcb-48a5-a48a-d606720d15d2
+                        Position: {X: 0.78535074, Y: 0.1, Z: 0.11395308}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 08586704-be20-4ca6-b262-0945be7b7165
+                Name: Marker_2_2
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: e6ff66b9-8819-452e-af8f-fd266843984b
+                        Position: {X: 0.329, Y: 0.1, Z: 0.33139658}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 0d708b31-c009-4c40-8cc0-878c69103645
+                Name: Marker_3_6
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 5f482a63-323a-4102-8fc3-cb1fe719cd13
+                        Position: {X: 0.112, Y: 0.1, Z: -0.56269187}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 0ee606e1-e434-412e-a522-d17e51a9e043
+                Name: Marker_1_2
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 008e2543-4d0b-406f-9274-e341964d624a
+                        Position: {X: 0.559, Y: 0.1, Z: 0.33139658}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 0fa18079-f5f9-4ba3-bd02-396bce25605d
+                Name: Marker_4_2
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 71dd0197-8308-4ad3-b3e8-b589bec4abf9
+                        Position: {X: -0.112, Y: 0.1, Z: 0.33139658}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 1401b06b-5d40-461e-98f7-1beec131a51e
+                Name: Marker_6_6
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 9ada4226-a2ac-490a-bb2f-19cc44a97555
+                        Position: {X: -0.562, Y: 0.1, Z: -0.56269187}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 15d0ef2e-d764-47ba-a0fc-e96a24155ab7
+                Name: Marker_2_0
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 8a8f7bc6-9976-4f09-8a8b-4e9769ed93f1
+                        Position: {X: 0.329, Y: 0.1, Z: 0.78789693}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 16a27eec-8b3f-4562-ad8b-8321666a8b93
+                Name: Marker_1_3
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: aa749c0b-585d-4233-9ad5-315f795f92c3
+                        Position: {X: 0.559, Y: 0.1, Z: 0.11395308}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 1949cd9d-0e06-4faa-8a76-541c3574e27d
+                Name: Marker_4_5
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 68f373ed-535c-4840-9d67-042d9170a5a7
+                        Position: {X: -0.112, Y: 0.1, Z: -0.333446}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 1e0a19f2-c7df-421a-9233-e6de0888ee62
+                Name: Skybox
+                Components:
+                    bf05e16197a9b51fe4d17b513c8f68f6: !TransformComponent
+                        Id: a1ceacea-6db3-4597-b2da-de2db8a75986
+                        Position: {X: 0.0, Y: 2.0, Z: -2.0}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    8250cf23d6f7c90c2637240ba6059c9e: !BackgroundComponent
+                        Id: 5496c13a-31a8-46b4-afab-ea24571c0deb
+                        Texture: a8ea16fc-c1da-4e80-b517-071b16748f1d:Skybox texture
+                    542a2ca8c23b9b6b537f94144abc2ce3: !LightComponent
+                        Id: 9cddcea1-ef0b-41d0-8ae4-de1a1d98fde3
+                        Type: !LightSkybox
+                            Skybox: 60b7d6ed-b65f-46e6-9051-d6a8d0701ffc:Skybox
+        -   Entity:
+                Id: 28820e12-0155-4903-acdc-ffa43d6cd9a3
+                Name: Marker_1_0
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 0c979251-7c65-41ac-9c84-89c04ea84c6c
+                        Position: {X: 0.559, Y: 0.1, Z: 0.78789693}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 2abc8223-7423-4b77-98f0-9ddc20d58023
+                Name: Marker_5_4
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: ebfc32a2-214d-45e0-9afc-fc986ad701a1
+                        Position: {X: -0.334, Y: 0.1, Z: -0.11477377}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 2ce8c175-e79f-4f06-a9ad-96f14f96808b
+                Name: Marker_4_6
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: c01f3643-a499-4dba-820f-0e8bd4b67cb7
+                        Position: {X: -0.112, Y: 0.1, Z: -0.56269187}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 2da36f9a-2ad1-4c55-b79d-9a4b01ece676
+                Name: Marker_2_6
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: d6a72c3b-9599-44ca-ad8e-dcd0ed1cf298
+                        Position: {X: 0.329, Y: 0.1, Z: -0.56269187}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 2e66afca-d729-40c3-8ee5-6c83a93825a3
+                Name: Marker_3_4
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 5f97c974-d4c1-46ff-af3c-d2e5759b46fc
+                        Position: {X: 0.112, Y: 0.1, Z: -0.11477377}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 382f1f3e-8d9b-4c10-801e-5acf6242bde7
+                Name: Marker_7_2
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 4b146d75-6097-47de-ba50-026e2ee817ae
+                        Position: {X: -0.787, Y: 0.1, Z: 0.33139658}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 42d40701-41a4-45db-bcb2-34133b67ff2d
+                Name: Marker_6_0
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 6debc00f-99e1-413a-94eb-1656c35ec5f0
+                        Position: {X: -0.5616222, Y: 0.1, Z: 0.78789693}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 47503b4f-2379-423f-ad83-3003ce02574e
+                Name: Marker_4_7
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 4c730d34-8edf-4f56-bf41-88c89ea20a6c
+                        Position: {X: -0.112, Y: 0.1, Z: -0.78288543}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 4900e1df-7c96-4fcf-93f9-9ad83fcbff5c
+                Name: Marker_6_4
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 9d3a6a8e-b4ad-424d-8567-e9b73c99dcd1
+                        Position: {X: -0.562, Y: 0.1, Z: -0.11477377}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 4bdaef73-1201-472a-972f-0421d0ac54d5
+                Name: Marker_4_4
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: c21851aa-b3f3-436f-aca7-d75d87662702
+                        Position: {X: -0.112, Y: 0.1, Z: -0.11477377}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Folder: null
+            Entity:
+                Id: 53bff3a5-9eca-432e-81e4-bb08a4384855
+                Name: Marker_0_2
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 51824999-dc15-4a63-b29a-50199fd42919
+                        Position: {X: 0.78535074, Y: 0.1, Z: 0.33139658}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 55c12a42-0c6d-4989-ac16-8d94d8f7f2f1
+                Name: BoardMarkers
+                Components:
+                    a4331389325ef5b2bb2b8ecbe753165b: !TransformComponent
+                        Id: 6eb4e283-43cf-4f31-bc66-43742d1edf6a
+                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children:
+                            e69d680f9680ab85a447390ac4a20df9: ref!! 02fe2fe6-3bf0-45ba-bdd6-8b0d78fa4ac9
+                            61961f0bdc2d94a38e4d74f80abd895b: ref!! 7220cd5e-e013-42cd-aa88-867be3be45e3
+                            9c3a23887d661ac43a082778fe92c6b7: ref!! 51824999-dc15-4a63-b29a-50199fd42919
+                            efe3601589b79a172844d9b499604efb: ref!! c48fe9d2-dbcb-48a5-a48a-d606720d15d2
+                            6f209b3e77366b9cc793ba22421c6dde: ref!! d5616636-a933-484c-8752-d1bdecf4c543
+                            976dd3f05985112c6e4f27a3c6f856c7: ref!! 0fa7237d-a212-4c22-a247-72f2a43daec1
+                            7bbdc65e5bffb78c2ec8d1b1d8cc8f11: ref!! 65be7ce2-e355-45d7-a82a-a5bac72193a2
+                            706997befb3245f499da621c1249b792: ref!! 9a19a4b3-bc12-4518-91ec-a88f884fe040
+                            5e31d3d2e9ce058a71fe6095673b4f14: ref!! 0c979251-7c65-41ac-9c84-89c04ea84c6c
+                            2ba072fa60030950f4474849114fdf77: ref!! 44b5f9fd-9ac5-4308-9c99-48c129b55b34
+                            b6aa1648aae0f2868dbd74e1e5af11f2: ref!! 008e2543-4d0b-406f-9274-e341964d624a
+                            ec236d9fec488ec1e9426b4b3181b26d: ref!! aa749c0b-585d-4233-9ad5-315f795f92c3
+                            7043819c285d49adcffc1733186afa9b: ref!! 2aff8490-9bbb-4229-8c2f-6a76d5a0dc68
+                            32ee14d5a55703d2a3c427a91e028dbd: ref!! 198566de-4d5f-4b1c-a7c4-3f97fadd74c7
+                            4fd5d83691ab2236bac7924695f10754: ref!! c164ff40-21f3-4972-a053-d92064a2a4e4
+                            12d4e8eeb48ec820eddfecb0cd46392f: ref!! 1ffbcef6-5d9b-4120-939b-93b4681f1095
+                            09d0cf48e4f9685503df1f56f7c75cdd: ref!! 8a8f7bc6-9976-4f09-8a8b-4e9769ed93f1
+                            5b3b6f395234d50f6ece1407909b72a6: ref!! 4ab06688-dd22-4cd9-be8b-d5c279497c16
+                            6d3e2151ad5509108c8a2a50ead0cf9b: ref!! e6ff66b9-8819-452e-af8f-fd266843984b
+                            e456074a3e2ee973edc7c74ed735ccbf: ref!! 3cca06c7-a966-4e12-aa08-903127c2f208
+                            bd7ff25d50873b4d89d108594da8fc32: ref!! 52981d94-a2e4-4c95-be15-7d510df06148
+                            feb20446c2465b51ea1708385e98881c: ref!! aab90074-eb82-473c-8310-eecc8d6a7185
+                            f4f7b5f86238ff8acbc76a7006ce39f8: ref!! d6a72c3b-9599-44ca-ad8e-dcd0ed1cf298
+                            1e9b0f4e1026ebf00aba85085b4f68b5: ref!! 82a98595-0748-4e51-aa56-cdc4555447fb
+                            ed79bb0c5151b5102ede74407100903e: ref!! fbc2bd80-6790-4dc6-be7a-14dba51e431a
+                            75ea8e295eabbff4ecb9261c8018b2a2: ref!! a691394e-eccf-4aba-9aaf-35b5d411a8ee
+                            896b7463d978e89f5efe7306492744bd: ref!! 90a5b64d-c024-407a-9b7c-db59e499f498
+                            98f2d2b4b665bc2c46b56211587eeec3: ref!! dc6f29b0-202e-4248-a04f-19158a7e344a
+                            d35e54ea76753ef34ee8326b0128b2d2: ref!! 5f97c974-d4c1-46ff-af3c-d2e5759b46fc
+                            972102db74d8a8c942e259aff8ec3952: ref!! eb0db84a-c7cc-4a33-a01e-f0a69f8a3683
+                            fdef9043683c9566d41b31bb05b8dd11: ref!! 5f482a63-323a-4102-8fc3-cb1fe719cd13
+                            2813349ea563dc1979732594b9e5ec24: ref!! 9c2a27c7-c408-4d7e-9e65-e0078ac9cee0
+                            e775fbec4f015e080adaf3f4248d0709: ref!! 3ce75dbd-7532-4fc1-94de-04ce9483312a
+                            cd5579ee93b0b6bf69ad4dddbd831e02: ref!! ab3f8dc4-1f62-446c-8ed6-65e90421b8bc
+                            f30d26cbaf75834f5ebc99de609ce471: ref!! 71dd0197-8308-4ad3-b3e8-b589bec4abf9
+                            44d8e27156ec063442abddc8723b258e: ref!! 84ec28b1-e035-400e-bbb8-76fadf999f8a
+                            d8e22f009ff6d042c9c438a85bb5ca72: ref!! c21851aa-b3f3-436f-aca7-d75d87662702
+                            a5ba7df2bba9cae153cb566adacc6e4e: ref!! 68f373ed-535c-4840-9d67-042d9170a5a7
+                            2d544434ac38d91a6ae907eee744689b: ref!! c01f3643-a499-4dba-820f-0e8bd4b67cb7
+                            43bc02004250faed18643aa4171cf51e: ref!! 4c730d34-8edf-4f56-bf41-88c89ea20a6c
+                            f4263c8650faed5f1a5f3cd0a1afc0b5: ref!! ec28c24e-ff4b-42e5-8c69-5963d47faf93
+                            01e3d23953b7d4769f4eec68aa9581c3: ref!! 463136ff-3222-4210-acc5-1e22d92d3080
+                            99ddd1e60bda1591fee242d4bed99249: ref!! 95bd2c09-e2a5-4aa2-9a0b-24593aa26095
+                            4f49a33cec790a2a94861049321310fa: ref!! 55372a5e-b93d-474f-8b99-4513527d6ab3
+                            0ebe68c80ba90a999c33c305548da88c: ref!! ebfc32a2-214d-45e0-9afc-fc986ad701a1
+                            26ca85bb92f3d40f057415a91b35e60b: ref!! 1769abbc-c4e3-48c0-ad6d-a18e4adce4b4
+                            eb0047e7253c8f71d6f066a5a6fcc05b: ref!! 69369988-8365-4f9c-8084-425075811862
+                            4a72104c067a92007a590c08f073e343: ref!! 27661614-c478-4917-9a54-3f2f301f72d3
+                            16aec4360ec2e6b327388fc45faf4d1e: ref!! 6debc00f-99e1-413a-94eb-1656c35ec5f0
+                            56227794b033bbf8eb7bdc83794f4fc2: ref!! ebca23d3-9e5a-4fe2-a0df-21ac5acea0f7
+                            dba63424797f24ad4b227341e9a87ee1: ref!! 012b185c-5b4b-4408-9e3d-e4e9adc311a1
+                            156b31b6d32939756fb6c0261fcb5fcc: ref!! 849b7d5a-d43a-4c0c-8ad7-8ae674547677
+                            ef46a22a8a6d96d011af774d2a3877b4: ref!! 9d3a6a8e-b4ad-424d-8567-e9b73c99dcd1
+                            ad4629417a0b3ac6efabcd61cc108501: ref!! 6f3e5100-ee8e-4a9e-a368-22bca2aec4ec
+                            0f24c7b72d1d78c988b3a172368ea442: ref!! 9ada4226-a2ac-490a-bb2f-19cc44a97555
+                            59e32372f784424724a250682680596c: ref!! 5452c102-6213-42c8-8091-bd55a0da98c8
+                            0520da4aa3115effff398de9d4295fcf: ref!! ef7c03f4-efd4-4a95-836e-fd68ed729900
+                            daa0f4814529c67e2051d4f2322eda57: ref!! 21d2b93e-06fb-48b2-b957-4612ab961ea1
+                            09d3c16b8c482cc7124a0748d4c395fb: ref!! 4b146d75-6097-47de-ba50-026e2ee817ae
+                            4a90c692e2fe1850191cd053fa0fa653: ref!! 3774bc34-4bb3-4da3-bc9b-e926e5eca8a1
+                            5d57fddbadf32a2525d97d51c484f900: ref!! 0f655414-5dc9-4b29-80dd-28da4291f891
+                            ac87f899e8ffc0872741ede7878cbdeb: ref!! bb90cc86-3b33-4505-97d3-c3b070be9e1f
+                            a0ea1d2f1bb3732ae9b58d939cc2079d: ref!! 85ddae4c-9404-416c-824e-aae27ed198a4
+                            41917497755b6ce1abbc35a9bfd016bc: ref!! b7e648d4-e1ec-48fa-9337-0bf466255ca7
+        -   Folder: null
+            Entity:
+                Id: 56f96a5b-1dc2-420c-8278-5859c124bae0
+                Name: Marker_0_1
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 7220cd5e-e013-42cd-aa88-867be3be45e3
+                        Position: {X: 0.78535074, Y: 0.1, Z: 0.5586374}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 5acaeefa-702f-4394-b426-db17016e2f66
+                Name: Marker_0_0
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 02fe2fe6-3bf0-45ba-bdd6-8b0d78fa4ac9
+                        Position: {X: 0.78535074, Y: 0.1, Z: 0.78789693}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 673634f7-0d22-4ec6-974a-821a65c0614e
+                Name: Marker_6_5
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 6f3e5100-ee8e-4a9e-a368-22bca2aec4ec
+                        Position: {X: -0.562, Y: 0.1, Z: -0.333446}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 6d59fe22-2f98-4950-93a6-0d2e5f02fb31
+                Name: Marker_7_0
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: ef7c03f4-efd4-4a95-836e-fd68ed729900
+                        Position: {X: -0.7867779, Y: 0.1, Z: 0.78789693}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 71070022-4430-49ed-872c-1aaf80b7f045
+                Name: Marker_5_7
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 27661614-c478-4917-9a54-3f2f301f72d3
+                        Position: {X: -0.334, Y: 0.1, Z: -0.78288543}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 7242e7b6-316f-4e0f-9f67-a637bcc53643
+                Name: Marker_3_3
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: dc6f29b0-202e-4248-a04f-19158a7e344a
+                        Position: {X: 0.112, Y: 0.1, Z: 0.11395308}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 73f09a67-39bc-4443-8c3a-c2f57111baa2
+                Name: Marker_5_6
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 69369988-8365-4f9c-8084-425075811862
+                        Position: {X: -0.334, Y: 0.1, Z: -0.56269187}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 74ddcfe5-4b8f-4104-9bb9-9580e3d1b3e8
+                Name: Marker_1_5
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 198566de-4d5f-4b1c-a7c4-3f97fadd74c7
+                        Position: {X: 0.559, Y: 0.1, Z: -0.333446}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 756351aa-29b7-41d2-9038-97bc4a51c26d
+                Name: Marker_7_3
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 3774bc34-4bb3-4da3-bc9b-e926e5eca8a1
+                        Position: {X: -0.787, Y: 0.1, Z: 0.11395308}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 75b8841b-fda2-4f42-befe-bb7b55eec9b3
+                Name: Marker_4_3
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 84ec28b1-e035-400e-bbb8-76fadf999f8a
+                        Position: {X: -0.112, Y: 0.1, Z: 0.11395308}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 791e289a-9cf6-4b36-8fc3-86e6084b5f63
+                Name: Marker_7_4
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 0f655414-5dc9-4b29-80dd-28da4291f891
+                        Position: {X: -0.787, Y: 0.1, Z: -0.11477377}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 7e3197a3-b6b7-4971-ba69-e8792773f82f
+                Name: Marker_1_6
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: c164ff40-21f3-4972-a053-d92064a2a4e4
+                        Position: {X: 0.559, Y: 0.1, Z: -0.56269187}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 7eb129ab-86b6-4aff-8568-fa3f9f237461
+                Name: Marker_1_4
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 2aff8490-9bbb-4229-8c2f-6a76d5a0dc68
+                        Position: {X: 0.559, Y: 0.1, Z: -0.11477377}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 888cf1d5-9e34-491e-83d2-237fb9dfefce
+                Name: Marker_7_1
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 21d2b93e-06fb-48b2-b957-4612ab961ea1
+                        Position: {X: -0.787, Y: 0.1, Z: 0.5586374}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Folder: null
+            Entity:
+                Id: 88a8ba85-7b59-4a2e-bf1f-bdbbd3134bdd
+                Name: Marker_0_7
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 9a19a4b3-bc12-4518-91ec-a88f884fe040
+                        Position: {X: 0.78535074, Y: 0.1, Z: -0.78288543}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 8b2af914-81dc-4d58-b224-cb74d4fd742e
+                Name: Marker_6_2
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 012b185c-5b4b-4408-9e3d-e4e9adc311a1
+                        Position: {X: -0.562, Y: 0.1, Z: 0.33139658}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 8cb0c3f2-61ff-4330-bc6e-a9861abcbeae
+                Name: Marker_5_1
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 463136ff-3222-4210-acc5-1e22d92d3080
+                        Position: {X: -0.334, Y: 0.1, Z: 0.5586374}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 8fca6a7b-8497-4223-b9d0-39b8b5abc5da
+                Name: Marker_1_1
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 44b5f9fd-9ac5-4308-9c99-48c129b55b34
+                        Position: {X: 0.559, Y: 0.1, Z: 0.5586374}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 99db957a-808f-4528-ab33-109f3115f0cc
+                Name: Marker_6_7
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 5452c102-6213-42c8-8091-bd55a0da98c8
+                        Position: {X: -0.562, Y: 0.1, Z: -0.78288543}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: 9c51a988-677a-40e3-889a-db7017db8b37
+                Name: Marker_5_2
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 95bd2c09-e2a5-4aa2-9a0b-24593aa26095
+                        Position: {X: -0.334, Y: 0.1, Z: 0.33139658}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: a2ba08da-0ced-4621-9f8e-f7c9e7437801
+                Name: Marker_5_5
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 1769abbc-c4e3-48c0-ad6d-a18e4adce4b4
+                        Position: {X: -0.334, Y: 0.1, Z: -0.333446}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: a3e2db8e-3682-429a-97b8-dfb31a04164e
+                Name: Marker_3_2
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 90a5b64d-c024-407a-9b7c-db59e499f498
+                        Position: {X: 0.112, Y: 0.1, Z: 0.33139658}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: b02acda6-410a-477a-bf0b-b587afe00851
+                Name: Marker_2_7
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 82a98595-0748-4e51-aa56-cdc4555447fb
+                        Position: {X: 0.329, Y: 0.1, Z: -0.78288543}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: b0977f02-1132-4115-ae73-67bdba75e743
+                Name: Camera
+                Components:
+                    99138f9e601bc9ec4c29b6e32b3694d4: !TransformComponent
+                        Id: af7c23b0-7ae7-4be0-b85d-bd5a5f1bd595
+                        Position: {X: 0.871, Y: 2.588, Z: 0.0}
+                        Rotation: {X: -0.4158727, Y: 0.5718828, Z: 0.4158727, W: 0.5718828}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    354a1ce61ebedc9a6a924d129caebcdf: !CameraComponent
+                        Id: 748e6239-8585-4d4a-9f81-e3a6e53b0c6a
+                        Name: null
+                        Projection: Perspective
+                        Slot: 407b5111-28b9-4aaa-b6ea-664f51cc06a7
+                    10d2a1578ef1fc9627e2be572491c04d: !Chess3d.OrbitCameraController,Chess3d
+                        Id: 023c499d-3044-4990-bdfc-472407371666
+        -   Entity:
+                Id: b2aa0065-3a99-40f0-8fb3-7e580ad2b1d3
+                Name: Ground
+                Components:
+                    2f7d4f125f44db637d1790835e47225f: !TransformComponent
+                        Id: 329e8c74-a864-4735-95db-901c07070227
+                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    47180e3937e27da38e29ef65c0675bf6: !ModelComponent
+                        Id: 78cbc45c-5d36-4b65-8ce2-71dd078d4565
+                        Model: 4b42e759-c38e-4ac8-9893-230c3cfe07d3:Ground
+                        Materials: {}
+        -   Entity:
+                Id: b2e9e055-2918-420e-afce-689d87b3f1df
+                Name: Marker_6_3
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 849b7d5a-d43a-4c0c-8ad7-8ae674547677
+                        Position: {X: -0.562, Y: 0.1, Z: 0.11395308}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: b917e798-a96b-468a-91cc-d569475f589d
+                Name: Marker_2_3
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 3cca06c7-a966-4e12-aa08-903127c2f208
+                        Position: {X: 0.329, Y: 0.1, Z: 0.11395308}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: bbf9730f-71d1-4db0-ac0d-6e43ad15ec81
+                Name: Marker_7_7
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: b7e648d4-e1ec-48fa-9337-0bf466255ca7
+                        Position: {X: -0.787, Y: 0.1, Z: -0.78288543}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: bffc7f22-3120-4a91-9b4e-eed9b32a4eba
+                Name: Marker_3_5
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: eb0db84a-c7cc-4a33-a01e-f0a69f8a3683
+                        Position: {X: 0.112, Y: 0.1, Z: -0.333446}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: c1e4df26-5b41-47ee-a308-468902a866f5
+                Name: Marker_5_3
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 55372a5e-b93d-474f-8b99-4513527d6ab3
+                        Position: {X: -0.334, Y: 0.1, Z: 0.11395308}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: c9f7f6cc-ea7c-4123-b19c-d29f8c2a719e
+                Name: Marker_6_1
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: ebca23d3-9e5a-4fe2-a0df-21ac5acea0f7
+                        Position: {X: -0.562, Y: 0.1, Z: 0.5586374}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Folder: null
+            Entity:
+                Id: cb8eb99a-5842-47f8-aab7-be0e2a145c9a
+                Name: Marker_0_4
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: d5616636-a933-484c-8752-d1bdecf4c543
+                        Position: {X: 0.78535074, Y: 0.1, Z: -0.11477377}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: cc56a7a7-d929-4353-890d-24ee96e232a7
+                Name: Marker_4_0
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 3ce75dbd-7532-4fc1-94de-04ce9483312a
+                        Position: {X: -0.112, Y: 0.1, Z: 0.78789693}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: cd66500c-29a5-4566-9f75-035564040cf6
+                Name: Directional light
+                Components:
+                    36aa253ba991d824fbec37875388f736: !TransformComponent
+                        Id: e0e200c7-94fb-4be1-b165-c203aeb0ae04
+                        Position: {X: 0.0, Y: 2.0, Z: 1.0397232}
+                        Rotation: {X: 1.131334E-08, Y: -0.9659258, Z: -0.25881904, W: -4.222196E-08}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    e6f4f25406a39ae2ddf5460e92e4c84b: !LightComponent
+                        Id: c7ebab69-7350-49e3-ba4f-5cfa4b9a98e0
+                        Type: !LightDirectional
+                            Color: !ColorRgbProvider
+                                Value: {R: 1.0, G: 1.0, B: 1.0}
+                            Shadow:
+                                Enabled: true
+                                Filter: !LightShadowMapFilterTypePcf
+                                    FilterSize: Filter5x5
+                                Size: Large
+                                DepthRange: {}
+                                PartitionMode: !LightDirectionalShadowMap.PartitionLogarithmic {}
+                                ComputeTransmittance: false
+                                BiasParameters: {}
+                        Intensity: 20.0
+        -   Folder: null
+            Entity:
+                Id: cd6f5497-6933-4968-af84-b3f3dacc9751
+                Name: Marker_0_5
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 0fa7237d-a212-4c22-a247-72f2a43daec1
+                        Position: {X: 0.78535074, Y: 0.1, Z: -0.333446}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: d23fd808-1d8c-477a-b27e-edebae9f767d
+                Name: Marker_3_1
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: a691394e-eccf-4aba-9aaf-35b5d411a8ee
+                        Position: {X: 0.112, Y: 0.1, Z: 0.5586374}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: d827ec7a-ec94-40a2-b22f-b2ba87ddb852
+                Name: Marker_3_7
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 9c2a27c7-c408-4d7e-9e65-e0078ac9cee0
+                        Position: {X: 0.112, Y: 0.1, Z: -0.78288543}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: ecd49937-a95f-4e4a-98a3-48cf425c324e
+                Name: Marker_7_6
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 85ddae4c-9404-416c-824e-aae27ed198a4
+                        Position: {X: -0.787, Y: 0.1, Z: -0.56269187}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Folder: null
+            Entity:
+                Id: f03c76ae-50fb-4425-9c6b-e29c6d6356e6
+                Name: Marker_0_6
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 65be7ce2-e355-45d7-a82a-a5bac72193a2
+                        Position: {X: 0.78535074, Y: 0.1, Z: -0.56269187}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: f1f90ec5-fd9a-4885-a91e-1c697247a13e
+                Name: Marker_5_0
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: ec28c24e-ff4b-42e5-8c69-5963d47faf93
+                        Position: {X: -0.33359677, Y: 0.1, Z: 0.78789693}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: f339d5ac-01d0-4163-8f76-129d93c2947b
+                Name: Marker_2_1
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 4ab06688-dd22-4cd9-be8b-d5c279497c16
+                        Position: {X: 0.329, Y: 0.1, Z: 0.5586374}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: f40f232b-0006-49c9-a5fe-e371316f08a8
+                Name: Marker_7_5
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: bb90cc86-3b33-4505-97d3-c3b070be9e1f
+                        Position: {X: -0.787, Y: 0.1, Z: -0.333446}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: f52f6c85-fd6d-47e2-a5ee-f62a643d5be0
+                Name: Board
+                Components:
+                    9e3fd2f7d03034f3cdf96f2ed8fe75a4: !TransformComponent
+                        Id: b755aaf3-abb6-42b0-bc0f-767bcc07d886
+                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
+                        Rotation: {X: -0.49999997, Y: 0.49999997, Z: 0.49999997, W: 0.49999997}
+                        Scale: {X: 0.05, Y: 0.05, Z: 0.05}
+                        Children: {}
+                    5d20174f32304811f837234cbe3836f3: !ModelComponent
+                        Id: 898f42a0-461e-4d36-af2c-163c7f9575ef
+                        Model: aa9f2117-1167-4567-ad01-6171276f3cfa:Chess/BoardModel
+                        Materials: {}
+                    5e8e1f80c03624b99e678192fa53687a: !Stride.BepuPhysics.StaticComponent,Stride.BepuPhysics
+                        Id: c17722c2-0f58-4aeb-9c17-f0a294e37237
+                        Collider: !Stride.BepuPhysics.Definitions.Colliders.CompoundCollider,Stride.BepuPhysics
+                            Colliders:
+                                9ec6ff6b0b7cd1403f7707d06b8ede0f: !Stride.BepuPhysics.Definitions.Colliders.BoxCollider,Stride.BepuPhysics
+                                    Mass: 1.0
+                                    PositionLocal: {X: 0.0, Y: 0.0, Z: 0.0}
+                                    RotationLocal: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                                    Size: {X: 2.0, Y: 2.0, Z: 0.2}
+                        SpringFrequency: 30.0
+                        SpringDampingRatio: 3.0
+                        FrictionCoefficient: 1.0
+                        MaximumRecoveryVelocity: 1000.0
+                        CollisionGroup: {}
+                        ContactEventHandler: null
+                    bc4f8ce4046f5b8c9423f754821d955d: !Chess3d.BoardManager,Chess3d
+                        Id: e10438b2-f85a-4134-bd16-8c0b8ad1d29f
+                        Camera: ref!! 748e6239-8585-4d4a-9f81-e3a6e53b0c6a
+        -   Entity:
+                Id: f7defa01-3869-46a5-91ea-6764a9704b4d
+                Name: Marker_3_0
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: fbc2bd80-6790-4dc6-be7a-14dba51e431a
+                        Position: {X: 0.112, Y: 0.1, Z: 0.78789693}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: f9c2a315-3f20-4dfd-9836-48d0c64ffbb4
+                Name: Marker_2_4
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 52981d94-a2e4-4c95-be15-7d510df06148
+                        Position: {X: 0.329, Y: 0.1, Z: -0.11477377}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: f9cefbe9-91da-484e-83b7-66e5767cd679
+                Name: Marker_4_1
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: ab3f8dc4-1f62-446c-8ed6-65e90421b8bc
+                        Position: {X: -0.112, Y: 0.1, Z: 0.5586374}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: fc7e5c84-0832-4463-b9d3-c8a257017c3a
+                Name: Marker_1_7
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: 1ffbcef6-5d9b-4120-939b-93b4681f1095
+                        Position: {X: 0.559, Y: 0.1, Z: -0.78288543}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+        -   Entity:
+                Id: ffe0d85c-a37f-4d5a-a977-566f30dab2c8
+                Name: Marker_2_5
+                Components:
+                    28531e2f1c0939f12e2a2d8dea02633f: !TransformComponent
+                        Id: aab90074-eb82-473c-8310-eecc8d6a7185
+                        Position: {X: 0.329, Y: 0.1, Z: -0.333446}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}

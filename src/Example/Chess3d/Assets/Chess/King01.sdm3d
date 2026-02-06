@@ -1,0 +1,15 @@
+!Model
+Id: 18311b1d-1c94-4747-9adb-ca548b18805c
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file King01.obj
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    d3522aba2857fa2bc436e760b42a0eac:
+        Name: wooddark5.002
+        MaterialInstance:
+            Material: 54070d0a-03d9-407d-81e0-b5a6fc486b70:Chess/wooddark5.002
+Modifiers: {}
+~SourceHashes:
+    1dbc2fd912a379d819143eda02a04908~King01.obj: d53b90597db4150b50841a63c709611c

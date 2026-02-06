@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="src/SUIM_SPECIFICATION.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/SUIM/SUIM.csproj" />
+  </Folder>
+  <Folder Name="/src/Example/">
+    <Project Path="src/Example/Chess3d.Windows/Chess3d.Windows.csproj" />
+    <Project Path="src/Example/Chess3d/Chess3d.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SUIM.Tests/SUIM.Tests.csproj" />
+  </Folder>
+</Solution>

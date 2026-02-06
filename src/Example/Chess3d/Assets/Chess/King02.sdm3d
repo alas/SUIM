@@ -1,0 +1,15 @@
+!Model
+Id: cdd2cab6-3e71-4b62-9468-aeeb7695762e
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file King02.obj
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    e4d7e54defcd98655b26561207b05b2b:
+        Name: woodlight5.002
+        MaterialInstance:
+            Material: a41f0fac-8e88-49a7-ae54-72b13fc041af:Chess/woodlight5.002
+Modifiers: {}
+~SourceHashes:
+    9d73767efbe0b0cb620d44a80e8c9074~King02.obj: e68e29ec051a69b82ce6e5cc1c275656

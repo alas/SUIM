@@ -1,0 +1,15 @@
+!Model
+Id: 3ac775ae-a28a-4268-b809-09fbf3852455
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file Rook02.obj
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    080cc080f2bbb7c8e7de5951a310ddff:
+        Name: woodlight1.002
+        MaterialInstance:
+            Material: a205b7bb-ff4d-4b1d-aa37-d4a123ed6f89:Chess/woodlight1.002_3
+Modifiers: {}
+~SourceHashes:
+    4219be8bd1611981837dcd909f151de6~Rook02.obj: 2fe16fe2fe4451835e72f3dd87179bba

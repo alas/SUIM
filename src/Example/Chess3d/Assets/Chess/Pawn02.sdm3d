@@ -1,0 +1,15 @@
+!Model
+Id: 7d665abf-2bca-45b9-922f-1d34bbfde588
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file Pawn02.obj
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    71bd0c572611b9194a011338b96c4e02:
+        Name: woodlight0.002
+        MaterialInstance:
+            Material: d062048c-0c70-4969-93f1-6a8c80aa2e14:Chess/woodlight0.002
+Modifiers: {}
+~SourceHashes:
+    fccf0a42c51db3215881de0be200a846~Pawn02.obj: 7770aa2864a2aee969a5f95550985db8

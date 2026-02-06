@@ -1,0 +1,35 @@
+!Package
+SerializedVersion: {Assets: 3.1.0.0}
+Meta:
+    Name: Chess3d.Windows
+    Version: 1.0.0
+    Authors: []
+    Owners: []
+    Dependencies: null
+AssetFolders:
+    -   Path: !dir Assets
+ResourceFolders:
+    - !dir Resources
+OutputGroupDirectories: {}
+ExplicitFolders: []
+Bundles: []
+TemplateFolders: []
+RootAssets:
+    - 0797564b-8ba4-46c6-a931-950418d9c7ee:Chess/Bishop02
+    - 17b5942d-ec18-415d-994c-6db2add6e1ec:Chess/Knight01
+    - 18311b1d-1c94-4747-9adb-ca548b18805c:Chess/King01
+    - 2d6327f4-ccee-4f8b-8ae3-332e4e24ac92:Chess/woodlight1.002
+    - 3ac775ae-a28a-4268-b809-09fbf3852455:Chess/Rook02
+    - 41e28788-44a4-4e60-823e-c2eb1e6ae55f:Chess/Queen02
+    - 42c3ab54-57c3-4ef5-a469-c716f3ab4743:Chess/wooddark4.002
+    - 63f052b8-ec4d-4acb-b430-dfcc8320a05f:Chess/Pawn01
+    - 6f1b7ace-e911-4d11-b453-871ba2e18482:Chess/wooddark1.002
+    - 7beb5baf-4d88-41c0-95cf-39112570a9d8:Chess/Queen01
+    - 7d665abf-2bca-45b9-922f-1d34bbfde588:Chess/Pawn02
+    - 80839006-f8a0-4e2b-a9ea-4c9b364d0150:Chess/woodlight1.002_2
+    - 996de5ee-cf08-48b9-8e72-42c516d72934:Chess/Rook01
+    - a853a8a6-5048-4a20-9dfd-3535b06afbe8:Chess/wooddark1.002_3
+    - b35b2ccd-1668-4d9a-a957-2a217881e0f4:Chess/Knight02
+    - c8cb9dca-8fb7-4afd-9e6c-2a188ce62315:Chess/Bishop01
+    - cc2c6e22-fac1-4370-b42a-6d74cf96a62b:Chess/wooddark1.002_2
+    - cdd2cab6-3e71-4b62-9468-aeeb7695762e:Chess/King02

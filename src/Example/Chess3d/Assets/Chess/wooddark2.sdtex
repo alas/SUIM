@@ -1,0 +1,8 @@
+!Texture
+Id: 007f8e14-98ef-44c5-856b-778584619987
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file wooddark2.jpg
+Type: !ColorTextureType
+    ColorKeyColor: {R: 255, G: 0, B: 255, A: 255}
+    PremultiplyAlpha: false

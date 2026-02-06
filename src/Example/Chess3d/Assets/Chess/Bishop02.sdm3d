@@ -1,0 +1,15 @@
+!Model
+Id: 0797564b-8ba4-46c6-a931-950418d9c7ee
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file Bishop02.obj
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    d0443b7f9e5fff87e0795a07c41d5025:
+        Name: woodlight3.002
+        MaterialInstance:
+            Material: 3a79fc7b-3d36-4e4c-94ad-da56842ae9d2:Chess/woodlight3.002
+Modifiers: {}
+~SourceHashes:
+    271b0382c481de023eab1ba5d4914d20~Bishop02.obj: 0bcb2692c66a5fb1580855e6a005d4fc

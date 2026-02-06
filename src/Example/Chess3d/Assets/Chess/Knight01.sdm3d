@@ -1,0 +1,15 @@
+!Model
+Id: 17b5942d-ec18-415d-994c-6db2add6e1ec
+SerializedVersion: {Stride: 2.0.0.0}
+Tags: []
+Source: !file Knight01.obj
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    1805c2bd116cf674ee6f0c6d1ab3aeb3:
+        Name: wooddark2.002
+        MaterialInstance:
+            Material: ed6a574c-18e3-46c1-8250-1231b503dcc5:Chess/wooddark2.002
+Modifiers: {}
+~SourceHashes:
+    25af91af1a00946f020c5a4a63000c4e~Knight01.obj: 55142259c0db6673048ebca05806ec5f
