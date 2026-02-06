@@ -2,6 +2,7 @@ namespace SUIM;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
+using System.Globalization;
 
 public class SUIMMarkupParser(Dictionary<string, object> model)
 {
@@ -86,6 +87,21 @@ public class SUIMMarkupParser(Dictionary<string, object> model)
             case "id":
                 element.Id = value;
                 break;
+            case "x":
+                element.X = int.Parse(value);
+                break;
+            case "y":
+                element.Y = int.Parse(value);
+                break;
+            case "opacity":
+                element.Opacity = float.Parse(value, CultureInfo.InvariantCulture);
+                break;
+            case "z-index":
+                element.ZIndex = int.Parse(value);
+                break;
+            case "visibility":
+                element.Visibility = value;
+                break;
             case "halign" or "horizontalalignment":
                 element.HorizontalAlignment = Enum.Parse<HorizontalAlignment>(value, true);
                 break;
@@ -118,6 +134,9 @@ public class SUIMMarkupParser(Dictionary<string, object> model)
                 break;
             case string x when x.StartsWith("on"):
                 element.On(x.Substring(2), GetHandler(value));
+                break;
+            case "spacing" when element is LayoutElement le:
+                le.Spacing = int.Parse(value);
                 break;
             default:
                 // Specific attributes
@@ -154,15 +173,6 @@ public class SUIMMarkupParser(Dictionary<string, object> model)
                             break;
                     }
                 }
-                else if (element is LayoutElement le)
-                {
-                    switch (name)
-                    {
-                        case "spacing":
-                            le.Spacing = int.Parse(value);
-                            break;
-                    }
-                }
                 else if (element is BaseText text)
                 {
                     switch (name)
@@ -189,7 +199,14 @@ public class SUIMMarkupParser(Dictionary<string, object> model)
                     switch (name)
                     {
                         case "type":
-                            input.Type = Enum.Parse<InputType>(value, true);
+                            if (value == "datetime-local")
+                            {
+                                input.Type = InputType.DatetimeLocal;
+                            }
+                            else
+                            {
+                                input.Type = Enum.Parse<InputType>(value, true);
+                            }
                             break;
                         case "value":
                             input.Value = value;
