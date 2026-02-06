@@ -133,15 +133,6 @@ public class SUIMMarkupParser(Dictionary<string, object> model)
                             break;
                     }
                 }
-                else if (element is LayoutElement le)
-                {
-                    switch (name)
-                    {
-                        case "spacing":
-                            le.Spacing = int.Parse(value);
-                            break;
-                    }
-                }
                 else if (element is Grid grid)
                 {
                     switch (name)
@@ -160,6 +151,15 @@ public class SUIMMarkupParser(Dictionary<string, object> model)
                     {
                         case "lastchildfill":
                             dock.LastChildFill = bool.Parse(value);
+                            break;
+                    }
+                }
+                else if (element is LayoutElement le)
+                {
+                    switch (name)
+                    {
+                        case "spacing":
+                            le.Spacing = int.Parse(value);
                             break;
                     }
                 }
