@@ -1405,31 +1405,30 @@ Text after
     [Fact]
     public void Parse_BorderAttribute_WithThicknessAndColorInStyle()
     {
-        var markup =
-@"<suim>
-    <style>
-    .myclass {
-	    width: 500,
-	    height: 400,
-	    border: 5 #FF0000
-    }
-    </style>
-    <div class=""myclass"">
-        <label text=""Bordered Content"" />
-    </div>
-</suim>";
+        var markup = @"<suim>
+                <style>
+                .myclass {
+	                width: 500,
+	                height: 400,
+	                border: 5 #FF0000
+                }
+                </style>
+                <div class=""myclass"">
+                    <label text=""Bordered Content"" />
+                </div>
+            </suim>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
-        // The parser extracts the div from the suim wrapper
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
+        var border = element as Border;
+        Assert.NotNull(border);
+        Assert.Equal("#FF0000", border.BorderColor);
+        Assert.Single(border.Children);
+
+        var div = border.Children[0] as Div;
+        Assert.NotNull(div);
         Assert.Equal("myclass", div.Class);
         Assert.Single(div.Children);
-
-        var border = div.Children[0] as Border;
-        Assert.NotNull(border);
-        Assert.Single(border.Children);
-        Assert.Equal("#FF0000", border.BorderColor);
+        Assert.IsType<Label>(div.Children[0]);
     }
 
     // ============== SUIM WRAPPER TESTS ==============
@@ -1494,7 +1493,7 @@ Text after
     public void Parse_Suim_IgnoresModelAndStyle()
     {
         var markup = @"<suim>
-    <model>{ value: ""ignored"" }</model>
+    <model>{ ""value"": ""ignored"" }</model>
     <style>.button { color: red; }</style>
     <button><label text=""Click"" /></button>
 </suim>";
@@ -1562,4 +1561,229 @@ Text after
         var label = (Label)stack.Children[0];
         Assert.Equal("This is root", label.Text);
     }
+
+    // ============== MODEL PARSING TESTS ==============
+
+    [Fact]
+    public void Parse_Suim_WithJsonModel()
+    {
+        var markup = @"<suim>
+    <model>{ ""name"": ""John"", ""age"": 30 }</model>
+    <div />
+</suim>";
+        var (element, model) = new MarkupParser().Parse(markup);
+
+        Assert.NotNull(model);
+        Assert.Equal("John", model!.name);
+        Assert.Equal(30, model.age);
+    }
+
+    [Fact]
+    public void Parse_Suim_WithJsonModelAndProvidedModel()
+    {
+        var providedModel = new { firstName = "Jane", age = 25 };
+        var markup = @"<suim>
+    <model>{ ""lastName"": ""Doe"", ""age"": 30 }</model>
+    <div />
+</suim>";
+        var (element, model) = new MarkupParser(providedModel).Parse(markup);
+
+        Assert.NotNull(model);
+        // From provided model
+        Assert.Equal("Jane", model!.firstName);
+        // From JSON (overrides provided)
+        Assert.Equal("Doe", model.lastName);
+        Assert.Equal(30, model.age); // JSON value overrides provided value
+    }
+
+    [Fact]
+    public void Parse_Suim_WithJsonModelStringProperty()
+    {
+        var markup = @"<suim>
+    <model>{ ""title"": ""Hello World"", ""description"": ""Test"" }</model>
+    <label text=""@title"" />
+</suim>";
+        var (element, model) = new MarkupParser().Parse(markup);
+
+        Assert.NotNull(model);
+        Assert.Equal("Hello World", model!.title);
+        Assert.Equal("Test", model.description);
+        
+        Assert.IsType<Label>(element);
+        var label = (Label)element;
+        Assert.Equal("Hello World", label.Text);
+    }
+
+    [Fact]
+    public void Parse_Suim_WithJsonModelNumberProperty()
+    {
+        var markup = @"<suim>
+    <model>{ ""width"": 500, ""height"": 300 }</model>
+    <div width=""@width"" height=""@height"" />
+</suim>";
+        var (_, model) = new MarkupParser().Parse(markup);
+
+        Assert.NotNull(model);
+        Assert.Equal(500, model!.width);
+        Assert.Equal(300, model.height);
+    }
+
+    [Fact]
+    public void Parse_Suim_WithJsonModelBooleanProperty()
+    {
+        var markup = @"<suim>
+    <model>{ ""isVisible"": true, ""isEnabled"": false }</model>
+    <div />
+</suim>";
+        var (_, model) = new MarkupParser().Parse(markup);
+
+        Assert.NotNull(model);
+        Assert.True(model!.isVisible);
+        Assert.False(model.isEnabled);
+    }
+
+    [Fact]
+    public void Parse_Suim_WithJsonModelArrayProperty()
+    {
+        var markup = @"<suim>
+    <model>{ ""items"": [1, 2, 3], ""names"": [""Alice"", ""Bob""] }</model>
+    <div />
+</suim>";
+        var (_, model) = new MarkupParser().Parse(markup);
+
+        Assert.NotNull(model);
+        
+        var items = model!.items as object[];
+        Assert.NotNull(items);
+        Assert.Equal(3, items.Length);
+        
+        var names = model.names as object[];
+        Assert.NotNull(names);
+        Assert.Equal(2, names.Length);
+    }
+
+    [Fact]
+    public void Parse_Suim_WithJsonModelNullProperty()
+    {
+        var markup = @"<suim>
+    <model>{ ""value"": null }</model>
+    <div />
+</suim>";
+        var (_, model) = new MarkupParser().Parse(markup);
+
+        Assert.NotNull(model);
+        Assert.Null(model!.value);
+    }
+
+    [Fact]
+    public void Parse_Suim_WithEmptyJsonModel()
+    {
+        var markup = @"<suim>
+    <model>{ }</model>
+    <div />
+</suim>";
+        var (_, model) = new MarkupParser().Parse(markup);
+
+        // Should create an observable object even if empty
+        Assert.NotNull(model);
+    }
+
+    [Fact]
+    public void Parse_Suim_WithNoModel()
+    {
+        var providedModel = new { value = "test" };
+        var markup = @"<suim>
+    <div />
+</suim>";
+        var (_, model) = new MarkupParser(providedModel).Parse(markup);
+
+        // Should only have provided model properties
+        Assert.NotNull(model);
+        Assert.Equal("test", model!.value);
+    }
+
+    [Fact]
+    public void Parse_Suim_WithInvalidJsonModel()
+    {
+        var markup = @"<suim>
+    <model>{ invalid json }</model>
+    <div />
+</suim>";
+        
+        Assert.Throws<InvalidOperationException>(() => new MarkupParser().Parse(markup));
+    }
+
+    [Fact]
+    public void Parse_Suim_ModelWithComplexObject()
+    {
+        var markup = @"<suim>
+    <model>{ ""user"": { ""name"": ""John"", ""age"": 30 }, ""settings"": { ""theme"": ""dark"" } }</model>
+    <div />
+</suim>";
+        var (_, model) = new MarkupParser().Parse(markup);
+
+        Assert.NotNull(model);
+        var user = model!.user;
+        Assert.NotNull(user);
+        
+        var settings = model.settings;
+        Assert.NotNull(settings);
+    }
+
+    [Fact]
+    public void Parse_Suim_ModelPropertiesAccessible()
+    {
+        var markup = @"<suim>
+    <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
+    <button><label text=""@buttonText"" /></button>
+</suim>";
+        var (element, model) = new MarkupParser().Parse(markup);
+
+        Assert.IsType<Button>(element);
+        var button = (Button)element;
+        Assert.Single(button.Children);
+        
+        Assert.NotNull(model);
+        Assert.Equal("Click Me", model!.buttonText);
+        Assert.Equal(42, model.count);
+    }
+
+    [Fact]
+    public void Parse_Suim_MergesProvidedAndJsonModel()
+    {
+        var providedModel = new { existing = "value" };
+        var markup = @"<suim>
+    <model>{ ""newProp"": ""new"" }</model>
+    <div />
+</suim>";
+        var (_, model) = new MarkupParser(providedModel).Parse(markup);
+
+        Assert.NotNull(model);
+        Assert.Equal("value", model!.existing);
+        Assert.Equal("new", model.newProp);
+    }
+
+    [Fact]
+    public void Parse_Suim_ModelWithMixedTypes()
+    {
+        var markup = @"<suim>
+    <model>{ ""str"": ""text"", ""num"": 123, ""bool"": true, ""arr"": [1, 2], ""obj"": { ""key"": ""val"" }, ""nil"": null }</model>
+    <div />
+</suim>";
+        var (element, model) = new MarkupParser().Parse(markup);
+
+        Assert.NotNull(model);
+        Assert.Equal("text", model!.str);
+        Assert.Equal(123, model.num);
+        Assert.True(model.@bool);
+        Assert.Null(model.nil);
+        
+        var arr = model.arr as object[];
+        Assert.NotNull(arr);
+        Assert.Equal(2, arr.Length);
+        
+        var obj = model.obj;
+        Assert.NotNull(obj);
+    }
 }
+

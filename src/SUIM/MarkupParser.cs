@@ -1,12 +1,15 @@
 namespace SUIM;
 
 using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Text.Json;
 using System.Xml.Linq;
 using SUIM.Components;
 
 public class MarkupParser(object? model = null)
 {
-    private readonly dynamic? model = model == null ? null : Create(model);
+    private dynamic? model = model == null ? null : Create(model);
 
     public (UIElement, dynamic?) Parse(string markup)
     {
@@ -16,13 +19,139 @@ public class MarkupParser(object? model = null)
         var doc = XDocument.Parse(expandedMarkup);
         var root = doc.Root!;
 
-        // If root element is "suim", extract the actual root element
+        // If root element is "suim", extract the model and actual root element
         if (root.Name.LocalName.Equals("suim", StringComparison.OrdinalIgnoreCase))
         {
+            var modelJson = ExtractModelFromSuimWrapper(root);
+            if (!string.IsNullOrEmpty(modelJson))
+            {
+                model = MergeModels(model, modelJson);
+            }
             root = ExtractRealRootFromSuimWrapper(root);
         }
 
         return (ParseElement(root), model);
+    }
+
+    private dynamic? MergeModels(dynamic? existingModel, string modelJson)
+    {
+        try
+        {
+            // Parse JSON into a dictionary
+            var jsonObject = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(modelJson);
+            if (jsonObject == null)
+            {
+                return existingModel;
+            }
+
+            // Convert JsonElement objects to standard .NET types
+            var modelDict = ConvertJsonElementDictionary(jsonObject);
+
+            // If no existing model, create from JSON
+            if (existingModel == null)
+            {
+                return CreateDynamicFromDictionary(modelDict);
+            }
+
+            // Merge: extract properties from existing model, then update with JSON values
+            var mergedDict = ExtractPropertiesAsDictionary(existingModel);
+            foreach (var kvp in modelDict)
+            {
+                mergedDict[kvp.Key] = kvp.Value;
+            }
+
+            return CreateDynamicFromDictionary(mergedDict);
+        }
+        catch (JsonException ex)
+        {
+            throw new InvalidOperationException($"Failed to parse model JSON: {ex.Message}", ex);
+        }
+    }
+
+    private Dictionary<string, object?> ConvertJsonElementDictionary(Dictionary<string, JsonElement> jsonObject)
+    {
+        var result = new Dictionary<string, object?>();
+        foreach (var kvp in jsonObject)
+        {
+            result[kvp.Key] = ConvertJsonElement(kvp.Value);
+        }
+        return result;
+    }
+
+    private object? ConvertJsonElement(JsonElement element)
+    {
+        return element.ValueKind switch
+        {
+            JsonValueKind.String => element.GetString(),
+            JsonValueKind.Number => element.TryGetInt32(out var intVal) ? intVal : element.GetDouble(),
+            JsonValueKind.True => true,
+            JsonValueKind.False => false,
+            JsonValueKind.Null => null,
+            JsonValueKind.Array => element.EnumerateArray().Select(ConvertJsonElement).ToArray(),
+            JsonValueKind.Object => ConvertJsonElementDictionary(
+                element.EnumerateObject().ToDictionary(p => p.Name, p => p.Value)
+            ),
+            _ => null
+        };
+    }
+
+    private Dictionary<string, object?> ExtractPropertiesAsDictionary(dynamic? model)
+    {
+        var dict = new Dictionary<string, object?>();
+        if (model == null)
+        {
+            return dict;
+        }
+
+        // If it's an ObservableObject, try to extract its properties
+        if (model is ObservableObject oo)
+        {
+            var modelType = model.GetType();
+            var propertiesField = modelType.GetField("_properties", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            
+            if (propertiesField?.GetValue(model) is Dictionary<string, object?> properties)
+            {
+                return new Dictionary<string, object?>(properties);
+            }
+        }
+
+        // Otherwise, extract using reflection
+        foreach (var prop in model.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+        {
+            if (prop.CanRead)
+            {
+                dict[prop.Name] = prop.GetValue(model);
+            }
+        }
+
+        return dict;
+    }
+
+    private dynamic CreateDynamicFromDictionary(Dictionary<string, object?> dict)
+    {
+        var observable = new ObservableObject();
+        // Set properties directly into the observable
+        foreach (var kvp in dict)
+        {
+            observable.SetValue(kvp.Key, kvp.Value);
+        }
+        return observable;
+    }
+
+    private static string? ExtractModelFromSuimWrapper(XElement suimElement)
+    {
+        var modelElement = suimElement.Elements()
+            .FirstOrDefault(e => e.Name.LocalName.Equals("model", StringComparison.OrdinalIgnoreCase));
+        
+        if (modelElement == null)
+        {
+            return null;
+        }
+
+        // Get the content of the model element
+        var content = modelElement.Value.Trim();
+        return string.IsNullOrEmpty(content) ? null : content;
     }
 
     private static XElement ExtractRealRootFromSuimWrapper(XElement suimElement)
