@@ -9,16 +9,16 @@ public class Border : UIElement
     {
         if (name.Equals("thickness", StringComparison.OrdinalIgnoreCase))
         {
-            BorderThickness = Thickness.Parse(Convert.ToString(value));
+            BorderThickness = Thickness.Parse(value as string);
         }
         else if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
         {
-            BorderColor = Convert.ToString(value);
+            BorderColor = value as string;
         }
         else if (name.Equals("border", StringComparison.OrdinalIgnoreCase))
         {
              // Parse shorthand: "10 White" or "10 5 0 2 White"
-             var str = Convert.ToString(value);
+            var str = value as string;
              ParseShorthand(str);
         }
         else

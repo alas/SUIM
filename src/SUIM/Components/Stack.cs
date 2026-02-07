@@ -9,12 +9,12 @@ public class Stack : LayoutElement
     {
         if (name.Equals("orientation", StringComparison.OrdinalIgnoreCase))
         {
-            var str = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
+            var str = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
             Orientation = Enum.Parse<Orientation>(str, true);
         }
         else if (name.Equals("clip", StringComparison.OrdinalIgnoreCase))
         {
-            Clip = Convert.ToBoolean(value);
+            Clip = value is bool b ? b : Convert.ToBoolean(value);
         }
         else
         {

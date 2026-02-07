@@ -11,7 +11,7 @@ public class Select : UIElement
     {
         if (name.Equals("multiple", StringComparison.OrdinalIgnoreCase))
         {
-            Multiple = Convert.ToBoolean(value);
+            Multiple = value is bool b ? b : Convert.ToBoolean(value);
         }
         else
         {
@@ -28,7 +28,7 @@ public class Option : UIElement
     {
         if (name.Equals("value", StringComparison.OrdinalIgnoreCase))
         {
-            Value = Convert.ToString(value);
+            Value = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else
         {

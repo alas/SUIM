@@ -11,23 +11,23 @@ public class BaseText : UIElement
     {
         if (name.Equals("text", StringComparison.OrdinalIgnoreCase))
         {
-            Text = Convert.ToString(value);
+            Text = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Equals("font", StringComparison.OrdinalIgnoreCase))
         {
-            Font = Convert.ToString(value);
+            Font = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase))
         {
-            FontSize = Convert.ToInt32(value);
+            FontSize = value is int i ? i : Convert.ToInt32(value);
         }
         else if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
         {
-            Color = Convert.ToString(value);
+            Color = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Equals("wrap", StringComparison.OrdinalIgnoreCase))
         {
-            Wrap = Convert.ToBoolean(value);
+            Wrap = value is bool b ? b : Convert.ToBoolean(value);
         }
         else
         {
@@ -46,11 +46,11 @@ public class TextArea : UIElement, IPlaceholder
     {
         if (name.Equals("rows", StringComparison.OrdinalIgnoreCase))
         {
-            Rows = Convert.ToInt32(value);
+            Rows = value is int i ? i : Convert.ToInt32(value);
         }
         else if (name.Equals("columns", StringComparison.OrdinalIgnoreCase))
         {
-            Columns = Convert.ToInt32(value);
+            Columns = value is int i ? i : Convert.ToInt32(value);
         }
         else
         {

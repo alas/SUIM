@@ -14,7 +14,7 @@ public class Input : UIElement, IPlaceholder
     {
         if (name.Equals("type", StringComparison.OrdinalIgnoreCase))
         {
-            var valueStr = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
+            var valueStr = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
             if (valueStr.Equals("datetime-local", StringComparison.OrdinalIgnoreCase))
             {
                 Type = InputType.DatetimeLocal;
@@ -26,23 +26,23 @@ public class Input : UIElement, IPlaceholder
         }
         else if (name.Equals("value", StringComparison.OrdinalIgnoreCase))
         {
-            Value = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
+            Value = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Equals("min", StringComparison.OrdinalIgnoreCase))
         {
-            Min = Convert.ToInt32(value);
+            Min = value is int i ? i : Convert.ToInt32(value);
         }
         else if (name.Equals("max", StringComparison.OrdinalIgnoreCase))
         {
-            Max = Convert.ToInt32(value);
+            Max = value is int i ? i : Convert.ToInt32(value);
         }
         else if (name.Equals("step", StringComparison.OrdinalIgnoreCase))
         {
-            Step = Convert.ToInt32(value);
+            Step = value is int i ? i : Convert.ToInt32(value);
         }
         else if (name.Equals("mask", StringComparison.OrdinalIgnoreCase))
         {
-            Mask = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
+            Mask = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else
         {

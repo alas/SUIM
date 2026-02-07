@@ -9,12 +9,11 @@ public class Image : UIElement
     {
         if (name.Equals("source", StringComparison.OrdinalIgnoreCase))
         {
-            Source = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
+            Source = value as string;
         }
         else if (name.Equals("stretch", StringComparison.OrdinalIgnoreCase))
         {
-            var str = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
-            Stretch = Enum.Parse<ImageStretch>(str, true);
+            Stretch = Enum.Parse<ImageStretch>((value as string)!, true);
         }
         else
         {

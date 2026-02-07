@@ -46,71 +46,75 @@ public abstract class UIElement
     {
         if (name.Equals("id", StringComparison.OrdinalIgnoreCase))
         {
-            Id = Convert.ToString(value);
+            Id = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Equals("x", StringComparison.OrdinalIgnoreCase))
         {
-            X = Convert.ToInt32(value);
+            X = value is int i ? i : Convert.ToInt32(value);
         }
         else if (name.Equals("y", StringComparison.OrdinalIgnoreCase))
         {
-            Y = Convert.ToInt32(value);
+            Y = value is int i ? i : Convert.ToInt32(value);
         }
         else if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase))
         {
-            Opacity = Convert.ToSingle(value);
+            Opacity = value is float f ? f : Convert.ToSingle(value);
         }
         else if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase))
         {
-            ZIndex = Convert.ToInt32(value);
+            ZIndex = value is int i ? i : Convert.ToInt32(value);
         }
         else if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase))
         {
-            Visibility = Convert.ToString(value);
+            Visibility = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Equals("halign", StringComparison.OrdinalIgnoreCase) || name.Equals("horizontalalignment", StringComparison.OrdinalIgnoreCase))
         {
-            HorizontalAlignment = Enum.Parse<HorizontalAlignment>(Convert.ToString(value) ?? throw new ArgumentException($"Attribute '{name}' cannot be '{value}'"), true);
+            var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            HorizontalAlignment = Enum.Parse<HorizontalAlignment>(s, true);
         }
         else if (name.Equals("valign", StringComparison.OrdinalIgnoreCase) || name.Equals("verticalalignment", StringComparison.OrdinalIgnoreCase))
         {
-            VerticalAlignment = Enum.Parse<VerticalAlignment>(Convert.ToString(value) ?? throw new ArgumentException($"Attribute '{name}' cannot be '{value}'"), true);
+            var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            VerticalAlignment = Enum.Parse<VerticalAlignment>(s, true);
         }
         else if (name.Equals("margin", StringComparison.OrdinalIgnoreCase))
         {
-            Margin = Convert.ToString(value);
+            Margin = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Equals("padding", StringComparison.OrdinalIgnoreCase))
         {
-            Padding = Convert.ToString(value);
+            Padding = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase))
         {
-            Background = Convert.ToString(value);
+            Background = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Equals("width", StringComparison.OrdinalIgnoreCase))
         {
-            Width = Convert.ToString(value);
+            Width = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Equals("height", StringComparison.OrdinalIgnoreCase))
         {
-            Height = Convert.ToString(value);
+            Height = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase))
         {
-            Anchor = Enum.Parse<Anchor>(Convert.ToString(value), true);
+            var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            Anchor = Enum.Parse<Anchor>(s, true);
         }
         else if (name.Equals("class", StringComparison.OrdinalIgnoreCase))
         {
-            Class = Convert.ToString(value);
+            Class = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
         {
-            On(name.Substring(2), GetHandler(Convert.ToString(value)));
+            var handlerName = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            On(name.Substring(2), GetHandler(handlerName));
         }
         else if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase))
         {
-            (this as IPlaceholder)?.Placeholder = Convert.ToString(value);
+            (this as IPlaceholder)?.Placeholder = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Contains('.'))
         {
@@ -180,7 +184,7 @@ public class LayoutElement : UIElement
     {
         if (name.Equals("spacing", StringComparison.OrdinalIgnoreCase))
         {
-            Spacing = Convert.ToInt32(value);
+            Spacing = value is int i ? i : Convert.ToInt32(value);
         }
         else
         {

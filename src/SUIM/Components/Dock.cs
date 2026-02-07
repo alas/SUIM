@@ -30,7 +30,7 @@ public class Dock : LayoutElement
     {
         if (name.Equals("lastchildfill", StringComparison.OrdinalIgnoreCase))
         {
-            LastChildFill = Convert.ToBoolean(value);
+            LastChildFill = value is bool b ? b : Convert.ToBoolean(value);
         }
         else
         {

@@ -43,11 +43,11 @@ public class Grid : LayoutElement
     {
         if (name.Equals("columns", StringComparison.OrdinalIgnoreCase))
         {
-            Columns = Convert.ToString(value);
+            Columns = value as string;
         }
         else if (name.Equals("rows", StringComparison.OrdinalIgnoreCase))
         {
-            Rows = Convert.ToString(value);
+            Rows = value as string;
         }
         else
         {
