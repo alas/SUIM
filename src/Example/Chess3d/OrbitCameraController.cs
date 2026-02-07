@@ -75,12 +75,12 @@ public class OrbitCameraController : SyncScript
         }
     }
 
-    private void HandlePitch()
+    private static void HandlePitch()
     {
         //pitch = MathUtil.Clamp(pitch, 20f, 80f);
     }
 
-    private void HandleZoom()
+    private static void HandleZoom()
     {
         //distance -= Input.MouseWheelDelta * ZoomSpeed;
         //distance = MathUtil.Clamp(distance, 2f, 12f);

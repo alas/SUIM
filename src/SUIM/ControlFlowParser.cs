@@ -176,7 +176,7 @@ public class ControlFlowParser(dynamic model)
 
                 var (caseContent, caseLen) = ExtractBlock(blockBody, valStart);
                 
-                if (!matched && object.Equals(switchVal, caseValue))
+                if (!matched && Equals(switchVal, caseValue))
                 {
                     result = caseContent;
                     matched = true;
@@ -308,13 +308,13 @@ public class ControlFlowParser(dynamic model)
         return (string.Empty, 0); // Unbalanced or EOF
     }
 
-    private int SkipWhitespace(string s, int idx)
+    private static int SkipWhitespace(string s, int idx)
     {
         while (idx < s.Length && char.IsWhiteSpace(s[idx])) idx++;
         return idx;
     }
 
-    private bool IsKeyword(string s, int idx, string keyword)
+    private static bool IsKeyword(string s, int idx, string keyword)
     {
         if (idx + keyword.Length > s.Length) return false;
         if (s.Substring(idx, keyword.Length) != keyword) return false;
