@@ -10,34 +10,35 @@ public class Input : UIElement, IPlaceholder
     public int? Max { get; set; }
     public int? Step { get; set; }
 
-    public override void SetAttribute(string name, string value)
+    public override void SetAttribute(string name, object? value)
     {
         switch (name)
         {
             case "type":
-                if (value == "datetime-local")
+                var valueStr = Convert.ToString(value);
+                if (valueStr == "datetime-local")
                 {
                     Type = InputType.DatetimeLocal;
                 }
                 else
                 {
-                    Type = Enum.Parse<InputType>(value, true);
+                    Type = Enum.Parse<InputType>(valueStr, true);
                 }
                 break;
             case "value":
-                Value = value;
+                Value = Convert.ToString(value);
                 break;
             case "min":
-                Min = int.Parse(value);
+                Min = Convert.ToInt32(value);
                 break;
             case "max":
-                Max = int.Parse(value);
+                Max = Convert.ToInt32(value);
                 break;
             case "step":
-                Step = int.Parse(value);
+                Step = Convert.ToInt32(value);
                 break;
             case "mask":
-                Mask = value;
+                Mask = Convert.ToString(value);
                 break;
             default:
                 base.SetAttribute(name, value);

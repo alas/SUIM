@@ -7,15 +7,15 @@ public class Image : UIElement
     public string? Source { get; set; }
     public ImageStretch Stretch { get; set; }
 
-    public override void SetAttribute(string name, string value)
+    public override void SetAttribute(string name, object? value)
     {
         switch (name)
         {
             case "source":
-                Source = value;
+                Source = Convert.ToString(value);
                 break;
             case "stretch":
-                Stretch = Enum.Parse<ImageStretch>(value, true);
+                Stretch = Enum.Parse<ImageStretch>(Convert.ToString(value), true);
                 break;
             default:
                 base.SetAttribute(name, value);

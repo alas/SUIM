@@ -9,24 +9,24 @@ public class BaseText : UIElement
     public int FontSize { get; set; }
     public bool Wrap { get; set; }
 
-    public override void SetAttribute(string name, string value)
+    public override void SetAttribute(string name, object? value)
     {
         switch (name)
         {
             case "text":
-                Text = value;
+                Text = Convert.ToString(value);
                 break;
             case "font":
-                Font = value;
+                Font = Convert.ToString(value);
                 break;
             case "fontsize":
-                FontSize = int.Parse(value);
+                FontSize = Convert.ToInt32(value);
                 break;
             case "color":
-                Color = value;
+                Color = Convert.ToString(value);
                 break;
             case "wrap":
-                Wrap = bool.Parse(value);
+                Wrap = Convert.ToBoolean(value);
                 break;
             default:
                 base.SetAttribute(name, value);
@@ -41,15 +41,15 @@ public class TextArea : UIElement, IPlaceholder
     public int Rows { get; set; }
     public int Columns { get; set; }
 
-    public override void SetAttribute(string name, string value)
+    public override void SetAttribute(string name, object? value)
     {
         switch (name)
         {
             case "rows":
-                Rows = int.Parse(value);
+                Rows = Convert.ToInt32(value);
                 break;
             case "columns":
-                Columns = int.Parse(value);
+                Columns = Convert.ToInt32(value);
                 break;
             default:
                 base.SetAttribute(name, value);

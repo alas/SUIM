@@ -26,12 +26,12 @@ public class Dock : LayoutElement
             DockChildren.Remove(dockChild);
     }
 
-    public override void SetAttribute(string name, string value)
+    public override void SetAttribute(string name, object? value)
     {
         switch (name)
         {
             case "lastchildfill":
-                LastChildFill = bool.Parse(value);
+                LastChildFill = Convert.ToBoolean(value);
                 break;
             default:
                 base.SetAttribute(name, value);

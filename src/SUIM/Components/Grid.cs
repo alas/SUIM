@@ -37,15 +37,15 @@ public class Grid : LayoutElement
             GridChildren.Remove(gridChild);
     }
 
-    public override void SetAttribute(string name, string value)
+    public override void SetAttribute(string name, object? value)
     {
         switch (name)
         {
             case "columns":
-                Columns = value;
+                Columns = Convert.ToString(value);
                 break;
             case "rows":
-                Rows = value;
+                Rows = Convert.ToString(value);
                 break;
             default:
                 base.SetAttribute(name, value);

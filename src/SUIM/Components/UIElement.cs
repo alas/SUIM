@@ -42,63 +42,69 @@ public abstract class UIElement
         Children.Remove(child);
     }
 
-    public virtual void SetAttribute(string name, string value)
+    public virtual void SetAttribute(string name, object? value)
     {
         switch (name)
         {
             case "id":
-                Id = value;
-                break;
+                {
+                    Id = Convert.ToString(value);
+                    break;
+                }
             case "x":
-                X = int.Parse(value);
-                break;
+                {
+                    X = Convert.ToInt32(value);
+                    break;
+                }
             case "y":
-                Y = int.Parse(value);
-                break;
+                {
+                    Y = Convert.ToInt32(value);
+                    break;
+                }
             case "opacity":
-                Opacity = float.Parse(value, CultureInfo.InvariantCulture);
+                Opacity = Convert.ToSingle(value, CultureInfo.InvariantCulture);
                 break;
             case "z-index":
-                ZIndex = int.Parse(value);
+                ZIndex = Convert.ToInt32(value);
                 break;
             case "visibility":
-                Visibility = value;
+                Visibility = Convert.ToString(value);
                 break;
             case "halign" or "horizontalalignment":
-                HorizontalAlignment = Enum.Parse<HorizontalAlignment>(value, true);
+                HorizontalAlignment = Enum.Parse<HorizontalAlignment>(Convert.ToString(value), true);
                 break;
             case "valign" or "verticalalignment":
-                VerticalAlignment = Enum.Parse<VerticalAlignment>(value, true);
+                VerticalAlignment = Enum.Parse<VerticalAlignment>(Convert.ToString(value), true);
                 break;
             case "margin":
-                Margin = value;
+                Margin = Convert.ToString(value);
                 break;
             case "padding":
-                Padding = value;
+                Padding = Convert.ToString(value);
                 break;
             case "bg" or "background":
-                Background = value;
+                Background = Convert.ToString(value);
                 break;
             case "width":
-                Width = value;
+                Width = Convert.ToString(value);
                 break;
             case "height":
-                Height = value;
+                Height = Convert.ToString(value);
                 break;
             case "anchor":
-                Anchor = Enum.Parse<Anchor>(value, true);
+                Anchor = Enum.Parse<Anchor>(Convert.ToString(value), true);
                 break;
             case "class":
-                Class = value;
+                Class = Convert.ToString(value);
                 break;
             case string x when x.StartsWith("on"):
-                On(x.Substring(2), GetHandler(value));
+                On(x.Substring(2), GetHandler(Convert.ToString(value)));
                 break;
             case "placeholder":
-                (this as IPlaceholder)?.Placeholder = value;
+                (this as IPlaceholder)?.Placeholder = Convert.ToString(value);
                 break;
             case string x when x.Contains('.'):
-                //todo: maybe move parent properties handling here
+                // ignore parent properties
                 break;
             default:
                 throw new NotSupportedException($"Attribute '{name}' is not supported on {GetType().Name}");
@@ -139,12 +145,12 @@ public class LayoutElement : UIElement
 {
     public int Spacing { get; set; }
 
-    public override void SetAttribute(string name, string value)
+    public override void SetAttribute(string name, object? value)
     {
         switch (name)
         {
             case "spacing":
-                Spacing = int.Parse(value);
+                Spacing = Convert.ToInt32(value);
                 break;
             default:
                 base.SetAttribute(name, value);
