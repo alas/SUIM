@@ -1,4 +1,4 @@
-namespace SUIM;
+namespace SUIM.Components;
 
 using System.Xml.Linq;
 
@@ -11,9 +11,9 @@ public class Dock : LayoutElement
     {
         base.AddChild(child, element);
 
-        var dockChild = new DockChild { Element = child };
         var edgeAttr = element.Attribute("dock.edge");
-        if (edgeAttr != null) dockChild.Edge = Enum.Parse<DockEdge>(edgeAttr.Value, true);
+        var dockChild_Edge = edgeAttr != null ? Enum.Parse<DockEdge>(edgeAttr.Value, true) : DockEdge.Left;
+        var dockChild = new DockChild(dockChild_Edge, child);
         DockChildren.Add(dockChild);
     }
 
@@ -40,11 +40,7 @@ public class Dock : LayoutElement
     }
 }
 
-public class DockChild
-{
-    public UIElement Element { get; set; } = null!;
-    public DockEdge Edge { get; set; }
-}
+public record class DockChild(DockEdge Edge, UIElement Element);
 
 public enum DockEdge
 {

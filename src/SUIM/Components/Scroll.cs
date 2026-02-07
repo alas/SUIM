@@ -1,4 +1,4 @@
-﻿namespace SUIM;
+﻿namespace SUIM.Components;
 
 internal class Scroll : LayoutElement
 {

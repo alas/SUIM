@@ -1,6 +1,7 @@
 ﻿namespace SUIM;
 
 using System.ComponentModel;
+using SUIM.Components;
 
 /// <summary>
 /// Manages the connection between a Model property and a UI Element property.

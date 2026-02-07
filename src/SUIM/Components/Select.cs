@@ -1,4 +1,4 @@
-﻿namespace SUIM;
+﻿namespace SUIM.Components;
 
 public class Select : UIElement
 {

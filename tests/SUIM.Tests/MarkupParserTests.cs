@@ -1,38 +1,31 @@
 ﻿namespace SUIM.Tests;
 
 using Xunit;
+using SUIM.Components;
 
-public class SUIMControlFlowParserTests
+public class MarkupParserTests
 {
-    private readonly dynamic _model;
-
-    private readonly SUIMMarkupParser _processor;
-
-    public SUIMControlFlowParserTests()
-    {
-        _model = SUIM.Create(
-            new
-            {
-                identifierbool = true,
-                identifierbool2 = true,
-                identifierbool3 = false,
-                identifierany = 500,
-                identifier2 = 500,
-                Collection = new[] { "item1", "item2" },
-                stringValue = "test",
-                numericValue = 42,
-                currentWidth = 250,
-                invWidth = 500,
-                items = new[] { new { Name = "Apple" }, new { Name = "Banana" } }
-            });
-        _processor = new SUIMMarkupParser(_model);
-    }
+    private readonly object _model =
+        new
+        {
+            identifierbool = true,
+            identifierbool2 = true,
+            identifierbool3 = false,
+            identifierany = 500,
+            identifier2 = 500,
+            Collection = new[] { "item1", "item2" },
+            stringValue = "test",
+            numericValue = 42,
+            currentWidth = 250,
+            invWidth = 500,
+            items = new[] { new { Name = "Apple" }, new { Name = "Banana" } }
+        };
 
     [Fact]
     public void Parse_DivWithAttributes()
     {
         var markup = "<div id=\"main\" width=\"100\" height=\"200\" halign=\"center\" valign=\"top\" margin=\"10\" padding=\"5\" bg=\"blue\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -50,7 +43,7 @@ public class SUIMControlFlowParserTests
     public void Parse_StackVertical()
     {
         var markup = "<stack orientation=\"vertical\" spacing=\"10\"><div /><div /></stack>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -65,7 +58,7 @@ public class SUIMControlFlowParserTests
     public void Parse_StackHorizontal()
     {
         var markup = "<stack orientation=\"horizontal\"><label text=\"Hello\" /><button /></stack>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -85,7 +78,7 @@ public class SUIMControlFlowParserTests
 <div grid.row=""0"" grid.column=""1"" bg=""silver"" />
 <div grid.row=""1"" grid.column=""0"" grid.columnspan=""2"" bg=""white"" />
 </grid>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Grid>(element);
         var grid = (Grid)element;
@@ -110,7 +103,7 @@ public class SUIMControlFlowParserTests
 <div dock.edge=""top"" />
 <div />
 </dock>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Dock>(element);
         var dock = (Dock)element;
@@ -126,7 +119,7 @@ public class SUIMControlFlowParserTests
     public void Parse_Overlay()
     {
         var markup = "<overlay><div /><div /></overlay>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Overlay>(element);
         var overlay = (Overlay)element;
@@ -137,7 +130,7 @@ public class SUIMControlFlowParserTests
     public void Parse_Label()
     {
         var markup = "<label text=\"Test Label\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
         var label = (Label)element;
@@ -148,7 +141,7 @@ public class SUIMControlFlowParserTests
     public void Parse_Button()
     {
         var markup = "<button><label text=\"Click me\" /></button>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Button>(element);
         var button = (Button)element;
@@ -160,28 +153,28 @@ public class SUIMControlFlowParserTests
     public void Parse_UnknownTag_Throws()
     {
         var markup = "<unknown />";
-        Assert.Throws<NotSupportedException>(() => _processor.Parse(markup));
+        Assert.Throws<NotSupportedException>(() => MarkupParser.Parse(markup, _model));
     }
 
     [Fact]
     public void Parse_InvalidXml_Throws()
     {
         var markup = "<div><unclosed>";
-        Assert.Throws<System.Xml.XmlException>(() => _processor.Parse(markup));
+        Assert.Throws<System.Xml.XmlException>(() => MarkupParser.Parse(markup, _model));
     }
 
     [Fact]
     public void Parse_EmptyMarkup_Throws()
     {
         var markup = "";
-        Assert.Throws<System.Xml.XmlException>(() => _processor.Parse(markup));
+        Assert.Throws<System.Xml.XmlException>(() => MarkupParser.Parse(markup, _model));
     }
 
     [Fact]
     public void Parse_NestedElements()
     {
         var markup = "<stack><div><label text=\"Nested\" /></div></stack>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -196,7 +189,7 @@ public class SUIMControlFlowParserTests
     public void Parse_AnchorAttribute()
     {
         var markup = "<div anchor=\"TopLeft\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -207,7 +200,7 @@ public class SUIMControlFlowParserTests
     public void Parse_SynonymAttributes()
     {
         var markup = "<div halign=\"right\" valign=\"bottom\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -221,7 +214,7 @@ public class SUIMControlFlowParserTests
         var markup = @"<grid>
 <div grid.row=""0"" grid.column=""0"" grid.rowspan=""2"" grid.columnspan=""2"" />
 </grid>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Grid>(element);
         var grid = (Grid)element;
@@ -239,233 +232,12 @@ public class SUIMControlFlowParserTests
         var markup = @"<dock>
 <div dock.edge=""LEFT"" />
 </dock>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Dock>(element);
         var dock = (Dock)element;
         Assert.Single(dock.DockChildren);
         Assert.Equal(DockEdge.Left, dock.DockChildren[0].Edge);
-    }
-
-    [Fact]
-    public void Parse_IfDirective_True()
-    {
-        var markup = @"<div>
-@if identifierbool
-{
-    <label text=""True"" />
-}
-</div>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("True", label.Text);
-    }
-
-    [Fact]
-    public void Parse_IfElseDirective_True()
-    {
-        var markup = @"<div>
-@if identifierbool2
-{
-    <label text=""True"" />
-}
-else
-{
-    <label text=""False"" />
-}
-</div>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("True", label.Text);
-    }
-
-    [Fact]
-    public void Parse_IfElseDirective_False()
-    {
-        var markup = @"<div>
-@if identifierbool3
-{
-    <label text=""True"" />
-}
-else
-{
-    <label text=""False"" />
-}
-</div>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("False", label.Text);
-    }
-
-    [Fact]
-    public void Parse_IfElseIfElseDirective_True()
-    {
-        var markup = @"<div>
-@if identifierbool3
-{
-    <label text=""False"" />
-}
-else if identifierbool3
-{
-    <label text=""False"" />
-}
-else
-{
-    <label text=""True"" />
-}
-</div>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("True", label.Text);
-    }
-
-    [Fact]
-    public void Parse_IfElseIfElseIfElseDirective_FinalElse()
-    {
-        var markup = @"<div>
-@if identifierbool3
-{
-    <label text=""False"" />
-}
-else if identifierbool3
-{
-    <label text=""False"" />
-}
-else if identifierbool3
-{
-    <label text=""False"" />
-}
-else
-{
-    <label text=""FinalElse"" />
-}
-</div>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("FinalElse", label.Text);
-    }
-
-    [Fact]
-    public void Parse_IfElseIfElseIfElseDirective_True()
-    {
-        var markup = @"<div>
-@if identifierbool3
-{
-    <label text=""False"" />
-}
-else if identifierbool3
-{
-    <label text=""False"" />
-}
-else if identifierbool2
-{
-    <label text=""True"" />
-}
-else
-{
-    <label text=""False"" />
-}
-</div>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("True", label.Text);
-    }
-
-    [Fact]
-    public void Parse_ForDirective()
-    {
-        var markup = @"<stack>
-@for i=0 count=3
-{
-    <label text=""@i"" />
-}
-</stack>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
-        Assert.Equal(3, stack.Children.Count);
-        for (int i = 0; i < 3; i++)
-        {
-            Assert.IsType<Label>(stack.Children[i]);
-            var label = (Label)stack.Children[i];
-            Assert.Equal(i.ToString(), label.Text);
-        }
-    }
-
-    [Fact]
-    public void Parse_SwitchDirective()
-    {
-        var markup = @"<div>
-@switch identifierany
-{
-    case 500
-    {
-        <label text=""Matched"" />
-    }
-    default
-    {
-        <label text=""Default"" />
-    }
-}
-</div>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("Matched", label.Text);
-    }
-
-    [Fact]
-    public void ControlFlow_SwitchDirective()
-    {
-        var parser = new SUIMControlFlowParser(_model);
-        var markup = @"@switch identifierany
-{
-    case 500
-    {
-        <label text=""Matched"" />
-    }
-    default
-    {
-        <label text=""Default"" />
-    }
-}";
-        var expanded = parser.ExpandDirectives(markup);
-        Assert.Equal("<label text=\"Matched\" />", expanded.Trim());
     }
 
     // ============== CONTENT TAGS TESTS ==============
@@ -474,7 +246,7 @@ else
     public void Parse_Button_WithSprites()
     {
         var markup = "<button text=\"idle_sprite\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Button>(element);
         var button = (Button)element;
@@ -485,7 +257,7 @@ else
     public void Parse_Button_WithOnClick()
     {
         var markup = "<button text=\"Submit\" onclick=\"HandleSubmit\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Button>(element);
         var button = (Button)element;
@@ -496,7 +268,7 @@ else
     public void Parse_Input_TextType()
     {
         var markup = "<input type=\"text\" placeholder=\"Enter name\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -508,7 +280,7 @@ else
     public void Parse_Input_NumberType_WithMinMax()
     {
         var markup = "<input type=\"number\" min=\"0\" max=\"100\" step=\"5\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -522,7 +294,7 @@ else
     public void Parse_Input_WithMask()
     {
         var markup = "<input type=\"text\" mask=\"[0-9]{3}-[0-9]{3}-[0-9]{4}\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -533,7 +305,7 @@ else
     public void Parse_Label_WithAllAttributes()
     {
         var markup = "<label text=\"Hello\" font=\"Arial\" fontsize=\"16\" color=\"#FF0000\" wrap=\"true\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
         var label = (Label)element;
@@ -548,7 +320,7 @@ else
     public void Parse_Image_WithStretch()
     {
         var markup = "<image source=\"mysprite\" stretch=\"uniform\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Image>(element);
         var image = (Image)element;
@@ -563,7 +335,7 @@ else
 <option value=""val1"">Option 1</option>
 <option value=""val2"">Option 2</option>
 </select>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Select>(element);
         var select = (Select)element;
@@ -575,7 +347,7 @@ else
     public void Parse_Select_WithMultiple()
     {
         var markup = "<select multiple=\"true\"><option>Opt1</option><option>Opt2</option></select>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Select>(element);
         var select = (Select)element;
@@ -586,7 +358,7 @@ else
     public void Parse_Textarea()
     {
         var markup = "<textarea id=\"notes\" width=\"300\" height=\"200\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<TextArea>(element);
         var textarea = (TextArea)element;
@@ -601,7 +373,7 @@ else
     public void Parse_VStack_Synonym()
     {
         var markup = "<vstack><div /><div /></vstack>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -613,7 +385,7 @@ else
     public void Parse_VBox_Synonym()
     {
         var markup = "<vbox><label text=\"A\" /><label text=\"B\" /></vbox>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -624,7 +396,7 @@ else
     public void Parse_HStack_Synonym()
     {
         var markup = "<hstack><div /><div /></hstack>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -636,7 +408,7 @@ else
     public void Parse_HBox_Synonym()
     {
         var markup = "<hbox><label text=\"X\" /><label text=\"Y\" /></hbox>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -654,7 +426,7 @@ else
     <div width=""*"" bg=""green"" />
 </row>
 </grid>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Grid>(element);
         var grid = (Grid)element;
@@ -670,7 +442,7 @@ else
     <div height=""*"" bg=""green"" />
 </column>
 </grid>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Grid>(element);
         var grid = (Grid)element;
@@ -683,7 +455,7 @@ else
     public void Parse_Visibility_Attribute()
     {
         var markup = "<div visibility=\"hidden\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -694,7 +466,7 @@ else
     public void Parse_Opacity_Attribute()
     {
         var markup = "<div opacity=\"0.5\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -705,7 +477,7 @@ else
     public void Parse_ZIndex_Attribute()
     {
         var markup = "<div z-index=\"10\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -716,7 +488,7 @@ else
     public void Parse_XY_Positioning()
     {
         var markup = "<div x=\"50\" y=\"100\" width=\"200\" height=\"150\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -728,7 +500,7 @@ else
     public void Parse_Clip_Attribute()
     {
         var markup = "<stack clip=\"true\"><div /></stack>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -739,7 +511,7 @@ else
     public void Parse_Spacing_SingleValue()
     {
         var markup = "<stack spacing=\"10\"><div /><div /></stack>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -750,215 +522,11 @@ else
     public void Parse_Class_Attribute()
     {
         var markup = "<div class=\"primary secondary\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Equal("primary secondary", div.Class);
-    }
-
-    // ============== DATA BINDING TESTS ==============
-
-    [Fact]
-    public void Parse_DataBinding_Width()
-    {
-        var markup = "<div width=\"@currentWidth\" height=\"100\" />";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        // Property binding should be created for width
-        Assert.NotNull(div.Width);
-    }
-
-    [Fact]
-    public void Parse_DataBinding_Text()
-    {
-        var markup = "<label text=\"@stringValue\" />";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Label>(element);
-        var label = (Label)element;
-        // Property binding should be created for text
-        Assert.NotNull(label.Text);
-    }
-
-    // ============== CONTROL FLOW - FOR WITH STEP ==============
-
-    [Fact]
-    public void Parse_ForDirective_WithNegativeStep()
-    {
-        var markup = @"<stack>
-@for i=2 count=3 step=-1
-{
-    <label text=""@i"" />
-}
-</stack>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
-        Assert.Equal(3, stack.Children.Count);
-        // Should contain: 2, 1, 0
-        var labels = stack.Children.Cast<Label>();
-        Assert.Equal("2", labels.ElementAt(0).Text);
-        Assert.Equal("1", labels.ElementAt(1).Text);
-        Assert.Equal("0", labels.ElementAt(2).Text);
-    }
-
-    [Fact]
-    public void Parse_ForDirective_WithCustomStep()
-    {
-        var markup = @"<stack>
-@for i=0 count=3 step=2
-{
-    <label text=""@i"" />
-}
-</stack>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
-        Assert.Equal(3, stack.Children.Count);
-        var labels = stack.Children.Cast<Label>();
-        Assert.Equal("0", labels.ElementAt(0).Text);
-        Assert.Equal("2", labels.ElementAt(1).Text);
-        Assert.Equal("4", labels.ElementAt(2).Text);
-    }
-
-    // ============== CONTROL FLOW - SWITCH WITH STRING ==============
-
-    [Fact]
-    public void Parse_SwitchDirective_WithStringCase()
-    {
-        var markup = @"<div>
-@switch stringValue
-{
-    case ""test""
-    {
-        <label text=""Matched String"" />
-    }
-    default
-    {
-        <label text=""No Match"" />
-    }
-}
-</div>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Single(div.Children);
-        var label = (Label)div.Children[0];
-        Assert.Equal("Matched String", label.Text);
-    }
-
-    [Fact]
-    public void Parse_SwitchDirective_WithMultipleCases()
-    {
-        var markup = @"<div>
-@switch identifierany
-{
-    case 100
-    {
-        <label text=""Hundred"" />
-    }
-    case 500
-    {
-        <label text=""FiveHundred"" />
-    }
-    default
-    {
-        <label text=""Other"" />
-    }
-}
-</div>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Single(div.Children);
-        var label = (Label)div.Children[0];
-        Assert.Equal("FiveHundred", label.Text);
-    }
-
-    [Fact]
-    public void ControlFlow_SwitchDirective_WithVariableCase()
-    {
-        var parser = new SUIMControlFlowParser(_model);
-        var markup = @"@switch identifierany
-{
-    case @identifier2
-    {
-        <label text=""Variable Match"" />
-    }
-    default
-    {
-        <label text=""No Match"" />
-    }
-}";
-        var expanded = parser.ExpandDirectives(markup);
-        Assert.Contains("Variable Match", expanded);
-    }
-
-    // ============== CONTROL FLOW - FOREACH TESTS ==============
-
-    [Fact]
-    public void Parse_ForEach_WithCollection()
-    {
-        var markup = @"<stack>
-@foreach item in Collection
-{
-    <label text=""@item"" />
-}
-</stack>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
-        Assert.Equal(2, stack.Children.Count);
-        var labels = stack.Children.Cast<Label>();
-        Assert.Equal("item1", labels.ElementAt(0).Text);
-        Assert.Equal("item2", labels.ElementAt(1).Text);
-    }
-
-    [Fact]
-    public void Parse_ForEach_WithCollectionProperty()
-    {
-        var markup = @"<stack>
-@foreach item in items
-{
-    <label text=""@item.Name"" />
-}
-</stack>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
-        Assert.Equal(2, stack.Children.Count);
-        var labels = stack.Children.Cast<Label>();
-        Assert.Equal("Apple", labels.ElementAt(0).Text);
-        Assert.Equal("Banana", labels.ElementAt(1).Text);
-    }
-
-    [Fact]
-    public void Parse_ForEach_WithRange()
-    {
-        var markup = @"<stack>
-@foreach i in 0..3
-{
-    <label text=""@i"" />
-}
-</stack>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
-        Assert.Equal(3, stack.Children.Count);
-        var labels = stack.Children.Cast<Label>();
-        Assert.Equal("0", labels.ElementAt(0).Text);
-        Assert.Equal("1", labels.ElementAt(1).Text);
-        Assert.Equal("2", labels.ElementAt(2).Text);
     }
 
     // ============== COMPLEX NESTING & COMBINATIONS ==============
@@ -973,7 +541,7 @@ else
 </stack>
 <div grid.row=""1"" grid.column=""0"" grid.columnspan=""2"" bg=""lightgray"" />
 </grid>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Grid>(element);
         var grid = (Grid)element;
@@ -990,7 +558,7 @@ else
 <div dock.edge=""bottom"" height=""30"" />
 <div bg=""white"" />
 </dock>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Dock>(element);
         var dock = (Dock)element;
@@ -1011,7 +579,7 @@ else
     <label text=""Disabled"" />
 }
 </button>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Button>(element);
         var button = (Button)element;
@@ -1026,7 +594,7 @@ else
     public void Parse_Color_Hex()
     {
         var markup = "<div bg=\"#FF0000\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1037,7 +605,7 @@ else
     public void Parse_Color_RGBA()
     {
         var markup = "<div bg=\"255,0,0,255\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1048,7 +616,7 @@ else
     public void Parse_Color_Named()
     {
         var markup = "<div bg=\"Red\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1061,7 +629,7 @@ else
     public void Parse_Size_Pixels()
     {
         var markup = "<div width=\"100\" height=\"200\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1073,7 +641,7 @@ else
     public void Parse_Size_Star()
     {
         var markup = "<div width=\"*\" height=\"2*\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1085,7 +653,7 @@ else
     public void Parse_Size_Auto()
     {
         var markup = "<label text=\"Auto\" width=\"auto\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
         var label = (Label)element;
@@ -1098,7 +666,7 @@ else
     public void Parse_Input_EmailType()
     {
         var markup = "<input type=\"email\" placeholder=\"your@email.com\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -1109,7 +677,7 @@ else
     public void Parse_Input_UrlType()
     {
         var markup = "<input type=\"url\" placeholder=\"https://example.com\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -1120,7 +688,7 @@ else
     public void Parse_Input_PasswordType()
     {
         var markup = "<input type=\"password\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -1131,7 +699,7 @@ else
     public void Parse_Input_DateType()
     {
         var markup = "<input type=\"date\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -1142,7 +710,7 @@ else
     public void Parse_Input_TimeType()
     {
         var markup = "<input type=\"time\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -1153,7 +721,7 @@ else
     public void Parse_Input_DatetimeLocalType()
     {
         var markup = "<input type=\"datetime-local\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -1164,7 +732,7 @@ else
     public void Parse_Input_RangeType()
     {
         var markup = "<input type=\"range\" min=\"0\" max=\"100\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -1175,7 +743,7 @@ else
     public void Parse_Input_CheckboxType()
     {
         var markup = "<input type=\"checkbox\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -1186,7 +754,7 @@ else
     public void Parse_Input_RadioType()
     {
         var markup = "<input type=\"radio\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -1199,7 +767,7 @@ else
     public void Parse_Textarea_WithPlaceholder()
     {
         var markup = "<textarea placeholder=\"Enter description\" rows=\"5\" columns=\"40\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<TextArea>(element);
         var textarea = (TextArea)element;
@@ -1214,7 +782,7 @@ else
     public void Parse_Option_Element()
     {
         var markup = "<option value=\"test-value\">Test Label</option>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Option>(element);
         var option = (Option)element;
@@ -1230,7 +798,7 @@ else
     public void Parse_Image_Stretch_None()
     {
         var markup = "<image source=\"sprite\" stretch=\"none\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Image>(element);
         var image = (Image)element;
@@ -1241,7 +809,7 @@ else
     public void Parse_Image_Stretch_Fill()
     {
         var markup = "<image source=\"sprite\" stretch=\"fill\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Image>(element);
         var image = (Image)element;
@@ -1252,7 +820,7 @@ else
     public void Parse_Image_Stretch_UniformToFill()
     {
         var markup = "<image source=\"sprite\" stretch=\"uniformtofill\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Image>(element);
         var image = (Image)element;
@@ -1265,7 +833,7 @@ else
     public void Parse_Anchor_TopRight()
     {
         var markup = "<div anchor=\"TopRight\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1276,7 +844,7 @@ else
     public void Parse_Anchor_BottomLeft()
     {
         var markup = "<div anchor=\"BottomLeft\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1287,7 +855,7 @@ else
     public void Parse_Anchor_BottomRight()
     {
         var markup = "<div anchor=\"BottomRight\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1298,7 +866,7 @@ else
     public void Parse_Anchor_Center()
     {
         var markup = "<div anchor=\"Center\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1314,7 +882,7 @@ else
 <div dock.edge=""bottom"" height=""50"" />
 <div />
 </dock>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Dock>(element);
         var dock = (Dock)element;
@@ -1328,7 +896,7 @@ else
 <div dock.edge=""left"" width=""50"" />
 <div bg=""white"" />
 </dock>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Dock>(element);
         var dock = (Dock)element;
@@ -1341,7 +909,7 @@ else
     public void Parse_Opacity_FullyOpaque()
     {
         var markup = "<div opacity=\"1.0\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1352,7 +920,7 @@ else
     public void Parse_Opacity_FullyTransparent()
     {
         var markup = "<div opacity=\"0.0\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1363,7 +931,7 @@ else
     public void Parse_Opacity_PartialTransparency()
     {
         var markup = "<div opacity=\"0.75\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1374,7 +942,7 @@ else
     public void Parse_ZIndex_Negative()
     {
         var markup = "<div z-index=\"-5\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1385,7 +953,7 @@ else
     public void Parse_ZIndex_Large()
     {
         var markup = "<div z-index=\"1000\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1396,7 +964,7 @@ else
     public void Parse_MultipleClasses()
     {
         var markup = "<div class=\"primary secondary large\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1409,7 +977,7 @@ else
     public void Parse_Label_WithoutWrap()
     {
         var markup = "<label text=\"Test\" wrap=\"false\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
         var label = (Label)element;
@@ -1420,7 +988,7 @@ else
     public void Parse_Label_WithColor()
     {
         var markup = "<label text=\"Colored\" color=\"blue\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
         var label = (Label)element;
@@ -1433,7 +1001,7 @@ else
     public void Parse_Visibility_Visible()
     {
         var markup = "<div visibility=\"visible\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1444,7 +1012,7 @@ else
     public void Parse_Visibility_Collapsed()
     {
         var markup = "<div visibility=\"collapsed\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1459,7 +1027,7 @@ else
         var markup = @"<grid>
 <div grid.row=""0"" grid.column=""0"" />
 </grid>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Grid>(element);
         var grid = (Grid)element;
@@ -1482,7 +1050,7 @@ else
 </div>
 </stack>
 </div>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1491,24 +1059,6 @@ else
         var innerStack = (Stack)innerDiv.Children[0];
         var label = (Label)innerStack.Children[0];
         Assert.Equal("Deep", label.Text);
-    }
-
-    // ============== CONTROL FLOW - IF WITHOUT ELSE ==============
-
-    [Fact]
-    public void Parse_IfDirective_False_NoElement()
-    {
-        var markup = @"<div>
-@if identifierbool3
-{
-    <label text=""Should not appear"" />
-}
-</div>";
-        var element = _processor.Parse(markup);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Empty(div.Children);
     }
 
     // ============== BUTTON WITH NESTED CONTENT ==============
@@ -1522,7 +1072,7 @@ else
 <label text=""Label"" />
 </stack>
 </button>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Button>(element);
         var button = (Button)element;
@@ -1537,7 +1087,7 @@ else
     public void Parse_Input_WithValue()
     {
         var markup = "<input type=\"text\" value=\"default-value\" />";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -1550,7 +1100,7 @@ else
     public void Parse_PlainText_CreatesLabel()
     {
         var markup = "<div>Simple text</div>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1568,7 +1118,7 @@ Text before
 <label text=""Label"" />
 Text after
 </stack>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -1594,7 +1144,7 @@ Text after
             Multi-line
             text content
         </div>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1612,7 +1162,7 @@ Text after
             <label text=""Only label"" />
             
         </div>";
-        var element = _processor.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1621,6 +1171,3 @@ Text after
         Assert.IsType<Label>(div.Children[0]);
     }
 }
-
-public record struct Item(string Name);
-

@@ -1,8 +1,8 @@
+namespace SUIM;
+
 using System.ComponentModel;
 using System.Dynamic;
 using System.Reflection;
-
-namespace SUIM;
 
 public class ObservableObject : DynamicObject, INotifyPropertyChanged
 {
@@ -40,14 +40,12 @@ public class ObservableObject : DynamicObject, INotifyPropertyChanged
         return true;
     }
 
-    // Helper for PropertyBinding to access without dynamic dispatch if needed (though dynamic covers most)
     public object? GetValue(string propertyName)
     {
         _properties.TryGetValue(propertyName, out var value);
         return value;
     }
 
-    // Helper to set value by string name
     public void SetValue(string propertyName, object? value)
     {
         if (_properties.TryGetValue(propertyName, out var existingValue) && Equals(existingValue, value))

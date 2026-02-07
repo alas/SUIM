@@ -9,9 +9,8 @@
 // *****************************************************
 //                                    Made by Geras1mleo
 
-namespace Chess3d;
+namespace Chess3d.ChessLogic;
 
-using Chess3d.ChessLogic;
 using System.Collections.Generic;
 using System.Linq;
 

@@ -1,4 +1,4 @@
-namespace SUIM;
+namespace SUIM.Components;
 
 using System.Globalization;
 using System.Xml.Linq;
@@ -47,20 +47,14 @@ public abstract class UIElement
         switch (name)
         {
             case "id":
-                {
-                    Id = Convert.ToString(value);
-                    break;
-                }
+                Id = Convert.ToString(value);
+                break;
             case "x":
-                {
-                    X = Convert.ToInt32(value);
-                    break;
-                }
+                X = Convert.ToInt32(value);
+                break;
             case "y":
-                {
-                    Y = Convert.ToInt32(value);
-                    break;
-                }
+                Y = Convert.ToInt32(value);
+                break;
             case "opacity":
                 Opacity = Convert.ToSingle(value, CultureInfo.InvariantCulture);
                 break;

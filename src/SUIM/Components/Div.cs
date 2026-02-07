@@ -1,5 +1,3 @@
-namespace SUIM;
+namespace SUIM.Components;
 
-public class Div : LayoutElement
-{
-}
+public class Div : LayoutElement { }

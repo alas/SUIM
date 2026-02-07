@@ -2,16 +2,27 @@ namespace SUIM;
 
 using System;
 using System.Xml.Linq;
+using SUIM.Components;
 
-public class SUIMMarkupParser(dynamic model)
+public static class MarkupParser
 {
-    public UIElement Parse(string markup)
+    public static (UIElement, dynamic?) Parse(string markup, object? model = null)
     {
-        var controlFlowParser = new SUIMControlFlowParser(model);
+        var observableModel = model == null ? null : Create(model);
+        var controlFlowParser = new ControlFlowParser(observableModel);
         var expandedMarkup = controlFlowParser.ExpandDirectives(markup);
 
         var doc = XDocument.Parse(expandedMarkup);
-        return ParseElement(doc.Root!, model);
+        return (ParseElement(doc.Root!, observableModel), observableModel);
+    }
+    
+    private static dynamic Create(object model)
+    {
+        if (model is ObservableObject oo) return oo;
+
+        var observable = new ObservableObject();
+        observable.Initialize(model);
+        return observable;
     }
 
     private static UIElement ParseElement(XElement element, dynamic model)

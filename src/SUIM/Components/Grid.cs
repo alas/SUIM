@@ -1,8 +1,7 @@
-namespace SUIM;
+namespace SUIM.Components;
 
 using System;
 using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
 
 public class Grid : LayoutElement
 {

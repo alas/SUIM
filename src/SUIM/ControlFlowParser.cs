@@ -1,11 +1,10 @@
 namespace SUIM;
 
 using System.Collections;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
-public class SUIMControlFlowParser(dynamic model)
+public class ControlFlowParser(dynamic model)
 {
     public string ExpandDirectives(string markup)
     {
@@ -355,7 +354,7 @@ public class SUIMControlFlowParser(dynamic model)
     private object? GetValue(string key)
     {
         if (string.IsNullOrWhiteSpace(key)) return null;
-        if (key.StartsWith("@")) key = key.Substring(1);
+        if (key.StartsWith('@')) key = key.Substring(1);
         
         return model.GetValue(key);
     }

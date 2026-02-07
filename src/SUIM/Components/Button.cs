@@ -1,3 +1,3 @@
-namespace SUIM;
+namespace SUIM.Components;
 
 public class Button : BaseText { }

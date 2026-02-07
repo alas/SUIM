@@ -1,6 +1,3 @@
-namespace SUIM;
+namespace SUIM.Components;
 
-public class Overlay : LayoutElement
-{
-    // Overlay allows overlapping children
-}
+public class Overlay : LayoutElement { }

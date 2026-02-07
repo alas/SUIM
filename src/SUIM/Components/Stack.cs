@@ -1,6 +1,4 @@
-using static System.Net.Mime.MediaTypeNames;
-
-namespace SUIM;
+namespace SUIM.Components;
 
 public class Stack : LayoutElement
 {
