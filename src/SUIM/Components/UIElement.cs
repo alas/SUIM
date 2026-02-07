@@ -1,6 +1,5 @@
 namespace SUIM.Components;
 
-using System.Globalization;
 using System.Xml.Linq;
 
 public abstract class UIElement
