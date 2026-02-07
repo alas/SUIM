@@ -1416,13 +1416,150 @@ Text after
     </style>
     <div class=""myclass"">
         <label text=""Bordered Content"" />
-    </border>
+    </div>
 </suim>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
-        Assert.IsType<Border>(element);
-        var border = (Border)element;
+        // The parser extracts the div from the suim wrapper
+        Assert.IsType<Div>(element);
+        var div = (Div)element;
+        Assert.Equal("myclass", div.Class);
+        Assert.Single(div.Children);
+
+        var border = div.Children[0] as Border;
+        Assert.NotNull(border);
         Assert.Single(border.Children);
         Assert.Equal("#FF0000", border.BorderColor);
+    }
+
+    // ============== SUIM WRAPPER TESTS ==============
+
+    [Fact]
+    public void Parse_Suim_WithRootElement()
+    {
+        var markup = @"<suim><div /></suim>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Div>(element);
+    }
+
+    [Fact]
+    public void Parse_Suim_WithStyleAndRoot()
+    {
+        var markup = @"<suim>
+    <style>.class { width: 100; }</style>
+    <div width=""200"" />
+</suim>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Div>(element);
+        var div = (Div)element;
+        Assert.Equal("200", div.Width);
+    }
+
+    [Fact]
+    public void Parse_Suim_WithModelAndRoot()
+    {
+        var markup = @"<suim>
+    <model></model>
+    <div width=""150"" />
+</suim>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Div>(element);
+        var div = (Div)element;
+        Assert.Equal("150", div.Width);
+    }
+
+    [Fact]
+    public void Parse_Suim_WithModelStyleAndRoot()
+    {
+        var markup = @"<suim>
+    <model></model>
+    <style>.btn { }</style>
+    <stack orientation=""vertical"">
+        <label text=""Item 1"" />
+        <label text=""Item 2"" />
+    </stack>
+</suim>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Stack>(element);
+        var stack = (Stack)element;
+        Assert.Equal(Orientation.Vertical, stack.Orientation);
+        Assert.Equal(2, stack.Children.Count);
+    }
+
+    [Fact]
+    public void Parse_Suim_IgnoresModelAndStyle()
+    {
+        var markup = @"<suim>
+    <model><value>ignored</value></model>
+    <style>.button { color: red; }</style>
+    <button><label text=""Click"" /></button>
+</suim>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Button>(element);
+        var button = (Button)element;
+        Assert.Single(button.Children);
+        Assert.IsType<Label>(button.Children[0]);
+    }
+
+    [Fact]
+    public void Parse_Suim_EmptyThrows()
+    {
+        var markup = @"<suim></suim>";
+        Assert.Throws<InvalidOperationException>(() => new MarkupParser(_model).Parse(markup));
+    }
+
+    [Fact]
+    public void Parse_Suim_OnlyModelAndStyleThrows()
+    {
+        var markup = @"<suim>
+    <model></model>
+    <style></style>
+</suim>";
+        Assert.Throws<InvalidOperationException>(() => new MarkupParser(_model).Parse(markup));
+    }
+
+    [Fact]
+    public void Parse_Suim_WithComplexRoot()
+    {
+        var markup = @"<suim>
+    <style></style>
+    <grid columns=""*,*"" rows=""auto,*"">
+        <div grid.row=""0"" grid.column=""0"" bg=""blue"" />
+        <div grid.row=""0"" grid.column=""1"" bg=""red"" />
+    </grid>
+</suim>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Grid>(element);
+        var grid = (Grid)element;
+        Assert.Equal("*,*", grid.Columns);
+        Assert.Equal("auto,*", grid.Rows);
+        Assert.Equal(2, grid.GridChildren.Count);
+    }
+
+    [Fact]
+    public void Parse_Suim_LastElementIsRoot()
+    {
+        var markup = @"<suim>
+    <model></model>
+    <div bg=""gray"" />
+    <stack orientation=""vertical"">
+        <label text=""This is root"" />
+    </stack>
+</suim>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        // The last element (stack) should be the root, not the div
+        Assert.IsType<Stack>(element);
+        var stack = (Stack)element;
+        Assert.Equal(Orientation.Vertical, stack.Orientation);
+        Assert.Single(stack.Children);
+        var label = (Label)stack.Children[0];
+        Assert.Equal("This is root", label.Text);
     }
 }

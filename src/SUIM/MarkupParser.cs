@@ -14,7 +14,39 @@ public class MarkupParser(object? model = null)
         var expandedMarkup = controlFlowParser.ExpandDirectives(markup);
 
         var doc = XDocument.Parse(expandedMarkup);
-        return (ParseElement(doc.Root!), model);
+        var root = doc.Root!;
+
+        // If root element is "suim", extract the actual root element
+        if (root.Name.LocalName.Equals("suim", StringComparison.OrdinalIgnoreCase))
+        {
+            root = ExtractRealRootFromSuimWrapper(root);
+        }
+
+        return (ParseElement(root), model);
+    }
+
+    private static XElement ExtractRealRootFromSuimWrapper(XElement suimElement)
+    {
+        var children = suimElement.Elements().ToList();
+        
+        if (children.Count == 0)
+        {
+            throw new InvalidOperationException("suim element must contain at least one child element (the visual tree root)");
+        }
+
+        // Filter out "model" and "style" elements
+        var visualElements = children
+            .Where(e => !e.Name.LocalName.Equals("model", StringComparison.OrdinalIgnoreCase) &&
+                       !e.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        if (visualElements.Count == 0)
+        {
+            throw new InvalidOperationException("suim element must contain at least one visual tree element after model and style");
+        }
+
+        // Return the last visual element as the root
+        return visualElements.Last();
     }
     
     private static dynamic Create(object model)
