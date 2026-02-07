@@ -1,6 +1,8 @@
 namespace SUIM;
 
+using System;
 using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 public class Grid : LayoutElement
 {
@@ -33,6 +35,22 @@ public class Grid : LayoutElement
         var gridChild = GridChildren.FirstOrDefault(gc => gc.Element == child);
         if (gridChild != null)
             GridChildren.Remove(gridChild);
+    }
+
+    public override void SetAttribute(string name, string value)
+    {
+        switch (name)
+        {
+            case "columns":
+                Columns = value;
+                break;
+            case "rows":
+                Rows = value;
+                break;
+            default:
+                base.SetAttribute(name, value);
+                break;
+        }
     }
 }
 

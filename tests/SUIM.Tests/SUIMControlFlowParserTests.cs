@@ -558,8 +558,8 @@ else
     public void Parse_Select_WithOptions()
     {
         var markup = @"<select id=""dropdown"">
-<option text=""Option 1"" value=""val1"" />
-<option text=""Option 2"" value=""val2"" />
+<option value=""val1"">Option 1</option>
+<option value=""val2"">Option 2</option>
 </select>";
         var element = _processor.Parse(markup);
 
@@ -572,7 +572,7 @@ else
     [Fact]
     public void Parse_Select_WithMultiple()
     {
-        var markup = "<select multiple=\"true\"><option text=\"Opt1\" /></select>";
+        var markup = "<select multiple=\"true\"><option>Opt1</option><option>Opt2</option></select>";
         var element = _processor.Parse(markup);
 
         Assert.IsType<Select>(element);

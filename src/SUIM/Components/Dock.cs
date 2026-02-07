@@ -25,6 +25,19 @@ public class Dock : LayoutElement
         if (dockChild != null)
             DockChildren.Remove(dockChild);
     }
+
+    public override void SetAttribute(string name, string value)
+    {
+        switch (name)
+        {
+            case "lastchildfill":
+                LastChildFill = bool.Parse(value);
+                break;
+            default:
+                base.SetAttribute(name, value);
+                break;
+        }
+    }
 }
 
 public class DockChild

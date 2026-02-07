@@ -1,3 +1,5 @@
+using static System.Net.Mime.MediaTypeNames;
+
 namespace SUIM;
 
 public class BaseText : UIElement
@@ -6,6 +8,31 @@ public class BaseText : UIElement
     public string? Font { get; set; }
     public int FontSize { get; set; }
     public bool Wrap { get; set; }
+
+    public override void SetAttribute(string name, string value)
+    {
+        switch (name)
+        {
+            case "text":
+                Text = value;
+                break;
+            case "font":
+                Font = value;
+                break;
+            case "fontsize":
+                FontSize = int.Parse(value);
+                break;
+            case "color":
+                Color = value;
+                break;
+            case "wrap":
+                Wrap = bool.Parse(value);
+                break;
+            default:
+                base.SetAttribute(name, value);
+                break;
+        }
+    }
 }
 
 public class TextArea : UIElement, IPlaceholder
@@ -13,6 +40,22 @@ public class TextArea : UIElement, IPlaceholder
     public string? Placeholder { get; set; }
     public int Rows { get; set; }
     public int Columns { get; set; }
+
+    public override void SetAttribute(string name, string value)
+    {
+        switch (name)
+        {
+            case "rows":
+                Rows = int.Parse(value);
+                break;
+            case "columns":
+                Columns = int.Parse(value);
+                break;
+            default:
+                base.SetAttribute(name, value);
+                break;
+        }
+    }
 }
 
 public class Label : BaseText

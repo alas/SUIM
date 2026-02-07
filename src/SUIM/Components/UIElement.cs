@@ -1,5 +1,6 @@
 namespace SUIM;
 
+using System.Globalization;
 using System.Xml.Linq;
 
 public abstract class UIElement
@@ -41,6 +42,75 @@ public abstract class UIElement
         Children.Remove(child);
     }
 
+    public virtual void SetAttribute(string name, string value)
+    {
+        switch (name)
+        {
+            case "id":
+                Id = value;
+                break;
+            case "x":
+                X = int.Parse(value);
+                break;
+            case "y":
+                Y = int.Parse(value);
+                break;
+            case "opacity":
+                Opacity = float.Parse(value, CultureInfo.InvariantCulture);
+                break;
+            case "z-index":
+                ZIndex = int.Parse(value);
+                break;
+            case "visibility":
+                Visibility = value;
+                break;
+            case "halign" or "horizontalalignment":
+                HorizontalAlignment = Enum.Parse<HorizontalAlignment>(value, true);
+                break;
+            case "valign" or "verticalalignment":
+                VerticalAlignment = Enum.Parse<VerticalAlignment>(value, true);
+                break;
+            case "margin":
+                Margin = value;
+                break;
+            case "padding":
+                Padding = value;
+                break;
+            case "bg" or "background":
+                Background = value;
+                break;
+            case "width":
+                Width = value;
+                break;
+            case "height":
+                Height = value;
+                break;
+            case "anchor":
+                Anchor = Enum.Parse<Anchor>(value, true);
+                break;
+            case "class":
+                Class = value;
+                break;
+            case string x when x.StartsWith("on"):
+                On(x.Substring(2), GetHandler(value));
+                break;
+            case "placeholder":
+                (this as IPlaceholder)?.Placeholder = value;
+                break;
+            case string x when x.Contains('.'):
+                //todo: maybe move parent properties handling here
+                break;
+            default:
+                throw new NotSupportedException($"Attribute '{name}' is not supported on {GetType().Name}");
+        }
+    }
+
+    private static Action<UIElement>? GetHandler(string value)
+    {
+        //throw new NotImplementedException();
+        return null;
+    }
+
     public virtual void On(string eventName, Action<UIElement>? handler)
     {
         if (!EventHandlers.TryGetValue(eventName, out List<Action<UIElement>>? value))
@@ -68,6 +138,19 @@ public abstract class UIElement
 public class LayoutElement : UIElement
 {
     public int Spacing { get; set; }
+
+    public override void SetAttribute(string name, string value)
+    {
+        switch (name)
+        {
+            case "spacing":
+                Spacing = int.Parse(value);
+                break;
+            default:
+                base.SetAttribute(name, value);
+                break;
+        }
+    }
 }
 
 public interface IPlaceholder
