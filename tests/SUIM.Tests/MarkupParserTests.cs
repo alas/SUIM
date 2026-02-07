@@ -1171,4 +1171,174 @@ Text after
         Assert.Single(div.Children);
         Assert.IsType<Label>(div.Children[0]);
     }
+
+    // ============== SCROLL & BORDER TESTS ==============
+
+    [Fact]
+    public void Parse_Stack_WithScroll_Vertical()
+    {
+        var markup = @"<stack orientation=""vertical"" scroll=""vertical"">
+<label text=""Item 1"" />
+<label text=""Item 2"" />
+<label text=""Item 3"" />
+</stack>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Stack>(element);
+        var stack = (Stack)element;
+        Assert.Equal(Orientation.Vertical, stack.Orientation);
+        Assert.Equal(3, stack.Children.Count);
+    }
+
+    [Fact]
+    public void Parse_Stack_WithScroll_Horizontal()
+    {
+        var markup = @"<stack orientation=""horizontal"" scroll=""horizontal"">
+<label text=""Item 1"" />
+<label text=""Item 2"" />
+</stack>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Stack>(element);
+        var stack = (Stack)element;
+        Assert.Equal(Orientation.Horizontal, stack.Orientation);
+        Assert.Equal(2, stack.Children.Count);
+    }
+
+    [Fact]
+    public void Parse_Stack_WithScroll_Both()
+    {
+        var markup = @"<stack scroll=""both"">
+<div width=""1000"" height=""800"" />
+</stack>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Stack>(element);
+        var stack = (Stack)element;
+        Assert.Single(stack.Children);
+    }
+
+    [Fact]
+    public void Parse_Stack_WithScroll_WithAllAttributes()
+    {
+        var markup = @"<stack orientation=""vertical"" scroll=""vertical"" width=""400"" height=""300"" spacing=""5"">
+<label text=""Scrollable Item 1"" />
+<label text=""Scrollable Item 2"" />
+<label text=""Scrollable Item 3"" />
+</stack>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Stack>(element);
+        var stack = (Stack)element;
+        Assert.Equal(Orientation.Vertical, stack.Orientation);
+        Assert.Equal("400", stack.Width);
+        Assert.Equal("300", stack.Height);
+        Assert.Equal(5, stack.Spacing);
+        Assert.Equal(3, stack.Children.Count);
+    }
+
+    [Fact]
+    public void Parse_Border_WithThicknessAndColor()
+    {
+        var markup = @"<border thickness=""2"" color=""#FF0000"">
+<label text=""Bordered Content"" />
+</border>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Border>(element);
+        var border = (Border)element;
+        Assert.Single(border.Children);
+        Assert.Equal("#FF0000", border.BorderColor);
+    }
+
+    [Fact]
+    public void Parse_Border_WithMultipleSideThickness()
+    {
+        var markup = @"<border thickness=""5,10,5,10"" color=""blue"">
+<div width=""200"" height=""100"" />
+</border>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Border>(element);
+        var border = (Border)element;
+        Assert.NotNull(border.BorderThickness);
+        Assert.Equal("blue", border.BorderColor);
+        Assert.Single(border.Children);
+    }
+
+    [Fact]
+    public void Parse_Border_WithTwoValueThickness()
+    {
+        var markup = @"<border thickness=""3,6"" color=""green"">
+<label text=""Border Test"" />
+</border>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Border>(element);
+        var border = (Border)element;
+        Assert.NotNull(border.BorderThickness);
+        Assert.Equal("green", border.BorderColor);
+    }
+
+    [Fact]
+    public void Parse_Div_WithBorder()
+    {
+        var markup = @"<div width=""300"" height=""200"" bg=""lightgray"">
+<border thickness=""2"" color=""red"">
+<label text=""Bordered Inner Content"" />
+</border>
+</div>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Div>(element);
+        var div = (Div)element;
+        Assert.Equal("300", div.Width);
+        Assert.Equal("200", div.Height);
+        Assert.Equal("lightgray", div.Background);
+        Assert.Single(div.Children);
+        
+        var border = (Border)div.Children[0];
+        Assert.Equal("red", border.BorderColor);
+        Assert.Single(border.Children);
+        var label = (Label)border.Children[0];
+        Assert.Equal("Bordered Inner Content", label.Text);
+    }
+
+    [Fact]
+    public void Parse_Border_WithoutColor()
+    {
+        var markup = @"<border thickness=""1"">
+<div width=""100"" />
+</border>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Border>(element);
+        var border = (Border)element;
+        Assert.Null(border.BorderColor);
+        Assert.Single(border.Children);
+    }
+
+    [Fact]
+    public void Parse_Border_WithThicknessAndColorInStyle()
+    {
+        var markup =
+@"<suim>
+    <style>
+    .myclass {
+	    width: 500,
+	    height: 400,
+	    border: 5 #FF0000
+    }
+    </style>
+    <div class=""myclass"">
+        <label text=""Bordered Content"" />
+    </border>
+</suim>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Border>(element);
+        var border = (Border)element;
+        Assert.Single(border.Children);
+        Assert.Equal("#FF0000", border.BorderColor);
+    }
 }
