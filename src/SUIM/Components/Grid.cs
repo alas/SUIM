@@ -41,17 +41,17 @@ public class Grid : LayoutElement
 
     public override void SetAttribute(string name, object? value)
     {
-        switch (name)
+        if (name.Equals("columns", StringComparison.OrdinalIgnoreCase))
         {
-            case "columns":
-                Columns = Convert.ToString(value);
-                break;
-            case "rows":
-                Rows = Convert.ToString(value);
-                break;
-            default:
-                base.SetAttribute(name, value);
-                break;
+            Columns = Convert.ToString(value);
+        }
+        else if (name.Equals("rows", StringComparison.OrdinalIgnoreCase))
+        {
+            Rows = Convert.ToString(value);
+        }
+        else
+        {
+            base.SetAttribute(name, value);
         }
     }
 }

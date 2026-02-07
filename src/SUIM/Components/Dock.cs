@@ -28,14 +28,13 @@ public class Dock : LayoutElement
 
     public override void SetAttribute(string name, object? value)
     {
-        switch (name)
+        if (name.Equals("lastchildfill", StringComparison.OrdinalIgnoreCase))
         {
-            case "lastchildfill":
-                LastChildFill = Convert.ToBoolean(value);
-                break;
-            default:
-                base.SetAttribute(name, value);
-                break;
+            LastChildFill = Convert.ToBoolean(value);
+        }
+        else
+        {
+            base.SetAttribute(name, value);
         }
     }
 }

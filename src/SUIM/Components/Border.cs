@@ -7,22 +7,23 @@ public class Border : UIElement
 
     public override void SetAttribute(string name, object? value)
     {
-        switch (name)
+        if (name.Equals("thickness", StringComparison.OrdinalIgnoreCase))
         {
-            case "thickness":
-                BorderThickness = Thickness.Parse(Convert.ToString(value));
-                break;
-            case "color":
-                BorderColor = Convert.ToString(value);
-                break;
-            case "border":
-                 // Parse shorthand: "10 White" or "10 5 0 2 White"
-                 var str = Convert.ToString(value);
-                 ParseShorthand(str);
-                 break;
-            default:
-                base.SetAttribute(name, value);
-                break;
+            BorderThickness = Thickness.Parse(Convert.ToString(value));
+        }
+        else if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
+        {
+            BorderColor = Convert.ToString(value);
+        }
+        else if (name.Equals("border", StringComparison.OrdinalIgnoreCase))
+        {
+             // Parse shorthand: "10 White" or "10 5 0 2 White"
+             var str = Convert.ToString(value);
+             ParseShorthand(str);
+        }
+        else
+        {
+            base.SetAttribute(name, value);
         }
     }
 

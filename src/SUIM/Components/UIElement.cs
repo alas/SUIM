@@ -178,14 +178,13 @@ public class LayoutElement : UIElement
 
     public override void SetAttribute(string name, object? value)
     {
-        switch (name)
+        if (name.Equals("spacing", StringComparison.OrdinalIgnoreCase))
         {
-            case "spacing":
-                Spacing = Convert.ToInt32(value);
-                break;
-            default:
-                base.SetAttribute(name, value);
-                break;
+            Spacing = Convert.ToInt32(value);
+        }
+        else
+        {
+            base.SetAttribute(name, value);
         }
     }
 }
