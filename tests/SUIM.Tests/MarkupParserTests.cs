@@ -1494,7 +1494,7 @@ Text after
     public void Parse_Suim_IgnoresModelAndStyle()
     {
         var markup = @"<suim>
-    <model><value>ignored</value></model>
+    <model>.class { value: ignored }</model>
     <style>.button { color: red; }</style>
     <button><label text=""Click"" /></button>
 </suim>";
