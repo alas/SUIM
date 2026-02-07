@@ -1,3 +1,3 @@
 namespace SUIM.Components;
 
-public class Button : BaseText { }
+public class Button : UIElement { }

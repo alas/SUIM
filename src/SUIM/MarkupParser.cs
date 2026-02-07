@@ -4,16 +4,17 @@ using System;
 using System.Xml.Linq;
 using SUIM.Components;
 
-public static class MarkupParser
+public class MarkupParser(object? model = null)
 {
-    public static (UIElement, dynamic?) Parse(string markup, object? model = null)
+    private readonly dynamic? model = model == null ? null : Create(model);
+
+    public (UIElement, dynamic?) Parse(string markup)
     {
-        var observableModel = model == null ? null : Create(model);
-        var controlFlowParser = new ControlFlowParser(observableModel);
+        var controlFlowParser = new ControlFlowParser(model);
         var expandedMarkup = controlFlowParser.ExpandDirectives(markup);
 
         var doc = XDocument.Parse(expandedMarkup);
-        return (ParseElement(doc.Root!, observableModel), observableModel);
+        return (ParseElement(doc.Root!), model);
     }
     
     private static dynamic Create(object model)
@@ -25,7 +26,7 @@ public static class MarkupParser
         return observable;
     }
 
-    private static UIElement ParseElement(XElement element, dynamic model)
+    private UIElement ParseElement(XElement element)
     {
         UIElement uiElement = ParseElementTag(element);
 
@@ -66,7 +67,7 @@ public static class MarkupParser
                     {
                         child.SetAttributeValue("grid.row", rowIndex.ToString());
                         child.SetAttributeValue("grid.column", colIdx.ToString());
-                        var childElement = ParseElement(child, model);
+                        var childElement = ParseElement(child);
                         grid.AddChild(childElement, child);
                         colIdx++;
                     }
@@ -86,7 +87,7 @@ public static class MarkupParser
                     {
                         child.SetAttributeValue("grid.column", columnIndex.ToString());
                         child.SetAttributeValue("grid.row", rowIdx.ToString());
-                        var childElement = ParseElement(child, model);
+                        var childElement = ParseElement(child);
                         grid.AddChild(childElement, child);
                         rowIdx++;
                     }
@@ -95,7 +96,7 @@ public static class MarkupParser
                 }
                 else
                 {
-                    var childElement = ParseElement(node, model);
+                    var childElement = ParseElement(node);
                     grid.AddChild(childElement, node);
                 }
             }
@@ -115,7 +116,7 @@ public static class MarkupParser
                 }
                 else if (node is XElement childXElement)
                 {
-                    var childElement = ParseElement(childXElement, model);
+                    var childElement = ParseElement(childXElement);
                     uiElement.AddChild(childElement, childXElement);
                 }
             }

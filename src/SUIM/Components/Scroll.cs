@@ -1,6 +1,6 @@
 ﻿namespace SUIM.Components;
 
-internal class Scroll : LayoutElement
+public class Scroll : LayoutElement
 {
     public ScrollDirection Direction { get; set; } = ScrollDirection.Vertical;
     public float ScrollX { get; set; }

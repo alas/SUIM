@@ -30,7 +30,7 @@ public class ControlFlowParserTests
     <label text=""True"" />
 }
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -53,7 +53,7 @@ else
     <label text=""False"" />
 }
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -76,7 +76,7 @@ else
     <label text=""False"" />
 }
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -103,7 +103,7 @@ else
     <label text=""True"" />
 }
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -134,7 +134,7 @@ else
     <label text=""FinalElse"" />
 }
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -165,7 +165,7 @@ else
     <label text=""False"" />
 }
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -184,7 +184,7 @@ else
     <label text=""@i"" />
 }
 </stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -206,7 +206,7 @@ else
     <label text=""@i"" />
 }
 </stack>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var (element, _) = new MarkupParser().Parse(markup);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -235,7 +235,7 @@ else
     }
 }
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -275,7 +275,7 @@ else
     <label text=""@i"" />
 }
 </stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -296,7 +296,7 @@ else
     <label text=""@i"" />
 }
 </stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -325,7 +325,7 @@ else
     }
 }
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -354,7 +354,7 @@ else
     }
 }
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -393,7 +393,7 @@ else
     <label text=""@item"" />
 }
 </stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -412,7 +412,7 @@ else
     <label text=""@item.Name"" />
 }
 </stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -431,7 +431,7 @@ else
     <label text=""@i"" />
 }
 </stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -457,7 +457,7 @@ else
     <label text=""Disabled"" />
 }
 </button>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Button>(element);
         var button = (Button)element;
@@ -477,7 +477,7 @@ else
     <label text=""Should not appear"" />
 }
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
