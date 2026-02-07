@@ -7,11 +7,11 @@ public class Dock : LayoutElement
     public bool LastChildFill { get; set; } = true;
     public List<DockChild> DockChildren { get; } = [];
 
-    public override void AddChild(UIElement child, XElement element)
+    public override void AddChild(UIElement child, XElement? element)
     {
         base.AddChild(child, element);
 
-        var edgeAttr = element.Attribute("dock.edge");
+        var edgeAttr = element?.Attribute("dock.edge");
         var dockChild_Edge = edgeAttr != null ? Enum.Parse<DockEdge>(edgeAttr.Value, true) : DockEdge.Left;
         var dockChild = new DockChild(dockChild_Edge, child);
         DockChildren.Add(dockChild);

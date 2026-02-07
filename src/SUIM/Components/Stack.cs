@@ -10,7 +10,8 @@ public class Stack : LayoutElement
         switch (name)
         {
             case "orientation":
-                Orientation = Enum.Parse<Orientation>(Convert.ToString(value), true);
+                var str = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
+                Orientation = Enum.Parse<Orientation>(str, true);
                 break;
             case "clip":
                 Clip = Convert.ToBoolean(value);

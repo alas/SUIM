@@ -2,7 +2,6 @@ namespace SUIM;
 
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Text.Json;
 using System.Xml.Linq;
 using SUIM.Components;
@@ -19,7 +18,9 @@ public class MarkupParser(object? model = null)
         var doc = XDocument.Parse(expandedMarkup);
         var root = doc.Root!;
 
-        // If root element is "suim", extract the model and actual root element
+        Dictionary<string, Dictionary<string, string>>? styles = null;
+
+        // If root element is "suim", extract the model, styles, and actual root element
         if (root.Name.LocalName.Equals("suim", StringComparison.OrdinalIgnoreCase))
         {
             var modelJson = ExtractModelFromSuimWrapper(root);
@@ -27,10 +28,25 @@ public class MarkupParser(object? model = null)
             {
                 model = MergeModels(model, modelJson);
             }
+
+            var styleContent = ExtractStylesFromSuimWrapper(root);
+            if (!string.IsNullOrEmpty(styleContent))
+            {
+                styles = ParseStyles(styleContent);
+            }
+
             root = ExtractRealRootFromSuimWrapper(root);
         }
 
-        return (ParseElement(root), model);
+        var element = ParseElement(root);
+
+        // Apply styles after parsing the tree
+        if (styles != null && styles.Count > 0)
+        {
+            element = ApplyStylesToElement(element, styles);
+        }
+
+        return (element, model);
     }
 
     private dynamic? MergeModels(dynamic? existingModel, string modelJson)
@@ -154,6 +170,175 @@ public class MarkupParser(object? model = null)
         return string.IsNullOrEmpty(content) ? null : content;
     }
 
+    private static string? ExtractStylesFromSuimWrapper(XElement suimElement)
+    {
+        var styleElement = suimElement.Elements()
+            .FirstOrDefault(e => e.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase));
+        
+        if (styleElement == null)
+        {
+            return null;
+        }
+
+        // Get the content of the style element
+        var content = styleElement.Value.Trim();
+        return string.IsNullOrEmpty(content) ? null : content;
+    }
+
+    private static Dictionary<string, Dictionary<string, string>> ParseStyles(string styleContent)
+    {
+        var styles = new Dictionary<string, Dictionary<string, string>>();
+        
+        // Simple CSS-like parser
+        // Format: .classname { property: value; property: value; }
+        var classRegex = new System.Text.RegularExpressions.Regex(@"\.([a-zA-Z0-9_-]+)\s*\{([^}]*)\}");
+        var matches = classRegex.Matches(styleContent);
+
+        foreach (System.Text.RegularExpressions.Match match in matches)
+        {
+            var className = match.Groups[1].Value;
+            var propertiesContent = match.Groups[2].Value;
+
+            var properties = new Dictionary<string, string>();
+            // Parse properties: "property: value, property: value"
+            var propertyRegex = new System.Text.RegularExpressions.Regex(@"([a-zA-Z0-9\-]+)\s*:\s*([^,}]+)");
+            var propMatches = propertyRegex.Matches(propertiesContent);
+
+            foreach (System.Text.RegularExpressions.Match propMatch in propMatches)
+            {
+                var propName = propMatch.Groups[1].Value.Trim();
+                var propValue = propMatch.Groups[2].Value.Trim();
+                properties[propName] = propValue;
+            }
+
+            if (properties.Count > 0)
+            {
+                styles[className] = properties;
+            }
+        }
+
+        return styles;
+    }
+
+    private static UIElement ApplyStylesToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles)
+    {
+        // Get the element's class
+        var elementClass = element.GetAttribute("class") as string;
+        
+        // Check if this element has a matching style
+        if (!string.IsNullOrEmpty(elementClass))
+        {
+            var classToCheck = elementClass.Trim();
+            if (styles.TryGetValue(classToCheck, out var properties))
+            {
+                element = ApplyStylePropertiesToElement(element, properties, styles);
+                return element;
+            }
+        }
+
+        // Recursively apply to children
+        return ApplyStylesToChildren(element, styles);
+    }
+
+    private static UIElement ApplyStylePropertiesToElement(UIElement element, Dictionary<string, string> properties, Dictionary<string, Dictionary<string, string>> allStyles)
+    {
+        // Extract border and scroll attributes for special handling
+        string? borderAttr = null;
+        string? scrollAttr = null;
+        var regularAttrs = new Dictionary<string, string>();
+
+        foreach (var kvp in properties)
+        {
+            var propName = kvp.Key.ToLower();
+            var propValue = kvp.Value;
+
+            if (propName == "border")
+            {
+                borderAttr = propValue;
+            }
+            else if (propName == "scroll")
+            {
+                scrollAttr = propValue;
+            }
+            else
+            {
+                regularAttrs[propName] = propValue;
+            }
+        }
+
+        // Apply regular attributes
+        foreach (var kvp in regularAttrs)
+        {
+            element.SetAttribute(kvp.Key, kvp.Value);
+        }
+
+        // First, apply styles to children of the original element
+        ApplyStylesToChildren(element, allStyles);
+
+        // Handle scroll wrapper
+        if (!string.IsNullOrEmpty(scrollAttr))
+        {
+            var scroll = new Scroll();
+            if (Enum.TryParse<ScrollDirection>(scrollAttr, true, out var dir))
+            {
+                scroll.Direction = dir;
+            }
+            scroll.AddChild(element, null);
+            element = scroll;
+        }
+
+        // Handle border wrapper (must be applied last to wrap scroll if present)
+        if (!string.IsNullOrEmpty(borderAttr))
+        {
+            var border = new Border();
+            border.SetAttribute("border", borderAttr);
+            border.AddChild(element, null);
+            element = border;
+        }
+
+        return element;
+    }
+
+    private static UIElement ApplyStylesToChildren(UIElement element, Dictionary<string, Dictionary<string, string>> styles)
+    {
+        // For elements that have children, recursively apply styles
+        switch (element)
+        {
+            case Div:
+            case Stack:
+            case Button:
+            case Overlay:
+            case Border:
+            case Scroll:
+                for (int i = 0; i < element.Children.Count; i++)
+                {
+                    element.Children[i] = ApplyStylesToElement(element.Children[i], styles);
+                }
+                break;
+            case Grid grid:
+                foreach (var gridChild in grid.GridChildren)
+                {
+                    gridChild.Element = ApplyStylesToElement(gridChild.Element, styles);
+                }
+                break;
+            case Dock dock:
+                var newDockChildren = new List<DockChild>();
+                foreach (var dockChild in dock.DockChildren)
+                {
+                    var styledElement = ApplyStylesToElement(dockChild.Element, styles);
+                    newDockChildren.Add(new DockChild(dockChild.Edge, styledElement));
+                }
+                dock.DockChildren.Clear();
+                foreach (var dockChild in newDockChildren)
+                {
+                    dock.DockChildren.Add(dockChild);
+                }
+                break;
+        }
+
+        return element;
+    }
+
     private static XElement ExtractRealRootFromSuimWrapper(XElement suimElement)
     {
         var children = suimElement.Elements().ToList();
@@ -169,13 +354,13 @@ public class MarkupParser(object? model = null)
                        !e.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))
             .ToList();
 
-        if (visualElements.Count == 0)
+        if (visualElements.Count != 1)
         {
             throw new InvalidOperationException("suim element must contain at least one visual tree element after model and style");
         }
 
         // Return the last visual element as the root
-        return visualElements.Last();
+        return visualElements.Single();
     }
     
     private static dynamic Create(object model)

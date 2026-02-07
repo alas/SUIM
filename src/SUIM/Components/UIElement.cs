@@ -30,7 +30,7 @@ public abstract class UIElement
     public Dictionary<string, List<Action<UIElement>>> EventHandlers { get; set; } = [];
     public List<UIElement> Children { get; } = [];
 
-    public virtual void AddChild(UIElement child, XElement element)
+    public virtual void AddChild(UIElement child, XElement? element)
     {
         child.Parent = this;
         Children.Add(child);
@@ -56,7 +56,7 @@ public abstract class UIElement
                 Y = Convert.ToInt32(value);
                 break;
             case "opacity":
-                Opacity = Convert.ToSingle(value, CultureInfo.InvariantCulture);
+                Opacity = Convert.ToSingle(value);
                 break;
             case "z-index":
                 ZIndex = Convert.ToInt32(value);
@@ -65,10 +65,10 @@ public abstract class UIElement
                 Visibility = Convert.ToString(value);
                 break;
             case "halign" or "horizontalalignment":
-                HorizontalAlignment = Enum.Parse<HorizontalAlignment>(Convert.ToString(value), true);
+                HorizontalAlignment = Enum.Parse<HorizontalAlignment>(Convert.ToString(value) ?? throw new ArgumentException($"Attribute '{name}' cannot be '{value}'"), true);
                 break;
             case "valign" or "verticalalignment":
-                VerticalAlignment = Enum.Parse<VerticalAlignment>(Convert.ToString(value), true);
+                VerticalAlignment = Enum.Parse<VerticalAlignment>(Convert.ToString(value) ?? throw new ArgumentException($"Attribute '{name}' cannot be '{value}'"), true);
                 break;
             case "margin":
                 Margin = Convert.ToString(value);
@@ -109,6 +109,29 @@ public abstract class UIElement
     {
         //throw new NotImplementedException();
         return null;
+    }
+
+    public virtual object? GetAttribute(string name)
+    {
+        return name.ToLower() switch
+        {
+            "id" => Id,
+            "class" => Class,
+            "x" => X,
+            "y" => Y,
+            "opacity" => Opacity,
+            "z-index" => ZIndex,
+            "visibility" => Visibility,
+            "halign" or "horizontalalignment" => HorizontalAlignment,
+            "valign" or "verticalalignment" => VerticalAlignment,
+            "margin" => Margin,
+            "padding" => Padding,
+            "bg" or "background" => Background,
+            "width" => Width,
+            "height" => Height,
+            "anchor" => Anchor,
+            _ => null
+        };
     }
 
     public virtual void On(string eventName, Action<UIElement>? handler)

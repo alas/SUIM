@@ -15,7 +15,7 @@ public class Input : UIElement, IPlaceholder
         switch (name)
         {
             case "type":
-                var valueStr = Convert.ToString(value);
+                var valueStr = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
                 if (valueStr == "datetime-local")
                 {
                     Type = InputType.DatetimeLocal;
@@ -26,7 +26,7 @@ public class Input : UIElement, IPlaceholder
                 }
                 break;
             case "value":
-                Value = Convert.ToString(value);
+                Value = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
                 break;
             case "min":
                 Min = Convert.ToInt32(value);
@@ -38,7 +38,7 @@ public class Input : UIElement, IPlaceholder
                 Step = Convert.ToInt32(value);
                 break;
             case "mask":
-                Mask = Convert.ToString(value);
+                Mask = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
                 break;
             default:
                 base.SetAttribute(name, value);

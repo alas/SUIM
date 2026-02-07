@@ -26,7 +26,7 @@ public class Border : UIElement
         }
     }
 
-    private void ParseShorthand(string value)
+    private void ParseShorthand(string? value)
     {
         if (string.IsNullOrWhiteSpace(value)) return;
         

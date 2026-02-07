@@ -1542,11 +1542,10 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_LastElementIsRoot()
+    public void Parse_Suim_FirstVisualElementIsRoot()
     {
         var markup = @"<suim>
     <model></model>
-    <div bg=""gray"" />
     <stack orientation=""vertical"">
         <label text=""This is root"" />
     </stack>

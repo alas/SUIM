@@ -10,10 +10,11 @@ public class Image : UIElement
         switch (name)
         {
             case "source":
-                Source = Convert.ToString(value);
+                Source = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
                 break;
             case "stretch":
-                Stretch = Enum.Parse<ImageStretch>(Convert.ToString(value), true);
+                var str = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
+                Stretch = Enum.Parse<ImageStretch>(str, true);
                 break;
             default:
                 base.SetAttribute(name, value);
