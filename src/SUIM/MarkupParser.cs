@@ -249,14 +249,14 @@ public class MarkupParser(object? model = null)
 
         foreach (var kvp in properties)
         {
-            var propName = kvp.Key.ToLower();
+            var propName = kvp.Key;
             var propValue = kvp.Value;
 
-            if (propName == "border")
+            if (propName.Equals("border", StringComparison.OrdinalIgnoreCase))
             {
                 borderAttr = propValue;
             }
-            else if (propName == "scroll")
+            else if (propName.Equals("scroll", StringComparison.OrdinalIgnoreCase))
             {
                 scrollAttr = propValue;
             }
@@ -402,8 +402,8 @@ public class MarkupParser(object? model = null)
 
         foreach (var attr in attributes)
         {
-            var name = attr.Name.LocalName.ToLower();
-            if (name == "scroll" || name == "border") continue;
+            var name = attr.Name.LocalName;
+            if (name.Equals("scroll", StringComparison.OrdinalIgnoreCase) || name.Equals("border", StringComparison.OrdinalIgnoreCase)) continue;
 
             var target = IsLayoutAttribute(name) ? rootElement : innerElement;
 
@@ -500,38 +500,39 @@ public class MarkupParser(object? model = null)
         return rootElement;
     }
 
+    private static readonly HashSet<string> LayoutAttributeNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "id", "width", "height", "padding", "margin",
+        "halign", "horizontalalignment", "valign", "verticalalignment",
+        "visibility", "opacity", "background", "bg", "class",
+        "x", "y", "z-index", "anchor"
+    };
+
     private static bool IsLayoutAttribute(string name)
     {
-        return name switch
-        {
-            "id" or "width" or "height" or "padding" or "margin" or
-            "halign" or "horizontalalignment" or "valign" or "verticalalignment" or
-            "visibility" or "opacity" or "background" or "bg" or "class" or
-            "x" or "y" or "z-index" or "anchor" => true,
-            _ => false
-        };
+        return LayoutAttributeNames.Contains(name);
     }
 
     private static UIElement ParseElementTag(XElement element)
     {
-        return element.Name.LocalName switch
-        {
-            "div" => new Div(),
-            "stack" => new Stack(),
-            "hstack" or "hbox" => new Stack { Orientation = Orientation.Horizontal },
-            "vstack" or "vbox" => new Stack { Orientation = Orientation.Vertical },
-            "grid" => new Grid(),
-            "dock" => new Dock(),
-            "overlay" => new Overlay(),
-            "label" => new Label(),
-            "button" => new Button(),
-            "image" => new Image(),
-            "input" => new Input(),
-            "select" => new Select(),
-            "option" => new Option(),
-            "textarea" => new TextArea(),
-            "border" => new Border(),
-            _ => throw new NotSupportedException($"Unknown tag: {element.Name.LocalName}")
-        };
+        var tag = element.Name.LocalName;
+
+        if (tag.Equals("div", StringComparison.OrdinalIgnoreCase)) return new Div();
+        if (tag.Equals("stack", StringComparison.OrdinalIgnoreCase)) return new Stack();
+        if (tag.Equals("hstack", StringComparison.OrdinalIgnoreCase) || tag.Equals("hbox", StringComparison.OrdinalIgnoreCase)) return new Stack { Orientation = Orientation.Horizontal };
+        if (tag.Equals("vstack", StringComparison.OrdinalIgnoreCase) || tag.Equals("vbox", StringComparison.OrdinalIgnoreCase)) return new Stack { Orientation = Orientation.Vertical };
+        if (tag.Equals("grid", StringComparison.OrdinalIgnoreCase)) return new Grid();
+        if (tag.Equals("dock", StringComparison.OrdinalIgnoreCase)) return new Dock();
+        if (tag.Equals("overlay", StringComparison.OrdinalIgnoreCase)) return new Overlay();
+        if (tag.Equals("label", StringComparison.OrdinalIgnoreCase)) return new Label();
+        if (tag.Equals("button", StringComparison.OrdinalIgnoreCase)) return new Button();
+        if (tag.Equals("image", StringComparison.OrdinalIgnoreCase)) return new Image();
+        if (tag.Equals("input", StringComparison.OrdinalIgnoreCase)) return new Input();
+        if (tag.Equals("select", StringComparison.OrdinalIgnoreCase)) return new Select();
+        if (tag.Equals("option", StringComparison.OrdinalIgnoreCase)) return new Option();
+        if (tag.Equals("textarea", StringComparison.OrdinalIgnoreCase)) return new TextArea();
+        if (tag.Equals("border", StringComparison.OrdinalIgnoreCase)) return new Border();
+
+        throw new NotSupportedException($"Unknown tag: {element.Name.LocalName}");
     }
 }

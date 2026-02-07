@@ -44,64 +44,81 @@ public abstract class UIElement
 
     public virtual void SetAttribute(string name, object? value)
     {
-        switch (name)
+        if (name.Equals("id", StringComparison.OrdinalIgnoreCase))
         {
-            case "id":
-                Id = Convert.ToString(value);
-                break;
-            case "x":
-                X = Convert.ToInt32(value);
-                break;
-            case "y":
-                Y = Convert.ToInt32(value);
-                break;
-            case "opacity":
-                Opacity = Convert.ToSingle(value);
-                break;
-            case "z-index":
-                ZIndex = Convert.ToInt32(value);
-                break;
-            case "visibility":
-                Visibility = Convert.ToString(value);
-                break;
-            case "halign" or "horizontalalignment":
-                HorizontalAlignment = Enum.Parse<HorizontalAlignment>(Convert.ToString(value) ?? throw new ArgumentException($"Attribute '{name}' cannot be '{value}'"), true);
-                break;
-            case "valign" or "verticalalignment":
-                VerticalAlignment = Enum.Parse<VerticalAlignment>(Convert.ToString(value) ?? throw new ArgumentException($"Attribute '{name}' cannot be '{value}'"), true);
-                break;
-            case "margin":
-                Margin = Convert.ToString(value);
-                break;
-            case "padding":
-                Padding = Convert.ToString(value);
-                break;
-            case "bg" or "background":
-                Background = Convert.ToString(value);
-                break;
-            case "width":
-                Width = Convert.ToString(value);
-                break;
-            case "height":
-                Height = Convert.ToString(value);
-                break;
-            case "anchor":
-                Anchor = Enum.Parse<Anchor>(Convert.ToString(value), true);
-                break;
-            case "class":
-                Class = Convert.ToString(value);
-                break;
-            case string x when x.StartsWith("on"):
-                On(x.Substring(2), GetHandler(Convert.ToString(value)));
-                break;
-            case "placeholder":
-                (this as IPlaceholder)?.Placeholder = Convert.ToString(value);
-                break;
-            case string x when x.Contains('.'):
-                // ignore parent properties
-                break;
-            default:
-                throw new NotSupportedException($"Attribute '{name}' is not supported on {GetType().Name}");
+            Id = Convert.ToString(value);
+        }
+        else if (name.Equals("x", StringComparison.OrdinalIgnoreCase))
+        {
+            X = Convert.ToInt32(value);
+        }
+        else if (name.Equals("y", StringComparison.OrdinalIgnoreCase))
+        {
+            Y = Convert.ToInt32(value);
+        }
+        else if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase))
+        {
+            Opacity = Convert.ToSingle(value);
+        }
+        else if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase))
+        {
+            ZIndex = Convert.ToInt32(value);
+        }
+        else if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase))
+        {
+            Visibility = Convert.ToString(value);
+        }
+        else if (name.Equals("halign", StringComparison.OrdinalIgnoreCase) || name.Equals("horizontalalignment", StringComparison.OrdinalIgnoreCase))
+        {
+            HorizontalAlignment = Enum.Parse<HorizontalAlignment>(Convert.ToString(value) ?? throw new ArgumentException($"Attribute '{name}' cannot be '{value}'"), true);
+        }
+        else if (name.Equals("valign", StringComparison.OrdinalIgnoreCase) || name.Equals("verticalalignment", StringComparison.OrdinalIgnoreCase))
+        {
+            VerticalAlignment = Enum.Parse<VerticalAlignment>(Convert.ToString(value) ?? throw new ArgumentException($"Attribute '{name}' cannot be '{value}'"), true);
+        }
+        else if (name.Equals("margin", StringComparison.OrdinalIgnoreCase))
+        {
+            Margin = Convert.ToString(value);
+        }
+        else if (name.Equals("padding", StringComparison.OrdinalIgnoreCase))
+        {
+            Padding = Convert.ToString(value);
+        }
+        else if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase))
+        {
+            Background = Convert.ToString(value);
+        }
+        else if (name.Equals("width", StringComparison.OrdinalIgnoreCase))
+        {
+            Width = Convert.ToString(value);
+        }
+        else if (name.Equals("height", StringComparison.OrdinalIgnoreCase))
+        {
+            Height = Convert.ToString(value);
+        }
+        else if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase))
+        {
+            Anchor = Enum.Parse<Anchor>(Convert.ToString(value), true);
+        }
+        else if (name.Equals("class", StringComparison.OrdinalIgnoreCase))
+        {
+            Class = Convert.ToString(value);
+        }
+        else if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
+        {
+            On(name.Substring(2), GetHandler(Convert.ToString(value)));
+        }
+        else if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase))
+        {
+            (this as IPlaceholder)?.Placeholder = Convert.ToString(value);
+        }
+        else if (name.Contains('.'))
+        {
+            // ignore parent properties
+        }
+        else
+        {
+            throw new NotSupportedException($"Attribute '{name}' is not supported on {GetType().Name}");
         }
     }
 
@@ -113,25 +130,22 @@ public abstract class UIElement
 
     public virtual object? GetAttribute(string name)
     {
-        return name.ToLower() switch
-        {
-            "id" => Id,
-            "class" => Class,
-            "x" => X,
-            "y" => Y,
-            "opacity" => Opacity,
-            "z-index" => ZIndex,
-            "visibility" => Visibility,
-            "halign" or "horizontalalignment" => HorizontalAlignment,
-            "valign" or "verticalalignment" => VerticalAlignment,
-            "margin" => Margin,
-            "padding" => Padding,
-            "bg" or "background" => Background,
-            "width" => Width,
-            "height" => Height,
-            "anchor" => Anchor,
-            _ => null
-        };
+        if (name.Equals("id", StringComparison.OrdinalIgnoreCase)) return Id;
+        if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) return Class;
+        if (name.Equals("x", StringComparison.OrdinalIgnoreCase)) return X;
+        if (name.Equals("y", StringComparison.OrdinalIgnoreCase)) return Y;
+        if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase)) return Opacity;
+        if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase)) return ZIndex;
+        if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase)) return Visibility;
+        if (name.Equals("halign", StringComparison.OrdinalIgnoreCase) || name.Equals("horizontalalignment", StringComparison.OrdinalIgnoreCase)) return HorizontalAlignment;
+        if (name.Equals("valign", StringComparison.OrdinalIgnoreCase) || name.Equals("verticalalignment", StringComparison.OrdinalIgnoreCase)) return VerticalAlignment;
+        if (name.Equals("margin", StringComparison.OrdinalIgnoreCase)) return Margin;
+        if (name.Equals("padding", StringComparison.OrdinalIgnoreCase)) return Padding;
+        if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase)) return Background;
+        if (name.Equals("width", StringComparison.OrdinalIgnoreCase)) return Width;
+        if (name.Equals("height", StringComparison.OrdinalIgnoreCase)) return Height;
+        if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase)) return Anchor;
+        return null;
     }
 
     public virtual void On(string eventName, Action<UIElement>? handler)
