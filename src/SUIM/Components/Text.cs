@@ -9,26 +9,29 @@ public class BaseText : UIElement
 
     public override void SetAttribute(string name, object? value)
     {
-        switch (name)
+        if (name.Equals("text", StringComparison.OrdinalIgnoreCase))
         {
-            case "text":
-                Text = Convert.ToString(value);
-                break;
-            case "font":
-                Font = Convert.ToString(value);
-                break;
-            case "fontsize":
-                FontSize = Convert.ToInt32(value);
-                break;
-            case "color":
-                Color = Convert.ToString(value);
-                break;
-            case "wrap":
-                Wrap = Convert.ToBoolean(value);
-                break;
-            default:
-                base.SetAttribute(name, value);
-                break;
+            Text = Convert.ToString(value);
+        }
+        else if (name.Equals("font", StringComparison.OrdinalIgnoreCase))
+        {
+            Font = Convert.ToString(value);
+        }
+        else if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase))
+        {
+            FontSize = Convert.ToInt32(value);
+        }
+        else if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
+        {
+            Color = Convert.ToString(value);
+        }
+        else if (name.Equals("wrap", StringComparison.OrdinalIgnoreCase))
+        {
+            Wrap = Convert.ToBoolean(value);
+        }
+        else
+        {
+            base.SetAttribute(name, value);
         }
     }
 }
@@ -41,17 +44,17 @@ public class TextArea : UIElement, IPlaceholder
 
     public override void SetAttribute(string name, object? value)
     {
-        switch (name)
+        if (name.Equals("rows", StringComparison.OrdinalIgnoreCase))
         {
-            case "rows":
-                Rows = Convert.ToInt32(value);
-                break;
-            case "columns":
-                Columns = Convert.ToInt32(value);
-                break;
-            default:
-                base.SetAttribute(name, value);
-                break;
+            Rows = Convert.ToInt32(value);
+        }
+        else if (name.Equals("columns", StringComparison.OrdinalIgnoreCase))
+        {
+            Columns = Convert.ToInt32(value);
+        }
+        else
+        {
+            base.SetAttribute(name, value);
         }
     }
 }

@@ -9,14 +9,13 @@ public class Select : UIElement
 
     public override void SetAttribute(string name, object? value)
     {
-        switch (name)
+        if (name.Equals("multiple", StringComparison.OrdinalIgnoreCase))
         {
-            case "multiple":
-                Multiple = Convert.ToBoolean(value);
-                break;
-            default:
-                base.SetAttribute(name, value);
-                break;
+            Multiple = Convert.ToBoolean(value);
+        }
+        else
+        {
+            base.SetAttribute(name, value);
         }
     }
 }
@@ -27,14 +26,13 @@ public class Option : UIElement
 
     public override void SetAttribute(string name, object? value)
     {
-        switch (name)
+        if (name.Equals("value", StringComparison.OrdinalIgnoreCase))
         {
-            case "value":
-                Value = Convert.ToString(value);
-                break;
-            default:
-                base.SetAttribute(name, value);
-                break;
+            Value = Convert.ToString(value);
+        }
+        else
+        {
+            base.SetAttribute(name, value);
         }
     }
 }

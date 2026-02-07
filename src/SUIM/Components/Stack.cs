@@ -7,18 +7,18 @@ public class Stack : LayoutElement
 
     public override void SetAttribute(string name, object? value)
     {
-        switch (name)
+        if (name.Equals("orientation", StringComparison.OrdinalIgnoreCase))
         {
-            case "orientation":
-                var str = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
-                Orientation = Enum.Parse<Orientation>(str, true);
-                break;
-            case "clip":
-                Clip = Convert.ToBoolean(value);
-                break;
-            default:
-                base.SetAttribute(name, value);
-                break;
+            var str = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
+            Orientation = Enum.Parse<Orientation>(str, true);
+        }
+        else if (name.Equals("clip", StringComparison.OrdinalIgnoreCase))
+        {
+            Clip = Convert.ToBoolean(value);
+        }
+        else
+        {
+            base.SetAttribute(name, value);
         }
     }
 }

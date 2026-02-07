@@ -12,37 +12,41 @@ public class Input : UIElement, IPlaceholder
 
     public override void SetAttribute(string name, object? value)
     {
-        switch (name)
+        if (name.Equals("type", StringComparison.OrdinalIgnoreCase))
         {
-            case "type":
-                var valueStr = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
-                if (valueStr == "datetime-local")
-                {
-                    Type = InputType.DatetimeLocal;
-                }
-                else
-                {
-                    Type = Enum.Parse<InputType>(valueStr, true);
-                }
-                break;
-            case "value":
-                Value = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
-                break;
-            case "min":
-                Min = Convert.ToInt32(value);
-                break;
-            case "max":
-                Max = Convert.ToInt32(value);
-                break;
-            case "step":
-                Step = Convert.ToInt32(value);
-                break;
-            case "mask":
-                Mask = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
-                break;
-            default:
-                base.SetAttribute(name, value);
-                break;
+            var valueStr = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
+            if (valueStr.Equals("datetime-local", StringComparison.OrdinalIgnoreCase))
+            {
+                Type = InputType.DatetimeLocal;
+            }
+            else
+            {
+                Type = Enum.Parse<InputType>(valueStr, true);
+            }
+        }
+        else if (name.Equals("value", StringComparison.OrdinalIgnoreCase))
+        {
+            Value = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
+        }
+        else if (name.Equals("min", StringComparison.OrdinalIgnoreCase))
+        {
+            Min = Convert.ToInt32(value);
+        }
+        else if (name.Equals("max", StringComparison.OrdinalIgnoreCase))
+        {
+            Max = Convert.ToInt32(value);
+        }
+        else if (name.Equals("step", StringComparison.OrdinalIgnoreCase))
+        {
+            Step = Convert.ToInt32(value);
+        }
+        else if (name.Equals("mask", StringComparison.OrdinalIgnoreCase))
+        {
+            Mask = Convert.ToString(value) ?? throw new ArgumentException($"Value for attribute '{name}' cannot be null.");
+        }
+        else
+        {
+            base.SetAttribute(name, value);
         }
     }
 }
