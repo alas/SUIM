@@ -1184,8 +1184,13 @@ Text after
 </stack>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
+        Assert.IsType<Scroll>(element);
+        var scroll = (Scroll)element;
+        Assert.Equal(ScrollDirection.Vertical, scroll.Direction);
+        
+        Assert.Single(scroll.Children);
+        Assert.IsType<Stack>(scroll.Children[0]);
+        var stack = (Stack)scroll.Children[0];
         Assert.Equal(Orientation.Vertical, stack.Orientation);
         Assert.Equal(3, stack.Children.Count);
     }
@@ -1199,8 +1204,13 @@ Text after
 </stack>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
+        Assert.IsType<Scroll>(element);
+        var scroll = (Scroll)element;
+        Assert.Equal(ScrollDirection.Horizontal, scroll.Direction);
+        
+        Assert.Single(scroll.Children);
+        Assert.IsType<Stack>(scroll.Children[0]);
+        var stack = (Stack)scroll.Children[0];
         Assert.Equal(Orientation.Horizontal, stack.Orientation);
         Assert.Equal(2, stack.Children.Count);
     }
@@ -1213,9 +1223,12 @@ Text after
 </stack>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
-        Assert.Single(stack.Children);
+        Assert.IsType<Scroll>(element);
+        var scroll = (Scroll)element;
+        Assert.Equal(ScrollDirection.Both, scroll.Direction);
+        
+        Assert.Single(scroll.Children);
+        Assert.IsType<Stack>(scroll.Children[0]);
     }
 
     [Fact]
@@ -1228,11 +1241,17 @@ Text after
 </stack>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
+        Assert.IsType<Scroll>(element);
+        var scroll = (Scroll)element;
+        Assert.Equal(ScrollDirection.Vertical, scroll.Direction);
+        Assert.Equal("400", scroll.Width);
+        Assert.Equal("300", scroll.Height);
+        
+        Assert.Single(scroll.Children);
+        var stack = (Stack)scroll.Children[0];
+        Assert.IsType<Stack>(stack);
         Assert.Equal(Orientation.Vertical, stack.Orientation);
-        Assert.Equal("400", stack.Width);
-        Assert.Equal("300", stack.Height);
+        // Spacing is component specific, goes to stack
         Assert.Equal(5, stack.Spacing);
         Assert.Equal(3, stack.Children.Count);
     }
@@ -1326,16 +1345,65 @@ Text after
 </div>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Equal("300", div.Width);
-        Assert.Equal("200", div.Height);
-        Assert.Equal("lightgray", div.Background);
+        Assert.IsType<Border>(element);
+        var border = (Border)element;
+        
+        // Border props
+        // "2 red" -> Thickness 2, Color red
+        Assert.Equal(2, border.BorderThickness.Left); 
+        Assert.Equal("red", border.BorderColor);
+        
+        Assert.Single(border.Children);
+        Assert.IsType<Div>(border.Children[0]);
+        var div = (Div)border.Children[0];
+        
+        // Layout props transfer to Wrapper (Border)
+        // Spec: "inherits all of the tag's styling"
+        // My implementation adds Layout props to rootElement (Border).
+        // So Width, Height, Bg should be on Border?
+        // Wait, Spec says: "including size, background, borders, and padding".
+        // So Border should have Width=300, Height=200, Bg=lightgray.
+        // And Div? Div becomes just a container? 
+        // Logic in Parser: `target = IsLayoutAttribute(name) ? rootElement : innerElement;`
+        // Width, Height, Bg ARE LayoutAttributes. So they go to Border.
+        
+        Assert.Equal("300", border.Width);
+        Assert.Equal("200", border.Height);
+        Assert.Equal("lightgray", border.Background);
+        
+        // Inner Div should NOT have them? Or Parser doesn't set them on inner.
+        // Let's check Inner Div.
+        Assert.Null(div.Width);
+        Assert.Null(div.Height);
+        Assert.Null(div.Background); // If it was null before.
+        
         Assert.Single(div.Children);
     }
 
     [Fact]
-    public void Parse_Border_WithThicknessAndColorInStyle()
+    public void Parse_BorderAttribute_WithThicknessAndColor()
+    {
+        // Note: Styles are not applied in MarkupParser, so we test inline attribute to ensure wrapper creation logic works.
+        // Fixed XML hierarchy and tag matching.
+        var markup = @"<div width=""500"" height=""400"" border=""5 #FF0000"">
+<label text=""Bordered Content"" />
+</div>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Border>(element);
+        var border = (Border)element;
+        
+        Assert.Equal(5f, border.BorderThickness.Left); // Assuming uniform
+        Assert.Equal("#FF0000", border.BorderColor);
+        Assert.Equal("500", border.Width);
+        Assert.Equal("400", border.Height);
+        
+        Assert.Single(border.Children);
+        Assert.IsType<Div>(border.Children[0]);
+    }
+
+    [Fact]
+    public void Parse_BorderAttribute_WithThicknessAndColorInStyle()
     {
         var markup =
 @"<suim>

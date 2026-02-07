@@ -28,27 +28,56 @@ public class MarkupParser(object? model = null)
 
     private UIElement ParseElement(XElement element)
     {
-        UIElement uiElement = ParseElementTag(element);
+        var innerElement = ParseElementTag(element);
+        var rootElement = innerElement;
 
-        // Parse common attributes
-        foreach (var attr in element.Attributes())
+        var attributes = element.Attributes().ToList();
+        var scrollAttr = attributes.FirstOrDefault(a => a.Name.LocalName.Equals("scroll", StringComparison.OrdinalIgnoreCase));
+        var borderAttr = attributes.FirstOrDefault(a => a.Name.LocalName.Equals("border", StringComparison.OrdinalIgnoreCase));
+
+        if (scrollAttr != null)
         {
+            var scroll = new Scroll();
+            if (Enum.TryParse<ScrollDirection>(scrollAttr.Value, true, out var dir))
+            {
+                scroll.Direction = dir;
+            }
+            scroll.AddChild(rootElement, element);
+            rootElement = scroll;
+        }
+
+        if (borderAttr != null)
+        {
+            var border = new Border();
+            border.SetAttribute("border", borderAttr.Value);
+            border.AddChild(rootElement, element);
+            rootElement = border;
+        }
+
+        foreach (var attr in attributes)
+        {
+            var name = attr.Name.LocalName.ToLower();
+            if (name == "scroll" || name == "border") continue;
+
+            var target = IsLayoutAttribute(name) ? rootElement : innerElement;
+
             if (attr.Value.StartsWith('@'))
             {
                 // Dynamic Binding: <grid width="@myVar" />
                 string modelPropName = attr.Value.Substring(1);
-                var binding = new PropertyBinding(model, modelPropName, uiElement, attr.Name.LocalName);
-                uiElement.Bindings.Add(binding);
+                var binding = new PropertyBinding(model, modelPropName, target, name);
+                target.Bindings.Add(binding);
                 binding.Apply();
             }
             else
             {
-                uiElement.SetAttribute(attr.Name.LocalName.ToLower(), attr.Value);
+                target.SetAttribute(name, attr.Value);
             }
         }
 
         // Handle both text nodes and element children
-        if (uiElement is Grid grid)
+        // Use innerElement for children as it is the content container
+        if (innerElement is Grid grid)
         {
             int rowIndex = 0;
             int columnIndex = 0;
@@ -111,18 +140,30 @@ public class MarkupParser(object? model = null)
                     if (!string.IsNullOrEmpty(text))
                     {
                         var textElement = new Label { Text = text };
-                        uiElement.AddChild(textElement, element);
+                        innerElement.AddChild(textElement, element);
                     }
                 }
                 else if (node is XElement childXElement)
                 {
                     var childElement = ParseElement(childXElement);
-                    uiElement.AddChild(childElement, childXElement);
+                    innerElement.AddChild(childElement, childXElement);
                 }
             }
         }
 
-        return uiElement;
+        return rootElement;
+    }
+
+    private static bool IsLayoutAttribute(string name)
+    {
+        return name switch
+        {
+            "id" or "width" or "height" or "padding" or "margin" or
+            "halign" or "horizontalalignment" or "valign" or "verticalalignment" or
+            "visibility" or "opacity" or "background" or "bg" or "class" or
+            "x" or "y" or "z-index" or "anchor" => true,
+            _ => false
+        };
     }
 
     private static UIElement ParseElementTag(XElement element)
