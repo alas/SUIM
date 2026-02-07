@@ -1,7 +1,6 @@
 namespace SUIM.StrideIntegration;
 
 using System;
-using System.Linq;
 using Stride.Core.Mathematics;
 using Stride.Engine;
 using Stride.UI;
@@ -31,6 +30,7 @@ public class StrideUIMapper
             Components.Grid g => MapGrid(g),
             Components.Input i => MapInput(i),
             Components.Image img => MapImage(img),
+            Components.Border br => MapBorder(br),
             _ => new StrideGrid() // Fallback
         };
 
@@ -65,13 +65,13 @@ public class StrideUIMapper
         return strideElement;
     }
 
-    private static StrideElement MapButton(Components.Button button)
+    private static Button MapButton(Components.Button button)
     {
         var btn = new Button();
         return btn;
     }
 
-    private static StrideElement MapText(Components.BaseText text)
+    private static TextBlock MapText(Components.BaseText text)
     {
         var tb = new TextBlock
         {
@@ -129,35 +129,40 @@ public class StrideUIMapper
             _ => StretchType.None
         };
 
-        // Optionally map Stretch if Stride's Image supports a similar property later
         return img;
+    }
+
+    private Border MapBorder(Components.Border border)
+    {
+        var borderElem = new Border
+        {
+            BorderThickness = ComponentsThicknessToStride(border.BorderThickness)
+        };
+
+        if (!string.IsNullOrEmpty(border.BorderColor))
+        {
+            borderElem.BorderColor = ParseColor(border.BorderColor);
+        }
+
+        // Handle Children
+        if (border.Children.Count > 0)
+        {
+            if (border.Children.Count == 1)
+            {
+                borderElem.Content = MapElement(border.Children[0]);
+            }
+            else
+            {
+                throw new NotSupportedException("Border element in SUIM supports only one child element for now.");
+            }
+        }
+
+        return borderElem;
     }
 
     private StrideGrid MapGrid(Components.Grid grid)
     {
         var g = new StrideGrid();
-        
-        // Parse Rows/Columns
-        // SUIM: "100, auto, *"
-        /*
-        if (!string.IsNullOrEmpty(grid.Rows))
-        {
-            var rows = grid.Rows.Split(',');
-            foreach (var r in rows)
-            {
-                g.RowDefinitions.Add(new GridRowDefinition { Height = ParseGridLength(r) });
-            }
-        }
-
-        if (!string.IsNullOrEmpty(grid.Columns))
-        {
-            var cols = grid.Columns.Split(',');
-            foreach (var c in cols)
-            {
-                g.ColumnDefinitions.Add(new GridColumnDefinition { Width = ParseGridLength(c) });
-            }
-        }
-        */
 
         foreach (var childContainer in grid.GridChildren)
         {
@@ -182,21 +187,6 @@ public class StrideUIMapper
         };
     }
 
-    /*
-    private GridLength ParseGridLength(string val)
-    {
-        val = val.Trim();
-        if (val == "auto") return GridLength.Auto;
-        if (val.EndsWith("*"))
-        {
-            var starVal = val.TrimEnd('*');
-            float f = string.IsNullOrEmpty(starVal) ? 1.0f : float.Parse(starVal);
-            return new GridLength(f, GridUnitType.Star);
-        }
-        return new GridLength(float.Parse(val), GridUnitType.Absolute);
-    }
-    */
-
     private static void ApplyCommonProperties(Components.UIElement suim, StrideElement stride)
     {
         stride.Name = suim.Id;
@@ -204,8 +194,8 @@ public class StrideUIMapper
         stride.Visibility = suim.Visibility == "hidden" ? Visibility.Hidden : (suim.Visibility == "collapse" ? Visibility.Collapsed : Visibility.Visible);
         
         // Start simple with margins/padding parsing
-        if (suim.Margin != null) stride.Margin = ParseThickness(suim.Margin);
-        if (suim.Padding != null && stride is ContentControl cc) cc.Padding = ParseThickness(suim.Padding); // Only ContentControl has padding in Stride basic? No, wrappers do.
+        if (suim.Margin != null) stride.Margin = ComponentsThicknessToStride(Components.Thickness.Parse(suim.Margin));
+        if (suim.Padding != null && stride is ContentControl cc) cc.Padding = ComponentsThicknessToStride(Components.Thickness.Parse(suim.Padding)); // Only ContentControl has padding in Stride basic? No, wrappers do.
 
         // Alignment
         stride.HorizontalAlignment = suim.HorizontalAlignment switch
@@ -244,17 +234,9 @@ public class StrideUIMapper
         }
     }
 
-    private static Thickness ParseThickness(string value)
+    private static Thickness ComponentsThicknessToStride(Components.Thickness thickness)
     {
-        // Simplistic parser: "10" "10,20" "10,20,30,40"
-        var parts = value.Split(',').Select(s => float.Parse(s.Trim())).ToArray();
-        return parts.Length switch
-        {
-            1 => new Thickness(parts[0], parts[0], parts[0], parts[0]),
-            2 => new Thickness(parts[0], parts[1], parts[0], parts[1]), // L, T, R, B
-            4 => new Thickness(parts[0], parts[1], parts[2], parts[3]),
-            _ => new Thickness(0, 0, 0, 0)
-        };
+        return new Thickness(thickness.Left, thickness.Top, thickness.Right, thickness.Bottom);
     }
 
     private static Color ParseColor(string colorStr)
@@ -281,8 +263,6 @@ public class StrideUIMapper
                      Convert.ToByte(hex.Substring(0, 2), 16));
              }
         }
-        var success = Enum.TryParse<Color>(colorStr, out var namedColor);
-        if (success) return namedColor;
 
         return Color.White;
     }

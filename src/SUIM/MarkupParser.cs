@@ -143,6 +143,7 @@ public class MarkupParser(object? model = null)
             "select" => new Select(),
             "option" => new Option(),
             "textarea" => new TextArea(),
+            "border" => new Border(),
             _ => throw new NotSupportedException($"Unknown tag: {element.Name.LocalName}")
         };
     }
