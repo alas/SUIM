@@ -108,6 +108,7 @@ public class PropertyBindingTests
         var div = (Div)element;
         // Property binding should be created for width
         Assert.NotNull(div.Width);
+        Assert.Equal("250", div.Width);
     }
 
     [Fact]
@@ -120,6 +121,7 @@ public class PropertyBindingTests
         var label = (Label)element;
         // Property binding should be created for text
         Assert.NotNull(label.Text);
+        Assert.Equal("test", label.Text);
     }
 
     private static dynamic Create(object model)
