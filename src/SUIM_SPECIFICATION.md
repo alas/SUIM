@@ -213,6 +213,27 @@ Original.suim
 * `Dockpanel (width: 10000, height: 800)`
 * `Label` (Text: "Inventory")
 
+Original.suim
+```xml
+<style>
+.myclass {
+	width: 500,
+	height: 400,
+	border: 10 5 0 2 White,
+}
+<style>
+<dock class="myclass">
+	<label text="Inventory" />
+</dock>
+
+```
+
+**Final C# Tree:**
+
+* `Border (Thicknes: 10 5 0 2, Color: "White")`
+* `Dockpanel (width: 10000, height: 800)`
+* `Label` (Text: "Inventory")
+
 ---
 
 ## 6. Language Grammar & Markup Syntax

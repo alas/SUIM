@@ -1319,6 +1319,22 @@ Text after
     }
 
     [Fact]
+    public void Parse_Div_WithBorderAttribute()
+    {
+        var markup = @"<div width=""300"" height=""200"" bg=""lightgray"" border=""2 red"">
+<label text=""Bordered Div"" />
+</div>";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Div>(element);
+        var div = (Div)element;
+        Assert.Equal("300", div.Width);
+        Assert.Equal("200", div.Height);
+        Assert.Equal("lightgray", div.Background);
+        Assert.Single(div.Children);
+    }
+
+    [Fact]
     public void Parse_Border_WithThicknessAndColorInStyle()
     {
         var markup =
