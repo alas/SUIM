@@ -154,7 +154,7 @@ Graphic Display.
 
 ## 5. The scroll Attribute & Constraints
 
-The **scroll** attribute triggers a structural transformation. The tag is wrapped in an outer scroll-viewport (the scrollbar component), which inherits **all of the tag's styling** (including size, background, borders, and padding). The original tag remains as the direct child of the scroll-viewport, containing all nested children. Example:
+The **scroll** attribute triggers a structural transformation. The tag is wrapped in an outer scroll-viewport (the scroll component), which inherits **all of the tag's styling** (including size, background, borders, and padding). The original tag remains as the direct child of the scroll-viewport, containing all nested children. Example:
 
 Original.suim
 ```xml
@@ -180,12 +180,38 @@ Original.suim
 
 ### 5.2 Allowed Variations
 
-* **scroll="vertical"**: Outer wrapper is a vertical scrollbar.
-* **scroll="horizontal"**: Outer wrapper is a horizontal scrollbar.
+* **scroll="vertical"**: Outer wrapper is a vertical scroll-viewport.
+* **scroll="horizontal"**: Outer wrapper is a horizontal scroll-viewport.
+* **scroll="both"**: Outer wrapper is a horizontal and vertical scroll-viewport.
 
 ### 5.3 The "auto" Rule (Experimental)
 
 `auto` resolutions are determined by the engine metric table (using the font information to calculate text sizes) rather than content measurement, ensuring efficiency.
+
+## 5. The border Attribute
+
+The **border** attribute triggers a structural transformation. The tag is wrapped in an outer border-element (the border component). The original tag remains as the direct child of the border, containing all nested children. Example:
+
+Original.suim
+```xml
+<style>
+.myclass {
+	width: 500,
+	height: 400,
+	border: 10 White,
+}
+<style>
+<dock class="myclass">
+	<label text="Inventory" />
+</dock>
+
+```
+
+**Final C# Tree:**
+
+* `Border (Thicknes: 10, Color: "White")`
+* `Dockpanel (width: 10000, height: 800)`
+* `Label` (Text: "Inventory")
 
 ---
 

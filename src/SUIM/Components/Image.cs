@@ -26,6 +26,7 @@ public enum ImageStretch
 {
     None,
     Fill,
+    FillOnStretch,
     Uniform,
     UniformToFill
 }

@@ -251,7 +251,7 @@ public class MarkupParserTests
         Assert.IsType<Button>(element);
         var button = (Button)element;
         var child = button.Children[0] as BaseText;
-        Assert.Equal("idle_sprite", child.Text);
+        Assert.Equal("idle_sprite", child?.Text);
     }
 
     [Fact]

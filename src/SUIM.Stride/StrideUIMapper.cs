@@ -30,6 +30,7 @@ public class StrideUIMapper
             Components.Stack s => MapStack(s),
             Components.Grid g => MapGrid(g),
             Components.Input i => MapInput(i),
+            Components.Image img => MapImage(img),
             _ => new StrideGrid() // Fallback
         };
 
@@ -98,12 +99,41 @@ public class StrideUIMapper
 
     private static StrideElement MapInput(Components.Input input)
     {
-        var eb = new EditText();
-        eb.Text = input.Value ?? "";
-        return eb;
+        // Map based on the input type
+        return input.Type switch
+        {
+            Components.InputType.Checkbox => new ToggleButton(),
+            // Components.InputType.Radio => new ToggleButton(), // Stride doesn't have a direct RadioButton in all versions; use ToggleButton for now
+            _ => new EditText
+            {
+                Text = input.Value ?? ""
+            },
+        };
     }
 
-    private StrideElement MapGrid(Components.Grid grid)
+    private static ImageElement MapImage(Components.Image image)
+    {
+        var img = new ImageElement();
+
+        if (!string.IsNullOrEmpty(image.Source))
+        {
+            //img.Source = image.Source;
+        }
+
+        img.StretchType = image.Stretch switch
+        {
+            Components.ImageStretch.Uniform => StretchType.Uniform,
+            Components.ImageStretch.UniformToFill => StretchType.UniformToFill,
+            Components.ImageStretch.Fill => StretchType.Fill,
+            Components.ImageStretch.FillOnStretch => StretchType.FillOnStretch,
+            _ => StretchType.None
+        };
+
+        // Optionally map Stretch if Stride's Image supports a similar property later
+        return img;
+    }
+
+    private StrideGrid MapGrid(Components.Grid grid)
     {
         var g = new StrideGrid();
         
@@ -142,7 +172,7 @@ public class StrideUIMapper
         return g;
     }
 
-    private static StrideElement MapStack(Components.Stack stack)
+    private static StackPanel MapStack(Components.Stack stack)
     {
         return new StackPanel
         {
