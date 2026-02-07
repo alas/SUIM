@@ -1,5 +1,3 @@
-using static System.Net.Mime.MediaTypeNames;
-
 namespace SUIM;
 
 public class BaseText : UIElement

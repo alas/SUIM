@@ -1,10 +1,11 @@
 namespace SUIM;
 
 using System.Collections;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
-public class SUIMControlFlowParser(Dictionary<string, object> model)
+public class SUIMControlFlowParser(dynamic model)
 {
     public string ExpandDirectives(string markup)
     {
@@ -327,7 +328,7 @@ public class SUIMControlFlowParser(Dictionary<string, object> model)
         return true;
     }
 
-    private Dictionary<string, string> ParseParams(string s)
+    private static Dictionary<string, string> ParseParams(string s)
     {
         var dict = new Dictionary<string, string>();
         var matches = Regex.Matches(s, @"(\w+)=(-?\d+)");
@@ -348,11 +349,7 @@ public class SUIMControlFlowParser(Dictionary<string, object> model)
         if (condition.StartsWith('(') && condition.EndsWith(')'))
              condition = condition.Substring(1, condition.Length - 2);
 
-        if (model.TryGetValue(condition, out var value))
-        {
-            return value is bool b && b;
-        }
-        return false;
+        return model.GetValue(condition) is bool b && b;
     }
 
     private object? GetValue(string key)
@@ -360,8 +357,7 @@ public class SUIMControlFlowParser(Dictionary<string, object> model)
         if (string.IsNullOrWhiteSpace(key)) return null;
         if (key.StartsWith("@")) key = key.Substring(1);
         
-        if (model.TryGetValue(key, out var value)) return value;
-        return null;
+        return model.GetValue(key);
     }
 
     private object? ParseValue(string val)
@@ -372,7 +368,7 @@ public class SUIMControlFlowParser(Dictionary<string, object> model)
         return val; // fallback string
     }
 
-    private string ReplaceVariables(string template, string varName, object item)
+    private static string ReplaceVariables(string template, string varName, object item)
     {
         // Simple regex replace for @var.Prop or @var
         // Same logic as before is okay for basic variable replacement

@@ -2,9 +2,8 @@ namespace SUIM;
 
 using System;
 using System.Xml.Linq;
-using System.Globalization;
 
-public class SUIMMarkupParser(Dictionary<string, object> model)
+public class SUIMMarkupParser(dynamic model)
 {
     public UIElement Parse(string markup)
     {
@@ -15,7 +14,7 @@ public class SUIMMarkupParser(Dictionary<string, object> model)
         return ParseElement(doc.Root!, model);
     }
 
-    private static UIElement ParseElement(XElement element, Dictionary<string, object> model)
+    private static UIElement ParseElement(XElement element, dynamic model)
     {
         UIElement uiElement = ParseElementTag(element);
 
@@ -32,7 +31,7 @@ public class SUIMMarkupParser(Dictionary<string, object> model)
             }
             else
             {
-                uiElement.SetAttribute(attr.Name.LocalName, attr.Value);
+                uiElement.SetAttribute(attr.Name.LocalName.ToLower(), attr.Value);
             }
         }
 

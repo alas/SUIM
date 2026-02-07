@@ -4,25 +4,27 @@ using Xunit;
 
 public class SUIMControlFlowParserTests
 {
-    private readonly Dictionary<string, object> _model = new()
-    {
-        { "identifierbool", true },
-        { "identifierbool2", true },
-        { "identifierbool3", false },
-        { "identifierany", 500 },
-        { "identifier2", 500 },
-        { "Collection", new List<string> { "item1", "item2" } },
-        { "stringValue", "test" },
-        { "numericValue", 42 },
-        { "currentWidth", 250 },
-        { "invWidth", 500 },
-        { "items", new List<Item> { new() { Name = "Apple" }, new() { Name = "Banana" } } }
-    };
+    private readonly dynamic _model;
 
     private readonly SUIMMarkupParser _processor;
 
     public SUIMControlFlowParserTests()
     {
+        _model = SUIM.Create(
+            new
+            {
+                identifierbool = true,
+                identifierbool2 = true,
+                identifierbool3 = false,
+                identifierany = 500,
+                identifier2 = 500,
+                Collection = new[] { "item1", "item2" },
+                stringValue = "test",
+                numericValue = 42,
+                currentWidth = 250,
+                invWidth = 500,
+                items = new[] { new { Name = "Apple" }, new { Name = "Banana" } }
+            });
         _processor = new SUIMMarkupParser(_model);
     }
 
