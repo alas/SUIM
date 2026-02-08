@@ -124,6 +124,21 @@ public class PropertyBindingTests
         Assert.Equal("test", label.Text);
     }
 
+    [Fact]
+    public void Parse_Suim_ModelPropertiesAccessibleAndBindingWorks()
+    {
+        var markup = @"<suim>
+    <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
+    <button><label text=""@buttonText"" /></button>
+</suim>";
+        var (element, model) = new MarkupParser().Parse(markup);
+
+        var label = (Label)element.Children[0];
+        Assert.Equal("Click Me", label.Text);
+        model!.buttonText = "Updated Text";
+        Assert.Equal("Updated Text", label.Text);
+    }
+
     private static dynamic Create(object model)
     {
         var observable = new ObservableObject();

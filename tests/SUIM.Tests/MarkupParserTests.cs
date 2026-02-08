@@ -1730,7 +1730,7 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_ModelPropertiesAccessibleANdBindingWorks()
+    public void Parse_Suim_ModelPropertiesAccessible()
     {
         var markup = @"<suim>
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
@@ -1748,9 +1748,6 @@ Text after
         Assert.NotNull(model);
         Assert.Equal("Click Me", model!.buttonText);
         Assert.Equal(42, model.count);
-
-        model.buttonText = "Updated Text";
-        Assert.Equal("Updated Text", label.Text);
     }
 
     [Fact]
