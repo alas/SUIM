@@ -453,17 +453,6 @@ Result in this output:
 
 ---
 
-## 5. Implementation Roadmap
-
-### Core Classes:
-
-1. **`SUIMProcessor`**: Handles `@if` chains, `@foreach`, and component file loading.
-2. **`SUIMHydrator`**: Uses Reflection to turn XML attributes into object properties and bindings.
-3. **`MetricTable`**: Pre-bakes font widths into a lookup table.
-4. **`SUIMElement`**: Base class containing `Bounds`, `Children`, and `List<PropertyBinding>`.
-
----
-
 ## 6. Example Input/Output
 
 **Input (`Inventory.suim`):**
