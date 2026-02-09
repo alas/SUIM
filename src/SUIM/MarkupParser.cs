@@ -187,14 +187,14 @@ public class MarkupParser(object? model = null)
     {
         var styles = new Dictionary<string, Dictionary<string, string>>();
         
-        // Simple CSS-like parser
-        // Format: .classname { property: value; property: value; }
-        var classRegex = new System.Text.RegularExpressions.Regex(@"\.([a-zA-Z0-9_-]+)\s*\{([^}]*)\}");
-        var matches = classRegex.Matches(styleContent);
+        // CSS-like parser supporting: .classname, #id, tagname, and *
+        // Format: selector { property: value; property: value; }
+        var selectorRegex = new System.Text.RegularExpressions.Regex(@"([#.]?[a-zA-Z0-9_*-]+)\s*\{([^}]*)\}");
+        var matches = selectorRegex.Matches(styleContent);
 
         foreach (System.Text.RegularExpressions.Match match in matches)
         {
-            var className = match.Groups[1].Value;
+            var selector = match.Groups[1].Value.Trim();
             var propertiesContent = match.Groups[2].Value;
 
             var properties = new Dictionary<string, string>();
@@ -211,7 +211,7 @@ public class MarkupParser(object? model = null)
 
             if (properties.Count > 0)
             {
-                styles[className] = properties;
+                styles[selector] = properties;
             }
         }
 
@@ -220,18 +220,61 @@ public class MarkupParser(object? model = null)
 
     private static UIElement ApplyStylesToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles)
     {
-        // Get the element's class
+        var elementTag = element.GetType().Name.ToLowerInvariant();
+        var elementId = element.GetAttribute("id") as string;
         var elementClass = element.GetAttribute("class") as string;
         
-        // Check if this element has a matching style
+        // Merge styles from all matching selectors in order of precedence (low to high)
+        var mergedProperties = new Dictionary<string, string>();
+
+        // Universal selector (lowest precedence)
+        if (styles.TryGetValue("*", out var universalProps))
+        {
+            foreach (var kvp in universalProps)
+            {
+                mergedProperties[kvp.Key] = kvp.Value;
+            }
+        }
+
+        // Class selector
         if (!string.IsNullOrEmpty(elementClass))
         {
-            var classToCheck = elementClass.Trim();
-            if (styles.TryGetValue(classToCheck, out var properties))
+            var classSelector = "." + elementClass.Trim();
+            if (styles.TryGetValue(classSelector, out var classProps))
             {
-                element = ApplyStylePropertiesToElement(element, properties, styles);
-                return element;
+                foreach (var kvp in classProps)
+                {
+                    mergedProperties[kvp.Key] = kvp.Value;
+                }
             }
+        }
+
+        // Tag selector
+        if (styles.TryGetValue(elementTag, out var tagProps))
+        {
+            foreach (var kvp in tagProps)
+            {
+                mergedProperties[kvp.Key] = kvp.Value;
+            }
+        }
+
+        // ID selector (highest precedence)
+        if (!string.IsNullOrEmpty(elementId))
+        {
+            var idSelector = "#" + elementId.Trim();
+            if (styles.TryGetValue(idSelector, out var idProps))
+            {
+                foreach (var kvp in idProps)
+                {
+                    mergedProperties[kvp.Key] = kvp.Value;
+                }
+            }
+        }
+
+        if (mergedProperties.Count > 0)
+        {
+            element = ApplyStylePropertiesToElement(element, mergedProperties, styles);
+            return element;
         }
 
         // Recursively apply to children
