@@ -17,6 +17,19 @@ public class LayoutEngine
         return FinalizeElement(root, context);
     }
 
+    private static bool TreeHasAnyExplicitSize(UIElement element)
+    {
+        if (element.Width.Type != UnitType.None || element.Height.Type != UnitType.None)
+            return true;
+
+        foreach (var child in element.Children)
+        {
+            if (TreeHasAnyExplicitSize(child)) return true;
+        }
+
+        return false;
+    }
+
     private void MeasureElement(UIElement element, LayoutContext context)
     {
         // First, recursively measure all children
@@ -48,8 +61,19 @@ public class LayoutEngine
         var availableHeight = Math.Max(0, context.AvailableHeight - marginTop - marginBottom - paddingTop - paddingBottom);
         
         // Initialize content size with explicit sizes if provided
-        result.ContentWidth = widthInPixels;
-        result.ContentHeight = heightInPixels;
+        // Default measurement for content elements
+        if (element is BaseText)
+        {
+            // If no explicit width, use available width so text fills its container
+            result.ContentWidth = widthInPixels == 0 ? availableWidth : widthInPixels;
+            // If no explicit height, use current font size as a reasonable default
+            result.ContentHeight = heightInPixels == 0 ? context.CurrentFontSize : heightInPixels;
+        }
+        else
+        {
+            result.ContentWidth = widthInPixels;
+            result.ContentHeight = heightInPixels;
+        }
         
         // Store result early so measurement methods can update it
         _layoutResults[element] = result;
@@ -82,15 +106,25 @@ public class LayoutEngine
         {
             result = updatedResult;
         }
-        
-        // Apply constraints (but don't override explicit sizes)
-        if (widthInPixels == 0)
+
+        // If this is the root element and no explicit sizes are present in the tree,
+        // the root should take the full available space (treats undefined sizing as "*").
+        if (element.Parent == null && !TreeHasAnyExplicitSize(element))
         {
-            result.ContentWidth = Math.Min(result.ContentWidth, availableWidth);
+            result.ContentWidth = availableWidth;
+            result.ContentHeight = availableHeight;
         }
-        if (heightInPixels == 0)
+        else
         {
-            result.ContentHeight = Math.Min(result.ContentHeight, availableHeight);
+            // Apply constraints (but don't override explicit sizes)
+            if (widthInPixels == 0)
+            {
+                result.ContentWidth = Math.Min(result.ContentWidth, availableWidth);
+            }
+            if (heightInPixels == 0)
+            {
+                result.ContentHeight = Math.Min(result.ContentHeight, availableHeight);
+            }
         }
         
         // Calculate total size including padding
@@ -220,7 +254,7 @@ public class LayoutEngine
             
             foreach (var child in stack.Children)
             {
-                if (child.Width.Type == UnitType.Star)
+                if (child.Width.Type == UnitType.Star || (child.Width.Type == UnitType.None && child is LayoutElement))
                 {
                     starElements.Add(child);
                 }
@@ -279,7 +313,7 @@ public class LayoutEngine
             
             foreach (var child in stack.Children)
             {
-                if (child.Height.Type == UnitType.Star)
+                if (child.Height.Type == UnitType.Star || (child.Height.Type == UnitType.None && child is LayoutElement))
                 {
                     starElements.Add(child);
                 }
