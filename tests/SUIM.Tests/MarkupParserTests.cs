@@ -1405,7 +1405,7 @@ Text after
     [Fact]
     public void Parse_BorderAttribute_WithThicknessAndColorInStyle()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
                 <style>
                 .myclass {
 	                width: 500,
@@ -1416,10 +1416,10 @@ Text after
                 <div class=""myclass"">
                     <label text=""Bordered Content"" />
                 </div>
-            </suim>";
+            </window>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
-        var border = element as Border;
+        var border = element?.Children.Single() as Border;
         Assert.NotNull(border);
         Assert.Equal("#FF0000", border.BorderColor);
         Assert.Single(border.Children);
@@ -1431,24 +1431,24 @@ Text after
         Assert.IsType<Label>(div.Children[0]);
     }
 
-    // ============== SUIM WRAPPER TESTS ==============
+    // ============== Window TESTS ==============
 
     [Fact]
-    public void Parse_Suim_WithRootElement()
+    public void Parse_Window_WithRootElement()
     {
-        var markup = @"<suim><div /></suim>";
+        var markup = @"<window><div /></window>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
     }
 
     [Fact]
-    public void Parse_Suim_WithStyleAndRoot()
+    public void Parse_Window_WithStyleAndRoot()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <style>.class { width: 100; }</style>
     <div width=""200"" />
-</suim>";
+</window>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
@@ -1457,12 +1457,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_WithModelAndRoot()
+    public void Parse_Window_WithModelAndRoot()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model></model>
     <div width=""150"" />
-</suim>";
+</window>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
@@ -1471,16 +1471,16 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_WithModelStyleAndRoot()
+    public void Parse_Window_WithModelStyleAndRoot()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model></model>
     <style>.btn { }</style>
     <stack orientation=""vertical"">
         <label text=""Item 1"" />
         <label text=""Item 2"" />
     </stack>
-</suim>";
+</window>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Stack>(element);
@@ -1490,13 +1490,13 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_IgnoresModelAndStyle()
+    public void Parse_Window_IgnoresModelAndStyle()
     {
-        var markup = @"<suim>
+        var markup = @"<button>
     <model>{ ""value"": ""ignored"" }</model>
     <style>.button { color: red; }</style>
-    <button><label text=""Click"" /></button>
-</suim>";
+    <label text=""Click"" />
+</button>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Button>(element);
@@ -1506,32 +1506,15 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_EmptyThrows()
+    public void Parse_Window_WithComplexRoot()
     {
-        var markup = @"<suim></suim>";
-        Assert.Throws<InvalidOperationException>(() => new MarkupParser(_model).Parse(markup));
-    }
-
-    [Fact]
-    public void Parse_Suim_OnlyModelAndStyleThrows()
-    {
-        var markup = @"<suim>
-    <model></model>
-    <style></style>
-</suim>";
-        Assert.Throws<InvalidOperationException>(() => new MarkupParser(_model).Parse(markup));
-    }
-
-    [Fact]
-    public void Parse_Suim_WithComplexRoot()
-    {
-        var markup = @"<suim>
+        var markup = @"<window>
     <style></style>
     <grid columns=""*,*"" rows=""auto,*"">
         <div grid.row=""0"" grid.column=""0"" bg=""blue"" />
         <div grid.row=""0"" grid.column=""1"" bg=""red"" />
     </grid>
-</suim>";
+</window>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Grid>(element);
@@ -1541,35 +1524,15 @@ Text after
         Assert.Equal(2, grid.GridChildren.Count);
     }
 
-    [Fact]
-    public void Parse_Suim_FirstVisualElementIsRoot()
-    {
-        var markup = @"<suim>
-    <model></model>
-    <stack orientation=""vertical"">
-        <label text=""This is root"" />
-    </stack>
-</suim>";
-        var (element, _) = new MarkupParser(_model).Parse(markup);
-
-        // The last element (stack) should be the root, not the div
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
-        Assert.Equal(Orientation.Vertical, stack.Orientation);
-        Assert.Single(stack.Children);
-        var label = (Label)stack.Children[0];
-        Assert.Equal("This is root", label.Text);
-    }
-
     // ============== MODEL PARSING TESTS ==============
 
     [Fact]
-    public void Parse_Suim_WithJsonModel()
+    public void Parse_Window_WithJsonModel()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ ""name"": ""John"", ""age"": 30 }</model>
     <div />
-</suim>";
+</window>";
         var (element, model) = new MarkupParser().Parse(markup);
 
         Assert.NotNull(model);
@@ -1578,13 +1541,13 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_WithJsonModelAndProvidedModel()
+    public void Parse_Window_WithJsonModelAndProvidedModel()
     {
         var providedModel = new { firstName = "Jane", age = 25 };
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ ""lastName"": ""Doe"", ""age"": 30 }</model>
     <div />
-</suim>";
+</window>";
         var (element, model) = new MarkupParser(providedModel).Parse(markup);
 
         Assert.NotNull(model);
@@ -1596,12 +1559,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_WithJsonModelStringProperty()
+    public void Parse_Window_WithJsonModelStringProperty()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ ""title"": ""Hello World"", ""description"": ""Test"" }</model>
     <label text=""@title"" />
-</suim>";
+</window>";
         var (element, model) = new MarkupParser().Parse(markup);
 
         Assert.NotNull(model);
@@ -1614,12 +1577,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_WithJsonModelNumberProperty()
+    public void Parse_Window_WithJsonModelNumberProperty()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ ""width"": 500, ""height"": 300 }</model>
     <div width=""@width"" height=""@height"" />
-</suim>";
+</window>";
         var (_, model) = new MarkupParser().Parse(markup);
 
         Assert.NotNull(model);
@@ -1628,12 +1591,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_WithJsonModelBooleanProperty()
+    public void Parse_Window_WithJsonModelBooleanProperty()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ ""isVisible"": true, ""isEnabled"": false }</model>
     <div />
-</suim>";
+</window>";
         var (_, model) = new MarkupParser().Parse(markup);
 
         Assert.NotNull(model);
@@ -1642,12 +1605,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_WithJsonModelArrayProperty()
+    public void Parse_Window_WithJsonModelArrayProperty()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ ""items"": [1, 2, 3], ""names"": [""Alice"", ""Bob""] }</model>
     <div />
-</suim>";
+</window>";
         var (_, model) = new MarkupParser().Parse(markup);
 
         Assert.NotNull(model);
@@ -1662,12 +1625,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_WithJsonModelNullProperty()
+    public void Parse_Window_WithJsonModelNullProperty()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ ""value"": null }</model>
     <div />
-</suim>";
+</window>";
         var (_, model) = new MarkupParser().Parse(markup);
 
         Assert.NotNull(model);
@@ -1675,12 +1638,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_WithEmptyJsonModel()
+    public void Parse_Window_WithEmptyJsonModel()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ }</model>
     <div />
-</suim>";
+</window>";
         var (_, model) = new MarkupParser().Parse(markup);
 
         // Should create an observable object even if empty
@@ -1688,12 +1651,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_WithNoModel()
+    public void Parse_Window_WithNoModel()
     {
         var providedModel = new { value = "test" };
-        var markup = @"<suim>
+        var markup = @"<window>
     <div />
-</suim>";
+</window>";
         var (_, model) = new MarkupParser(providedModel).Parse(markup);
 
         // Should only have provided model properties
@@ -1702,23 +1665,23 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_WithInvalidJsonModel()
+    public void Parse_Window_WithInvalidJsonModel()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ invalid json }</model>
     <div />
-</suim>";
+</window>";
         
         Assert.Throws<InvalidOperationException>(() => new MarkupParser().Parse(markup));
     }
 
     [Fact]
-    public void Parse_Suim_ModelWithComplexObject()
+    public void Parse_Window_ModelWithComplexObject()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ ""user"": { ""name"": ""John"", ""age"": 30 }, ""settings"": { ""theme"": ""dark"" } }</model>
     <div />
-</suim>";
+</window>";
         var (_, model) = new MarkupParser().Parse(markup);
 
         Assert.NotNull(model);
@@ -1730,12 +1693,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_ModelPropertiesAccessible()
+    public void Parse_Window_ModelPropertiesAccessible()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
     <button><label text=""@buttonText"" /></button>
-</suim>";
+</window>";
         var (element, model) = new MarkupParser().Parse(markup);
 
         Assert.IsType<Button>(element);
@@ -1751,13 +1714,13 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_MergesProvidedAndJsonModel()
+    public void Parse_Window_MergesProvidedAndJsonModel()
     {
         var providedModel = new { existing = "value" };
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ ""newProp"": ""new"" }</model>
     <div />
-</suim>";
+</window>";
         var (_, model) = new MarkupParser(providedModel).Parse(markup);
 
         Assert.NotNull(model);
@@ -1766,12 +1729,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Suim_ModelWithMixedTypes()
+    public void Parse_Window_ModelWithMixedTypes()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ ""str"": ""text"", ""num"": 123, ""bool"": true, ""arr"": [1, 2], ""obj"": { ""key"": ""val"" }, ""nil"": null }</model>
     <div />
-</suim>";
+</window>";
         var (element, model) = new MarkupParser().Parse(markup);
 
         Assert.NotNull(model);

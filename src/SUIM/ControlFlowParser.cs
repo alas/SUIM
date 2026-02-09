@@ -271,7 +271,7 @@ public class ControlFlowParser(dynamic model)
     
     // --- Helpers ---
 
-    private string ExtractCondition(string markup, ref int index)
+    private static string ExtractCondition(string markup, ref int index)
     {
         index = SkipWhitespace(markup, index);
         int start = index;
@@ -282,7 +282,7 @@ public class ControlFlowParser(dynamic model)
         return markup.Substring(start, index - start).Trim();
     }
 
-    private (string content, int totalLen) ExtractBlock(string markup, int startIndex)
+    private static (string content, int totalLen) ExtractBlock(string markup, int startIndex)
     {
         // startIndex should be at '{' or whitespace before '{'
         int i = SkipWhitespace(markup, startIndex);

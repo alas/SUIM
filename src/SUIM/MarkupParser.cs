@@ -21,15 +21,15 @@ public class MarkupParser(object? model = null)
         Dictionary<string, Dictionary<string, string>>? styles = null;
 
         // If root element is "suim", extract the model, styles, and actual root element
-        if (root.Name.LocalName.Equals("suim", StringComparison.OrdinalIgnoreCase))
+        if (root.Name.LocalName.Equals("template", StringComparison.OrdinalIgnoreCase))
         {
-            var modelJson = ExtractModelFromSuimWrapper(root);
+            var modelJson = ExtractModel(root);
             if (!string.IsNullOrEmpty(modelJson))
             {
                 model = MergeModels(model, modelJson);
             }
 
-            var styleContent = ExtractStylesFromSuimWrapper(root);
+            var styleContent = ExtractStyles(root);
             if (!string.IsNullOrEmpty(styleContent))
             {
                 styles = ParseStyles(styleContent);
@@ -39,6 +39,10 @@ public class MarkupParser(object? model = null)
         }
 
         var element = ParseElement(root);
+        if (element == null)
+        {
+            throw new InvalidOperationException("Root element not found.");
+        }
 
         // Apply styles after parsing the tree
         if (styles != null && styles.Count > 0)
@@ -66,7 +70,7 @@ public class MarkupParser(object? model = null)
             // If no existing model, create from JSON
             if (existingModel == null)
             {
-                return CreateDynamicFromDictionary(modelDict);
+                return MarkupParser.CreateDynamicFromDictionary(modelDict);
             }
 
             // Merge: extract properties from existing model, then update with JSON values
@@ -111,7 +115,7 @@ public class MarkupParser(object? model = null)
         };
     }
 
-    private Dictionary<string, object?> ExtractPropertiesAsDictionary(dynamic? model)
+    private static Dictionary<string, object?> ExtractPropertiesAsDictionary(dynamic? model)
     {
         var dict = new Dictionary<string, object?>();
         if (model == null)
@@ -144,7 +148,7 @@ public class MarkupParser(object? model = null)
         return dict;
     }
 
-    private dynamic CreateDynamicFromDictionary(Dictionary<string, object?> dict)
+    private static dynamic CreateDynamicFromDictionary(Dictionary<string, object?> dict)
     {
         var observable = new ObservableObject();
         // Set properties directly into the observable
@@ -155,9 +159,9 @@ public class MarkupParser(object? model = null)
         return observable;
     }
 
-    private static string? ExtractModelFromSuimWrapper(XElement suimElement)
+    private static string? ExtractModel(XElement root)
     {
-        var modelElement = suimElement.Elements()
+        var modelElement = root.Elements()
             .FirstOrDefault(e => e.Name.LocalName.Equals("model", StringComparison.OrdinalIgnoreCase));
         
         if (modelElement == null)
@@ -170,9 +174,9 @@ public class MarkupParser(object? model = null)
         return string.IsNullOrEmpty(content) ? null : content;
     }
 
-    private static string? ExtractStylesFromSuimWrapper(XElement suimElement)
+    private static string? ExtractStyles(XElement root)
     {
-        var styleElement = suimElement.Elements()
+        var styleElement = root.Elements()
             .FirstOrDefault(e => e.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase));
         
         if (styleElement == null)
@@ -304,17 +308,6 @@ public class MarkupParser(object? model = null)
         // For elements that have children, recursively apply styles
         switch (element)
         {
-            case Div:
-            case Stack:
-            case Button:
-            case Overlay:
-            case Border:
-            case Scroll:
-                for (int i = 0; i < element.Children.Count; i++)
-                {
-                    element.Children[i] = ApplyStylesToElement(element.Children[i], styles);
-                }
-                break;
             case Grid grid:
                 foreach (var gridChild in grid.GridChildren)
                 {
@@ -334,6 +327,12 @@ public class MarkupParser(object? model = null)
                     dock.DockChildren.Add(dockChild);
                 }
                 break;
+            default:
+                for (int i = 0; i < element.Children.Count; i++)
+                {
+                    element.Children[i] = ApplyStylesToElement(element.Children[i], styles);
+                }
+                break;
         }
 
         return element;
@@ -342,7 +341,7 @@ public class MarkupParser(object? model = null)
     private static XElement ExtractRealRootFromSuimWrapper(XElement suimElement)
     {
         var children = suimElement.Elements().ToList();
-        
+
         if (children.Count == 0)
         {
             throw new InvalidOperationException("suim element must contain at least one child element (the visual tree root)");
@@ -362,7 +361,7 @@ public class MarkupParser(object? model = null)
         // Return the last visual element as the root
         return visualElements.Single();
     }
-    
+
     private static dynamic Create(object model)
     {
         if (model is ObservableObject oo) return oo;
@@ -372,9 +371,11 @@ public class MarkupParser(object? model = null)
         return observable;
     }
 
-    private UIElement ParseElement(XElement element)
+    private UIElement? ParseElement(XElement element)
     {
         var innerElement = ParseElementTag(element);
+        if (innerElement == null) return null;
+
         var rootElement = innerElement;
 
         var attributes = element.Attributes().ToList();
@@ -443,6 +444,8 @@ public class MarkupParser(object? model = null)
                         child.SetAttributeValue("grid.row", rowIndex.ToString());
                         child.SetAttributeValue("grid.column", colIdx.ToString());
                         var childElement = ParseElement(child);
+                        if (childElement == null) continue;
+
                         grid.AddChild(childElement, child);
                         colIdx++;
                     }
@@ -463,6 +466,8 @@ public class MarkupParser(object? model = null)
                         child.SetAttributeValue("grid.column", columnIndex.ToString());
                         child.SetAttributeValue("grid.row", rowIdx.ToString());
                         var childElement = ParseElement(child);
+                        if (childElement == null) continue;
+
                         grid.AddChild(childElement, child);
                         rowIdx++;
                     }
@@ -472,6 +477,8 @@ public class MarkupParser(object? model = null)
                 else
                 {
                     var childElement = ParseElement(node);
+                    if (childElement == null) continue;
+
                     grid.AddChild(childElement, node);
                 }
             }
@@ -492,6 +499,8 @@ public class MarkupParser(object? model = null)
                 else if (node is XElement childXElement)
                 {
                     var childElement = ParseElement(childXElement);
+                    if (childElement == null) continue;
+
                     innerElement.AddChild(childElement, childXElement);
                 }
             }
@@ -513,7 +522,7 @@ public class MarkupParser(object? model = null)
         return LayoutAttributeNames.Contains(name);
     }
 
-    private static UIElement ParseElementTag(XElement element)
+    private static UIElement? ParseElementTag(XElement element)
     {
         var tag = element.Name.LocalName;
 
@@ -532,6 +541,9 @@ public class MarkupParser(object? model = null)
         if (tag.Equals("option", StringComparison.OrdinalIgnoreCase)) return new Option();
         if (tag.Equals("textarea", StringComparison.OrdinalIgnoreCase)) return new TextArea();
         if (tag.Equals("border", StringComparison.OrdinalIgnoreCase)) return new Border();
+        if (tag.Equals("window", StringComparison.OrdinalIgnoreCase)) return new Window();
+        if (tag.Equals("style", StringComparison.OrdinalIgnoreCase)) return null;
+        if (tag.Equals("model", StringComparison.OrdinalIgnoreCase)) return null;
 
         throw new NotSupportedException($"Unknown tag: {element.Name.LocalName}");
     }

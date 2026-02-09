@@ -127,10 +127,10 @@ public class PropertyBindingTests
     [Fact]
     public void Parse_Suim_ModelPropertiesAccessibleAndBindingWorks()
     {
-        var markup = @"<suim>
+        var markup = @"<window>
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
     <button><label text=""@buttonText"" /></button>
-</suim>";
+</window>";
         var (element, model) = new MarkupParser().Parse(markup);
 
         var label = (Label)element.Children[0];
