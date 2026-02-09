@@ -118,7 +118,7 @@ public class MarkupParser(object? model = null)
         }
 
         // If it's an ObservableObject, try to extract its properties
-        if (model is ObservableObject oo)
+        if (model is ObservableObject)
         {
             var modelType = model.GetType();
             var propertiesField = modelType.GetField("_properties", 
@@ -199,7 +199,7 @@ public class MarkupParser(object? model = null)
 
             var properties = new Dictionary<string, string>();
             // Parse properties: "property: value, property: value"
-            var propertyRegex = new System.Text.RegularExpressions.Regex(@"([a-zA-Z0-9\-]+)\s*:\s*([^,}]+)");
+            var propertyRegex = new System.Text.RegularExpressions.Regex(@"([a-zA-Z0-9\-]+)\s*:\s*([^;}]+)");
             var propMatches = propertyRegex.Matches(propertiesContent);
 
             foreach (System.Text.RegularExpressions.Match propMatch in propMatches)
@@ -236,6 +236,15 @@ public class MarkupParser(object? model = null)
             }
         }
 
+        // Tag selector
+        if (styles.TryGetValue(elementTag, out var tagProps))
+        {
+            foreach (var kvp in tagProps)
+            {
+                mergedProperties[kvp.Key] = kvp.Value;
+            }
+        }
+
         // Class selector
         if (!string.IsNullOrEmpty(elementClass))
         {
@@ -246,15 +255,6 @@ public class MarkupParser(object? model = null)
                 {
                     mergedProperties[kvp.Key] = kvp.Value;
                 }
-            }
-        }
-
-        // Tag selector
-        if (styles.TryGetValue(elementTag, out var tagProps))
-        {
-            foreach (var kvp in tagProps)
-            {
-                mergedProperties[kvp.Key] = kvp.Value;
             }
         }
 

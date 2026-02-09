@@ -160,12 +160,12 @@ Original.suim
 ```xml
 <style>
 .myclass {
-	width: 500,
-	height: 400,
-	scroll.width: 10000,
-	scroll.height: 800
+	width: 500;
+	height: 400;
+	scroll.width: 10000;
+	scroll.height: 800;
 }
-<style>
+</style>
 <dock class="myclass" scroll="vertical">
 	<label text="Inventory" />
 </dock>
@@ -196,11 +196,11 @@ Original.suim
 ```xml
 <style>
 .myclass {
-	width: 500,
-	height: 400,
-	border: 10 White,
+	width: 500;
+	height: 400;
+	border: 10 White;
 }
-<style>
+</style>
 <dock class="myclass">
 	<label text="Inventory" />
 </dock>
@@ -217,11 +217,11 @@ Original.suim
 ```xml
 <style>
 .myclass {
-	width: 500,
-	height: 400,
-	border: 10 5 0 2 White,
+	width: 500;
+	height: 400;
+	border: 10 5 0 2 White;
 }
-<style>
+</style>
 <dock class="myclass">
 	<label text="Inventory" />
 </dock>

@@ -1408,9 +1408,9 @@ Text after
         var markup = @"<window>
                 <style>
                 .myclass {
-	                width: 500,
+	                width: 500;
 	                height: 400,
-	                border: 5 #FF0000
+	                border: 5 #FF0000;
                 }
                 </style>
                 <div class=""myclass"">
@@ -1743,6 +1743,258 @@ Text after
         
         var obj = model.obj;
         Assert.NotNull(obj);
+    }
+
+    [Fact]
+    public void Parse_Style_ClassSelector()
+    {
+        var markup = @"<window>
+    <style>
+        .header { padding: 10; margin: 5; }
+    </style>
+    <div class=""header"" />
+</window>";
+        var (element, _) = new MarkupParser().Parse(markup);
+
+        var div = element.Children.Single() as Div;
+        Assert.NotNull(div);
+        Assert.Equal("10", div.Padding);
+        Assert.Equal("5", div.Margin);
+    }
+
+    [Fact]
+    public void Parse_Style_IdSelector()
+    {
+        var markup = @"<window>
+    <style>
+        #main { width: 500; height: 300; }
+    </style>
+    <div id=""main"" />
+</window>";
+        var (element, _) = new MarkupParser().Parse(markup);
+
+        var div = element.Children.Single() as Div;
+        Assert.NotNull(div);
+        Assert.Equal("500", div.Width);
+        Assert.Equal("300", div.Height);
+    }
+
+    [Fact]
+    public void Parse_Style_TagSelector()
+    {
+        var markup = @"<window>
+    <style>
+        div { padding: 8; background: blue; }
+    </style>
+    <div />
+</window>";
+        var (element, _) = new MarkupParser().Parse(markup);
+
+        var div = element.Children.Single() as Div;
+        Assert.NotNull(div);
+        Assert.Equal("8", div.Padding);
+        Assert.Equal("blue", div.Background);
+    }
+
+    [Fact]
+    public void Parse_Style_UniversalSelector()
+    {
+        var markup = @"<window>
+    <style>
+        * { margin: 5; padding: 3; }
+    </style>
+    <stack><div /><label /></stack>
+</window>";
+        var (element, _) = new MarkupParser().Parse(markup);
+
+        var stack = element.Children.Single() as Stack;
+        Assert.NotNull(stack);
+        Assert.Equal("5", stack.Margin);
+        Assert.Equal("3", stack.Padding);
+
+        var div = (Div)stack.Children[0];
+        Assert.Equal("5", div.Margin);
+        Assert.Equal("3", div.Padding);
+
+        var label = (Label)stack.Children[1];
+        Assert.Equal("5", label.Margin);
+        Assert.Equal("3", label.Padding);
+    }
+
+    [Fact]
+    public void Parse_Style_MergeMultipleSelectors()
+    {
+        var markup = @"<window>
+    <style>
+        * { padding: 5; }
+        .container { margin: 10; }
+        div { background: gray; }
+    </style>
+    <div class=""container"" />
+</window>";
+        var (element, _) = new MarkupParser().Parse(markup);
+
+        var div = element.Children.Single() as Div;
+        Assert.NotNull(div);
+        Assert.Equal("5", div.Padding);      // from universal
+        Assert.Equal("10", div.Margin);      // from class
+        Assert.Equal("gray", div.Background); // from tag
+    }
+
+    [Fact]
+    public void Parse_Style_PrecedenceOverride()
+    {
+        var markup = @"<window>
+    <style>
+        * { padding: 5; margin: 1; }
+        div { padding: 8; background: blue; }
+        .special { padding: 12; }
+        #unique { padding: 20; }
+    </style>
+    <div id=""unique"" class=""special"" />
+</window>";
+        var (element, _) = new MarkupParser().Parse(markup);
+
+        var div = element.Children.Single() as Div;
+        Assert.NotNull(div);
+        Assert.Equal("20", div.Padding);      // ID selector overrides all
+        Assert.Equal("1", div.Margin);        // from universal
+        Assert.Equal("blue", div.Background);  // from tag selector
+    }
+
+    [Fact]
+    public void Parse_Style_ClassSelectorOverridesTagAndUniversal()
+    {
+        var markup = @"<window>
+    <style>
+        * { padding: 5; }
+        div { padding: 8; }
+        .highlight { padding: 12; }
+    </style>
+    <div class=""highlight"" />
+</window>";
+        var (element, _) = new MarkupParser().Parse(markup);
+
+        var div = element.Children.Single() as Div;
+        Assert.NotNull(div);
+        Assert.Equal("12", div.Padding); // class overrides tag and universal
+    }
+
+    [Fact]
+    public void Parse_Style_TagSelectorAppliedToChildren()
+    {
+        var markup = @"<window>
+    <style>
+        label { padding: 6; }
+    </style>
+    <stack><label /><button /></stack>
+</window>";
+        var (element, _) = new MarkupParser().Parse(markup);
+
+        var stack = element.Children.Single() as Stack;
+        Assert.NotNull(stack);
+        var label = (Label)stack.Children[0];
+        Assert.Equal("6", label.Padding);
+
+        var button = (Button)stack.Children[1];
+        Assert.Null(button.Padding); // button not styled
+    }
+
+    [Fact]
+    public void Parse_Style_MultipleClassesNotSupported()
+    {
+        // Currently only single class is supported, test verifies behavior
+        var markup = @"<window>
+    <style>
+        .header { padding: 10; }
+    </style>
+    <div class=""header other"" />
+</window>";
+        var (element, _) = new MarkupParser().Parse(markup);
+
+        var div = element.Children.Single() as Div;
+        Assert.NotNull(div);
+        // Class selector should not match "header other" exactly
+        Assert.Null(div.Padding);
+    }
+
+    [Fact]
+    public void Parse_Style_DirectRootWithoutWrapper()
+    {
+        var markup = @"<div padding=""5"" margin=""10"" />";
+        var (element, _) = new MarkupParser().Parse(markup);
+
+        var div = (Div)element;
+        Assert.Equal("5", div.Padding);
+        Assert.Equal("10", div.Margin);
+    }
+
+    [Fact]
+    public void Parse_Style_WrapperWithOnlyVisualRoot()
+    {
+        var markup = @"<window><div padding=""5"" /></window>";
+        var (element, _) = new MarkupParser().Parse(markup);
+
+        var div = element.Children.Single() as Div;
+        Assert.NotNull(div);
+        Assert.Equal("5", div.Padding);
+    }
+
+    [Fact]
+    public void Parse_Style_WrapperWithModelAndStyle()
+    {
+        var markup = @"<window>
+    <model>{ ""name"": ""test"" }</model>
+    <style>
+        div { padding: 8; }
+    </style>
+    <div />
+</window>";
+        var (element, model) = new MarkupParser().Parse(markup);
+
+        var div = element.Children.Single() as Div;
+        Assert.NotNull(div);
+        Assert.Equal("8", div.Padding);
+        Assert.NotNull(model);
+        Assert.Equal("test", model!.name);
+    }
+
+    [Fact]
+    public void Parse_Style_IdPrecedenceOverClassAndTag()
+    {
+        var markup = @"<window>
+    <style>
+        div { padding: 5; }
+        .btn { padding: 8; }
+        #submit { padding: 15; }
+    </style>
+    <div id=""submit"" class=""btn"" />
+</window>";
+        var (element, _) = new MarkupParser().Parse(markup);
+
+        var div = element.Children.Single() as Div;
+        Assert.NotNull(div);
+        Assert.Equal("15", div.Padding); // ID takes highest precedence
+    }
+
+    [Fact]
+    public void Parse_Style_MergeWithNoOverlap()
+    {
+        var markup = @"<window>
+    <style>
+        * { margin: 5; }
+        .card { padding: 10; }
+        div { background: white; }
+    </style>
+    <div class=""card"" />
+</window>";
+        var (element, _) = new MarkupParser().Parse(markup);
+
+        var div = element.Children.Single() as Div;
+        Assert.NotNull(div);
+        Assert.Equal("5", div.Margin);        // from universal
+        Assert.Equal("10", div.Padding);      // from class
+        Assert.Equal("white", div.Background); // from tag
     }
 }
 
