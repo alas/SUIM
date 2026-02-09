@@ -5,7 +5,7 @@ public class UnitConverter(float rootFontSize = 16f)
     public float RootFontSize { get; set; } = rootFontSize;
     public float ParentFontSize { get; set; } = rootFontSize;
 
-    public float ConvertToPixels(UnitValue unitValue, float availableSpace = 0f)
+    public float ToPixels(UnitValue unitValue, float availableSpace = 0f)
     {
         return unitValue.Type switch
         {
@@ -18,8 +18,8 @@ public class UnitConverter(float rootFontSize = 16f)
         };
     }
     
-    public float ConvertToPixels(string value, float availableSpace = 0f)
+    public float ToPixels(string value, float availableSpace = 0f)
     {
-        return ConvertToPixels(UnitValue.Parse(value), availableSpace);
+        return ToPixels(UnitValue.Parse(value), availableSpace);
     }
 }

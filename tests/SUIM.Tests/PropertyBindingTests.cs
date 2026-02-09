@@ -2,6 +2,7 @@ namespace SUIM.Tests;
 
 using Xunit;
 using SUIM.Components;
+using SUIM.Layout;
 
 public class PropertyBindingTests
 {
@@ -107,8 +108,7 @@ public class PropertyBindingTests
         Assert.IsType<Div>(element);
         var div = (Div)element;
         // Property binding should be created for width
-        Assert.NotNull(div.Width);
-        Assert.Equal("250", div.Width);
+        Assert.Equal(new UnitValue(250), div.Width);
     }
 
     [Fact]

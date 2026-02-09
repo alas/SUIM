@@ -1,16 +1,30 @@
 namespace SUIM.Layout;
 
-public record struct UnitValue(float Value, UnitType Type)
+public record struct UnitValue(float Value, UnitType Type = UnitType.Pixels)
 {
+    public static readonly UnitValue None = new (0, UnitType.None);
+
+    public static UnitValue FromObject(object? obj)
+    {
+        if (obj is UnitValue uv)
+            return uv;
+        if (obj is string str)
+            return Parse(str);
+        if (obj.IsNumericType())
+            return new UnitValue(Convert.ToSingle(obj));
+
+        throw new ArgumentException($"Cannot convert object of type '{obj?.GetType()}'.");
+    }
+
     public static UnitValue Parse(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return new UnitValue(0, UnitType.Pixels);
+            return new UnitValue(0, UnitType.None);
             
         value = value.Trim();
         
         // Handle star units
-        if (value.EndsWith("*"))
+        if (value.EndsWith('*'))
         {
             if (value == "*")
                 return new UnitValue(1, UnitType.Star);
@@ -42,55 +56,46 @@ public record struct UnitValue(float Value, UnitType Type)
             
         return new UnitValue(0, UnitType.Pixels);
     }
-}
 
-public record struct UnitValue4(UnitValue Left, UnitValue Top, UnitValue Right, UnitValue Bottom)
-{
-    public static UnitValue4 Parse(string? value)
+    public readonly float ToPixels(LayoutContext context)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            return new UnitValue4(new UnitValue(0, UnitType.Pixels), new UnitValue(0, UnitType.Pixels), new UnitValue(0, UnitType.Pixels), new UnitValue(0, UnitType.Pixels));
-        
-        var parts = value.Split([' ', ','], StringSplitOptions.RemoveEmptyEntries)
-            .Where(p => p.All(x => char.IsNumber(x))
-                || p == "*"
-                || p.EndsWith("px", StringComparison.OrdinalIgnoreCase)
-                || string.Compare(p, "rem", StringComparison.OrdinalIgnoreCase) == 0
-                || string.Compare(p, "em", StringComparison.OrdinalIgnoreCase) == 0
-                || string.Compare(p, "auto", StringComparison.OrdinalIgnoreCase) == 0)
-            .ToArray();
-        if (parts.Length == 1)
-        {
-            var uv = UnitValue.Parse(parts[0]);
-            return new UnitValue4(uv, uv, uv, uv);
-        }
-        else if (parts.Length == 2)
-        {
-            var vertical = UnitValue.Parse(parts[0]);
-            var horizontal = UnitValue.Parse(parts[1]);
-            return new UnitValue4(horizontal, vertical, horizontal, vertical);
-        }
-        else if (parts.Length == 4)
-        {
-            return new UnitValue4(
-                UnitValue.Parse(parts[0]),
-                UnitValue.Parse(parts[1]),
-                UnitValue.Parse(parts[2]),
-                UnitValue.Parse(parts[3])
-            );
-        }
-        
-        throw new FormatException($"Invalid unit value format: '{value}'");
+        return context.UnitConverter.ToPixels(this);
     }
 
-    public static implicit operator UnitValue4(UnitValue uniformValue) => new(uniformValue, uniformValue, uniformValue, uniformValue);
+    public readonly float ToPixels()
+    {
+        return Type switch
+        {
+            UnitType.Pixels => Value,
+            _ => 0f
+        };
+    }
 }
 
 public enum UnitType
 {
+    None,
     Pixels,
     Rem,      // Root em - relative to root font size
     Em,       // Relative to parent font size  
     Star,     // Proportional space
     Auto      // Content-based sizing
+}
+
+public static class NumberExtensions
+{
+    public static bool IsNumericType(this object? value)
+    {
+        return value is sbyte ||
+               value is byte ||
+               value is short ||
+               value is ushort ||
+               value is int ||
+               value is uint ||
+               value is long ||
+               value is ulong ||
+               value is float ||
+               value is double ||
+               value is decimal;
+    }
 }

@@ -1,28 +1,25 @@
-using SUIM.Layout;
+namespace SUIM.Layout;
 
 public static class StarUnitResolver
 {
-    public static float[] ResolveStarUnits(UnitValue[] starUnits, float availableSpace)
+    public static float[] ResolveStarUnits(float[] starValues, float availableSpace)
     {
-        if (starUnits.Length == 0) return [];
+        if (starValues.Length == 0) return [];
         
         float totalStars = 0f;
-        foreach (var unit in starUnits)
+        foreach (var value in starValues)
         {
-            if (unit.Type == UnitType.Star)
-                totalStars += unit.Value;
+            totalStars += value;
         }
         
-        if (totalStars == 0f) return new float[starUnits.Length];
+        if (totalStars == 0f) return new float[starValues.Length];
         
         float spacePerStar = availableSpace / totalStars;
-        float[] resolvedValues = new float[starUnits.Length];
+        float[] resolvedValues = new float[starValues.Length];
         
-        for (int i = 0; i < starUnits.Length; i++)
+        for (int i = 0; i < starValues.Length; i++)
         {
-            resolvedValues[i] = starUnits[i].Type == UnitType.Star 
-                ? starUnits[i].Value * spacePerStar 
-                : 0f;
+            resolvedValues[i] = starValues[i] * spacePerStar;
         }
         
         return resolvedValues;

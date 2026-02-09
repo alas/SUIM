@@ -1,15 +1,17 @@
 namespace SUIM.Components;
 
+using SUIM.Layout;
+
 public class Border : UIElement
 {
-    public Thickness BorderThickness { get; set; } = new Thickness(0);
+    public Thickness BorderThickness { get; set; } = new Thickness(0f);
     public string? BorderColor { get; set; }
 
     public override void SetAttribute(string name, object? value)
     {
         if (name.Equals("thickness", StringComparison.OrdinalIgnoreCase))
         {
-            BorderThickness = Thickness.Parse(value as string);
+            BorderThickness = Thickness.FromObject(value);
         }
         else if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
         {

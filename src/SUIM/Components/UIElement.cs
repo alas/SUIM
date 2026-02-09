@@ -12,10 +12,10 @@ public abstract class UIElement
     public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.Top;
     public int X { get; set; }
     public int Y { get; set; }
-    public UnitValue Width { get; set; } = new UnitValue(0, UnitType.Auto);
-    public UnitValue Height { get; set; } = new UnitValue(0, UnitType.Auto);
-    public UnitValue4 Margin { get; set; } = new UnitValue(0, UnitType.Pixels);
-    public UnitValue4 Padding { get; set; } = new UnitValue(0, UnitType.Pixels);
+    public UnitValue Width { get; set; } = UnitValue.None;
+    public UnitValue Height { get; set; } = UnitValue.None;
+    public Thickness Margin { get; set; } = Thickness.None;
+    public Thickness Padding { get; set; } = Thickness.None;
   
     public Anchor? Anchor { get; set; }
     public string? Background { get; set; }
@@ -81,11 +81,11 @@ public abstract class UIElement
         }
         else if (name.Equals("margin", StringComparison.OrdinalIgnoreCase))
         {
-            Margin = value is UnitValue4 uv4 ? uv4 : value is UnitValue uv ? uv : UnitValue4.Parse(value as string);
+            Margin = Thickness.FromObject(value);
         }
         else if (name.Equals("padding", StringComparison.OrdinalIgnoreCase))
         {
-            Padding = value is UnitValue4 uv4 ? uv4 : value is UnitValue uv ? uv : UnitValue4.Parse(value as string);
+            Padding = Thickness.FromObject(value);
         }
         else if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase))
         {
@@ -93,11 +93,11 @@ public abstract class UIElement
         }
         else if (name.Equals("width", StringComparison.OrdinalIgnoreCase))
         {
-            Width = value is UnitValue uv ? uv : UnitValue.Parse(value as string);
+            Width = UnitValue.FromObject(value);
         }
         else if (name.Equals("height", StringComparison.OrdinalIgnoreCase))
         {
-            Height = value is UnitValue uv ? uv : UnitValue.Parse(value as string);
+            Height = UnitValue.FromObject(value);
         }
         else if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase))
         {
@@ -178,12 +178,12 @@ public abstract class UIElement
 
     public float GetWidthInPixels(LayoutContext context)
     {
-        return context.UnitConverter.ConvertToPixels(Width, context.AvailableWidth);
+        return context.UnitConverter.ToPixels(Width, context.AvailableWidth);
     }
     
     public float GetHeightInPixels(LayoutContext context)
     {
-        return context.UnitConverter.ConvertToPixels(Height, context.AvailableHeight);
+        return context.UnitConverter.ToPixels(Height, context.AvailableHeight);
     }
 }
 
