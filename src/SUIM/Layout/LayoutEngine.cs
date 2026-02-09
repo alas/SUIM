@@ -11,21 +11,21 @@ public class LayoutEngine
     {
         _layoutResults.Clear();
         _layoutContexts.Clear();
-        
-        // Phase 1: Measure all elements
         MeasureElement(root, context);
-        
-        // Phase 2: Position all elements
         PositionElement(root, context);
-        
-        // Phase 3: Finalize layout
-        FinalizeElement(root, context);
-        
-        return _layoutResults[root];
+
+        return FinalizeElement(root, context);
     }
-    
+
     private void MeasureElement(UIElement element, LayoutContext context)
     {
+        // First, recursively measure all children
+        foreach (var child in element.Children)
+        {
+            var childContext = CreateChildContext(element, child, context);
+            MeasureElement(child, childContext);
+        }
+        
         var result = new LayoutResult();
         
         // Convert units to pixels
@@ -46,6 +46,14 @@ public class LayoutEngine
         // Calculate content area
         var availableWidth = Math.Max(0, context.AvailableWidth - marginLeft - marginRight - paddingLeft - paddingRight);
         var availableHeight = Math.Max(0, context.AvailableHeight - marginTop - marginBottom - paddingTop - paddingBottom);
+        
+        // Initialize content size with explicit sizes if provided
+        result.ContentWidth = widthInPixels;
+        result.ContentHeight = heightInPixels;
+        
+        // Store result early so measurement methods can update it
+        _layoutResults[element] = result;
+        _layoutContexts[element] = context;
         
         // Measure children based on element type
         if (element is Stack stack)
@@ -68,24 +76,29 @@ public class LayoutEngine
         {
             MeasureWindow(window, availableWidth, availableHeight, context);
         }
-        else
+        
+        // Retrieve the result (which may have been updated by measurement methods)
+        if (_layoutResults.TryGetValue(element, out var updatedResult))
         {
-            // Default measurement for content elements
-            result.ContentWidth = widthInPixels;
-            result.ContentHeight = heightInPixels;
+            result = updatedResult;
         }
         
-        // Apply constraints
-        result.ContentWidth = Math.Min(result.ContentWidth, availableWidth);
-        result.ContentHeight = Math.Min(result.ContentHeight, availableHeight);
+        // Apply constraints (but don't override explicit sizes)
+        if (widthInPixels == 0)
+        {
+            result.ContentWidth = Math.Min(result.ContentWidth, availableWidth);
+        }
+        if (heightInPixels == 0)
+        {
+            result.ContentHeight = Math.Min(result.ContentHeight, availableHeight);
+        }
         
         // Calculate total size including padding
         result.Width = result.ContentWidth + paddingLeft + paddingRight;
         result.Height = result.ContentHeight + paddingTop + paddingBottom;
         
-        // Store result
+        // Store final result
         _layoutResults[element] = result;
-        _layoutContexts[element] = context;
     }
     
     private void PositionElement(UIElement element, LayoutContext context)
@@ -123,25 +136,70 @@ public class LayoutEngine
         
         // Update stored result
         _layoutResults[element] = result;
-    }
-    
-    private void FinalizeElement(UIElement element, LayoutContext context)
-    {
-        // Apply final adjustments and propagate to children
+        
+        // Recursively position children
         foreach (var child in element.Children)
         {
             var childContext = CreateChildContext(element, child, context);
-            Layout(child, childContext);
+            PositionElement(child, childContext);
         }
     }
-    
-    private LayoutContext CreateChildContext(UIElement parent, UIElement child, LayoutContext parentContext)
+
+    private LayoutResult FinalizeElement(UIElement root, LayoutContext context)
     {
-        if (!_layoutResults.TryGetValue(parent, out var parentResult))
-            return parentContext;
-            
+        // Ensure the root element has been measured and positioned
+        if (!_layoutResults.TryGetValue(root, out var rootResult))
+        {
+            // If root wasn't measured (shouldn't happen with recursive measurement), measure it directly
+            var result = new LayoutResult();
+
+            // Convert units to pixels
+            var widthInPixels = root.Width.Type == UnitType.Auto ? 0 : root.Width.ToPixels(context);
+            var heightInPixels = root.Height.Type == UnitType.Auto ? 0 : root.Height.ToPixels(context);
+
+            // Convert margin and padding to pixels
+            var marginLeft = root.Margin.Left.ToPixels(context);
+            var marginTop = root.Margin.Top.ToPixels(context);
+            var marginRight = root.Margin.Right.ToPixels(context);
+            var marginBottom = root.Margin.Bottom.ToPixels(context);
+
+            var paddingLeft = root.Padding.Left.ToPixels(context);
+            var paddingTop = root.Padding.Top.ToPixels(context);
+            var paddingRight = root.Padding.Right.ToPixels(context);
+            var paddingBottom = root.Padding.Bottom.ToPixels(context);
+
+            // Calculate content area
+            var availableWidth = Math.Max(0, context.AvailableWidth - marginLeft - marginRight - paddingLeft - paddingRight);
+            var availableHeight = Math.Max(0, context.AvailableHeight - marginTop - marginBottom - paddingTop - paddingBottom);
+
+            // Default measurement for content elements
+            result.ContentWidth = widthInPixels;
+            result.ContentHeight = heightInPixels;
+
+            // Apply constraints
+            result.ContentWidth = Math.Min(result.ContentWidth, availableWidth);
+            result.ContentHeight = Math.Min(result.ContentHeight, availableHeight);
+
+            // Calculate total size including padding
+            result.Width = result.ContentWidth + paddingLeft + paddingRight;
+            result.Height = result.ContentHeight + paddingTop + paddingBottom;
+
+            // Store result
+            _layoutResults[root] = result;
+            _layoutContexts[root] = context;
+
+            rootResult = result;
+        }
+
+        return rootResult;
+    }
+    
+    private static LayoutContext CreateChildContext(UIElement parent, UIElement child, LayoutContext parentContext)
+    {
+        // For child context, use the available space from parent context
+        // The parent's content area is the available space for children
         var childContext = new LayoutContext(parentContext.RootFontSize, 
-            parentResult.ContentWidth, parentResult.ContentHeight)
+            parentContext.AvailableWidth, parentContext.AvailableHeight)
         {
             CurrentFontSize = parentContext.CurrentFontSize
         };
@@ -152,13 +210,12 @@ public class LayoutEngine
     private void MeasureStack(Stack stack, float availableWidth, float availableHeight, LayoutContext context)
     {
         var totalSpacing = Math.Max(0, stack.Spacing * (stack.Children.Count - 1));
-        var remainingWidth = availableWidth;
-        var remainingHeight = availableHeight - totalSpacing;
         
         if (stack.Orientation == Orientation.Horizontal)
         {
-            // Horizontal stack: sum of widths
+            // Horizontal stack: sum of widths, max of heights
             float totalWidth = 0;
+            float maxHeight = 0;
             var starElements = new List<UIElement>();
             
             foreach (var child in stack.Children)
@@ -171,20 +228,52 @@ public class LayoutEngine
                 {
                     var childContext = new LayoutContext(context.RootFontSize, availableWidth, availableHeight);
                     MeasureElement(child, childContext);
-                    var childResult = _layoutResults[child];
-                    totalWidth += childResult.Width;
+                    if (_layoutResults.TryGetValue(child, out var childResult))
+                    {
+                        totalWidth += childResult.Width;
+                        maxHeight = Math.Max(maxHeight, childResult.Height);
+                    }
                 }
             }
             
             // Handle star units for proportional width
             if (starElements.Count > 0)
             {
-                ResolveStarWidths(starElements, Math.Max(0, remainingWidth - totalWidth), context);
+                var remainingWidth = availableWidth - totalWidth - totalSpacing;
+                ResolveStarWidths(starElements, Math.Max(0, remainingWidth), context);
+                
+                // Update maxHeight for star elements
+                foreach (var starElement in starElements)
+                {
+                    if (_layoutResults.TryGetValue(starElement, out var starResult))
+                    {
+                        maxHeight = Math.Max(maxHeight, starResult.Height);
+                    }
+                }
+            }
+            
+            // Calculate final width including spacing and star elements
+            float finalWidth = totalWidth + totalSpacing;
+            foreach (var starElement in starElements)
+            {
+                if (_layoutResults.TryGetValue(starElement, out var starResult))
+                {
+                    finalWidth += starResult.Width;
+                }
+            }
+            
+            // Set the stack's content size
+            if (_layoutResults.TryGetValue(stack, out var stackResult))
+            {
+                stackResult.ContentWidth = finalWidth;
+                stackResult.ContentHeight = maxHeight;
+                _layoutResults[stack] = stackResult;
             }
         }
         else
         {
-            // Vertical stack: sum of heights
+            // Vertical stack: max of widths, sum of heights
+            float maxWidth = 0;
             float totalHeight = 0;
             var starElements = new List<UIElement>();
             
@@ -198,15 +287,46 @@ public class LayoutEngine
                 {
                     var childContext = new LayoutContext(context.RootFontSize, availableWidth, availableHeight);
                     MeasureElement(child, childContext);
-                    var childResult = _layoutResults[child];
-                    totalHeight += childResult.Height;
+                    if (_layoutResults.TryGetValue(child, out var childResult))
+                    {
+                        totalHeight += childResult.Height;
+                        maxWidth = Math.Max(maxWidth, childResult.Width);
+                    }
                 }
             }
             
             // Handle star units for proportional height
             if (starElements.Count > 0)
             {
-                ResolveStarHeights(starElements, Math.Max(0, remainingHeight - totalHeight), context);
+                var remainingHeight = availableHeight - totalHeight - totalSpacing;
+                ResolveStarHeights(starElements, Math.Max(0, remainingHeight), context);
+                
+                // Update maxWidth for star elements
+                foreach (var starElement in starElements)
+                {
+                    if (_layoutResults.TryGetValue(starElement, out var starResult))
+                    {
+                        maxWidth = Math.Max(maxWidth, starResult.Width);
+                    }
+                }
+            }
+            
+            // Calculate final height including spacing and star elements
+            float finalHeight = totalHeight + totalSpacing;
+            foreach (var starElement in starElements)
+            {
+                if (_layoutResults.TryGetValue(starElement, out var starResult))
+                {
+                    finalHeight += starResult.Height;
+                }
+            }
+            
+            // Set the stack's content size
+            if (_layoutResults.TryGetValue(stack, out var stackResult))
+            {
+                stackResult.ContentWidth = maxWidth;
+                stackResult.ContentHeight = finalHeight;
+                _layoutResults[stack] = stackResult;
             }
         }
     }
@@ -225,6 +345,18 @@ public class LayoutEngine
             
             var childContext = new LayoutContext(context.RootFontSize, childWidth, childHeight);
             MeasureElement(gridChild.Element, childContext);
+        }
+        
+        // Calculate total grid size
+        float totalWidth = columnWidths.Sum();
+        float totalHeight = rowHeights.Sum();
+        
+        // Set the grid's content size
+        if (_layoutResults.TryGetValue(grid, out var gridResult))
+        {
+            gridResult.ContentWidth = totalWidth;
+            gridResult.ContentHeight = totalHeight;
+            _layoutResults[grid] = gridResult;
         }
     }
     
@@ -255,29 +387,78 @@ public class LayoutEngine
         }
         
         // Measure remaining space for last child if needed
-        // This would be handled in the finalization phase
+        // Set the dock's content size to the available space
+        if (_layoutResults.TryGetValue(dock, out var dockResult))
+        {
+            dockResult.ContentWidth = availableWidth;
+            dockResult.ContentHeight = availableHeight;
+            _layoutResults[dock] = dockResult;
+        }
     }
     
     private void MeasureDiv(Div div, float availableWidth, float availableHeight, LayoutContext context)
     {
-        if (div.Anchor.HasValue)
+        // Measure children
+        foreach (var child in div.Children)
         {
-            // Absolute positioning based on anchor - measurement handled in positioning phase
+            var childContext = new LayoutContext(context.RootFontSize, availableWidth, availableHeight);
+            MeasureElement(child, childContext);
         }
-        else if (div.X != 0 || div.Y != 0)
+        
+        // Only update content size if div doesn't have explicit dimensions
+        if (_layoutResults.TryGetValue(div, out var divResult))
         {
-            // Explicit positioning - measurement handled in positioning phase
-        }
-        else
-        {
-            // Default block layout - use available space
+            if (div.Width.Type == UnitType.Auto && div.Height.Type == UnitType.Auto)
+            {
+                // Size to children
+                float maxWidth = 0;
+                float maxHeight = 0;
+                
+                foreach (var child in div.Children)
+                {
+                    if (_layoutResults.TryGetValue(child, out var childResult))
+                    {
+                        maxWidth = Math.Max(maxWidth, childResult.Width);
+                        maxHeight = Math.Max(maxHeight, childResult.Height);
+                    }
+                }
+                
+                divResult.ContentWidth = maxWidth > 0 ? maxWidth : availableWidth;
+                divResult.ContentHeight = maxHeight > 0 ? maxHeight : availableHeight;
+            }
+            // If has explicit dimensions, they're already set in MeasureElement
+            _layoutResults[div] = divResult;
         }
     }
     
     private void MeasureWindow(Window window, float availableWidth, float availableHeight, LayoutContext context)
     {
-        // Window takes full available space
-        // No special measurement needed, uses available space
+        // Measure children
+        foreach (var child in window.Children)
+        {
+            var childContext = new LayoutContext(context.RootFontSize, availableWidth, availableHeight);
+            MeasureElement(child, childContext);
+        }
+        
+        // Window measures its children to determine its own size
+        float maxWidth = 0;
+        float maxHeight = 0;
+        
+        foreach (var child in window.Children)
+        {
+            if (_layoutResults.TryGetValue(child, out var childResult))
+            {
+                maxWidth = Math.Max(maxWidth, childResult.Width);
+                maxHeight = Math.Max(maxHeight, childResult.Height);
+            }
+        }
+        
+        if (_layoutResults.TryGetValue(window, out var windowResult))
+        {
+            windowResult.ContentWidth = maxWidth > 0 ? maxWidth : availableWidth;
+            windowResult.ContentHeight = maxHeight > 0 ? maxHeight : availableHeight;
+            _layoutResults[window] = windowResult;
+        }
     }
     
     private void PositionStack(Stack stack, LayoutResult result, LayoutContext context)
@@ -430,7 +611,7 @@ public class LayoutEngine
         }
     }
     
-    private void PositionWindow(Window window, LayoutResult result, LayoutContext context)
+    private static void PositionWindow(Window window, LayoutResult result, LayoutContext context)
     {
         // Window positioned at origin by default
         result.X = 0;
@@ -562,7 +743,7 @@ public class LayoutEngine
         }
     }
     
-    private float[] ParseGridUnits(string? unitsString, float totalSize)
+    private static float[] ParseGridUnits(string? unitsString, float totalSize)
     {
         if (string.IsNullOrWhiteSpace(unitsString))
             return [totalSize];
@@ -614,7 +795,7 @@ public class LayoutEngine
         return result;
     }
     
-    private float GetGridSpanWidth(float[] columnWidths, int startColumn, int columnSpan)
+    private static float GetGridSpanWidth(float[] columnWidths, int startColumn, int columnSpan)
     {
         float width = 0;
         for (int i = startColumn; i < startColumn + columnSpan && i < columnWidths.Length; i++)
@@ -624,7 +805,7 @@ public class LayoutEngine
         return width;
     }
     
-    private float GetGridSpanHeight(float[] rowHeights, int startRow, int rowSpan)
+    private static float GetGridSpanHeight(float[] rowHeights, int startRow, int rowSpan)
     {
         float height = 0;
         for (int i = startRow; i < startRow + rowSpan && i < rowHeights.Length; i++)

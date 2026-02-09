@@ -205,7 +205,7 @@ public class ControlFlowParser(dynamic model)
         return (result, (currentIndex - startIndex) + blockLen);
     }
 
-    private (string result, int eaten) ProcessFor(string markup, int startIndex)
+    private static (string result, int eaten) ProcessFor(string markup, int startIndex)
     {
         int currentIndex = startIndex + 4; // "@for"
         
