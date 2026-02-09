@@ -133,10 +133,10 @@ public class PropertyBindingTests
 </window>";
         var (element, model) = new MarkupParser().Parse(markup);
 
-        var label = (Label)element.Children[0];
-        Assert.Equal("Click Me", label.Text);
+        var label = element?.Children?.Single().Children?.Single() as Label;
+        Assert.Equal("Click Me", label?.Text);
         model!.buttonText = "Updated Text";
-        Assert.Equal("Updated Text", label.Text);
+        Assert.Equal("Updated Text", label!.Text);
     }
 
     private static dynamic Create(object model)

@@ -20,22 +20,16 @@ public class MarkupParser(object? model = null)
 
         Dictionary<string, Dictionary<string, string>>? styles = null;
 
-        // If root element is "suim", extract the model, styles, and actual root element
-        if (root.Name.LocalName.Equals("template", StringComparison.OrdinalIgnoreCase))
+        var modelJson = ExtractModel(root);
+        if (!string.IsNullOrEmpty(modelJson))
         {
-            var modelJson = ExtractModel(root);
-            if (!string.IsNullOrEmpty(modelJson))
-            {
-                model = MergeModels(model, modelJson);
-            }
+            model = MergeModels(model, modelJson);
+        }
 
-            var styleContent = ExtractStyles(root);
-            if (!string.IsNullOrEmpty(styleContent))
-            {
-                styles = ParseStyles(styleContent);
-            }
-
-            root = ExtractRealRootFromSuimWrapper(root);
+        var styleContent = ExtractStyles(root);
+        if (!string.IsNullOrEmpty(styleContent))
+        {
+            styles = ParseStyles(styleContent);
         }
 
         var element = ParseElement(root);
@@ -336,30 +330,6 @@ public class MarkupParser(object? model = null)
         }
 
         return element;
-    }
-
-    private static XElement ExtractRealRootFromSuimWrapper(XElement suimElement)
-    {
-        var children = suimElement.Elements().ToList();
-
-        if (children.Count == 0)
-        {
-            throw new InvalidOperationException("suim element must contain at least one child element (the visual tree root)");
-        }
-
-        // Filter out "model" and "style" elements
-        var visualElements = children
-            .Where(e => !e.Name.LocalName.Equals("model", StringComparison.OrdinalIgnoreCase) &&
-                       !e.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))
-            .ToList();
-
-        if (visualElements.Count != 1)
-        {
-            throw new InvalidOperationException("suim element must contain at least one visual tree element after model and style");
-        }
-
-        // Return the last visual element as the root
-        return visualElements.Single();
     }
 
     private static dynamic Create(object model)

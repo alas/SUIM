@@ -1434,16 +1434,16 @@ Text after
     // ============== Window TESTS ==============
 
     [Fact]
-    public void Parse_Window_WithRootElement()
+    public void Parse_Window_WithDivElement()
     {
         var markup = @"<window><div /></window>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
-        Assert.IsType<Div>(element);
+        Assert.IsType<Div>(element!.Children.Single());
     }
 
     [Fact]
-    public void Parse_Window_WithStyleAndRoot()
+    public void Parse_Window_WithStyleAndDiv()
     {
         var markup = @"<window>
     <style>.class { width: 100; }</style>
@@ -1451,13 +1451,12 @@ Text after
 </window>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Equal("200", div.Width);
+        var div = element?.Children.Single() as Div;
+        Assert.Equal("200", div?.Width);
     }
 
     [Fact]
-    public void Parse_Window_WithModelAndRoot()
+    public void Parse_Window_WithModelAndDiv()
     {
         var markup = @"<window>
     <model></model>
@@ -1465,13 +1464,12 @@ Text after
 </window>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Equal("150", div.Width);
+        var div = element?.Children.Single() as Div;
+        Assert.Equal("150", div?.Width);
     }
 
     [Fact]
-    public void Parse_Window_WithModelStyleAndRoot()
+    public void Parse_Window_WithModelStyleAndStack()
     {
         var markup = @"<window>
     <model></model>
@@ -1483,9 +1481,8 @@ Text after
 </window>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
-        Assert.Equal(Orientation.Vertical, stack.Orientation);
+        var stack = element?.Children.Single() as Stack;
+        Assert.Equal(Orientation.Vertical, stack!.Orientation);
         Assert.Equal(2, stack.Children.Count);
     }
 
@@ -1493,8 +1490,8 @@ Text after
     public void Parse_Window_IgnoresModelAndStyle()
     {
         var markup = @"<button>
-    <model>{ ""value"": ""ignored"" }</model>
-    <style>.button { color: red; }</style>
+<model>{ ""value"": ""ignored"" }</model>
+<style>.button { color: red; }</style>
     <label text=""Click"" />
 </button>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
@@ -1506,15 +1503,13 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_WithComplexRoot()
+    public void Parse_ComplexRoot()
     {
-        var markup = @"<window>
-    <style></style>
-    <grid columns=""*,*"" rows=""auto,*"">
-        <div grid.row=""0"" grid.column=""0"" bg=""blue"" />
-        <div grid.row=""0"" grid.column=""1"" bg=""red"" />
-    </grid>
-</window>";
+        var markup = @"<grid columns=""*,*"" rows=""auto,*"">
+<style></style>
+    <div grid.row=""0"" grid.column=""0"" bg=""blue"" />
+    <div grid.row=""0"" grid.column=""1"" bg=""red"" />
+</grid>";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Grid>(element);
@@ -1533,7 +1528,7 @@ Text after
     <model>{ ""name"": ""John"", ""age"": 30 }</model>
     <div />
 </window>";
-        var (element, model) = new MarkupParser().Parse(markup);
+        var (_, model) = new MarkupParser().Parse(markup);
 
         Assert.NotNull(model);
         Assert.Equal("John", model!.name);
@@ -1571,9 +1566,8 @@ Text after
         Assert.Equal("Hello World", model!.title);
         Assert.Equal("Test", model.description);
         
-        Assert.IsType<Label>(element);
-        var label = (Label)element;
-        Assert.Equal("Hello World", label.Text);
+        var label = element?.Children.Single() as Label;
+        Assert.Equal("Hello World", label?.Text);
     }
 
     [Fact]
@@ -1701,8 +1695,8 @@ Text after
 </window>";
         var (element, model) = new MarkupParser().Parse(markup);
 
-        Assert.IsType<Button>(element);
-        var button = (Button)element;
+        var button = element?.Children.Single() as Button;
+        Assert.NotNull(button);
         Assert.Single(button.Children);
         var label = (Label)button.Children[0];
         Assert.NotNull(label);
