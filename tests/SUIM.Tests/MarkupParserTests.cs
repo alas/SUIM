@@ -1409,7 +1409,7 @@ Text after
                 <style>
                 .myclass {
 	                width: 500;
-	                height: 400,
+	                height: 400;
 	                border: 5 #FF0000;
                 }
                 </style>
