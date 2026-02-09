@@ -16,7 +16,10 @@ public abstract class UIElement
     public UnitValue Height { get; set; } = UnitValue.None;
     public Thickness Margin { get; set; } = Thickness.None;
     public Thickness Padding { get; set; } = Thickness.None;
-  
+    public int ActualX { get; set; }
+    public int ActualY { get; set; }
+    public int ActualWidth { get; set; }
+    public int ActualHeight { get; set; }
     public Anchor? Anchor { get; set; }
     public string? Background { get; set; }
     public string? Color { get; set; }
@@ -178,12 +181,12 @@ public abstract class UIElement
 
     public float GetWidthInPixels(LayoutContext context)
     {
-        return context.UnitConverter.ToPixels(Width, context.AvailableWidth);
+        return context.UnitConverter.ToPixels(Width);
     }
     
     public float GetHeightInPixels(LayoutContext context)
     {
-        return context.UnitConverter.ToPixels(Height, context.AvailableHeight);
+        return context.UnitConverter.ToPixels(Height);
     }
 }
 

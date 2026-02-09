@@ -2,7 +2,6 @@ namespace SUIM.Tests;
 
 using Xunit;
 using SUIM.Layout;
-using SUIM.Components;
 
 public class IntegrationTests
 {
@@ -78,8 +77,7 @@ public class IntegrationTests
                     <label />
                     <label />
                 </stack>
-            </stack>
-";
+            </stack>";
 
         var (element, _) = new MarkupParser().Parse(markup);
         var layoutEngine = new LayoutEngine();

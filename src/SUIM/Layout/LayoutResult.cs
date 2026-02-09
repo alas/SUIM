@@ -16,9 +16,12 @@ public record struct LayoutResult
     public float PaddingTop { get; set; }
     public float PaddingRight { get; set; }
     public float PaddingBottom { get; set; }
-    
-    public float ContentX => X + MarginLeft + PaddingLeft;
-    public float ContentY => Y + MarginTop + PaddingTop;
-    public float ContentRight => ContentX + ContentWidth;
-    public float ContentBottom => ContentY + ContentHeight;
+
+    public readonly float GetContentX() => X + MarginLeft + PaddingLeft;
+
+    public readonly float GetContentY() => Y + MarginTop + PaddingTop;
+
+    public readonly float GetContentRight() => GetContentX() + ContentWidth;
+
+    public readonly float GetContentBottom() => GetContentY() + ContentHeight;
 }

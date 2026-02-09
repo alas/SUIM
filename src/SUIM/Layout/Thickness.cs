@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace SUIM.Layout;
+﻿namespace SUIM.Layout;
 
 public record struct Thickness(UnitValue Left, UnitValue Top, UnitValue Right, UnitValue Bottom)
 {

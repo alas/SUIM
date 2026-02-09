@@ -509,14 +509,14 @@ public class LayoutEngine
     
     private void PositionHorizontalStack(Stack stack, LayoutResult result, LayoutContext context)
     {
-        float currentX = result.ContentX;
+        float currentX = result.GetContentX();
         
         foreach (var child in stack.Children)
         {
             if (_layoutResults.TryGetValue(child, out var childResult))
             {
                 childResult.X = currentX;
-                childResult.Y = result.ContentY;
+                childResult.Y = result.GetContentY();
                 
                 // Apply vertical alignment
                 ApplyVerticalAlignment(child, childResult, result.ContentHeight);
@@ -529,13 +529,13 @@ public class LayoutEngine
     
     private void PositionVerticalStack(Stack stack, LayoutResult result, LayoutContext context)
     {
-        float currentY = result.ContentY;
+        float currentY = result.GetContentY();
         
         foreach (var child in stack.Children)
         {
             if (_layoutResults.TryGetValue(child, out var childResult))
             {
-                childResult.X = result.ContentX;
+                childResult.X = result.GetContentX();
                 childResult.Y = currentY;
                 
                 // Apply horizontal alignment
@@ -556,8 +556,8 @@ public class LayoutEngine
         {
             if (_layoutResults.TryGetValue(gridChild.Element, out var childResult))
             {
-                float x = result.ContentX;
-                float y = result.ContentY;
+                float x = result.GetContentX();
+                float y = result.GetContentY();
                 
                 // Calculate position based on grid coordinates
                 for (int i = 0; i < gridChild.Column; i++)
@@ -580,10 +580,10 @@ public class LayoutEngine
     
     private void PositionDock(Dock dock, LayoutResult result, LayoutContext context)
     {
-        float left = result.ContentX;
-        float top = result.ContentY;
-        float right = result.ContentRight;
-        float bottom = result.ContentBottom;
+        float left = result.GetContentX();
+        float top = result.GetContentY();
+        float right = result.GetContentRight();
+        float bottom = result.GetContentBottom();
         
         foreach (var dockChild in dock.DockChildren)
         {
