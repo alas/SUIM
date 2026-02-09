@@ -60,4 +60,38 @@ public class IntegrationTests
         Assert.Equal(32, result.Width);
         Assert.Equal(48, result.Height); // 16 + 32
     }
+
+    [Fact]
+    public void MarkupParser_Withoutsize_CreatesStarLayout()
+    {
+        var markup = @"
+            <stack orientation=""horizontal"" spacing=""10"">
+                <stack orientation=""vertical"" spacing=""5"">
+                    <label />
+                    <label />
+                    <label />
+                    <label />
+                    <label />
+                </stack>
+                <stack orientation=""vertical"" spacing=""15"">
+                    <label />
+                    <label />
+                    <label />
+                </stack>
+            </stack>
+";
+
+        var (element, _) = new MarkupParser().Parse(markup);
+        var layoutEngine = new LayoutEngine();
+        var context = new LayoutContext(25, 640, 480);
+        var result = layoutEngine.Layout(element, context);
+
+        Assert.Equal(640, result.Width);
+        Assert.Equal(480, result.Height);
+
+        // todo: The horizontal stack should be 640 wide (no size defined, asume *, it takes all available width).
+        // The heights of the labels should be determined by the default font size (no size defined, asume auto, root font size: 25),
+        // The widths of the labels should be determined by the available width (640) minus the spacing between the two vertical stacks (10), divided by 2,
+        // so each label in the first vertical stack should be 315 pixels wide, and each label in the second vertical stack should be 315 pixels wide.
+    }
 }
