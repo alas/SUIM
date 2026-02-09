@@ -1,6 +1,7 @@
 namespace SUIM.Components;
 
 using System.Xml.Linq;
+using SUIM.Layout;
 
 public abstract class UIElement
 {
@@ -11,10 +12,11 @@ public abstract class UIElement
     public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.Top;
     public int X { get; set; }
     public int Y { get; set; }
-    public string? Width { get; set; }
-    public string? Height { get; set; }
-    public string? Margin { get; set; }
-    public string? Padding { get; set; }
+    public UnitValue Width { get; set; } = new UnitValue(0, UnitType.Auto);
+    public UnitValue Height { get; set; } = new UnitValue(0, UnitType.Auto);
+    public UnitValue4 Margin { get; set; } = new UnitValue(0, UnitType.Pixels);
+    public UnitValue4 Padding { get; set; } = new UnitValue(0, UnitType.Pixels);
+  
     public Anchor? Anchor { get; set; }
     public string? Background { get; set; }
     public string? Color { get; set; }
@@ -79,11 +81,11 @@ public abstract class UIElement
         }
         else if (name.Equals("margin", StringComparison.OrdinalIgnoreCase))
         {
-            Margin = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            Margin = value is UnitValue4 uv4 ? uv4 : value is UnitValue uv ? uv : UnitValue4.Parse(value as string);
         }
         else if (name.Equals("padding", StringComparison.OrdinalIgnoreCase))
         {
-            Padding = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            Padding = value is UnitValue4 uv4 ? uv4 : value is UnitValue uv ? uv : UnitValue4.Parse(value as string);
         }
         else if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase))
         {
@@ -91,11 +93,11 @@ public abstract class UIElement
         }
         else if (name.Equals("width", StringComparison.OrdinalIgnoreCase))
         {
-            Width = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            Width = value is UnitValue uv ? uv : UnitValue.Parse(value as string);
         }
         else if (name.Equals("height", StringComparison.OrdinalIgnoreCase))
         {
-            Height = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            Height = value is UnitValue uv ? uv : UnitValue.Parse(value as string);
         }
         else if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase))
         {
@@ -172,6 +174,16 @@ public abstract class UIElement
                 handler?.Invoke(this);
             }
         }
+    }
+
+    public float GetWidthInPixels(LayoutContext context)
+    {
+        return context.UnitConverter.ConvertToPixels(Width, context.AvailableWidth);
+    }
+    
+    public float GetHeightInPixels(LayoutContext context)
+    {
+        return context.UnitConverter.ConvertToPixels(Height, context.AvailableHeight);
     }
 }
 
