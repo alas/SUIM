@@ -132,10 +132,26 @@ public class LayoutTests
     public void UnitConverter_ConvertPixels()
     {
         var unit = new UnitValue(100, UnitType.Pixels);
-        var pixels = unit.ToPixels();
-        Assert.Equal(100, pixels);
+        Assert.Equal(100, unit.Value);
+        Assert.Equal(UnitType.Pixels, unit.Type);
     }
     
+    [Fact]
+    public void UnitConverter_ConvertPixelsString()
+    {
+        var unit = UnitValue.Parse("100");
+        Assert.Equal(100, unit.Value);
+        Assert.Equal(UnitType.Pixels, unit.Type);
+    }
+
+    [Fact]
+    public void UnitConverter_ConvertPixelsFloat()
+    {
+        var unit = UnitValue.FromObject(100f);
+        Assert.Equal(100, unit.Value);
+        Assert.Equal(UnitType.Pixels, unit.Type);
+    }
+
     [Fact]
     public void UnitConverter_ConvertRem()
     {

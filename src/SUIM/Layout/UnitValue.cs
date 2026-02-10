@@ -56,15 +56,6 @@ public record struct UnitValue(float Value, UnitType Type = UnitType.Pixels)
             
         return new UnitValue(0, UnitType.Pixels);
     }
-    
-    public readonly float ToPixels()
-    {
-        return Type switch
-        {
-            UnitType.Pixels => Value,
-            _ => 0f
-        };
-    }
 }
 
 public enum UnitType

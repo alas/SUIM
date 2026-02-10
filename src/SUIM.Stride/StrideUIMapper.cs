@@ -136,7 +136,7 @@ public class StrideUIMapper
     {
         var borderElem = new Border
         {
-            BorderThickness = ComponentsThicknessToStride(border.BorderThickness)
+            BorderThickness = ComponentsThicknessToStride(border.BorderThickness, border)
         };
 
         if (!string.IsNullOrEmpty(border.BorderColor))
@@ -194,10 +194,10 @@ public class StrideUIMapper
         stride.Visibility = suim.Visibility == "hidden" ? Visibility.Hidden : (suim.Visibility == "collapse" ? Visibility.Collapsed : Visibility.Visible);
         
         // Start simple with margins/padding parsing
-        stride.Margin = ComponentsThicknessToStride(suim.Margin);
+        stride.Margin = ComponentsThicknessToStride(suim.Margin, suim);
         if (stride is ContentControl cc)
         {
-            cc.Padding = ComponentsThicknessToStride(suim.Padding); // Only ContentControl has padding in Stride basic? No, wrappers do.
+            cc.Padding = ComponentsThicknessToStride(suim.Padding, suim); // Only ContentControl has padding in Stride basic? No, wrappers do.
         }
 
         // Alignment
@@ -219,13 +219,13 @@ public class StrideUIMapper
             _ => VerticalAlignment.Top
         };
 
-        var width = suim.Width.ToPixels();
+        var width = suim.ToPixels(suim.Width);
         if (width != 0f)
         {
              stride.Width = width;
         }
 
-        var height = suim.Height.ToPixels();
+        var height = suim.ToPixels(suim.Height);
         if (height != 0f)
         {
              stride.Height = height;
@@ -237,9 +237,13 @@ public class StrideUIMapper
         }
     }
 
-    private static Thickness ComponentsThicknessToStride(Layout.Thickness thickness)
+    private static Thickness ComponentsThicknessToStride(Layout.Thickness thickness, Components.UIElement suim)
     {
-        return new Thickness(thickness.Left.ToPixels(), thickness.Top.ToPixels(), thickness.Right.ToPixels(), thickness.Bottom.ToPixels());
+        return new Thickness(
+            suim.ToPixels(thickness.Left),
+            suim.ToPixels(thickness.Top),
+            suim.ToPixels(thickness.Right),
+            suim.ToPixels(thickness.Bottom));
     }
 
     private static Color ParseColor(string colorStr)
