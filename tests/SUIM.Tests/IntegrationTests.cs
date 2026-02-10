@@ -63,6 +63,31 @@ public class IntegrationTests
     }
 
     [Fact]
+    public void MarkupParser_WithRemUnitsAndAutoParent_CreatesScaledLayout()
+    {
+        var markup = @"
+            <stack orientation=""vertical"" spacing=""0"" width=""auto"">
+                <label width=""2rem"" height=""1rem"" />
+                <label width=""1rem"" height=""2rem"" />
+            </stack>";
+
+        var (element, _) = new MarkupParser().Parse(markup);
+        LayoutEngine.Layout(element, 16, 200, 200);
+
+        // 2rem = 32px, 1rem = 16px
+        Assert.Equal(32, element.ActualWidth);
+        Assert.Equal(48, element.ActualHeight); // 16 + 32
+
+        var label1 = (Components.Label)element.Children[0];
+        Assert.Equal(32, label1.ActualWidth);
+        Assert.Equal(16, label1.ActualHeight);
+
+        var label2 = (Components.Label)element.Children[1];
+        Assert.Equal(16, label2.ActualWidth);
+        Assert.Equal(32, label2.ActualHeight);
+    }
+
+    [Fact]
     public void MarkupParser_Withoutsize_CreatesStarLayout()
     {
         var markup = @"

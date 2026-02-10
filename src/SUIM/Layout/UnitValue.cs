@@ -10,6 +10,8 @@ public record struct UnitValue(float Value, UnitType Type = UnitType.Pixels)
             return uv;
         if (obj is string str)
             return Parse(str);
+        if (obj is float f)
+            return new UnitValue(f, UnitType.Pixels);
         if (obj.IsNumericType())
             return new UnitValue(Convert.ToSingle(obj));
 

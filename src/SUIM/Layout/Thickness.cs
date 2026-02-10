@@ -16,6 +16,8 @@ public record struct Thickness(UnitValue Left, UnitValue Top, UnitValue Right, U
             return thickness;
         if (obj is UnitValue uv)
             return new Thickness(uv);
+        if (obj is float f)
+            return new Thickness(new UnitValue(f, UnitType.Pixels));
         if (obj is string str)
             return Parse(str);
         if (obj.IsNumericType())

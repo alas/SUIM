@@ -111,13 +111,6 @@ public static class LayoutEngine
         element.ActualHeight = element.MeasuredContentHeight + element.ComputedPaddingTop + element.ComputedPaddingBottom;
     }
 
-    private static bool TreeHasAnyExplicitSize(UIElement element)
-    {
-        // Deprecated: keep for compatibility by treating any explicit width/height in either axis
-        // Use per-axis checks via TreeHasAnyExplicitWidth/Height where needed.
-        return TreeHasAnyExplicitWidth(element) || TreeHasAnyExplicitHeight(element);
-    }
-
     private static bool TreeHasAnyExplicitWidth(UIElement element)
     {
         bool widthExplicit = element.Width.Type != UnitType.None && element.Width.Type != UnitType.Rem && element.Width.Type != UnitType.Em;
