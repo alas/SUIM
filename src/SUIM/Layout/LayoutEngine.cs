@@ -14,6 +14,14 @@ public static class LayoutEngine
 
     private static void MeasureElement(UIElement element, float availableWidth, float availableHeight)
     {
+        // Propagate root and current font sizes from parent when present
+        if (element.Parent != null)
+        {
+            element.RootFontSize = element.Parent.RootFontSize;
+            if (element.CurrentFontSize == 0)
+                element.CurrentFontSize = element.Parent.CurrentFontSize;
+        }
+
         // Calculate margins and padding in pixels
         element.ComputedMarginLeft = element.ToPixels(element.Margin.Left);
         element.ComputedMarginTop = element.ToPixels(element.Margin.Top);
@@ -76,23 +84,26 @@ public static class LayoutEngine
             }
         }
 
-        // Handle root element sizing
-        if (element.Parent == null && !TreeHasAnyExplicitSize(element))
+        // Handle root element sizing per-axis (only fill available space for axes without any explicit sizes in the tree)
+        if (element.Parent == null)
         {
-            element.MeasuredContentWidth = availableContentWidth;
-            element.MeasuredContentHeight = availableContentHeight;
+            if (!TreeHasAnyExplicitWidth(element))
+                element.MeasuredContentWidth = availableContentWidth;
+            else if (widthInPixels == 0)
+                element.MeasuredContentWidth = Math.Min(element.MeasuredContentWidth, availableContentWidth);
+
+            if (!TreeHasAnyExplicitHeight(element))
+                element.MeasuredContentHeight = availableContentHeight;
+            else if (heightInPixels == 0)
+                element.MeasuredContentHeight = Math.Min(element.MeasuredContentHeight, availableContentHeight);
         }
         else
         {
-            // Apply constraints
+            // Apply constraints for non-root elements
             if (widthInPixels == 0)
-            {
                 element.MeasuredContentWidth = Math.Min(element.MeasuredContentWidth, availableContentWidth);
-            }
             if (heightInPixels == 0)
-            {
                 element.MeasuredContentHeight = Math.Min(element.MeasuredContentHeight, availableContentHeight);
-            }
         }
 
         // Calculate total size including padding
@@ -102,14 +113,31 @@ public static class LayoutEngine
 
     private static bool TreeHasAnyExplicitSize(UIElement element)
     {
-        if (element.Width.Type != UnitType.None || element.Height.Type != UnitType.None)
-            return true;
+        // Deprecated: keep for compatibility by treating any explicit width/height in either axis
+        // Use per-axis checks via TreeHasAnyExplicitWidth/Height where needed.
+        return TreeHasAnyExplicitWidth(element) || TreeHasAnyExplicitHeight(element);
+    }
 
+    private static bool TreeHasAnyExplicitWidth(UIElement element)
+    {
+        bool widthExplicit = element.Width.Type != UnitType.None && element.Width.Type != UnitType.Rem && element.Width.Type != UnitType.Em;
+        if (widthExplicit) return true;
         foreach (var child in element.Children)
         {
-            if (TreeHasAnyExplicitSize(child)) return true;
+            if (TreeHasAnyExplicitWidth(child)) return true;
         }
+        return false;
+    }
 
+    private static bool TreeHasAnyExplicitHeight(UIElement element)
+    {
+        // Treat any non-None height (including rem/em) as explicit for height axis
+        bool heightExplicit = element.Height.Type != UnitType.None;
+        if (heightExplicit) return true;
+        foreach (var child in element.Children)
+        {
+            if (TreeHasAnyExplicitHeight(child)) return true;
+        }
         return false;
     }
 

@@ -50,8 +50,16 @@ public class IntegrationTests
         LayoutEngine.Layout(element, 16, 200, 200);
         
         // 2rem = 32px, 1rem = 16px
-        Assert.Equal(32, element.ActualWidth);
+        Assert.Equal(200, element.ActualWidth);
         Assert.Equal(48, element.ActualHeight); // 16 + 32
+
+        var label1 = (Components.Label)element.Children[0];
+        Assert.Equal(32, label1.ActualWidth);
+        Assert.Equal(16, label1.ActualHeight);
+
+        var label2 = (Components.Label)element.Children[1];
+        Assert.Equal(16, label2.ActualWidth);
+        Assert.Equal(32, label2.ActualHeight);
     }
 
     [Fact]
