@@ -4,15 +4,15 @@ using SUIM.Components;
 
 public static class LayoutEngine
 {
-    public static void Layout(UIElement root, float rootFontSize, LayoutContext context)
+    public static void Layout(UIElement root, float rootFontSize, float availableWidth, float availableHeight)
     {
         root.CurrentFontSize = root.RootFontSize = rootFontSize;
-        MeasureElement(root, context.AvailableWidth, context.AvailableHeight, context);
-        PositionElement(root, 0, 0, context.AvailableWidth, context.AvailableHeight, context);
+        MeasureElement(root, availableWidth, availableHeight);
+        PositionElement(root, 0, 0);
         DetectOverflow(root);
     }
 
-    private static void MeasureElement(UIElement element, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureElement(UIElement element, float availableWidth, float availableHeight)
     {
         // Calculate margins and padding in pixels
         element.ComputedMarginLeft = element.ToPixels(element.Margin.Left);
@@ -48,23 +48,23 @@ public static class LayoutEngine
         // Measure children based on element type
         if (element is Stack stack)
         {
-            MeasureStack(stack, availableContentWidth, availableContentHeight, context);
+            MeasureStack(stack, availableContentWidth, availableContentHeight);
         }
         else if (element is Grid grid)
         {
-            MeasureGrid(grid, availableContentWidth, availableContentHeight, context);
+            MeasureGrid(grid, availableContentWidth, availableContentHeight);
         }
         else if (element is Dock dock)
         {
-            MeasureDock(dock, availableContentWidth, availableContentHeight, context);
+            MeasureDock(dock, availableContentWidth, availableContentHeight);
         }
         else if (element is Div div)
         {
-            MeasureDiv(div, availableContentWidth, availableContentHeight, context);
+            MeasureDiv(div, availableContentWidth, availableContentHeight);
         }
         else if (element is Window window)
         {
-            MeasureWindow(window, availableContentWidth, availableContentHeight, context);
+            MeasureWindow(window, availableContentWidth, availableContentHeight);
         }
         else
         {
@@ -72,7 +72,7 @@ public static class LayoutEngine
             foreach (var child in element.Children)
             {
                 child.CurrentFontSize = element.CurrentFontSize;
-                MeasureElement(child, availableContentWidth, availableContentHeight, context);
+                MeasureElement(child, availableContentWidth, availableContentHeight);
             }
         }
 
@@ -113,7 +113,7 @@ public static class LayoutEngine
         return false;
     }
 
-    private static void PositionElement(UIElement element, float parentX, float parentY, float availableWidth, float availableHeight, LayoutContext context)
+    private static void PositionElement(UIElement element, float parentX, float parentY)
     {
         // Position the element itself
         if (element is Stack or Grid or Dock or Div or Window)
@@ -131,16 +131,16 @@ public static class LayoutEngine
         switch (element)
         {
             case Stack stack:
-                PositionStack(stack, context);
+                PositionStack(stack);
                 break;
             case Grid grid:
                 PositionGrid(grid);
                 break;
             case Dock dock:
-                PositionDock(dock, context);
+                PositionDock(dock);
                 break;
             case Div div:
-                PositionDiv(div, context);
+                PositionDiv(div);
                 break;
             case Window window:
                 PositionWindow(window);
@@ -154,25 +154,25 @@ public static class LayoutEngine
         foreach (var child in element.Children)
         {
             child.CurrentFontSize = element.CurrentFontSize;
-            PositionElement(child, contentX, contentY, element.MeasuredContentWidth, element.MeasuredContentHeight, context);
+            PositionElement(child, contentX, contentY);
         }
     }
 
-    private static void MeasureStack(Stack stack, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureStack(Stack stack, float availableWidth, float availableHeight)
     {
         var totalSpacing = Math.Max(0, stack.Spacing * (stack.Children.Count - 1));
 
         if (stack.Orientation == Orientation.Horizontal)
         {
-            MeasureHorizontalStack(stack, availableWidth, availableHeight, totalSpacing, context);
+            MeasureHorizontalStack(stack, availableWidth, availableHeight, totalSpacing);
         }
         else
         {
-            MeasureVerticalStack(stack, availableWidth, availableHeight, totalSpacing, context);
+            MeasureVerticalStack(stack, availableWidth, availableHeight, totalSpacing);
         }
     }
 
-    private static void MeasureHorizontalStack(Stack stack, float availableWidth, float availableHeight, float totalSpacing, LayoutContext context)
+    private static void MeasureHorizontalStack(Stack stack, float availableWidth, float availableHeight, float totalSpacing)
     {
         float totalWidth = 0;
         float maxHeight = 0;
@@ -188,7 +188,7 @@ public static class LayoutEngine
             else
             {
                 child.CurrentFontSize = stack.CurrentFontSize;
-                MeasureElement(child, availableWidth, availableHeight, context);
+                MeasureElement(child, availableWidth, availableHeight);
                 totalWidth += child.ActualWidth;
                 maxHeight = Math.Max(maxHeight, child.ActualHeight);
             }
@@ -198,7 +198,7 @@ public static class LayoutEngine
         if (starElements.Count > 0)
         {
             var remainingWidth = availableWidth - totalWidth - totalSpacing;
-            ResolveStarWidths(starElements, Math.Max(0, remainingWidth), availableHeight, context);
+            ResolveStarWidths(starElements, Math.Max(0, remainingWidth), availableHeight);
 
             foreach (var starElement in starElements)
             {
@@ -211,7 +211,7 @@ public static class LayoutEngine
         stack.MeasuredContentHeight = maxHeight;
     }
 
-    private static void MeasureVerticalStack(Stack stack, float availableWidth, float availableHeight, float totalSpacing, LayoutContext context)
+    private static void MeasureVerticalStack(Stack stack, float availableWidth, float availableHeight, float totalSpacing)
     {
         float totalHeight = 0;
         float maxWidth = 0;
@@ -227,7 +227,7 @@ public static class LayoutEngine
             else
             {
                 child.CurrentFontSize = stack.CurrentFontSize;
-                MeasureElement(child, availableWidth, availableHeight, context);
+                MeasureElement(child, availableWidth, availableHeight);
                 totalHeight += child.ActualHeight;
                 maxWidth = Math.Max(maxWidth, child.ActualWidth);
             }
@@ -237,7 +237,7 @@ public static class LayoutEngine
         if (starElements.Count > 0)
         {
             var remainingHeight = availableHeight - totalHeight - totalSpacing;
-            ResolveStarHeights(starElements, Math.Max(0, remainingHeight), availableWidth, context);
+            ResolveStarHeights(starElements, Math.Max(0, remainingHeight), availableWidth);
 
             foreach (var starElement in starElements)
             {
@@ -250,7 +250,7 @@ public static class LayoutEngine
         stack.MeasuredContentHeight = totalHeight + totalSpacing;
     }
 
-    private static void ResolveStarWidths(List<UIElement> starElements, float remainingSpace, float availableHeight, LayoutContext context)
+    private static void ResolveStarWidths(List<UIElement> starElements, float remainingSpace, float availableHeight)
     {
         var starValues = starElements.Select(e => e.Width.Type == UnitType.Star ? e.Width.Value : 1f).ToArray();
         var resolvedValues = StarUnitResolver.ResolveStarUnits(starValues, remainingSpace);
@@ -258,11 +258,11 @@ public static class LayoutEngine
         for (int i = 0; i < starElements.Count; i++)
         {
             starElements[i].CurrentFontSize = (starElements[i].Parent as Stack)?.CurrentFontSize ?? 16f;
-            MeasureElement(starElements[i], resolvedValues[i], availableHeight, context);
+            MeasureElement(starElements[i], resolvedValues[i], availableHeight);
         }
     }
 
-    private static void ResolveStarHeights(List<UIElement> starElements, float remainingSpace, float availableWidth, LayoutContext context)
+    private static void ResolveStarHeights(List<UIElement> starElements, float remainingSpace, float availableWidth)
     {
         var starValues = starElements.Select(e => e.Height.Type == UnitType.Star ? e.Height.Value : 1f).ToArray();
         var resolvedValues = StarUnitResolver.ResolveStarUnits(starValues, remainingSpace);
@@ -270,11 +270,11 @@ public static class LayoutEngine
         for (int i = 0; i < starElements.Count; i++)
         {
             starElements[i].CurrentFontSize = (starElements[i].Parent as Stack)?.CurrentFontSize ?? 16f;
-            MeasureElement(starElements[i], availableWidth, resolvedValues[i], context);
+            MeasureElement(starElements[i], availableWidth, resolvedValues[i]);
         }
     }
 
-    private static void MeasureGrid(Grid grid, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureGrid(Grid grid, float availableWidth, float availableHeight)
     {
         var columnWidths = ParseGridUnits(grid.Columns, availableWidth, grid);
         var rowHeights = ParseGridUnits(grid.Rows, availableHeight, grid);
@@ -285,40 +285,40 @@ public static class LayoutEngine
             var childHeight = GetGridSpanHeight(rowHeights, gridChild.Row, gridChild.RowSpan);
 
             gridChild.Element.CurrentFontSize = grid.CurrentFontSize;
-            MeasureElement(gridChild.Element, childWidth, childHeight, context);
+            MeasureElement(gridChild.Element, childWidth, childHeight);
         }
 
         grid.MeasuredContentWidth = columnWidths.Sum();
         grid.MeasuredContentHeight = rowHeights.Sum();
     }
 
-    private static void MeasureDock(Dock dock, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureDock(Dock dock, float availableWidth, float availableHeight)
     {
         foreach (var dockChild in dock.DockChildren)
         {
             dockChild.Element.CurrentFontSize = dock.CurrentFontSize;
-            MeasureElement(dockChild.Element, availableWidth, availableHeight, context);
+            MeasureElement(dockChild.Element, availableWidth, availableHeight);
         }
 
         dock.MeasuredContentWidth = availableWidth;
         dock.MeasuredContentHeight = availableHeight;
     }
 
-    private static void MeasureDiv(Div div, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureDiv(Div div, float availableWidth, float availableHeight)
     {
         bool hasExplicitlyPositionedChildren = div.Children.Any(c => c.X.Type != UnitType.None || c.Y.Type != UnitType.None);
 
         if (!hasExplicitlyPositionedChildren && div.Children.Count > 0)
         {
-            MeasureVerticalDiv(div, availableWidth, availableHeight, context);
+            MeasureVerticalDiv(div, availableWidth, availableHeight);
         }
         else
         {
-            MeasureStandardDiv(div, availableWidth, availableHeight, context);
+            MeasureStandardDiv(div, availableWidth, availableHeight);
         }
     }
 
-    private static void MeasureVerticalDiv(Div div, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureVerticalDiv(Div div, float availableWidth, float availableHeight)
     {
         float maxWidth = 0;
         float totalHeight = 0;
@@ -336,7 +336,7 @@ public static class LayoutEngine
             else
             {
                 child.CurrentFontSize = div.CurrentFontSize;
-                MeasureElement(child, availableWidth, availableHeight, context);
+                MeasureElement(child, availableWidth, availableHeight);
                 totalHeight += child.ActualHeight;
                 maxWidth = Math.Max(maxWidth, child.ActualWidth);
             }
@@ -346,7 +346,7 @@ public static class LayoutEngine
         if (starElements.Count > 0)
         {
             var remainingHeight = availableHeight - totalHeight - totalSpacing;
-            ResolveStarHeights(starElements, Math.Max(0, remainingHeight), availableWidth, context);
+            ResolveStarHeights(starElements, Math.Max(0, remainingHeight), availableWidth);
 
             foreach (var starElement in starElements)
             {
@@ -375,7 +375,7 @@ public static class LayoutEngine
         }
     }
 
-    private static void MeasureStandardDiv(Div div, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureStandardDiv(Div div, float availableWidth, float availableHeight)
     {
         float maxWidth = 0;
         float maxHeight = 0;
@@ -383,7 +383,7 @@ public static class LayoutEngine
         foreach (var child in div.Children)
         {
             child.CurrentFontSize = div.CurrentFontSize;
-            MeasureElement(child, availableWidth, availableHeight, context);
+            MeasureElement(child, availableWidth, availableHeight);
             maxWidth = Math.Max(maxWidth, child.ActualWidth);
             maxHeight = Math.Max(maxHeight, child.ActualHeight);
         }
@@ -395,7 +395,7 @@ public static class LayoutEngine
         }
     }
 
-    private static void MeasureWindow(Window window, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureWindow(Window window, float availableWidth, float availableHeight)
     {
         float maxWidth = 0;
         float maxHeight = 0;
@@ -403,7 +403,7 @@ public static class LayoutEngine
         foreach (var child in window.Children)
         {
             child.CurrentFontSize = window.CurrentFontSize;
-            MeasureElement(child, availableWidth, availableHeight, context);
+            MeasureElement(child, availableWidth, availableHeight);
             maxWidth = Math.Max(maxWidth, child.ActualWidth);
             maxHeight = Math.Max(maxHeight, child.ActualHeight);
         }
@@ -412,7 +412,7 @@ public static class LayoutEngine
         window.MeasuredContentHeight = maxHeight > 0 ? maxHeight : availableHeight;
     }
 
-    private static void PositionStack(Stack stack, LayoutContext context)
+    private static void PositionStack(Stack stack)
     {
         stack.ActualX = 0;
         stack.ActualY = 0;
@@ -482,7 +482,7 @@ public static class LayoutEngine
         }
     }
 
-    private static void PositionDock(Dock dock, LayoutContext context)
+    private static void PositionDock(Dock dock)
     {
         dock.ActualX = 0;
         dock.ActualY = 0;
@@ -525,11 +525,11 @@ public static class LayoutEngine
         }
     }
 
-    private static void PositionDiv(Div div, LayoutContext context)
+    private static void PositionDiv(Div div)
     {
         if (div.Anchor.HasValue)
         {
-            PositionWithAnchor(div, context);
+            PositionWithAnchor(div);
         }
         else if (div.X.Type != UnitType.None || div.Y.Type != UnitType.None)
         {
@@ -570,7 +570,7 @@ public static class LayoutEngine
         window.ActualY = 0;
     }
 
-    private static void PositionWithAnchor(Div div, LayoutContext context)
+    private static void PositionWithAnchor(Div div)
     {
         // This needs parent context info - for now, assume parent is 640x480
         var parentWidth = 640f;

@@ -17,8 +17,7 @@ public class LayoutTests
         stack.AddChild(child1, null);
         stack.AddChild(child2, null);
         
-        var context = new LayoutContext { AvailableWidth = 200, AvailableHeight = 200 };
-        LayoutEngine.Layout(stack, 16, context);
+        LayoutEngine.Layout(stack, 16, 200, 200);
         
         Assert.Equal(100, stack.ActualWidth);
         Assert.Equal(90, stack.ActualHeight); // 50 + 30 + 10 spacing
@@ -34,8 +33,7 @@ public class LayoutTests
         stack.AddChild(child1, null);
         stack.AddChild(child2, null);
         
-        var context = new LayoutContext { AvailableWidth = 300, AvailableHeight = 100 };
-        LayoutEngine.Layout(stack, 16, context);
+        LayoutEngine.Layout(stack, 16, 300, 100);
         
         Assert.Equal(300, stack.ActualWidth);
         Assert.Equal(50, stack.ActualHeight);
@@ -51,8 +49,7 @@ public class LayoutTests
         grid.AddChild(child1, null);
         grid.AddChild(child2, null);
         
-        var context = new LayoutContext { AvailableWidth = 300, AvailableHeight = 200 };
-        LayoutEngine.Layout(grid, 16, context);
+        LayoutEngine.Layout(grid, 16, 300, 200);
         
         Assert.Equal(300, grid.ActualWidth);
         Assert.Equal(200, grid.ActualHeight);
@@ -66,8 +63,7 @@ public class LayoutTests
         
         div.AddChild(child, null);
         
-        var context = new LayoutContext { AvailableWidth = 400, AvailableHeight = 300 };
-        LayoutEngine.Layout(div, 16, context);
+        LayoutEngine.Layout(div, 16, 400, 300);
         
         Assert.Equal(100, div.ActualWidth);
         Assert.Equal(50, div.ActualHeight);
@@ -81,8 +77,7 @@ public class LayoutTests
         
         window.AddChild(child, null);
         
-        var context = new LayoutContext { AvailableWidth = 800, AvailableHeight = 600 };
-        LayoutEngine.Layout(window, 16, context);
+        LayoutEngine.Layout(window, 16, 800, 600);
         
         Assert.Equal(100, window.ActualWidth);
         Assert.Equal(50, window.ActualHeight);

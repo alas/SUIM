@@ -15,8 +15,7 @@ public class IntegrationTests
             </stack>";
             
         var (element, _) = new MarkupParser().Parse(markup);
-        var context = new LayoutContext { AvailableWidth = 200, AvailableHeight = 200 };
-        LayoutEngine.Layout(element, 16, context);
+        LayoutEngine.Layout(element, 16, 200, 200);
         
         Assert.Equal(100, element.ActualWidth);
         Assert.Equal(90, element.ActualHeight); // 50 + 30 + 10 spacing
@@ -32,8 +31,7 @@ public class IntegrationTests
             </stack>";
             
         var (element, _) = new MarkupParser().Parse(markup);
-        var context = new LayoutContext { AvailableWidth = 300, AvailableHeight = 100 };
-        LayoutEngine.Layout(element, 16, context);
+        LayoutEngine.Layout(element, 16, 300, 100);
         
         Assert.Equal(300, element.ActualWidth);
         Assert.Equal(50, element.ActualHeight);
@@ -49,8 +47,7 @@ public class IntegrationTests
             </stack>";
             
         var (element, _) = new MarkupParser().Parse(markup);
-        var context = new LayoutContext { AvailableWidth = 200, AvailableHeight = 200 };
-        LayoutEngine.Layout(element, 16, context);
+        LayoutEngine.Layout(element, 16, 200, 200);
         
         // 2rem = 32px, 1rem = 16px
         Assert.Equal(32, element.ActualWidth);
@@ -77,8 +74,7 @@ public class IntegrationTests
             </stack>";
 
         var (element, _) = new MarkupParser().Parse(markup);
-        var context = new LayoutContext { AvailableWidth = 640, AvailableHeight = 480 };
-        LayoutEngine.Layout(element, 25, context);
+        LayoutEngine.Layout(element, 25, 640, 480);
 
         Assert.Equal(640, element.ActualWidth);
         Assert.Equal(480, element.ActualHeight);
