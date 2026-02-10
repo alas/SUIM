@@ -76,7 +76,7 @@ public class StrideUIMapper
         var tb = new TextBlock
         {
             Text = text.Text ?? "",
-            TextSize = text.FontSize > 0 ? text.FontSize : 14
+            TextSize = text.FontSize > 0f ? text.FontSize : 14f
         };
 
         //if (!string.IsNullOrEmpty(text.Font))

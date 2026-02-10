@@ -20,6 +20,25 @@ public abstract class UIElement
     public float ActualY { get; set; } = float.NaN;
     public float ActualWidth { get; set; } = float.NaN;
     public float ActualHeight { get; set; } = float.NaN;
+    public string? Font { get; set; }
+    public float FontSize { get; set; }
+    public string? CurrentFont { get; set; }
+    
+    // Layout calculation properties (transient, used during measurement/positioning)
+    internal float MeasuredContentWidth { get; set; }
+    internal float MeasuredContentHeight { get; set; }
+    internal float ComputedMarginLeft { get; set; }
+    internal float ComputedMarginTop { get; set; }
+    internal float ComputedMarginRight { get; set; }
+    internal float ComputedMarginBottom { get; set; }
+    internal float ComputedPaddingLeft { get; set; }
+    internal float ComputedPaddingTop { get; set; }
+    internal float ComputedPaddingRight { get; set; }
+    internal float ComputedPaddingBottom { get; set; }
+    internal float CurrentFontSize { get; set; }
+    public bool NeedsVerticalScroll { get; set; }
+    public bool NeedsHorizontalScroll { get; set; }
+    
     public Anchor? Anchor { get; set; }
     public string? Background { get; set; }
     public string? Color { get; set; }
@@ -90,10 +109,6 @@ public abstract class UIElement
         {
             Padding = Thickness.FromObject(value);
         }
-        else if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase))
-        {
-            Background = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-        }
         else if (name.Equals("width", StringComparison.OrdinalIgnoreCase))
         {
             Width = UnitValue.FromObject(value);
@@ -119,6 +134,22 @@ public abstract class UIElement
         else if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase))
         {
             (this as IPlaceholder)?.Placeholder = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+        }
+        else if (name.Equals("font", StringComparison.OrdinalIgnoreCase))
+        {
+            Font = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+        }
+        else if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase))
+        {
+            FontSize = value is float f ? f : Convert.ToSingle(value);
+        }
+        else if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
+        {
+            Color = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+        }
+        else if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase))
+        {
+            Background = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Contains('.'))
         {

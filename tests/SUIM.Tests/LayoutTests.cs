@@ -153,7 +153,7 @@ public class LayoutTests
     [Fact]
     public void UnitConverter_ConvertEm()
     {
-        var context = new LayoutContext(16, 100, 100) { CurrentFontSize = 20 };
+        var context = new LayoutContext(20, 100, 100);
         var unit = new UnitValue(1.5f, UnitType.Em);
         var pixels = unit.ToPixels(context);
         Assert.Equal(30, pixels); // 1.5 * 20

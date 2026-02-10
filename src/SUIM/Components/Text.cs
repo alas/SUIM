@@ -3,8 +3,6 @@ namespace SUIM.Components;
 public class BaseText : UIElement
 {
     public string? Text { get; set; }
-    public string? Font { get; set; }
-    public int FontSize { get; set; }
     public bool Wrap { get; set; }
 
     public override void SetAttribute(string name, object? value)
@@ -12,18 +10,6 @@ public class BaseText : UIElement
         if (name.Equals("text", StringComparison.OrdinalIgnoreCase))
         {
             Text = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-        }
-        else if (name.Equals("font", StringComparison.OrdinalIgnoreCase))
-        {
-            Font = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-        }
-        else if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase))
-        {
-            FontSize = value is int i ? i : Convert.ToInt32(value);
-        }
-        else if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
-        {
-            Color = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Equals("wrap", StringComparison.OrdinalIgnoreCase))
         {

@@ -313,7 +313,7 @@ public class MarkupParserTests
         var label = (Label)element;
         Assert.Equal("Hello", label.Text);
         Assert.Equal("Arial", label.Font);
-        Assert.Equal(16, label.FontSize);
+        Assert.Equal(16f, label.FontSize);
         Assert.Equal("#FF0000", label.Color);
         Assert.True(label.Wrap);
     }

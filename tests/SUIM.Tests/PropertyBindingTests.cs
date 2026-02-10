@@ -57,13 +57,13 @@ public class PropertyBindingTests
         var binding = new PropertyBinding(model, "FontSize", element, "fontsize");
         binding.Apply();
 
-        Assert.Equal(10, element.FontSize);
+        Assert.Equal(10f, element.FontSize);
 
         binding.Dispose();
 
         model.FontSize = 20;
 
-        Assert.Equal(10, element.FontSize);
+        Assert.Equal(10f, element.FontSize);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class PropertyBindingTests
         binder2.Apply();
 
         Assert.Equal("Dynamic", element.Text);
-        Assert.Equal(42, element.FontSize);
+        Assert.Equal(42f, element.FontSize);
     }
 
     [Fact]
