@@ -672,8 +672,8 @@ public class LayoutEngine
         }
         else if (div.X != UnitValue.None || div.Y != UnitValue.None)
         {
-            result.X = div.X.Value;
-            result.Y = div.Y.Value;
+            result.X = div.X.ToPixels(_layoutContexts[div]);
+            result.Y = div.Y.ToPixels(_layoutContexts[div]);
         }
         else
         {
