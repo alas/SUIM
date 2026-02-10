@@ -35,7 +35,7 @@ public class LayoutEngine
         // First, recursively measure all children
         foreach (var child in element.Children)
         {
-            var childContext = CreateChildContext(element, child, context);
+            var childContext = CreateChildContext(context);
             MeasureElement(child, childContext);
         }
         
@@ -143,23 +143,23 @@ public class LayoutEngine
         // Position based on element type and alignment
         if (element is Stack stack)
         {
-            PositionStack(stack, result, context);
+            PositionStack(stack, result);
         }
         else if (element is Grid grid)
         {
-            PositionGrid(grid, result, context);
+            PositionGrid(grid, result);
         }
         else if (element is Dock dock)
         {
-            PositionDock(dock, result, context);
+            PositionDock(dock, result);
         }
         else if (element is Div div)
         {
-            PositionDiv(div, result, context);
+            PositionDiv(div, result);
         }
-        else if (element is Window window)
+        else if (element is Window)
         {
-            PositionWindow(window, result, context);
+            PositionWindow(result);
         }
         else
         {
@@ -174,7 +174,7 @@ public class LayoutEngine
         // Recursively position children
         foreach (var child in element.Children)
         {
-            var childContext = CreateChildContext(element, child, context);
+            var childContext = CreateChildContext(context);
             PositionElement(child, childContext);
         }
     }
@@ -225,15 +225,33 @@ public class LayoutEngine
             rootResult = result;
         }
 
+        ApplyResultsToElements();
+
         return rootResult;
     }
-    
-    private static LayoutContext CreateChildContext(UIElement parent, UIElement child, LayoutContext parentContext)
+
+    private void ApplyResultsToElements()
+    {
+        foreach (var kv in _layoutResults)
+        {
+            var element = kv.Key;
+            var res = kv.Value;
+
+            element.ActualX = res.X;
+            element.ActualY = res.Y;
+            element.ActualWidth = res.Width;
+            element.ActualHeight = res.Height;
+        }
+    }
+
+    private static LayoutContext CreateChildContext(LayoutContext parentContext)
     {
         // For child context, use the available space from parent context
         // The parent's content area is the available space for children
-        var childContext = new LayoutContext(parentContext.RootFontSize, 
-            parentContext.AvailableWidth, parentContext.AvailableHeight)
+        var childContext = new LayoutContext(
+            parentContext.RootFontSize,
+            parentContext.AvailableWidth,
+            parentContext.AvailableHeight)
         {
             CurrentFontSize = parentContext.CurrentFontSize
         };
@@ -274,9 +292,19 @@ public class LayoutEngine
             if (starElements.Count > 0)
             {
                 var remainingWidth = availableWidth - totalWidth - totalSpacing;
-                ResolveStarWidths(starElements, Math.Max(0, remainingWidth), context);
+                ResolveStarWidths(starElements, Math.Max(0, remainingWidth));
                 
-                // Update maxHeight for star elements
+                // Re-measure star elements using their resolved widths so their children/layout adapt
+                foreach (var starElement in starElements)
+                {
+                    if (_layoutResults.TryGetValue(starElement, out var starResult))
+                    {
+                        var childContext = new LayoutContext(context.RootFontSize, starResult.Width, availableHeight);
+                        MeasureElement(starElement, childContext);
+                    }
+                }
+
+                // Update maxHeight for star elements after re-measure
                 foreach (var starElement in starElements)
                 {
                     if (_layoutResults.TryGetValue(starElement, out var starResult))
@@ -333,9 +361,19 @@ public class LayoutEngine
             if (starElements.Count > 0)
             {
                 var remainingHeight = availableHeight - totalHeight - totalSpacing;
-                ResolveStarHeights(starElements, Math.Max(0, remainingHeight), context);
+                ResolveStarHeights(starElements, Math.Max(0, remainingHeight));
                 
-                // Update maxWidth for star elements
+                // Re-measure star elements using their resolved heights so their children/layout adapt
+                foreach (var starElement in starElements)
+                {
+                    if (_layoutResults.TryGetValue(starElement, out var starResult))
+                    {
+                        var childContext = new LayoutContext(context.RootFontSize, availableWidth, starResult.Height);
+                        MeasureElement(starElement, childContext);
+                    }
+                }
+
+                // Update maxWidth for star elements after re-measure
                 foreach (var starElement in starElements)
                 {
                     if (_layoutResults.TryGetValue(starElement, out var starResult))
@@ -495,19 +533,19 @@ public class LayoutEngine
         }
     }
     
-    private void PositionStack(Stack stack, LayoutResult result, LayoutContext context)
+    private void PositionStack(Stack stack, LayoutResult result)
     {
         if (stack.Orientation == Orientation.Horizontal)
         {
-            PositionHorizontalStack(stack, result, context);
+            PositionHorizontalStack(stack, result);
         }
         else
         {
-            PositionVerticalStack(stack, result, context);
+            PositionVerticalStack(stack, result);
         }
     }
     
-    private void PositionHorizontalStack(Stack stack, LayoutResult result, LayoutContext context)
+    private void PositionHorizontalStack(Stack stack, LayoutResult result)
     {
         float currentX = result.GetContentX();
         
@@ -527,7 +565,7 @@ public class LayoutEngine
         }
     }
     
-    private void PositionVerticalStack(Stack stack, LayoutResult result, LayoutContext context)
+    private void PositionVerticalStack(Stack stack, LayoutResult result)
     {
         float currentY = result.GetContentY();
         
@@ -547,7 +585,7 @@ public class LayoutEngine
         }
     }
     
-    private void PositionGrid(Grid grid, LayoutResult result, LayoutContext context)
+    private void PositionGrid(Grid grid, LayoutResult result)
     {
         var columnWidths = ParseGridUnits(grid.Columns, result.ContentWidth);
         var rowHeights = ParseGridUnits(grid.Rows, result.ContentHeight);
@@ -578,7 +616,7 @@ public class LayoutEngine
         }
     }
     
-    private void PositionDock(Dock dock, LayoutResult result, LayoutContext context)
+    private void PositionDock(Dock dock, LayoutResult result)
     {
         float left = result.GetContentX();
         float top = result.GetContentY();
@@ -626,16 +664,16 @@ public class LayoutEngine
         }
     }
     
-    private void PositionDiv(Div div, LayoutResult result, LayoutContext context)
+    private void PositionDiv(Div div, LayoutResult result)
     {
         if (div.Anchor.HasValue)
         {
-            PositionWithAnchor(div, result, context);
+            PositionWithAnchor(div, result);
         }
-        else if (div.X != 0 || div.Y != 0)
+        else if (div.X != UnitValue.None || div.Y != UnitValue.None)
         {
-            result.X = div.X;
-            result.Y = div.Y;
+            result.X = div.X.Value;
+            result.Y = div.Y.Value;
         }
         else
         {
@@ -645,14 +683,14 @@ public class LayoutEngine
         }
     }
     
-    private static void PositionWindow(Window window, LayoutResult result, LayoutContext context)
+    private static void PositionWindow(LayoutResult result)
     {
         // Window positioned at origin by default
         result.X = 0;
         result.Y = 0;
     }
     
-    private void PositionWithAnchor(Div div, LayoutResult result, LayoutContext context)
+    private void PositionWithAnchor(Div div, LayoutResult result)
     {
         if (!_layoutContexts.TryGetValue(div, out var divContext))
             return;
@@ -739,14 +777,15 @@ public class LayoutEngine
         _layoutResults[element] = elementResult;
     }
     
-    private void ResolveStarWidths(List<UIElement> elements, float remainingSpace, LayoutContext context)
+    private void ResolveStarWidths(List<UIElement> elements, float remainingSpace)
     {
-        var starElements = elements.Where(e => e.Width.Type == UnitType.Star).ToList();
+        // Treat explicit star units as well as implicit star-like layout elements
+        var starElements = elements.Where(e => e.Width.Type == UnitType.Star || (e.Width.Type == UnitType.None && e is LayoutElement)).ToList();
         if (starElements.Count == 0) return;
-        
-        var starValues = starElements.Select(e => e.Width.Value).ToArray();
+
+        var starValues = starElements.Select(e => e.Width.Type == UnitType.Star ? e.Width.Value : 1f).ToArray();
         var resolvedValues = StarUnitResolver.ResolveStarUnits(starValues, remainingSpace);
-        
+
         for (int i = 0; i < starElements.Count; i++)
         {
             var element = starElements[i];
@@ -758,14 +797,15 @@ public class LayoutEngine
         }
     }
     
-    private void ResolveStarHeights(List<UIElement> elements, float remainingSpace, LayoutContext context)
+    private void ResolveStarHeights(List<UIElement> elements, float remainingSpace)
     {
-        var starElements = elements.Where(e => e.Height.Type == UnitType.Star).ToList();
+        // Treat explicit star units as well as implicit star-like layout elements
+        var starElements = elements.Where(e => e.Height.Type == UnitType.Star || (e.Height.Type == UnitType.None && e is LayoutElement)).ToList();
         if (starElements.Count == 0) return;
-        
-        var starValues = starElements.Select(e => e.Height.Value).ToArray();
+
+        var starValues = starElements.Select(e => e.Height.Type == UnitType.Star ? e.Height.Value : 1f).ToArray();
         var resolvedValues = StarUnitResolver.ResolveStarUnits(starValues, remainingSpace);
-        
+
         for (int i = 0; i < starElements.Count; i++)
         {
             var element = starElements[i];

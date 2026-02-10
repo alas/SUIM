@@ -494,8 +494,8 @@ public class MarkupParserTests
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(50, div.X);
-        Assert.Equal(100, div.Y);
+        Assert.Equal(50f, div.X.Value);
+        Assert.Equal(100f, div.Y.Value);
     }
 
     [Fact]

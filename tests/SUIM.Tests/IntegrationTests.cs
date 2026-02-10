@@ -86,10 +86,28 @@ public class IntegrationTests
 
         Assert.Equal(640, result.Width);
         Assert.Equal(480, result.Height);
-
-        // todo: The horizontal stack should be 640 wide (no size defined, asume *, it takes all available width).
-        // The heights of the labels should be determined by the default font size (no size defined, asume auto, root font size: 25),
+        // The horizontal stack should be 640 wide (no size defined, assume *, it takes all available width).
+        // The heights of the labels should be determined by the default font size (no size defined, assume auto, root font size: 25),
         // The widths of the labels should be determined by the available width (640) minus the spacing between the two vertical stacks (10), divided by 2,
         // so each label in the first vertical stack should be 315 pixels wide, and each label in the second vertical stack should be 315 pixels wide.
+
+        // Verify child label sizes using Actual* values populated by LayoutEngine
+        var firstStack = (Components.Stack)element.Children[0];
+        var secondStack = (Components.Stack)element.Children[1];
+
+        int expectedStackWidth = (640 - 10) / 2; // 315
+        int expectedLabelHeight = 25; // root font size
+
+        foreach (var lbl in firstStack.Children)
+        {
+            Assert.Equal(expectedStackWidth, lbl.ActualWidth);
+            Assert.Equal(expectedLabelHeight, lbl.ActualHeight);
+        }
+
+        foreach (var lbl in secondStack.Children)
+        {
+            Assert.Equal(expectedStackWidth, lbl.ActualWidth);
+            Assert.Equal(expectedLabelHeight, lbl.ActualHeight);
+        }
     }
 }

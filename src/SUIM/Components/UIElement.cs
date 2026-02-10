@@ -10,16 +10,16 @@ public abstract class UIElement
     public UIElement? Parent { get; set; }
     public HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.Left;
     public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.Top;
-    public int X { get; set; }
-    public int Y { get; set; }
+    public UnitValue X { get; set; }
+    public UnitValue Y { get; set; }
     public UnitValue Width { get; set; } = UnitValue.None;
     public UnitValue Height { get; set; } = UnitValue.None;
     public Thickness Margin { get; set; } = Thickness.None;
     public Thickness Padding { get; set; } = Thickness.None;
-    public int ActualX { get; set; }
-    public int ActualY { get; set; }
-    public int ActualWidth { get; set; }
-    public int ActualHeight { get; set; }
+    public float ActualX { get; set; } = float.NaN;
+    public float ActualY { get; set; } = float.NaN;
+    public float ActualWidth { get; set; } = float.NaN;
+    public float ActualHeight { get; set; } = float.NaN;
     public Anchor? Anchor { get; set; }
     public string? Background { get; set; }
     public string? Color { get; set; }
@@ -54,11 +54,11 @@ public abstract class UIElement
         }
         else if (name.Equals("x", StringComparison.OrdinalIgnoreCase))
         {
-            X = value is int i ? i : Convert.ToInt32(value);
+            X = UnitValue.FromObject(value);
         }
         else if (name.Equals("y", StringComparison.OrdinalIgnoreCase))
         {
-            Y = value is int i ? i : Convert.ToInt32(value);
+            Y = UnitValue.FromObject(value);
         }
         else if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase))
         {
