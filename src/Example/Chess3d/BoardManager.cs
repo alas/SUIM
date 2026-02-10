@@ -27,9 +27,13 @@ public class BoardManager : SyncScript
     public override void Start()
     {
         base.Start();
+
         Instance = this;
 
         InitBoard();
+
+        var uiComponent = Entity.GetOrCreate<UIComponent>();
+        SUIM.MainView.GetMainView((Game)Game, uiComponent);
     }
 
     public override void Update()

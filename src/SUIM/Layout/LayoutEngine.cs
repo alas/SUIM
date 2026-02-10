@@ -42,10 +42,29 @@ public static class LayoutEngine
         var heightInPixels = element.Height.Type == UnitType.Auto ? 0 : element.ToPixels(element.Height);
 
         // Initialize content size
-        if (element is BaseText)
+        if (element is BaseText baseText)
         {
-            element.MeasuredContentWidth = widthInPixels == 0 ? availableContentWidth : widthInPixels;
-            element.MeasuredContentHeight = heightInPixels == 0 ? element.CurrentFontSize : heightInPixels;
+            // Width: if explicit pixels provided use that, if auto use MetricTable, otherwise constrain to available width
+            if (element.Width.Type == UnitType.Auto)
+            {
+                var fontName = element.Font ?? element.RootFont ?? "__default__";
+                element.MeasuredContentWidth = MetricTable.MeasureText(baseText.Text ?? string.Empty, fontName, element.CurrentFontSize);
+            }
+            else
+            {
+                element.MeasuredContentWidth = widthInPixels == 0 ? availableContentWidth : widthInPixels;
+            }
+
+            // Height: auto resolves to single-line height from font metrics. Explicit heights are honored.
+            if (element.Height.Type == UnitType.Auto)
+            {
+                var fontName = element.Font ?? element.RootFont ?? "__default__";
+                element.MeasuredContentHeight = MetricTable.GetLineHeight(fontName, element.CurrentFontSize);
+            }
+            else
+            {
+                element.MeasuredContentHeight = heightInPixels == 0 ? element.CurrentFontSize : heightInPixels;
+            }
         }
         else
         {
