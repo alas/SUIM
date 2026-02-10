@@ -12,19 +12,6 @@ public static class LayoutEngine
         DetectOverflow(root);
     }
 
-    private static bool TreeHasAnyExplicitSize(UIElement element)
-    {
-        if (element.Width.Type != UnitType.None || element.Height.Type != UnitType.None)
-            return true;
-
-        foreach (var child in element.Children)
-        {
-            if (TreeHasAnyExplicitSize(child)) return true;
-        }
-
-        return false;
-    }
-
     private static void MeasureElement(UIElement element, float availableWidth, float availableHeight, LayoutContext context)
     {
         // Calculate margins and padding in pixels
@@ -111,6 +98,19 @@ public static class LayoutEngine
         // Calculate total size including padding
         element.ActualWidth = element.MeasuredContentWidth + element.ComputedPaddingLeft + element.ComputedPaddingRight;
         element.ActualHeight = element.MeasuredContentHeight + element.ComputedPaddingTop + element.ComputedPaddingBottom;
+    }
+
+    private static bool TreeHasAnyExplicitSize(UIElement element)
+    {
+        if (element.Width.Type != UnitType.None || element.Height.Type != UnitType.None)
+            return true;
+
+        foreach (var child in element.Children)
+        {
+            if (TreeHasAnyExplicitSize(child)) return true;
+        }
+
+        return false;
     }
 
     private static void PositionElement(UIElement element, float parentX, float parentY, float availableWidth, float availableHeight, LayoutContext context)
