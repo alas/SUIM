@@ -22,8 +22,22 @@ public abstract class UIElement
     public float ActualHeight { get; set; } = float.NaN;
     public string? Font { get; set; }
     public float FontSize { get; set; }
-    public string? CurrentFont { get; set; }
-    
+    public string? RootFont { get; set; }
+    public float RootFontSize { get; set; }
+    public Anchor? Anchor { get; set; }
+    public string? Background { get; set; }
+    public string? Color { get; set; }
+    public float Opacity { get; set; } = 1.0f;
+    public int ZIndex { get; set; }
+    public string? Visibility { get; set; }
+    public bool ReadOnly { get; set; }
+    public List<PropertyBinding> Bindings { get; } = [];
+    public string? Sprite { get; set; }
+    public string? HoverSprite { get; set; }
+    public string? PressedSprite { get; set; }
+    public Dictionary<string, List<Action<UIElement>>> EventHandlers { get; set; } = [];
+    public List<UIElement> Children { get; } = [];
+
     // Layout calculation properties (transient, used during measurement/positioning)
     internal float MeasuredContentWidth { get; set; }
     internal float MeasuredContentHeight { get; set; }
@@ -38,20 +52,6 @@ public abstract class UIElement
     internal float CurrentFontSize { get; set; }
     public bool NeedsVerticalScroll { get; set; }
     public bool NeedsHorizontalScroll { get; set; }
-    
-    public Anchor? Anchor { get; set; }
-    public string? Background { get; set; }
-    public string? Color { get; set; }
-    public float Opacity { get; set; } = 1.0f;
-    public int ZIndex { get; set; }
-    public string? Visibility { get; set; }
-    public bool ReadOnly { get; set; }
-    public List<PropertyBinding> Bindings { get; } = [];
-    public string? Sprite { get; set; }
-    public string? HoverSprite { get; set; }
-    public string? PressedSprite { get; set; }
-    public Dictionary<string, List<Action<UIElement>>> EventHandlers { get; set; } = [];
-    public List<UIElement> Children { get; } = [];
 
     public virtual void AddChild(UIElement child, XElement? element)
     {
@@ -210,15 +210,15 @@ public abstract class UIElement
         }
     }
 
-    public float GetWidthInPixels(LayoutContext context)
+    public float ToPixels(UnitValue unitValue) => unitValue.Type switch
     {
-        return context.UnitConverter.ToPixels(Width);
-    }
-    
-    public float GetHeightInPixels(LayoutContext context)
-    {
-        return context.UnitConverter.ToPixels(Height);
-    }
+        UnitType.Pixels => unitValue.Value,
+        UnitType.Rem => unitValue.Value * RootFontSize,
+        UnitType.Em => unitValue.Value * (Parent?.FontSize ?? RootFontSize),
+        UnitType.Auto => 0f, // Will be calculated during layout
+        UnitType.Star => 0f, // Will be calculated during star distribution
+        _ => 0f
+    };
 }
 
 public class LayoutElement : UIElement

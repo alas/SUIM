@@ -56,12 +56,7 @@ public record struct UnitValue(float Value, UnitType Type = UnitType.Pixels)
             
         return new UnitValue(0, UnitType.Pixels);
     }
-
-    public readonly float ToPixels(LayoutContext context)
-    {
-        return context.UnitConverter.ToPixels(this);
-    }
-
+    
     public readonly float ToPixels()
     {
         return Type switch

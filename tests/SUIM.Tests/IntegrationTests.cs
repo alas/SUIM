@@ -15,12 +15,11 @@ public class IntegrationTests
             </stack>";
             
         var (element, _) = new MarkupParser().Parse(markup);
-        var layoutEngine = new LayoutEngine();
-        var context = new LayoutContext(16, 200, 200);
-        var result = layoutEngine.Layout(element, context);
+        var context = new LayoutContext { AvailableWidth = 200, AvailableHeight = 200 };
+        LayoutEngine.Layout(element, 16, context);
         
-        Assert.Equal(100, result.Width);
-        Assert.Equal(90, result.Height); // 50 + 30 + 10 spacing
+        Assert.Equal(100, element.ActualWidth);
+        Assert.Equal(90, element.ActualHeight); // 50 + 30 + 10 spacing
     }
     
     [Fact]
@@ -33,12 +32,11 @@ public class IntegrationTests
             </stack>";
             
         var (element, _) = new MarkupParser().Parse(markup);
-        var layoutEngine = new LayoutEngine();
-        var context = new LayoutContext(16, 300, 100);
-        var result = layoutEngine.Layout(element, context);
+        var context = new LayoutContext { AvailableWidth = 300, AvailableHeight = 100 };
+        LayoutEngine.Layout(element, 16, context);
         
-        Assert.Equal(300, result.Width);
-        Assert.Equal(50, result.Height);
+        Assert.Equal(300, element.ActualWidth);
+        Assert.Equal(50, element.ActualHeight);
     }
     
     [Fact]
@@ -51,13 +49,12 @@ public class IntegrationTests
             </stack>";
             
         var (element, _) = new MarkupParser().Parse(markup);
-        var layoutEngine = new LayoutEngine();
-        var context = new LayoutContext(16, 200, 200);
-        var result = layoutEngine.Layout(element, context);
+        var context = new LayoutContext { AvailableWidth = 200, AvailableHeight = 200 };
+        LayoutEngine.Layout(element, 16, context);
         
         // 2rem = 32px, 1rem = 16px
-        Assert.Equal(32, result.Width);
-        Assert.Equal(48, result.Height); // 16 + 32
+        Assert.Equal(32, element.ActualWidth);
+        Assert.Equal(48, element.ActualHeight); // 16 + 32
     }
 
     [Fact]
@@ -80,12 +77,11 @@ public class IntegrationTests
             </stack>";
 
         var (element, _) = new MarkupParser().Parse(markup);
-        var layoutEngine = new LayoutEngine();
-        var context = new LayoutContext(25, 640, 480);
-        var result = layoutEngine.Layout(element, context);
+        var context = new LayoutContext { AvailableWidth = 640, AvailableHeight = 480 };
+        LayoutEngine.Layout(element, 25, context);
 
-        Assert.Equal(640, result.Width);
-        Assert.Equal(480, result.Height);
+        Assert.Equal(640, element.ActualWidth);
+        Assert.Equal(480, element.ActualHeight);
         // The horizontal stack should be 640 wide (no size defined, assume *, it takes all available width).
         // The heights of the labels should be determined by the default font size (no size defined, assume auto, root font size: 25),
         // The widths of the labels should be determined by the available width (640) minus the spacing between the two vertical stacks (10), divided by 2,

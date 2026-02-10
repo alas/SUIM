@@ -2,31 +2,13 @@ namespace SUIM.Layout;
 
 using SUIM.Components;
 
-public class LayoutEngine
+public static class LayoutEngine
 {
-    public LayoutResult Layout(UIElement root, LayoutContext context)
+    public static void Layout(UIElement root, float rootFontSize, LayoutContext context)
     {
-        root.CurrentFontSize = context.RootFontSize;
-        LayoutInternal(root, context.AvailableWidth, context.AvailableHeight, context.RootFontSize);
-        
-        // Return a LayoutResult based on root's calculated size
-        return new LayoutResult
-        {
-            X = root.ActualX,
-            Y = root.ActualY,
-            Width = root.ActualWidth,
-            Height = root.ActualHeight,
-            ContentWidth = root.MeasuredContentWidth,
-            ContentHeight = root.MeasuredContentHeight
-        };
-    }
-
-    private void LayoutInternal(UIElement root, float availableWidth, float availableHeight, float rootFontSize)
-    {
-        var context = new LayoutContext(rootFontSize);
-        root.CurrentFontSize = rootFontSize;
-        MeasureElement(root, availableWidth, availableHeight, context);
-        PositionElement(root, 0, 0, availableWidth, availableHeight, context);
+        root.CurrentFontSize = root.RootFontSize = rootFontSize;
+        MeasureElement(root, context.AvailableWidth, context.AvailableHeight, context);
+        PositionElement(root, 0, 0, context.AvailableWidth, context.AvailableHeight, context);
         DetectOverflow(root);
     }
 
@@ -43,26 +25,26 @@ public class LayoutEngine
         return false;
     }
 
-    private void MeasureElement(UIElement element, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureElement(UIElement element, float availableWidth, float availableHeight, LayoutContext context)
     {
         // Calculate margins and padding in pixels
-        element.ComputedMarginLeft = element.Margin.Left.ToPixels(context);
-        element.ComputedMarginTop = element.Margin.Top.ToPixels(context);
-        element.ComputedMarginRight = element.Margin.Right.ToPixels(context);
-        element.ComputedMarginBottom = element.Margin.Bottom.ToPixels(context);
+        element.ComputedMarginLeft = element.ToPixels(element.Margin.Left);
+        element.ComputedMarginTop = element.ToPixels(element.Margin.Top);
+        element.ComputedMarginRight = element.ToPixels(element.Margin.Right);
+        element.ComputedMarginBottom = element.ToPixels(element.Margin.Bottom);
 
-        element.ComputedPaddingLeft = element.Padding.Left.ToPixels(context);
-        element.ComputedPaddingTop = element.Padding.Top.ToPixels(context);
-        element.ComputedPaddingRight = element.Padding.Right.ToPixels(context);
-        element.ComputedPaddingBottom = element.Padding.Bottom.ToPixels(context);
+        element.ComputedPaddingLeft = element.ToPixels(element.Padding.Left);
+        element.ComputedPaddingTop = element.ToPixels(element.Padding.Top);
+        element.ComputedPaddingRight = element.ToPixels(element.Padding.Right);
+        element.ComputedPaddingBottom = element.ToPixels(element.Padding.Bottom);
 
         // Calculate available space for content
         var availableContentWidth = Math.Max(0, availableWidth - element.ComputedMarginLeft - element.ComputedMarginRight - element.ComputedPaddingLeft - element.ComputedPaddingRight);
         var availableContentHeight = Math.Max(0, availableHeight - element.ComputedMarginTop - element.ComputedMarginBottom - element.ComputedPaddingTop - element.ComputedPaddingBottom);
 
         // Convert explicit sizes to pixels
-        var widthInPixels = element.Width.Type == UnitType.Auto ? 0 : element.Width.ToPixels(context);
-        var heightInPixels = element.Height.Type == UnitType.Auto ? 0 : element.Height.ToPixels(context);
+        var widthInPixels = element.Width.Type == UnitType.Auto ? 0 : element.ToPixels(element.Width);
+        var heightInPixels = element.Height.Type == UnitType.Auto ? 0 : element.ToPixels(element.Height);
 
         // Initialize content size
         if (element is BaseText)
@@ -131,7 +113,7 @@ public class LayoutEngine
         element.ActualHeight = element.MeasuredContentHeight + element.ComputedPaddingTop + element.ComputedPaddingBottom;
     }
 
-    private void PositionElement(UIElement element, float parentX, float parentY, float availableWidth, float availableHeight, LayoutContext context)
+    private static void PositionElement(UIElement element, float parentX, float parentY, float availableWidth, float availableHeight, LayoutContext context)
     {
         // Position the element itself
         if (element is Stack or Grid or Dock or Div or Window)
@@ -152,7 +134,7 @@ public class LayoutEngine
                 PositionStack(stack, context);
                 break;
             case Grid grid:
-                PositionGrid(grid, context);
+                PositionGrid(grid);
                 break;
             case Dock dock:
                 PositionDock(dock, context);
@@ -176,7 +158,7 @@ public class LayoutEngine
         }
     }
 
-    private void MeasureStack(Stack stack, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureStack(Stack stack, float availableWidth, float availableHeight, LayoutContext context)
     {
         var totalSpacing = Math.Max(0, stack.Spacing * (stack.Children.Count - 1));
 
@@ -190,7 +172,7 @@ public class LayoutEngine
         }
     }
 
-    private void MeasureHorizontalStack(Stack stack, float availableWidth, float availableHeight, float totalSpacing, LayoutContext context)
+    private static void MeasureHorizontalStack(Stack stack, float availableWidth, float availableHeight, float totalSpacing, LayoutContext context)
     {
         float totalWidth = 0;
         float maxHeight = 0;
@@ -229,7 +211,7 @@ public class LayoutEngine
         stack.MeasuredContentHeight = maxHeight;
     }
 
-    private void MeasureVerticalStack(Stack stack, float availableWidth, float availableHeight, float totalSpacing, LayoutContext context)
+    private static void MeasureVerticalStack(Stack stack, float availableWidth, float availableHeight, float totalSpacing, LayoutContext context)
     {
         float totalHeight = 0;
         float maxWidth = 0;
@@ -268,7 +250,7 @@ public class LayoutEngine
         stack.MeasuredContentHeight = totalHeight + totalSpacing;
     }
 
-    private void ResolveStarWidths(List<UIElement> starElements, float remainingSpace, float availableHeight, LayoutContext context)
+    private static void ResolveStarWidths(List<UIElement> starElements, float remainingSpace, float availableHeight, LayoutContext context)
     {
         var starValues = starElements.Select(e => e.Width.Type == UnitType.Star ? e.Width.Value : 1f).ToArray();
         var resolvedValues = StarUnitResolver.ResolveStarUnits(starValues, remainingSpace);
@@ -280,7 +262,7 @@ public class LayoutEngine
         }
     }
 
-    private void ResolveStarHeights(List<UIElement> starElements, float remainingSpace, float availableWidth, LayoutContext context)
+    private static void ResolveStarHeights(List<UIElement> starElements, float remainingSpace, float availableWidth, LayoutContext context)
     {
         var starValues = starElements.Select(e => e.Height.Type == UnitType.Star ? e.Height.Value : 1f).ToArray();
         var resolvedValues = StarUnitResolver.ResolveStarUnits(starValues, remainingSpace);
@@ -292,10 +274,10 @@ public class LayoutEngine
         }
     }
 
-    private void MeasureGrid(Grid grid, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureGrid(Grid grid, float availableWidth, float availableHeight, LayoutContext context)
     {
-        var columnWidths = ParseGridUnits(grid.Columns, availableWidth);
-        var rowHeights = ParseGridUnits(grid.Rows, availableHeight);
+        var columnWidths = ParseGridUnits(grid.Columns, availableWidth, grid);
+        var rowHeights = ParseGridUnits(grid.Rows, availableHeight, grid);
 
         foreach (var gridChild in grid.GridChildren)
         {
@@ -310,7 +292,7 @@ public class LayoutEngine
         grid.MeasuredContentHeight = rowHeights.Sum();
     }
 
-    private void MeasureDock(Dock dock, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureDock(Dock dock, float availableWidth, float availableHeight, LayoutContext context)
     {
         foreach (var dockChild in dock.DockChildren)
         {
@@ -322,7 +304,7 @@ public class LayoutEngine
         dock.MeasuredContentHeight = availableHeight;
     }
 
-    private void MeasureDiv(Div div, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureDiv(Div div, float availableWidth, float availableHeight, LayoutContext context)
     {
         bool hasExplicitlyPositionedChildren = div.Children.Any(c => c.X.Type != UnitType.None || c.Y.Type != UnitType.None);
 
@@ -336,7 +318,7 @@ public class LayoutEngine
         }
     }
 
-    private void MeasureVerticalDiv(Div div, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureVerticalDiv(Div div, float availableWidth, float availableHeight, LayoutContext context)
     {
         float maxWidth = 0;
         float totalHeight = 0;
@@ -393,7 +375,7 @@ public class LayoutEngine
         }
     }
 
-    private void MeasureStandardDiv(Div div, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureStandardDiv(Div div, float availableWidth, float availableHeight, LayoutContext context)
     {
         float maxWidth = 0;
         float maxHeight = 0;
@@ -413,7 +395,7 @@ public class LayoutEngine
         }
     }
 
-    private void MeasureWindow(Window window, float availableWidth, float availableHeight, LayoutContext context)
+    private static void MeasureWindow(Window window, float availableWidth, float availableHeight, LayoutContext context)
     {
         float maxWidth = 0;
         float maxHeight = 0;
@@ -430,7 +412,7 @@ public class LayoutEngine
         window.MeasuredContentHeight = maxHeight > 0 ? maxHeight : availableHeight;
     }
 
-    private void PositionStack(Stack stack, LayoutContext context)
+    private static void PositionStack(Stack stack, LayoutContext context)
     {
         stack.ActualX = 0;
         stack.ActualY = 0;
@@ -445,7 +427,7 @@ public class LayoutEngine
         }
     }
 
-    private void PositionHorizontalStack(Stack stack)
+    private static void PositionHorizontalStack(Stack stack)
     {
         float currentX = stack.ActualX + stack.ComputedPaddingLeft;
         float baseY = stack.ActualY + stack.ComputedPaddingTop;
@@ -459,7 +441,7 @@ public class LayoutEngine
         }
     }
 
-    private void PositionVerticalStack(Stack stack)
+    private static void PositionVerticalStack(Stack stack)
     {
         float baseX = stack.ActualX + stack.ComputedPaddingLeft;
         float currentY = stack.ActualY + stack.ComputedPaddingTop;
@@ -473,13 +455,13 @@ public class LayoutEngine
         }
     }
 
-    private void PositionGrid(Grid grid, LayoutContext context)
+    private static void PositionGrid(Grid grid)
     {
         grid.ActualX = 0;
         grid.ActualY = 0;
 
-        var columnWidths = ParseGridUnits(grid.Columns, grid.MeasuredContentWidth);
-        var rowHeights = ParseGridUnits(grid.Rows, grid.MeasuredContentHeight);
+        var columnWidths = ParseGridUnits(grid.Columns, grid.MeasuredContentWidth, grid);
+        var rowHeights = ParseGridUnits(grid.Rows, grid.MeasuredContentHeight, grid);
 
         float baseX = grid.ActualX + grid.ComputedPaddingLeft;
         float baseY = grid.ActualY + grid.ComputedPaddingTop;
@@ -500,7 +482,7 @@ public class LayoutEngine
         }
     }
 
-    private void PositionDock(Dock dock, LayoutContext context)
+    private static void PositionDock(Dock dock, LayoutContext context)
     {
         dock.ActualX = 0;
         dock.ActualY = 0;
@@ -543,7 +525,7 @@ public class LayoutEngine
         }
     }
 
-    private void PositionDiv(Div div, LayoutContext context)
+    private static void PositionDiv(Div div, LayoutContext context)
     {
         if (div.Anchor.HasValue)
         {
@@ -551,8 +533,8 @@ public class LayoutEngine
         }
         else if (div.X.Type != UnitType.None || div.Y.Type != UnitType.None)
         {
-            div.ActualX = div.X.ToPixels(context);
-            div.ActualY = div.Y.ToPixels(context);
+            div.ActualX = div.ToPixels(div.X);
+            div.ActualY = div.ToPixels(div.Y);
         }
         else
         {
@@ -568,7 +550,7 @@ public class LayoutEngine
         }
     }
 
-    private void PositionVerticalDiv(Div div)
+    private static void PositionVerticalDiv(Div div)
     {
         float baseX = div.ActualX + div.ComputedPaddingLeft;
         float currentY = div.ActualY + div.ComputedPaddingTop;
@@ -582,13 +564,13 @@ public class LayoutEngine
         }
     }
 
-    private void PositionWindow(Window window)
+    private static void PositionWindow(Window window)
     {
         window.ActualX = 0;
         window.ActualY = 0;
     }
 
-    private void PositionWithAnchor(Div div, LayoutContext context)
+    private static void PositionWithAnchor(Div div, LayoutContext context)
     {
         // This needs parent context info - for now, assume parent is 640x480
         var parentWidth = 640f;
@@ -619,7 +601,7 @@ public class LayoutEngine
         }
     }
 
-    private void ApplyHorizontalAlignment(UIElement element, float baseX, float containerWidth)
+    private static void ApplyHorizontalAlignment(UIElement element, float baseX, float containerWidth)
     {
         switch (element.HorizontalAlignment)
         {
@@ -639,7 +621,7 @@ public class LayoutEngine
         }
     }
 
-    private void ApplyVerticalAlignment(UIElement element, float baseY, float containerHeight)
+    private static void ApplyVerticalAlignment(UIElement element, float baseY, float containerHeight)
     {
         switch (element.VerticalAlignment)
         {
@@ -659,14 +641,13 @@ public class LayoutEngine
         }
     }
 
-    private void DetectOverflow(UIElement element)
+    private static void DetectOverflow(UIElement element)
     {
         if (element.Width.Type != UnitType.None && element.Width.Type != UnitType.Auto &&
             element.Height.Type != UnitType.None && element.Height.Type != UnitType.Auto)
         {
-            var context = new LayoutContext(element.CurrentFontSize);
-            var explicitWidth = element.Width.ToPixels(context);
-            var explicitHeight = element.Height.ToPixels(context);
+            var explicitWidth = element.ToPixels(element.Width);
+            var explicitHeight = element.ToPixels(element.Height);
 
             element.NeedsHorizontalScroll = element.MeasuredContentWidth > explicitWidth;
             element.NeedsVerticalScroll = element.MeasuredContentHeight > explicitHeight;
@@ -678,7 +659,7 @@ public class LayoutEngine
         }
     }
 
-    private static float[] ParseGridUnits(string? unitsString, float totalSize)
+    private static float[] ParseGridUnits(string? unitsString, float totalSize, Grid elem)
     {
         if (string.IsNullOrWhiteSpace(unitsString))
             return [totalSize];
@@ -703,7 +684,7 @@ public class LayoutEngine
             }
             else
             {
-                result[i] = unit.ToPixels(new LayoutContext(16));
+                result[i] = elem.ToPixels(unit);
                 fixedSize += result[i];
             }
         }
