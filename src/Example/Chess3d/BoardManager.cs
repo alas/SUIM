@@ -33,7 +33,7 @@ public class BoardManager : SyncScript
         InitBoard();
 
         var uiComponent = Entity.GetOrCreate<UIComponent>();
-        SUIM.MainView.GetMainView((Game)Game, uiComponent);
+        _ = new SUIM.MainView((Game)Game, uiComponent);
     }
 
     public override void Update()
