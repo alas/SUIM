@@ -5,10 +5,15 @@ using Stride.Core.Mathematics;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
+using Stride.Graphics;
 using StrideGrid = Stride.UI.Panels.Grid;
+using Stride.Core.Serialization.Contents;
 
 public class SUIMStride
 {
+    public ContentManager? ContentManager { get; init; }
+    private Dictionary<string, SpriteFont> Fonts = new();
+
     public UIElement Parse(string markup)
     {
         var parser = new MarkupParser();
@@ -67,7 +72,7 @@ public class SUIMStride
         return btn;
     }
 
-    private static TextBlock MapText(Components.BaseText text)
+    private TextBlock MapText(Components.BaseText text)
     {
         var tb = new TextBlock
         {
@@ -75,10 +80,32 @@ public class SUIMStride
             TextSize = text.FontSize > 0f ? text.FontSize : 14f,
         };
 
-        //if (!string.IsNullOrEmpty(text.Font))
-        //{
-        //    tb.Font = null; 
-        //}
+        // Resolve SpriteFont by name (from style/attribute) using optional resolver.
+        // Consumers (e.g. example app) should set SUIMStride.FontResolver = name => game.Content.Load<SpriteFont>(name);
+        if (!string.IsNullOrEmpty(text.Font))
+        {
+            try
+            {
+                SpriteFont? sf = null;
+                if (!Fonts.ContainsKey(text.Font) && ContentManager != null)
+                {
+                    sf = ContentManager?.Load<SpriteFont>(text.Font);
+                    if (sf != null)
+                    {
+                        Fonts[text.Font] = sf;
+                    }
+                }
+
+                if (sf != null)
+                {
+                    tb.Font = sf;
+                }
+            }
+            catch
+            {
+                // If resolver fails, fall back to Stride default font silently.
+            }
+        }
         
         if (text.Wrap)
         {

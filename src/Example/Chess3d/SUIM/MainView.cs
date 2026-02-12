@@ -52,8 +52,10 @@ public class MainView
         <button class=""mybutton"" id=""saveButton"">Save</button>
     </stack>
 </grid>";
-
-        var mapper = new SUIMStride();
+        var mapper = new SUIMStride
+        {
+            ContentManager = game.Content
+        };
         rootUI = mapper.Parse(markup);
         Page = new UIPage
         {
