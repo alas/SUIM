@@ -26,8 +26,8 @@ public class LayoutTests
     public void LayoutEngine_MeasuresStackWithStarUnits()
     {
         var stack = new Stack { Orientation = Orientation.Horizontal, Spacing = 0 };
-        var child1 = new Label { Width = new UnitValue(1, UnitType.Star), Height = new UnitValue(50, UnitType.Pixels) };
-        var child2 = new Label { Width = new UnitValue(2, UnitType.Star), Height = new UnitValue(50, UnitType.Pixels) };
+        var child1 = new Label { Width = new UnitValue(1, UnitType.Fr), Height = new UnitValue(50, UnitType.Pixels) };
+        var child2 = new Label { Width = new UnitValue(2, UnitType.Fr), Height = new UnitValue(50, UnitType.Pixels) };
         
         stack.AddChild(child1, null);
         stack.AddChild(child2, null);
@@ -41,9 +41,9 @@ public class LayoutTests
     [Fact]
     public void LayoutEngine_MeasuresGridWithMixedUnits()
     {
-        var grid = new Grid { Columns = "100, *", Rows = "50, *" };
+        var grid = new Grid { Columns = "100, fr", Rows = "50, fr" };
         var child1 = new Label { Width = new UnitValue(50, UnitType.Pixels), Height = new UnitValue(25, UnitType.Pixels) };
-        var child2 = new Label { Width = new UnitValue(1, UnitType.Star), Height = new UnitValue(1, UnitType.Star) };
+        var child2 = new Label { Width = new UnitValue(1, UnitType.Fr), Height = new UnitValue(1, UnitType.Fr) };
         
         grid.AddChild(child1, null);
         grid.AddChild(child2, null);
@@ -57,7 +57,7 @@ public class LayoutTests
     [Fact]
     public void LayoutEngine_MeasuresDivWithAnchor()
     {
-        var div = new Div { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(50, UnitType.Pixels), Anchor = Anchor.TopRight };
+        var div = new Div { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(50, UnitType.Pixels), Anchor = Anchor.Top };
         var child = new Label { Width = new UnitValue(50, UnitType.Pixels), Height = new UnitValue(25, UnitType.Pixels) };
         
         div.AddChild(child, null);
@@ -107,11 +107,11 @@ public class LayoutTests
     }
     
     [Fact]
-    public void UnitValue_ParseStar()
+    public void UnitValue_ParseFractionalUnits()
     {
-        var unit = UnitValue.Parse("2*");
+        var unit = UnitValue.Parse("2fr");
         Assert.Equal(2, unit.Value);
-        Assert.Equal(UnitType.Star, unit.Type);
+        Assert.Equal(UnitType.Fr, unit.Type);
     }
     
     [Fact]

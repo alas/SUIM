@@ -9,7 +9,7 @@ public class IntegrationTests
     public void MarkupParser_WithLayoutEngine_CreatesLayout()
     {
         var markup = @"
-            <stack orientation=""vertical"" spacing=""10"">
+            <stack orientation=""vertical"" spacing=""10"" width=""auto"" height=""auto"">
                 <label width=""100"" height=""50"" />
                 <label width=""100"" height=""30"" />
             </stack>";
@@ -25,9 +25,9 @@ public class IntegrationTests
     public void MarkupParser_WithStarUnits_CreatesProportionalLayout()
     {
         var markup = @"
-            <stack orientation=""horizontal"" spacing=""0"">
-                <label width=""1*"" height=""50"" />
-                <label width=""2*"" height=""50"" />
+            <stack orientation=""horizontal"" spacing=""0"" height=""auto"">
+                <label width=""1fr"" height=""50"" />
+                <label width=""2fr"" height=""50"" />
             </stack>";
             
         var (element, _) = new MarkupParser().Parse(markup);
@@ -41,7 +41,7 @@ public class IntegrationTests
     public void MarkupParser_WithRemUnits_CreatesScaledLayout()
     {
         var markup = @"
-            <stack orientation=""vertical"" spacing=""0"">
+            <stack orientation=""vertical"" spacing=""0"" height=""auto"">
                 <label width=""2rem"" height=""1rem"" />
                 <label width=""1rem"" height=""2rem"" />
             </stack>";
@@ -66,7 +66,7 @@ public class IntegrationTests
     public void MarkupParser_WithRemUnitsAndAutoParent_CreatesScaledLayout()
     {
         var markup = @"
-            <stack orientation=""vertical"" spacing=""0"" width=""auto"">
+            <stack orientation=""vertical"" spacing=""0"" width=""auto"" height=""auto"">
                 <label width=""2rem"" height=""1rem"" />
                 <label width=""1rem"" height=""2rem"" />
             </stack>";
@@ -88,21 +88,21 @@ public class IntegrationTests
     }
 
     [Fact]
-    public void MarkupParser_Withoutsize_CreatesStarLayout()
+    public void MarkupParser_FractionalUnitsLabels_CreatesFractionalUnitsLayout()
     {
         var markup = @"
             <stack orientation=""horizontal"" spacing=""10"">
                 <stack orientation=""vertical"" spacing=""5"">
-                    <label />
-                    <label />
-                    <label />
-                    <label />
-                    <label />
+                    <label width=""fr"" />
+                    <label width=""fr"" />
+                    <label width=""fr"" />
+                    <label width=""fr"" />
+                    <label width=""fr"" />
                 </stack>
                 <stack orientation=""vertical"" spacing=""15"">
-                    <label />
-                    <label />
-                    <label />
+                    <label width=""fr"" />
+                    <label width=""fr"" />
+                    <label width=""fr"" />
                 </stack>
             </stack>";
 
@@ -111,7 +111,7 @@ public class IntegrationTests
 
         Assert.Equal(640, element.ActualWidth);
         Assert.Equal(480, element.ActualHeight);
-        // The horizontal stack should be 640 wide (no size defined, assume *, it takes all available width).
+        // The horizontal stack should be 640 wide (no size defined, assume 1fr, it takes all available width).
         // The heights of the labels should be determined by the default font size (no size defined, assume auto, root font size: 25),
         // The widths of the labels should be determined by the available width (640) minus the spacing between the two vertical stacks (10), divided by 2,
         // so each label in the first vertical stack should be 315 pixels wide, and each label in the second vertical stack should be 315 pixels wide.

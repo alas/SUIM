@@ -106,12 +106,12 @@ public static class LayoutEngine
         // Handle root element sizing per-axis (only fill available space for axes without any explicit sizes in the tree)
         if (element.Parent == null)
         {
-            if (!TreeHasAnyExplicitWidth(element))
+            if (!TreeHasAnyExplicitWidth(element) || element.Width.Type == UnitType.Fr)
                 element.MeasuredContentWidth = availableContentWidth;
             else if (widthInPixels == 0)
                 element.MeasuredContentWidth = Math.Min(element.MeasuredContentWidth, availableContentWidth);
 
-            if (!TreeHasAnyExplicitHeight(element))
+            if (!TreeHasAnyExplicitHeight(element) || element.Height.Type == UnitType.Fr)
                 element.MeasuredContentHeight = availableContentHeight;
             else if (heightInPixels == 0)
                 element.MeasuredContentHeight = Math.Min(element.MeasuredContentHeight, availableContentHeight);
@@ -132,7 +132,10 @@ public static class LayoutEngine
 
     private static bool TreeHasAnyExplicitWidth(UIElement element)
     {
-        bool widthExplicit = element.Width.Type != UnitType.None && element.Width.Type != UnitType.Rem && element.Width.Type != UnitType.Em;
+        bool widthExplicit = element.Width.Type != UnitType.None && 
+                            element.Width.Type != UnitType.Rem && 
+                            element.Width.Type != UnitType.Em && 
+                            element.Width.Type != UnitType.Fr;
         if (widthExplicit) return true;
         foreach (var child in element.Children)
         {
@@ -143,8 +146,8 @@ public static class LayoutEngine
 
     private static bool TreeHasAnyExplicitHeight(UIElement element)
     {
-        // Treat any non-None height (including rem/em) as explicit for height axis
-        bool heightExplicit = element.Height.Type != UnitType.None;
+        // Treat any non-None/non-Fr height (including rem/em/auto) as explicit for height axis
+        bool heightExplicit = element.Height.Type != UnitType.None && element.Height.Type != UnitType.Fr;
         if (heightExplicit) return true;
         foreach (var child in element.Children)
         {
@@ -221,7 +224,7 @@ public static class LayoutEngine
         // Measure fixed-size children
         foreach (var child in stack.Children)
         {
-            if (child.Width.Type == UnitType.Star || (child.Width.Type == UnitType.None && child is LayoutElement))
+            if (child.Width.Type == UnitType.Fr || (child.Width.Type == UnitType.None && child is LayoutElement))
             {
                 starElements.Add(child);
             }
@@ -260,7 +263,7 @@ public static class LayoutEngine
         // Measure fixed-size children
         foreach (var child in stack.Children)
         {
-            if (child.Height.Type == UnitType.Star || (child.Height.Type == UnitType.None && child is LayoutElement))
+            if (child.Height.Type == UnitType.Fr || (child.Height.Type == UnitType.None && child is LayoutElement))
             {
                 starElements.Add(child);
             }
@@ -292,7 +295,7 @@ public static class LayoutEngine
 
     private static void ResolveStarWidths(List<UIElement> starElements, float remainingSpace, float availableHeight)
     {
-        var starValues = starElements.Select(e => e.Width.Type == UnitType.Star ? e.Width.Value : 1f).ToArray();
+        var starValues = starElements.Select(e => e.Width.Type == UnitType.Fr ? e.Width.Value : 1f).ToArray();
         var resolvedValues = StarUnitResolver.ResolveStarUnits(starValues, remainingSpace);
 
         for (int i = 0; i < starElements.Count; i++)
@@ -304,7 +307,7 @@ public static class LayoutEngine
 
     private static void ResolveStarHeights(List<UIElement> starElements, float remainingSpace, float availableWidth)
     {
-        var starValues = starElements.Select(e => e.Height.Type == UnitType.Star ? e.Height.Value : 1f).ToArray();
+        var starValues = starElements.Select(e => e.Height.Type == UnitType.Fr ? e.Height.Value : 1f).ToArray();
         var resolvedValues = StarUnitResolver.ResolveStarUnits(starValues, remainingSpace);
 
         for (int i = 0; i < starElements.Count; i++)
@@ -369,7 +372,7 @@ public static class LayoutEngine
         // Measure fixed-size children
         foreach (var child in div.Children)
         {
-            if (child.Height.Type == UnitType.Star || (child.Height.Type == UnitType.None && child is LayoutElement))
+            if (child.Height.Type == UnitType.Fr || (child.Height.Type == UnitType.None && child is LayoutElement))
             {
                 starElements.Add(child);
             }
@@ -567,7 +570,7 @@ public static class LayoutEngine
 
     private static void PositionDiv(Div div)
     {
-        if (div.Anchor.HasValue)
+        if (div.Anchor.HasValue && div.Anchor != Anchor.None)
         {
             PositionWithAnchor(div);
         }
@@ -610,34 +613,64 @@ public static class LayoutEngine
         window.ActualY = 0;
     }
 
-    private static void PositionWithAnchor(Div div)
+    private static void PositionWithAnchor(UIElement element)
     {
-        // This needs parent context info - for now, assume parent is 640x480
-        var parentWidth = 640f;
-        var parentHeight = 480f;
-
-        switch (div.Anchor)
+        // Get parent dimensions
+        float parentWidth = element.Parent?.ActualWidth ?? 0;
+        float parentHeight = element.Parent?.ActualHeight ?? 0;
+        
+        if (parentWidth == 0 || parentHeight == 0)
         {
-            case Anchor.TopLeft:
-                div.ActualX = 0;
-                div.ActualY = 0;
-                break;
-            case Anchor.TopRight:
-                div.ActualX = parentWidth - div.ActualWidth;
-                div.ActualY = 0;
-                break;
-            case Anchor.BottomLeft:
-                div.ActualX = 0;
-                div.ActualY = parentHeight - div.ActualHeight;
-                break;
-            case Anchor.BottomRight:
-                div.ActualX = parentWidth - div.ActualWidth;
-                div.ActualY = parentHeight - div.ActualHeight;
-                break;
-            case Anchor.Center:
-                div.ActualX = (parentWidth - div.ActualWidth) / 2;
-                div.ActualY = (parentHeight - div.ActualHeight) / 2;
-                break;
+            // Fallback if parent not measured
+            element.ActualX = 0;
+            element.ActualY = 0;
+            return;
+        }
+
+        var anchor = element.Anchor ?? Anchor.None;
+        
+        // WinForms-style anchoring: element pins to the specified edges
+        // If both opposite edges are anchored, element stretches between them
+        
+        bool left = anchor.HasFlag(Anchor.Left);
+        bool right = anchor.HasFlag(Anchor.Right);
+        bool top = anchor.HasFlag(Anchor.Top);
+        bool bottom = anchor.HasFlag(Anchor.Bottom);
+        
+        // Horizontal positioning
+        if (left && right)
+        {
+            // Anchored to both left and right - stretch
+            element.ActualX = 0;
+            element.ActualWidth = parentWidth;
+        }
+        else if (right)
+        {
+            // Anchored to right only
+            element.ActualX = parentWidth - element.ActualWidth;
+        }
+        else
+        {
+            // Anchored to left or no horizontal anchor (default left)
+            element.ActualX = 0;
+        }
+        
+        // Vertical positioning
+        if (top && bottom)
+        {
+            // Anchored to both top and bottom - stretch
+            element.ActualY = 0;
+            element.ActualHeight = parentHeight;
+        }
+        else if (bottom)
+        {
+            // Anchored to bottom only
+            element.ActualY = parentHeight - element.ActualHeight;
+        }
+        else
+        {
+            // Anchored to top or no vertical anchor (default top)
+            element.ActualY = 0;
         }
     }
 
@@ -718,7 +751,7 @@ public static class LayoutEngine
         for (int i = 0; i < parts.Length; i++)
         {
             var unit = UnitValue.Parse(parts[i]);
-            if (unit.Type == UnitType.Star)
+            if (unit.Type == UnitType.Fr)
             {
                 starUnits.Add(unit);
             }
@@ -739,7 +772,7 @@ public static class LayoutEngine
             for (int i = 0; i < parts.Length; i++)
             {
                 var unit = UnitValue.Parse(parts[i]);
-                if (unit.Type == UnitType.Star)
+                if (unit.Type == UnitType.Fr)
                 {
                     result[i] = resolvedValues[starIndex++];
                 }

@@ -26,17 +26,19 @@ All layout containers support the following for child positioning:
 
 ### 1.3 Anchoring
 
-Inspired by WinForms, **anchor** allows an element to define its relationship to parent bounds. Anchored elements are removed from standard flow and do not occupy space in stacks or grids.
+Inspired by WinForms, **anchor** allows an element to pin itself to one or more edges of its parent container. Anchored elements are removed from standard flow and do not occupy space in stacks or grids. Valid values: `top`, `bottom`, `left`, `right`, or combinations like `top,left` or `left,right,bottom`.
 
 ### 1.4 Layout Sizing Logic
 
-Sizing uses **integers** (fixed pixels), **star-ratios** (proportional space), **em**, **rem**, or **auto**.
+Sizing uses **integers** (fixed pixels), **fr units** (fractional/proportional space), **em**, **rem**, or **auto**.
 
+* **Pixels:** Fixed size in pixels. Can be written as `100` or `100px`.
+* **fr (fractional units):** Proportional space distribution (e.g., `1fr`, `2fr`). Equivalent to CSS Grid's `fr` unit.
 * **em:** A multiplier of the parent font size.
 * **rem:** A multiplier of the global root font size.
 * **auto:** Resolves to a pre-defined metric constant (see Section 5.3).
 
-**Default Sizing Rule:** Content tags default to **auto**, Structural & Layout Tags (except <row> and <column>) default to **1***.
+**Default Sizing Rule:** Content tags default to **auto**, Structural & Layout Tags (except <row> and <column>) default to **1fr**.
 
 ---
 
@@ -259,14 +261,14 @@ Every element in SUIM inherits a set of **Common Attributes** for layout and sty
 | `class` | `string` | Space-separated styles. |
 | `x, y` | `integer` | Pixel offset (required for <div> or anchor). |
 | `z-index` | `integer` |  **Global Layering.** Higher values render on top of lower values across the entire application. |
-| `anchor` | `string` | Pin to edges: top, bottom, left, right. |
-| `scroll` | `bool` | Wraps the tag in an outer scroll-container. |
+| `anchor` | `string` | Pin to edges: `top`, `bottom`, `left`, `right`, or combinations (e.g., `top,left`). |
 
 #### 1.2 Common Container Attributes (Supported by ALL Container and Layout tags)
 
 * `spacing`: `integer|integer integer` - Spacing between children, one value for both orientations, 2 values for each separately.
 * `clip`: `bool` - If true, children outside bounds are not drawn.
 * `slicewidth`: `integer|integer integer integer integer` - Thickness of the 9-slice border or borders.
+* `scroll`: `both|vertical|horizontal` - Wraps the tag in an outer scroll-container.
 
 
 ---
@@ -274,12 +276,21 @@ Every element in SUIM inherits a set of **Common Attributes** for layout and sty
 #### B. Special Formatting Rules for Parser
 
 1. **Color Formatting:** Supported as Hex (`#FFFFFF`), RGBA (`255,255,255,255`), or named colors (`Red`).
-2. **Size Units:** * Numbers (e.g., `100`) are treated as **Pixels**.
-* Percentages (e.g., `50%`) are treated as **Relative to Parent**.
-* `Auto` tells the layout engine to use the **MetricTable** to fit content.
+2. **Size Units:** 
+   * Numbers (e.g., `100` or `100px`) are treated as **Pixels**.
+   * Fractional units (e.g., `1fr`, `2fr`) are treated as **proportional space**.
+   * `Auto` tells the layout engine to use the **MetricTable** to fit content.
+   * `em` and `rem` are font-relative units.
 
+3. **Attribute Precedence:**
+   When the same property is defined in multiple places, the following precedence applies (highest wins):
+   * Inline attributes (e.g., `<div width="100">`) - **Highest priority**
+   * ID selector in CSS (e.g., `#myDiv { width: 200; }`)
+   * Class selector in CSS (e.g., `.myClass { width: 150; }`)
+   * Tag selector in CSS (e.g., `div { width: 120; }`)
+   * Universal selector in CSS (e.g., `* { width: 100; }`) - **Lowest priority**
 
-3. **The `@` Prefix:**
+4. **The `@` Prefix:****
 * If any attribute starts with `@`, the **Hydrator** must create a `PropertyBinding` instead of a static assignment.
 
 

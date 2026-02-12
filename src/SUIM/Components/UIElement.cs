@@ -120,7 +120,7 @@ public abstract class UIElement
         else if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase))
         {
             var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-            Anchor = Enum.Parse<Anchor>(s, true);
+            Anchor = ParseAnchor(s);
         }
         else if (name.Equals("class", StringComparison.OrdinalIgnoreCase))
         {
@@ -210,13 +210,29 @@ public abstract class UIElement
         }
     }
 
+    private static Anchor ParseAnchor(string value)
+    {
+        var parts = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        Anchor result = Components.Anchor.None;
+        
+        foreach (var part in parts)
+        {
+            if (Enum.TryParse<Anchor>(part, true, out var anchor))
+            {
+                result |= anchor;
+            }
+        }
+        
+        return result;
+    }
+
     public float ToPixels(UnitValue unitValue) => unitValue.Type switch
     {
         UnitType.Pixels => unitValue.Value,
         UnitType.Rem => unitValue.Value * RootFontSize,
         UnitType.Em => unitValue.Value * (Parent?.FontSize ?? RootFontSize),
         UnitType.Auto => 0f, // Will be calculated during layout
-        UnitType.Star => 0f, // Will be calculated during star distribution
+        UnitType.Fr => 0f, // Will be calculated during fr distribution
         _ => 0f
     };
 }
@@ -224,12 +240,22 @@ public abstract class UIElement
 public class LayoutElement : UIElement
 {
     public int Spacing { get; set; }
+    public bool Clip { get; set; }
+    public Thickness SliceWidth { get; set; } = Thickness.None;
 
     public override void SetAttribute(string name, object? value)
     {
         if (name.Equals("spacing", StringComparison.OrdinalIgnoreCase))
         {
             Spacing = value is int i ? i : Convert.ToInt32(value);
+        }
+        else if (name.Equals("clip", StringComparison.OrdinalIgnoreCase))
+        {
+            Clip = value is bool b ? b : Convert.ToBoolean(value);
+        }
+        else if (name.Equals("slicewidth", StringComparison.OrdinalIgnoreCase))
+        {
+            SliceWidth = Thickness.FromObject(value);
         }
         else
         {
@@ -259,11 +285,12 @@ public enum VerticalAlignment
     Stretch
 }
 
+[Flags]
 public enum Anchor
 {
-    TopLeft,
-    TopRight,
-    BottomLeft,
-    BottomRight,
-    Center
+    None = 0,
+    Top = 1,
+    Bottom = 2,
+    Left = 4,
+    Right = 8
 }

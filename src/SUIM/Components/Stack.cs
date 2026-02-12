@@ -3,7 +3,6 @@ namespace SUIM.Components;
 public class Stack : LayoutElement
 {
     public Orientation Orientation { get; set; } = Orientation.Vertical;
-    public bool Clip { get; set; }
 
     public override void SetAttribute(string name, object? value)
     {
@@ -17,10 +16,6 @@ public class Stack : LayoutElement
             {
                 throw new ArgumentException($"Value for attribute '{name}' must be a valid Orientation (either an Orientation enum value or a string).", ex);
             }
-        }
-        else if (name.Equals("clip", StringComparison.OrdinalIgnoreCase))
-        {
-            Clip = value is bool b ? b : Convert.ToBoolean(value);
         }
         else
         {

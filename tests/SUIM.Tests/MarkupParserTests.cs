@@ -187,14 +187,25 @@ public class MarkupParserTests
     }
 
     [Fact]
-    public void Parse_AnchorAttribute()
+    public void Parse_AnchorAttribute_Top()
     {
-        var markup = "<div anchor=\"TopLeft\" />";
+        var markup = "<div anchor=\"Top\" />";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Anchor.TopLeft, div.Anchor);
+        Assert.Equal(Anchor.Top, div.Anchor);
+    }
+
+    [Fact]
+    public void Parse_AnchorAttribute_Left()
+    {
+        var markup = "<div anchor=\"Left\" />";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Div>(element);
+        var div = (Div)element;
+        Assert.Equal(Anchor.Left, div.Anchor);
     }
 
     [Fact]
@@ -640,15 +651,15 @@ else
     }
 
     [Fact]
-    public void Parse_Size_Star()
+    public void Parse_Size_FractionalUnits()
     {
-        var markup = "<div width=\"*\" height=\"2*\" />";
+        var markup = "<div width=\"fr\" height=\"2fr\" />";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(new UnitValue(1, UnitType.Star), div.Width);
-        Assert.Equal(new UnitValue(2, UnitType.Star), div.Height);
+        Assert.Equal(new UnitValue(1, UnitType.Fr), div.Width);
+        Assert.Equal(new UnitValue(2, UnitType.Fr), div.Height);
     }
 
     [Fact]
@@ -832,47 +843,58 @@ else
     // ============== ANCHOR VARIANTS ==============
 
     [Fact]
-    public void Parse_Anchor_TopRight()
+    public void Parse_Anchor_Top()
     {
-        var markup = "<div anchor=\"TopRight\" />";
+        var markup = "<div anchor=\"Top\" />";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Anchor.TopRight, div.Anchor);
+        Assert.Equal(Anchor.Top, div.Anchor);
     }
 
     [Fact]
-    public void Parse_Anchor_BottomLeft()
+    public void Parse_Anchor_Bottom()
     {
-        var markup = "<div anchor=\"BottomLeft\" />";
+        var markup = "<div anchor=\"Bottom\" />";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Anchor.BottomLeft, div.Anchor);
+        Assert.Equal(Anchor.Bottom, div.Anchor);
     }
 
     [Fact]
-    public void Parse_Anchor_BottomRight()
+    public void Parse_Anchor_Right()
     {
-        var markup = "<div anchor=\"BottomRight\" />";
+        var markup = "<div anchor=\"Right\" />";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Anchor.BottomRight, div.Anchor);
+        Assert.Equal(Anchor.Right, div.Anchor);
     }
 
     [Fact]
-    public void Parse_Anchor_Center()
+    public void Parse_Anchor_Left()
     {
-        var markup = "<div anchor=\"Center\" />";
+        var markup = "<div anchor=\"Left\" />";
         var (element, _) = new MarkupParser(_model).Parse(markup);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Anchor.Center, div.Anchor);
+        Assert.Equal(Anchor.Left, div.Anchor);
+    }
+
+    [Fact]
+    public void Parse_Anchor_None()
+    {
+        var markup = "<div anchor=\"None\" />";
+        var (element, _) = new MarkupParser(_model).Parse(markup);
+
+        Assert.IsType<Div>(element);
+        var div = (Div)element;
+        Assert.Equal(Anchor.None, div.Anchor);
     }
 
     // ============== DOCK EDGE VARIANTS ==============
@@ -1268,7 +1290,7 @@ Text after
         Assert.IsType<Border>(element);
         var border = (Border)element;
         Assert.Single(border.Children);
-        Assert.Equal("#FF0000", border.BorderColor);
+        Assert.Equal("#FF0000", border.Color);
     }
 
     [Fact]
@@ -1281,8 +1303,8 @@ Text after
 
         Assert.IsType<Border>(element);
         var border = (Border)element;
-        Assert.Equal(new Layout.Thickness(5, 10, 5, 10),  border.BorderThickness);
-        Assert.Equal("blue", border.BorderColor);
+        Assert.Equal(new Thickness(5, 10, 5, 10),  border.Thickness);
+        Assert.Equal("blue", border.Color);
         Assert.Single(border.Children);
     }
 
@@ -1296,8 +1318,8 @@ Text after
 
         Assert.IsType<Border>(element);
         var border = (Border)element;
-        Assert.Equal(new Thickness(3, 6), border.BorderThickness);
-        Assert.Equal("green", border.BorderColor);
+        Assert.Equal(new Thickness(3, 6), border.Thickness);
+        Assert.Equal("green", border.Color);
     }
 
     [Fact]
@@ -1318,7 +1340,7 @@ Text after
         Assert.Single(div.Children);
         
         var border = (Border)div.Children[0];
-        Assert.Equal("red", border.BorderColor);
+        Assert.Equal("red", border.Color);
         Assert.Single(border.Children);
         var label = (Label)border.Children[0];
         Assert.Equal("Bordered Inner Content", label.Text);
@@ -1334,7 +1356,7 @@ Text after
 
         Assert.IsType<Border>(element);
         var border = (Border)element;
-        Assert.Null(border.BorderColor);
+        Assert.Null(border.Color);
         Assert.Single(border.Children);
     }
 
@@ -1351,8 +1373,8 @@ Text after
         
         // Border props
         // "2 red" -> Thickness 2, Color red
-        Assert.Equal(2, border.BorderThickness.Left.Value); 
-        Assert.Equal("red", border.BorderColor);
+        Assert.Equal(2, border.Thickness.Left.Value); 
+        Assert.Equal("red", border.Color);
         
         Assert.Single(border.Children);
         Assert.IsType<Div>(border.Children[0]);
@@ -1374,8 +1396,8 @@ Text after
         
         // Inner Div should NOT have them? Or Parser doesn't set them on inner.
         // Let's check Inner Div.
-        Assert.Equal(UnitValue.None, div.Width);
-        Assert.Equal(UnitValue.None, div.Height);
+        Assert.Equal(UnitValue.Auto, div.Width);
+        Assert.Equal(UnitValue.Auto, div.Height);
         Assert.Null(div.BackgroundColor); // If it was null before.
         
         Assert.Single(div.Children);
@@ -1394,8 +1416,8 @@ Text after
         Assert.IsType<Border>(element);
         var border = (Border)element;
         
-        Assert.Equal(5f, border.BorderThickness.Left.Value); // Assuming uniform
-        Assert.Equal("#FF0000", border.BorderColor);
+        Assert.Equal(5f, border.Thickness.Left.Value); // Assuming uniform
+        Assert.Equal("#FF0000", border.Color);
         Assert.Equal(new UnitValue(500), border.Width);
         Assert.Equal(new UnitValue(400), border.Height);
         
@@ -1422,7 +1444,7 @@ Text after
 
         var border = element?.Children.Single() as Border;
         Assert.NotNull(border);
-        Assert.Equal("#FF0000", border.BorderColor);
+        Assert.Equal("#FF0000", border.Color);
         Assert.Single(border.Children);
 
         var div = border.Children[0] as Div;
@@ -1909,7 +1931,7 @@ Text after
     <style>
         .header { padding: 10; }
     </style>
-    <div class=""header other"" />
+    <div class=""header_other"" />
 </window>";
         var (element, _) = new MarkupParser().Parse(markup);
 

@@ -2,7 +2,8 @@ namespace SUIM.Layout;
 
 public record struct UnitValue(float Value, UnitType Type = UnitType.Pixels)
 {
-    public static readonly UnitValue None = new (0, UnitType.None);
+    public static readonly UnitValue None = new(0, UnitType.None);
+    public static readonly UnitValue Auto = new(0, UnitType.Auto);
 
     public static UnitValue FromObject(object? obj)
     {
@@ -25,13 +26,13 @@ public record struct UnitValue(float Value, UnitType Type = UnitType.Pixels)
             
         value = value.Trim();
         
-        // Handle star units
-        if (value.EndsWith('*'))
+        // Handle fr units (fractional units - web-friendly replacement for star units)
+        if (value.EndsWith("fr", StringComparison.OrdinalIgnoreCase))
         {
-            if (value == "*")
-                return new UnitValue(1, UnitType.Star);
-            else if (float.TryParse(value[..^1], out float starValue))
-                return new UnitValue(starValue, UnitType.Star);
+            if (value.Equals("fr", StringComparison.OrdinalIgnoreCase))
+                return new UnitValue(1, UnitType.Fr);
+            else if (float.TryParse(value[..^2], out float frValue))
+                return new UnitValue(frValue, UnitType.Fr);
         }
         
         // Handle auto
@@ -39,17 +40,24 @@ public record struct UnitValue(float Value, UnitType Type = UnitType.Pixels)
             return new UnitValue(0, UnitType.Auto);
             
         // Handle rem
-        if (value.EndsWith("rem"))
+        if (value.EndsWith("rem", StringComparison.OrdinalIgnoreCase))
         {
             if (float.TryParse(value[..^3], out float remValue))
                 return new UnitValue(remValue, UnitType.Rem);
         }
         
         // Handle em
-        if (value.EndsWith("em"))
+        if (value.EndsWith("em", StringComparison.OrdinalIgnoreCase))
         {
             if (float.TryParse(value[..^2], out float emValue))
                 return new UnitValue(emValue, UnitType.Em);
+        }
+        
+        // Handle px suffix (web-friendly)
+        if (value.EndsWith("px", StringComparison.OrdinalIgnoreCase))
+        {
+            if (float.TryParse(value[..^2], out float pxValue))
+                return new UnitValue(pxValue, UnitType.Pixels);
         }
         
         // Default to pixels
@@ -66,7 +74,7 @@ public enum UnitType
     Pixels,
     Rem,      // Root em - relative to root font size
     Em,       // Relative to parent font size  
-    Star,     // Proportional space
+    Fr,       // Fractional units - proportional space (CSS Grid's fr unit)
     Auto      // Content-based sizing
 }
 

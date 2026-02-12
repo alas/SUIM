@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Xml.Linq;
 using SUIM.Components;
+using SUIM.Layout;
 
 public class MarkupParser(object? model = null)
 {
@@ -245,15 +246,19 @@ public class MarkupParser(object? model = null)
             }
         }
 
-        // Class selector
+        // Class selector(s) - support multiple space-separated classes
         if (!string.IsNullOrEmpty(elementClass))
         {
-            var classSelector = "." + elementClass.Trim();
-            if (styles.TryGetValue(classSelector, out var classProps))
+            var classes = elementClass.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            foreach (var className in classes)
             {
-                foreach (var kvp in classProps)
+                var classSelector = "." + className;
+                if (styles.TryGetValue(classSelector, out var classProps))
                 {
-                    mergedProperties[kvp.Key] = kvp.Value;
+                    foreach (var kvp in classProps)
+                    {
+                        mergedProperties[kvp.Key] = kvp.Value;
+                    }
                 }
             }
         }
@@ -539,22 +544,29 @@ public class MarkupParser(object? model = null)
     {
         var tag = element.Name.LocalName;
 
-        if (tag.Equals("div", StringComparison.OrdinalIgnoreCase)) return new Div();
-        if (tag.Equals("stack", StringComparison.OrdinalIgnoreCase)) return new Stack();
-        if (tag.Equals("hstack", StringComparison.OrdinalIgnoreCase) || tag.Equals("hbox", StringComparison.OrdinalIgnoreCase)) return new Stack { Orientation = Orientation.Horizontal };
-        if (tag.Equals("vstack", StringComparison.OrdinalIgnoreCase) || tag.Equals("vbox", StringComparison.OrdinalIgnoreCase)) return new Stack { Orientation = Orientation.Vertical };
-        if (tag.Equals("grid", StringComparison.OrdinalIgnoreCase)) return new Grid();
-        if (tag.Equals("dock", StringComparison.OrdinalIgnoreCase)) return new Dock();
-        if (tag.Equals("overlay", StringComparison.OrdinalIgnoreCase)) return new Overlay();
-        if (tag.Equals("label", StringComparison.OrdinalIgnoreCase)) return new Label();
-        if (tag.Equals("button", StringComparison.OrdinalIgnoreCase)) return new Button();
-        if (tag.Equals("image", StringComparison.OrdinalIgnoreCase)) return new Image();
-        if (tag.Equals("input", StringComparison.OrdinalIgnoreCase)) return new Input();
-        if (tag.Equals("select", StringComparison.OrdinalIgnoreCase)) return new Select();
-        if (tag.Equals("option", StringComparison.OrdinalIgnoreCase)) return new Option();
-        if (tag.Equals("textarea", StringComparison.OrdinalIgnoreCase)) return new TextArea();
+        // Layout/Structural tags (default: 1fr)
+        if (tag.Equals("div", StringComparison.OrdinalIgnoreCase)) return new Div { Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
+        if (tag.Equals("stack", StringComparison.OrdinalIgnoreCase)) return new Stack { Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
+        if (tag.Equals("hstack", StringComparison.OrdinalIgnoreCase) || tag.Equals("hbox", StringComparison.OrdinalIgnoreCase)) 
+            return new Stack { Orientation = Orientation.Horizontal, Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
+        if (tag.Equals("vstack", StringComparison.OrdinalIgnoreCase) || tag.Equals("vbox", StringComparison.OrdinalIgnoreCase)) 
+            return new Stack { Orientation = Orientation.Vertical, Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
+        if (tag.Equals("grid", StringComparison.OrdinalIgnoreCase)) return new Grid { Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
+        if (tag.Equals("dock", StringComparison.OrdinalIgnoreCase)) return new Dock { Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
+        if (tag.Equals("overlay", StringComparison.OrdinalIgnoreCase)) return new Overlay { Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
+        if (tag.Equals("window", StringComparison.OrdinalIgnoreCase)) return new Window { Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
         if (tag.Equals("border", StringComparison.OrdinalIgnoreCase)) return new Border();
-        if (tag.Equals("window", StringComparison.OrdinalIgnoreCase)) return new Window();
+        
+        // Content tags (default: auto)
+        if (tag.Equals("label", StringComparison.OrdinalIgnoreCase)) return new Label { Width = UnitValue.Parse("auto"), Height = UnitValue.Parse("auto") };
+        if (tag.Equals("button", StringComparison.OrdinalIgnoreCase)) return new Button { Width = UnitValue.Parse("auto"), Height = UnitValue.Parse("auto") };
+        if (tag.Equals("image", StringComparison.OrdinalIgnoreCase)) return new Image { Width = UnitValue.Parse("auto"), Height = UnitValue.Parse("auto") };
+        if (tag.Equals("input", StringComparison.OrdinalIgnoreCase)) return new Input { Width = UnitValue.Parse("auto"), Height = UnitValue.Parse("auto") };
+        if (tag.Equals("select", StringComparison.OrdinalIgnoreCase)) return new Select { Width = UnitValue.Parse("auto"), Height = UnitValue.Parse("auto") };
+        if (tag.Equals("option", StringComparison.OrdinalIgnoreCase)) return new Option();
+        if (tag.Equals("textarea", StringComparison.OrdinalIgnoreCase)) return new TextArea { Width = UnitValue.Parse("auto"), Height = UnitValue.Parse("auto") };
+        
+        // Special tags
         if (tag.Equals("style", StringComparison.OrdinalIgnoreCase)) return null;
         if (tag.Equals("model", StringComparison.OrdinalIgnoreCase)) return null;
 
