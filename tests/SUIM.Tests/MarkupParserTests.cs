@@ -1274,6 +1274,9 @@ Text after
         var stack = (Stack)scroll.Children[0];
         Assert.IsType<Stack>(stack);
         Assert.Equal(Orientation.Vertical, stack.Orientation);
+        // Inner element should default to `auto` sizing when wrapped by a scroll-viewport
+        Assert.Equal(UnitValue.Auto, stack.Width);
+        Assert.Equal(UnitValue.Auto, stack.Height);
         // Spacing is component specific, goes to stack
         Assert.Equal(5, stack.Spacing);
         Assert.Equal(3, stack.Children.Count);
@@ -1445,13 +1448,33 @@ Text after
         var border = element?.Children.Single() as Border;
         Assert.NotNull(border);
         Assert.Equal("#FF0000", border.Color);
+        // Style sizes should be applied to the wrapper (Border)
+        Assert.Equal(new UnitValue(500), border.Width);
+        Assert.Equal(new UnitValue(400), border.Height);
         Assert.Single(border.Children);
 
         var div = border.Children[0] as Div;
         Assert.NotNull(div);
         Assert.Equal("myclass", div.Class);
+        // Wrapped inner element should default to auto sizing (style moved to wrapper)
+        Assert.Equal(UnitValue.Auto, div.Width);
+        Assert.Equal(UnitValue.Auto, div.Height);
         Assert.Single(div.Children);
         Assert.IsType<Label>(div.Children[0]);
+    }
+
+    [Fact]
+    public void ParseStyles_ClassWithBorderAndSizes_AssignsProperties()
+    {
+        var styleContent = ".myclass { width: 500; height: 400; border: 5 #FF0000; }";
+        var mi = typeof(MarkupParser).GetMethod("ParseStyles", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        var styles = (Dictionary<string, Dictionary<string, string>>)mi.Invoke(null, new object[] { styleContent });
+
+        Assert.True(styles.ContainsKey(".myclass"));
+        var props = styles[".myclass"];
+        Assert.Equal("500", props["width"]);
+        Assert.Equal("400", props["height"]);
+        Assert.Equal("5 #FF0000", props["border"]);
     }
 
     // ============== Window TESTS ==============
