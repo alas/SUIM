@@ -86,8 +86,8 @@ public class SUIMStride
         {
             try
             {
-                SpriteFont? sf = null;
-                if (!Fonts.ContainsKey(text.Font) && ContentManager != null)
+                SpriteFont? sf = Fonts.TryGetValue(text.Font, out SpriteFont? value) ? value : null;
+                if (sf == null && !Fonts.ContainsKey(text.Font) && ContentManager != null)
                 {
                     sf = ContentManager?.Load<SpriteFont>(text.Font);
                     if (sf != null)
