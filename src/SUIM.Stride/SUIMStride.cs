@@ -2,27 +2,23 @@ namespace SUIM.StrideIntegration;
 
 using System;
 using Stride.Core.Mathematics;
-using Stride.Engine;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
-using StrideElement = Stride.UI.UIElement;
 using StrideGrid = Stride.UI.Panels.Grid;
 
-public class StrideUIMapper
+public class SUIMStride
 {
-    public UIPage Map(Components.UIElement root, object model)
+    public UIElement Parse(string markup)
     {
-        var page = new UIPage
-        {
-            RootElement = MapElement(root)
-        };
-        return page;
+        var parser = new MarkupParser();
+        var (suimRoot, model) = parser.Parse(markup);
+        return MapElement(suimRoot);
     }
 
-    private StrideElement MapElement(Components.UIElement element)
+    private UIElement MapElement(Components.UIElement element)
     {
-        StrideElement strideElement = element switch
+        UIElement strideElement = element switch
         {
             Components.Button b => MapButton(b),
             Components.BaseText t => MapText(t),
@@ -76,7 +72,7 @@ public class StrideUIMapper
         var tb = new TextBlock
         {
             Text = text.Text ?? "",
-            TextSize = text.FontSize > 0f ? text.FontSize : 14f
+            TextSize = text.FontSize > 0f ? text.FontSize : 14f,
         };
 
         //if (!string.IsNullOrEmpty(text.Font))
@@ -97,7 +93,7 @@ public class StrideUIMapper
         return tb;
     }
 
-    private static StrideElement MapInput(Components.Input input)
+    private static UIElement MapInput(Components.Input input)
     {
         // Map based on the input type
         return input.Type switch
@@ -136,12 +132,12 @@ public class StrideUIMapper
     {
         var borderElem = new Border
         {
-            BorderThickness = ComponentsThicknessToStride(border.BorderThickness, border)
+            BorderThickness = ComponentsThicknessToStride(border.Thickness, border)
         };
 
-        if (!string.IsNullOrEmpty(border.BorderColor))
+        if (!string.IsNullOrEmpty(border.Color))
         {
-            borderElem.BorderColor = ParseColor(border.BorderColor);
+            borderElem.BorderColor = ParseColor(border.Color);
         }
 
         // Handle Children
@@ -187,7 +183,7 @@ public class StrideUIMapper
         };
     }
 
-    private static void ApplyCommonProperties(Components.UIElement suim, StrideElement stride)
+    private static void ApplyCommonProperties(Components.UIElement suim, UIElement stride)
     {
         stride.Name = suim.Id;
         stride.Opacity = suim.Opacity;
@@ -231,9 +227,9 @@ public class StrideUIMapper
              stride.Height = height;
         }
 
-        if (suim.Background != null)
+        if (suim.BackgroundColor != null)
         {
-            stride.BackgroundColor = ParseColor(suim.Background);
+            stride.BackgroundColor = ParseColor(suim.BackgroundColor);
         }
     }
 
@@ -271,6 +267,15 @@ public class StrideUIMapper
              }
         }
 
+        if (string.Equals(colorStr, "red", StringComparison.OrdinalIgnoreCase)) return Color.Red;
+        if (string.Equals(colorStr, "green", StringComparison.OrdinalIgnoreCase)) return Color.Green;
+        if (string.Equals(colorStr, "blue", StringComparison.OrdinalIgnoreCase)) return Color.Blue;
+        if (string.Equals(colorStr, "black", StringComparison.OrdinalIgnoreCase)) return Color.Black;
+        if (string.Equals(colorStr, "yellow", StringComparison.OrdinalIgnoreCase)) return Color.Yellow;
+        if (string.Equals(colorStr, "cyan", StringComparison.OrdinalIgnoreCase)) return Color.Cyan;
+        if (string.Equals(colorStr, "magenta", StringComparison.OrdinalIgnoreCase)) return Color.Magenta;
+        if (string.Equals(colorStr, "transparent", StringComparison.OrdinalIgnoreCase)) return Color.Transparent;
+        //if (string.Equals(colorStr, "white", StringComparison.OrdinalIgnoreCase)
         return Color.White;
     }
 }

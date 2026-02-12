@@ -4,24 +4,19 @@ using SUIM.Layout;
 
 public class Border : UIElement
 {
-    public Thickness BorderThickness { get; set; } = new Thickness(0f);
-    public string? BorderColor { get; set; }
+    public Thickness Thickness { get; set; } = new Thickness(0f);
 
     public override void SetAttribute(string name, object? value)
     {
         if (name.Equals("thickness", StringComparison.OrdinalIgnoreCase))
         {
-            BorderThickness = Thickness.FromObject(value);
-        }
-        else if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
-        {
-            BorderColor = value as string;
+            Thickness = Thickness.FromObject(value);
         }
         else if (name.Equals("border", StringComparison.OrdinalIgnoreCase))
         {
              // Parse shorthand: "10 White" or "10 5 0 2 White"
             var str = value as string;
-             ParseShorthand(str);
+            ParseShorthand(str);
         }
         else
         {
@@ -51,12 +46,12 @@ public class Border : UIElement
         if (numCount > 0)
         {
             string thicknessStr = string.Join(",", parts.Take(numCount));
-            BorderThickness = Thickness.Parse(thicknessStr);
+            Thickness = Thickness.Parse(thicknessStr);
         }
         
         if (numCount < parts.Length)
         {
-             BorderColor = parts[parts.Length - 1]; // Color is last
+             Color = parts[parts.Length - 1]; // Color is last
         }
     }
 }

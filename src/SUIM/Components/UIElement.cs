@@ -25,8 +25,8 @@ public abstract class UIElement
     public string? RootFont { get; set; }
     public float RootFontSize { get; set; }
     public Anchor? Anchor { get; set; }
-    public string? Background { get; set; }
     public string? Color { get; set; }
+    public string? BackgroundColor { get; set; }
     public float Opacity { get; set; } = 1.0f;
     public int ZIndex { get; set; }
     public string? Visibility { get; set; }
@@ -139,7 +139,7 @@ public abstract class UIElement
         {
             Font = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
-        else if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase) || name.Equals("font-size", StringComparison.OrdinalIgnoreCase))
         {
             FontSize = value is float f ? f : Convert.ToSingle(value);
         }
@@ -147,9 +147,9 @@ public abstract class UIElement
         {
             Color = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
-        else if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase))
         {
-            Background = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            BackgroundColor = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Contains('.'))
         {
@@ -180,7 +180,7 @@ public abstract class UIElement
         if (name.Equals("valign", StringComparison.OrdinalIgnoreCase) || name.Equals("verticalalignment", StringComparison.OrdinalIgnoreCase)) return VerticalAlignment;
         if (name.Equals("margin", StringComparison.OrdinalIgnoreCase)) return Margin;
         if (name.Equals("padding", StringComparison.OrdinalIgnoreCase)) return Padding;
-        if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase)) return Background;
+        if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase)) return BackgroundColor;
         if (name.Equals("width", StringComparison.OrdinalIgnoreCase)) return Width;
         if (name.Equals("height", StringComparison.OrdinalIgnoreCase)) return Height;
         if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase)) return Anchor;

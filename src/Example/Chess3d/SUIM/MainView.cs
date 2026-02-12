@@ -1,4 +1,4 @@
-﻿namespace Chess3d.SUIM;
+﻿namespace Chess3d;
 
 using System;
 using System.Threading.Tasks;
@@ -8,12 +8,13 @@ using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
+using SUIM.StrideIntegration;
 
 public class MainView
 {
     private readonly SpriteFont Font;
     private readonly UIPage Page;
-    private readonly Grid rootUI;
+    private readonly UIElement rootUI;
     private bool IsWorkInProgress;
 
     public MainView(Game game, UIComponent component)
@@ -25,33 +26,49 @@ public class MainView
         //game.Window.IsFullscreen = true;
 
         IsWorkInProgress = false;
-        // Build UI
-        var root = new StackPanel { Margin = new Thickness(6, 6, 6, 6), Orientation = Orientation.Vertical, HorizontalAlignment = HorizontalAlignment.Left };
-        rootUI = new Grid();
-        rootUI.Children.Add(root);
+        Font = game.Content.Load<SpriteFont>("StrideDefaultFont");
+
+        var markup = @"<grid halign=""left"">
+<style>
+* {
+        Font: StrideDefaultFont;
+        Color: Green;
+        FontSize: 16;
+        HorizontalAlignment: Center;
+        VerticalAlignment: Center;
+}
+.mybutton {
+        Background: Black;
+        Color: Green;
+        Width: 200;
+        Height: 50;
+        Margin: 5;
+}
+</style>
+    <stack orientation=""vertical"" margin=""6"" halign=""left"">
+        <button class=""mybutton"" id=""quitButton"">Quit</button>
+        <button class=""mybutton"" id=""restartButton"">Restart</button>
+        <button class=""mybutton"" id=""loadButton"">Load</button>
+        <button class=""mybutton"" id=""saveButton"">Save</button>
+    </stack>
+</grid>";
+
+        var mapper = new SUIMStride();
+        rootUI = mapper.Parse(markup);
         Page = new UIPage
         {
             RootElement = rootUI
         };
         component.Page = Page;
 
-        Font = game.Content.Load<SpriteFont>("StrideDefaultFont");
-
-        // Main buttons
-        var quitButton = GetButton("Quit");
-        var restartButton = GetButton("Restart");
-        var loadButton = GetButton("Load");
-        var saveButton = GetButton("Save");
-
-        root.Children.Add(quitButton);
-        root.Children.Add(restartButton);
-        root.Children.Add(loadButton);
-        root.Children.Add(saveButton);        
-        
-        quitButton.Click += (s, e) => OpenModal("Are you sure you want to quit?", QuitHandler);
-        restartButton.Click += (s, e) => OpenModal("Are you sure you want to start over?", RestartHandler);
-        loadButton.Click += (s, e) => OpenModal("Load() Not implemented yet!", LoadHandler);
-        saveButton.Click += (s, e) => OpenModal("Save() Not implemented yet!", SaveHandler);
+        var quitButton = FindStrideElementByName(Page.RootElement, "quitButton") as Button;
+        var restartButton = FindStrideElementByName(Page.RootElement, "restartButton") as Button;
+        var loadButton = FindStrideElementByName(Page.RootElement, "loadButton") as Button;
+        var saveButton = FindStrideElementByName(Page.RootElement, "saveButton") as Button;
+        quitButton!.Click += (s, e) => OpenModal("Are you sure you want to quit?", QuitHandler);
+        restartButton!.Click += (s, e) => OpenModal("Are you sure you want to start over?", RestartHandler);
+        loadButton!.Click += (s, e) => OpenModal("Load() Not implemented yet!", LoadHandler);
+        saveButton!.Click += (s, e) => OpenModal("Save() Not implemented yet!", SaveHandler);
         
         void QuitHandler(object? sender, EventArgs args)
         {
@@ -196,4 +213,38 @@ public class MainView
         Height = 50,
         Margin = new Thickness(5, 5, 5, 5),
     };
+
+    private static UIElement? FindStrideElementByName(UIElement root, string name)
+    {
+        if (root == null) return null;
+        if (string.Equals(root.Name, name, StringComparison.OrdinalIgnoreCase)) return root;
+
+        // Panels with Children
+        if (root is Panel panel)
+        {
+            foreach (var child in panel.Children)
+            {
+                var found = FindStrideElementByName(child, name);
+                if (found != null) return found;
+            }
+        }
+
+        // Grid (inherits Panel) already handled above
+
+        // Content Controls
+        if (root is ContentControl cc && cc.Content is UIElement contentElem)
+        {
+            var found = FindStrideElementByName(contentElem, name);
+            if (found != null) return found;
+        }
+
+        // Border has Content
+        if (root is Border br && br.Content is UIElement borderContent)
+        {
+            var found = FindStrideElementByName(borderContent, name);
+            if (found != null) return found;
+        }
+
+        return null;
+    }
 }

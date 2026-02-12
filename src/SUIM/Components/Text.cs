@@ -48,7 +48,21 @@ public class TextArea : UIElement, IPlaceholder
 public class Label : BaseText
 {
     public string? For { get; set; }
+
+    public override void SetAttribute(string name, object? value)
+    {
+        if (name.Equals("rows", StringComparison.OrdinalIgnoreCase))
+        {
+            For = value is string s ? s : value?.ToString();
+        }
+        else
+        {
+            base.SetAttribute(name, value);
+        }
+    }
 }
+
+public class PElement : BaseText { }
 
 public class H1Element : BaseText { }
 
@@ -65,5 +79,3 @@ public class H6Element : BaseText { }
 public class H7Element : BaseText { }
 
 public class H8Element : BaseText { }
-
-public class PElement : BaseText { }

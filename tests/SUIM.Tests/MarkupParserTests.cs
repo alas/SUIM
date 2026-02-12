@@ -37,7 +37,7 @@ public class MarkupParserTests
         Assert.Equal(VerticalAlignment.Top, div.VerticalAlignment);
         Assert.Equal(new Thickness(10), div.Margin);
         Assert.Equal(new Thickness(5), div.Padding);
-        Assert.Equal("blue", div.Background);
+        Assert.Equal("blue", div.BackgroundColor);
     }
 
     [Fact]
@@ -600,7 +600,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal("#FF0000", div.Background);
+        Assert.Equal("#FF0000", div.BackgroundColor);
     }
 
     [Fact]
@@ -611,7 +611,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal("255,0,0,255", div.Background);
+        Assert.Equal("255,0,0,255", div.BackgroundColor);
     }
 
     [Fact]
@@ -622,7 +622,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal("Red", div.Background);
+        Assert.Equal("Red", div.BackgroundColor);
     }
 
     // ============== SIZING UNITS TESTS ==============
@@ -1314,7 +1314,7 @@ Text after
         var div = (Div)element;
         Assert.Equal(new UnitValue(300), div.Width);
         Assert.Equal(new UnitValue(200), div.Height);
-        Assert.Equal("lightgray", div.Background);
+        Assert.Equal("lightgray", div.BackgroundColor);
         Assert.Single(div.Children);
         
         var border = (Border)div.Children[0];
@@ -1370,13 +1370,13 @@ Text after
         
         Assert.Equal(new UnitValue(300), border.Width);
         Assert.Equal(new UnitValue(200), border.Height);
-        Assert.Equal("lightgray", border.Background);
+        Assert.Equal("lightgray", border.BackgroundColor);
         
         // Inner Div should NOT have them? Or Parser doesn't set them on inner.
         // Let's check Inner Div.
         Assert.Equal(UnitValue.None, div.Width);
         Assert.Equal(UnitValue.None, div.Height);
-        Assert.Null(div.Background); // If it was null before.
+        Assert.Null(div.BackgroundColor); // If it was null before.
         
         Assert.Single(div.Children);
     }
@@ -1794,7 +1794,7 @@ Text after
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
         Assert.Equal(new Thickness(8), div.Padding);
-        Assert.Equal("blue", div.Background);
+        Assert.Equal("blue", div.BackgroundColor);
     }
 
     [Fact]
@@ -1839,7 +1839,7 @@ Text after
         Assert.NotNull(div);
         Assert.Equal(new Thickness(5), div.Padding);      // from universal
         Assert.Equal(new Thickness(10), div.Margin);      // from class
-        Assert.Equal("gray", div.Background); // from tag
+        Assert.Equal("gray", div.BackgroundColor); // from tag
     }
 
     [Fact]
@@ -1860,7 +1860,7 @@ Text after
         Assert.NotNull(div);
         Assert.Equal(new Thickness(20), div.Padding);      // ID selector overrides all
         Assert.Equal(new Thickness(1), div.Margin);        // from universal
-        Assert.Equal("blue", div.Background);  // from tag selector
+        Assert.Equal("blue", div.BackgroundColor);  // from tag selector
     }
 
     [Fact]
@@ -1995,7 +1995,7 @@ Text after
         Assert.NotNull(div);
         Assert.Equal(new Thickness(5), div.Margin);        // from universal
         Assert.Equal(new Thickness(10), div.Padding);      // from class
-        Assert.Equal("white", div.Background); // from tag
+        Assert.Equal("white", div.BackgroundColor); // from tag
     }
 }
 
