@@ -7,6 +7,8 @@ public class Select : UIElement
     public bool Multiple { get; set; }
     public List<Option> Options { get; set; } = [];
 
+    public Select() : base() { }
+
     public override void SetAttribute(string name, object? value)
     {
         if (name.Equals("multiple", StringComparison.OrdinalIgnoreCase))
@@ -22,6 +24,8 @@ public class Select : UIElement
 
 public class Option : UIElement
 {
+    public Option() : base() { }
+
     public string? Value { get; set; }
 
     public override void SetAttribute(string name, object? value)

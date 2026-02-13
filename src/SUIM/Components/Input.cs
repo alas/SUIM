@@ -10,6 +10,8 @@ public class Input : UIElement, IPlaceholder
     public int? Max { get; set; }
     public int? Step { get; set; }
 
+    public Input() : base() { }
+
     public override void SetAttribute(string name, object? value)
     {
         if (name.Equals("type", StringComparison.OrdinalIgnoreCase))

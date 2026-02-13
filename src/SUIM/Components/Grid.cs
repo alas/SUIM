@@ -9,6 +9,8 @@ public class Grid : LayoutElement
     public string? Rows { get; set; }
     public List<GridChild> GridChildren { get; } = [];
 
+    public Grid() : base() { }
+
     public override void AddChild(UIElement child, XElement? element)
     {
         base.AddChild(child, element);
@@ -37,6 +39,12 @@ public class Grid : LayoutElement
         var gridChild = GridChildren.FirstOrDefault(gc => gc.Element == child);
         if (gridChild != null)
             GridChildren.Remove(gridChild);
+    }
+
+    public override void ClearChildren()
+    {
+        base.ClearChildren();
+        GridChildren.Clear();
     }
 
     public override void SetAttribute(string name, object? value)

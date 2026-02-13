@@ -1,3 +1,6 @@
 namespace SUIM.Components;
 
-public class Div : LayoutElement { }
+public class Div : LayoutElement
+{
+    public Div() : base() { }
+}

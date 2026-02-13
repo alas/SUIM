@@ -6,19 +6,19 @@ using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
 using Stride.Graphics;
-using StrideGrid = Stride.UI.Panels.Grid;
 using Stride.Core.Serialization.Contents;
+using StrideGrid = Stride.UI.Panels.Grid;
 
 public class SUIMStride
 {
     public ContentManager? ContentManager { get; init; }
-    private Dictionary<string, SpriteFont> Fonts = new();
+    private readonly Dictionary<string, SpriteFont> Fonts = new();
 
-    public UIElement Parse(string markup)
+    public (UIElement, dynamic?) Parse(string markup)
     {
         var parser = new MarkupParser();
         var (suimRoot, model) = parser.Parse(markup);
-        return MapElement(suimRoot);
+        return (MapElement(suimRoot), model);
     }
 
     private UIElement MapElement(Components.UIElement element)

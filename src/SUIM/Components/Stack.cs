@@ -4,6 +4,8 @@ public class Stack : LayoutElement
 {
     public Orientation Orientation { get; set; } = Orientation.Vertical;
 
+    public Stack() : base() { }
+
     public override void SetAttribute(string name, object? value)
     {
         if (name.Equals("orientation", StringComparison.OrdinalIgnoreCase))

@@ -2,6 +2,8 @@ namespace SUIM.Components;
 
 public class BaseText : UIElement
 {
+    public BaseText() : base() { }
+
     public string? Text { get; set; }
     public bool Wrap { get; set; }
 
@@ -28,6 +30,8 @@ public class TextArea : UIElement, IPlaceholder
     public int Rows { get; set; }
     public int Columns { get; set; }
 
+    public TextArea() : base() { }
+
     public override void SetAttribute(string name, object? value)
     {
         if (name.Equals("rows", StringComparison.OrdinalIgnoreCase))
@@ -49,6 +53,8 @@ public class Label : BaseText
 {
     public string? For { get; set; }
 
+    public Label() : base() { }
+
     public override void SetAttribute(string name, object? value)
     {
         if (name.Equals("rows", StringComparison.OrdinalIgnoreCase))
@@ -62,20 +68,20 @@ public class Label : BaseText
     }
 }
 
-public class PElement : BaseText { }
+public class PElement : BaseText { public PElement() : base() { } }
 
-public class H1Element : BaseText { }
+public class H1Element : BaseText { public H1Element() : base() { } }
 
-public class H2Element : BaseText { }
+public class H2Element : BaseText { public H2Element() : base() { } }
 
-public class H3Element : BaseText { }
+public class H3Element : BaseText { public H3Element() : base() { } }
 
-public class H4Element : BaseText { }
+public class H4Element : BaseText { public H4Element() : base() { } }
 
-public class H5Element : BaseText { }
+public class H5Element : BaseText { public H5Element() : base() { } }
 
-public class H6Element : BaseText { }
+public class H6Element : BaseText { public H6Element() : base() { } }
 
-public class H7Element : BaseText { }
+public class H7Element : BaseText { public H7Element() : base() { } }
 
-public class H8Element : BaseText { }
+public class H8Element : BaseText { public H8Element() : base() { } }

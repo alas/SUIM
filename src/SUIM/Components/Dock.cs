@@ -7,6 +7,8 @@ public class Dock : LayoutElement
     public bool LastChildFill { get; set; } = true;
     public List<DockChild> DockChildren { get; } = [];
 
+    public Dock() : base() { }
+
     public override void AddChild(UIElement child, XElement? element)
     {
         base.AddChild(child, element);
@@ -24,6 +26,12 @@ public class Dock : LayoutElement
         var dockChild = DockChildren.Find(dc => dc.Element == child);
         if (dockChild != null)
             DockChildren.Remove(dockChild);
+    }
+
+    public override void ClearChildren()
+    {
+        base.ClearChildren();
+        DockChildren.Clear();
     }
 
     public override void SetAttribute(string name, object? value)

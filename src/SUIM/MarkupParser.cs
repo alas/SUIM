@@ -283,7 +283,8 @@ public class MarkupParser(object? model = null)
         }
 
         // Recursively apply to children
-        return ApplyStylesToChildren(element, styles);
+        ApplyStylesToChildren(element, styles);
+        return element;
     }
 
     private static UIElement ApplyStylePropertiesToElement(UIElement element, Dictionary<string, string> properties, Dictionary<string, Dictionary<string, string>> allStyles)
@@ -394,39 +395,14 @@ public class MarkupParser(object? model = null)
         return element;
     }
 
-    private static UIElement ApplyStylesToChildren(UIElement element, Dictionary<string, Dictionary<string, string>> styles)
+    private static void ApplyStylesToChildren(UIElement element, Dictionary<string, Dictionary<string, string>> styles)
     {
-        // For elements that have children, recursively apply styles
-        switch (element)
+        var newList = element.Children.Select(x => ApplyStylesToElement(x, styles)).ToList();
+        element.ClearChildren();
+        foreach (var child in newList)
         {
-            case Grid grid:
-                foreach (var gridChild in grid.GridChildren)
-                {
-                    gridChild.Element = ApplyStylesToElement(gridChild.Element, styles);
-                }
-                break;
-            case Dock dock:
-                var newDockChildren = new List<DockChild>();
-                foreach (var dockChild in dock.DockChildren)
-                {
-                    var styledElement = ApplyStylesToElement(dockChild.Element, styles);
-                    newDockChildren.Add(new DockChild(dockChild.Edge, styledElement));
-                }
-                dock.DockChildren.Clear();
-                foreach (var dockChild in newDockChildren)
-                {
-                    dock.DockChildren.Add(dockChild);
-                }
-                break;
-            default:
-                for (int i = 0; i < element.Children.Count; i++)
-                {
-                    element.Children[i] = ApplyStylesToElement(element.Children[i], styles);
-                }
-                break;
+            element.AddChild(child, null);
         }
-
-        return element;
     }
 
     private static dynamic Create(object model)
@@ -601,27 +577,27 @@ public class MarkupParser(object? model = null)
     {
         var tag = element.Name.LocalName;
 
-        // Layout/Structural tags (default: 1fr)
-        if (tag.Equals("div", StringComparison.OrdinalIgnoreCase)) return new Div { Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
-        if (tag.Equals("stack", StringComparison.OrdinalIgnoreCase)) return new Stack { Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
+        // Layout/Structural tags
+        if (tag.Equals("div", StringComparison.OrdinalIgnoreCase)) return new Div();
+        if (tag.Equals("stack", StringComparison.OrdinalIgnoreCase)) return new Stack();
         if (tag.Equals("hstack", StringComparison.OrdinalIgnoreCase) || tag.Equals("hbox", StringComparison.OrdinalIgnoreCase)) 
-            return new Stack { Orientation = Orientation.Horizontal, Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
+            return new Stack { Orientation = Orientation.Horizontal };
         if (tag.Equals("vstack", StringComparison.OrdinalIgnoreCase) || tag.Equals("vbox", StringComparison.OrdinalIgnoreCase)) 
-            return new Stack { Orientation = Orientation.Vertical, Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
-        if (tag.Equals("grid", StringComparison.OrdinalIgnoreCase)) return new Grid { Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
-        if (tag.Equals("dock", StringComparison.OrdinalIgnoreCase)) return new Dock { Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
-        if (tag.Equals("overlay", StringComparison.OrdinalIgnoreCase)) return new Overlay { Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
-        if (tag.Equals("window", StringComparison.OrdinalIgnoreCase)) return new Window { Width = UnitValue.Parse("1fr"), Height = UnitValue.Parse("1fr") };
+            return new Stack { Orientation = Orientation.Vertical };
+        if (tag.Equals("grid", StringComparison.OrdinalIgnoreCase)) return new Grid();
+        if (tag.Equals("dock", StringComparison.OrdinalIgnoreCase)) return new Dock();
+        if (tag.Equals("overlay", StringComparison.OrdinalIgnoreCase)) return new Overlay();
+        if (tag.Equals("window", StringComparison.OrdinalIgnoreCase)) return new Window();
         if (tag.Equals("border", StringComparison.OrdinalIgnoreCase)) return new Border();
         
-        // Content tags (default: auto)
-        if (tag.Equals("label", StringComparison.OrdinalIgnoreCase)) return new Label { Width = UnitValue.Parse("auto"), Height = UnitValue.Parse("auto") };
-        if (tag.Equals("button", StringComparison.OrdinalIgnoreCase)) return new Button { Width = UnitValue.Parse("auto"), Height = UnitValue.Parse("auto") };
-        if (tag.Equals("image", StringComparison.OrdinalIgnoreCase)) return new Image { Width = UnitValue.Parse("auto"), Height = UnitValue.Parse("auto") };
-        if (tag.Equals("input", StringComparison.OrdinalIgnoreCase)) return new Input { Width = UnitValue.Parse("auto"), Height = UnitValue.Parse("auto") };
-        if (tag.Equals("select", StringComparison.OrdinalIgnoreCase)) return new Select { Width = UnitValue.Parse("auto"), Height = UnitValue.Parse("auto") };
+        // Content tags
+        if (tag.Equals("label", StringComparison.OrdinalIgnoreCase)) return new Label();
+        if (tag.Equals("button", StringComparison.OrdinalIgnoreCase)) return new Button();
+        if (tag.Equals("image", StringComparison.OrdinalIgnoreCase)) return new Image();
+        if (tag.Equals("input", StringComparison.OrdinalIgnoreCase)) return new Input();
+        if (tag.Equals("select", StringComparison.OrdinalIgnoreCase)) return new Select();
         if (tag.Equals("option", StringComparison.OrdinalIgnoreCase)) return new Option();
-        if (tag.Equals("textarea", StringComparison.OrdinalIgnoreCase)) return new TextArea { Width = UnitValue.Parse("auto"), Height = UnitValue.Parse("auto") };
+        if (tag.Equals("textarea", StringComparison.OrdinalIgnoreCase)) return new TextArea();
         
         // Special tags
         if (tag.Equals("style", StringComparison.OrdinalIgnoreCase)) return null;

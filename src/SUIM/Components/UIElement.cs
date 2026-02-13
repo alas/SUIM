@@ -12,8 +12,8 @@ public abstract class UIElement
     public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.Top;
     public UnitValue X { get; set; }
     public UnitValue Y { get; set; }
-    public UnitValue Width { get; set; } = UnitValue.None;
-    public UnitValue Height { get; set; } = UnitValue.None;
+    public UnitValue Width { get; set; } = UnitValue.Auto;
+    public UnitValue Height { get; set; } = UnitValue.Auto;
     public Thickness Margin { get; set; } = Thickness.None;
     public Thickness Padding { get; set; } = Thickness.None;
     public float ActualX { get; set; } = float.NaN;
@@ -63,6 +63,15 @@ public abstract class UIElement
     {
         child.Parent = null;
         Children.Remove(child);
+    }
+
+    public virtual void ClearChildren()
+    {
+        foreach (var child in Children)
+        {
+            child.Parent = null;
+        }
+        Children.Clear();
     }
 
     public virtual void SetAttribute(string name, object? value)
@@ -239,6 +248,12 @@ public abstract class UIElement
 
 public class LayoutElement : UIElement
 {
+    public LayoutElement() : base()
+    {
+        Width = UnitValue.OneFR;
+        Height = UnitValue.OneFR;
+    }
+
     public int Spacing { get; set; }
     public bool Clip { get; set; }
     public Thickness SliceWidth { get; set; } = Thickness.None;

@@ -56,7 +56,7 @@ public class MainView
         {
             ContentManager = game.Content
         };
-        rootUI = mapper.Parse(markup);
+        (rootUI, _) = mapper.Parse(markup);
         Page = new UIPage
         {
             RootElement = rootUI

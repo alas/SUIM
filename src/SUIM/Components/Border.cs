@@ -4,6 +4,8 @@ using SUIM.Layout;
 
 public class Border : UIElement
 {
+    public Border() : base() { }
+
     public Thickness Thickness { get; set; } = new Thickness(0f);
 
     public override void SetAttribute(string name, object? value)

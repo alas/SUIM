@@ -2,6 +2,8 @@
 
 public class Scroll : LayoutElement
 {
+    public Scroll() : base() { }
+
     public ScrollDirection Direction { get; set; } = ScrollDirection.Vertical;
     public float ScrollX { get; set; }
     public float ScrollY { get; set; }

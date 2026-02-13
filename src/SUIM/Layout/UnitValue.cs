@@ -4,6 +4,7 @@ public record struct UnitValue(float Value, UnitType Type = UnitType.Pixels)
 {
     public static readonly UnitValue None = new(0, UnitType.None);
     public static readonly UnitValue Auto = new(0, UnitType.Auto);
+    public static readonly UnitValue OneFR = new(1, UnitType.Fr);
 
     public static UnitValue FromObject(object? obj)
     {
