@@ -219,14 +219,14 @@ public static class LayoutEngine
     {
         float totalWidth = 0;
         float maxHeight = 0;
-        var starElements = new List<UIElement>();
+        var frElements = new List<UIElement>();
 
         // Measure fixed-size children
         foreach (var child in stack.Children)
         {
             if (child.Width.Type == UnitType.Fr || (child.Width.Type == UnitType.None && child is LayoutElement))
             {
-                starElements.Add(child);
+                frElements.Add(child);
             }
             else
             {
@@ -237,16 +237,16 @@ public static class LayoutEngine
             }
         }
 
-        // Resolve star widths
-        if (starElements.Count > 0)
+        // Resolve FractionalUnit widths
+        if (frElements.Count > 0)
         {
             var remainingWidth = availableWidth - totalWidth - totalSpacing;
-            ResolveStarWidths(starElements, Math.Max(0, remainingWidth), availableHeight);
+            ResolveFractionalUnitWidths(frElements, Math.Max(0, remainingWidth), availableHeight);
 
-            foreach (var starElement in starElements)
+            foreach (var frElement in frElements)
             {
-                totalWidth += starElement.ActualWidth;
-                maxHeight = Math.Max(maxHeight, starElement.ActualHeight);
+                totalWidth += frElement.ActualWidth;
+                maxHeight = Math.Max(maxHeight, frElement.ActualHeight);
             }
         }
 
@@ -258,14 +258,14 @@ public static class LayoutEngine
     {
         float totalHeight = 0;
         float maxWidth = 0;
-        var starElements = new List<UIElement>();
+        var elements = new List<UIElement>();
 
         // Measure fixed-size children
         foreach (var child in stack.Children)
         {
             if (child.Height.Type == UnitType.Fr || (child.Height.Type == UnitType.None && child is LayoutElement))
             {
-                starElements.Add(child);
+                elements.Add(child);
             }
             else
             {
@@ -276,16 +276,16 @@ public static class LayoutEngine
             }
         }
 
-        // Resolve star heights
-        if (starElements.Count > 0)
+        // Resolve FractionalUnit heights
+        if (elements.Count > 0)
         {
             var remainingHeight = availableHeight - totalHeight - totalSpacing;
-            ResolveStarHeights(starElements, Math.Max(0, remainingHeight), availableWidth);
+            ResolveFractionalUnitHeights(elements, Math.Max(0, remainingHeight), availableWidth);
 
-            foreach (var starElement in starElements)
+            foreach (var element in elements)
             {
-                totalHeight += starElement.ActualHeight;
-                maxWidth = Math.Max(maxWidth, starElement.ActualWidth);
+                totalHeight += element.ActualHeight;
+                maxWidth = Math.Max(maxWidth, element.ActualWidth);
             }
         }
 
@@ -293,27 +293,27 @@ public static class LayoutEngine
         stack.MeasuredContentHeight = totalHeight + totalSpacing;
     }
 
-    private static void ResolveStarWidths(List<UIElement> starElements, float remainingSpace, float availableHeight)
+    private static void ResolveFractionalUnitWidths(List<UIElement> elements, float remainingSpace, float availableHeight)
     {
-        var starValues = starElements.Select(e => e.Width.Type == UnitType.Fr ? e.Width.Value : 1f).ToArray();
-        var resolvedValues = StarUnitResolver.ResolveStarUnits(starValues, remainingSpace);
+        var values = elements.Select(e => e.Width.Type == UnitType.Fr ? e.Width.Value : 1f).ToArray();
+        var resolvedValues = FractionalUnitResolver.ResolveFractionalUnits(values, remainingSpace);
 
-        for (int i = 0; i < starElements.Count; i++)
+        for (int i = 0; i < elements.Count; i++)
         {
-            starElements[i].CurrentFontSize = (starElements[i].Parent as Stack)?.CurrentFontSize ?? 16f;
-            MeasureElement(starElements[i], resolvedValues[i], availableHeight);
+            elements[i].CurrentFontSize = (elements[i].Parent as Stack)?.CurrentFontSize ?? 16f;
+            MeasureElement(elements[i], resolvedValues[i], availableHeight);
         }
     }
 
-    private static void ResolveStarHeights(List<UIElement> starElements, float remainingSpace, float availableWidth)
+    private static void ResolveFractionalUnitHeights(List<UIElement> elements, float remainingSpace, float availableWidth)
     {
-        var starValues = starElements.Select(e => e.Height.Type == UnitType.Fr ? e.Height.Value : 1f).ToArray();
-        var resolvedValues = StarUnitResolver.ResolveStarUnits(starValues, remainingSpace);
+        var values = elements.Select(e => e.Height.Type == UnitType.Fr ? e.Height.Value : 1f).ToArray();
+        var resolvedValues = FractionalUnitResolver.ResolveFractionalUnits(values, remainingSpace);
 
-        for (int i = 0; i < starElements.Count; i++)
+        for (int i = 0; i < elements.Count; i++)
         {
-            starElements[i].CurrentFontSize = (starElements[i].Parent as Stack)?.CurrentFontSize ?? 16f;
-            MeasureElement(starElements[i], availableWidth, resolvedValues[i]);
+            elements[i].CurrentFontSize = (elements[i].Parent as Stack)?.CurrentFontSize ?? 16f;
+            MeasureElement(elements[i], availableWidth, resolvedValues[i]);
         }
     }
 
@@ -365,7 +365,7 @@ public static class LayoutEngine
     {
         float maxWidth = 0;
         float totalHeight = 0;
-        var starElements = new List<UIElement>();
+        var elements = new List<UIElement>();
         int spacing = 0;
         var totalSpacing = Math.Max(0, spacing * (div.Children.Count - 1));
 
@@ -374,7 +374,7 @@ public static class LayoutEngine
         {
             if (child.Height.Type == UnitType.Fr || (child.Height.Type == UnitType.None && child is LayoutElement))
             {
-                starElements.Add(child);
+                elements.Add(child);
             }
             else
             {
@@ -385,16 +385,16 @@ public static class LayoutEngine
             }
         }
 
-        // Resolve star heights
-        if (starElements.Count > 0)
+        // Resolve FractionalUnit heights
+        if (elements.Count > 0)
         {
             var remainingHeight = availableHeight - totalHeight - totalSpacing;
-            ResolveStarHeights(starElements, Math.Max(0, remainingHeight), availableWidth);
+            ResolveFractionalUnitHeights(elements, Math.Max(0, remainingHeight), availableWidth);
 
-            foreach (var starElement in starElements)
+            foreach (var element in elements)
             {
-                totalHeight += starElement.ActualHeight;
-                maxWidth = Math.Max(maxWidth, starElement.ActualWidth);
+                totalHeight += element.ActualHeight;
+                maxWidth = Math.Max(maxWidth, element.ActualWidth);
             }
         }
 
@@ -745,7 +745,7 @@ public static class LayoutEngine
             return [totalSize];
 
         var result = new float[parts.Length];
-        var starUnits = new List<UnitValue>();
+        var frUnits = new List<UnitValue>();
         float fixedSize = 0;
 
         for (int i = 0; i < parts.Length; i++)
@@ -753,7 +753,7 @@ public static class LayoutEngine
             var unit = UnitValue.Parse(parts[i]);
             if (unit.Type == UnitType.Fr)
             {
-                starUnits.Add(unit);
+                frUnits.Add(unit);
             }
             else
             {
@@ -763,18 +763,18 @@ public static class LayoutEngine
         }
 
         float remainingSpace = Math.Max(0, totalSize - fixedSize);
-        if (starUnits.Count > 0)
+        if (frUnits.Count > 0)
         {
-            var starValues = starUnits.Select(u => u.Value).ToArray();
-            var resolvedValues = StarUnitResolver.ResolveStarUnits(starValues, remainingSpace);
+            var values = frUnits.Select(u => u.Value).ToArray();
+            var resolvedValues = FractionalUnitResolver.ResolveFractionalUnits(values, remainingSpace);
 
-            int starIndex = 0;
+            int index = 0;
             for (int i = 0; i < parts.Length; i++)
             {
                 var unit = UnitValue.Parse(parts[i]);
                 if (unit.Type == UnitType.Fr)
                 {
-                    result[i] = resolvedValues[starIndex++];
+                    result[i] = resolvedValues[index++];
                 }
             }
         }
@@ -782,20 +782,20 @@ public static class LayoutEngine
         return result;
     }
 
-    private static float GetGridSpanWidth(float[] columnWidths, int startColumn, int columnSpan)
+    private static float GetGridSpanWidth(float[] columnWidths, int column, int columnSpan)
     {
         float width = 0;
-        for (int i = startColumn; i < startColumn + columnSpan && i < columnWidths.Length; i++)
+        for (int i = column; i < column + columnSpan && i < columnWidths.Length; i++)
         {
             width += columnWidths[i];
         }
         return width;
     }
 
-    private static float GetGridSpanHeight(float[] rowHeights, int startRow, int rowSpan)
+    private static float GetGridSpanHeight(float[] rowHeights, int row, int rowSpan)
     {
         float height = 0;
-        for (int i = startRow; i < startRow + rowSpan && i < rowHeights.Length; i++)
+        for (int i = row; i < row + rowSpan && i < rowHeights.Length; i++)
         {
             height += rowHeights[i];
         }

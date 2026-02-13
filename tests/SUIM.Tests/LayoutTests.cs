@@ -23,7 +23,7 @@ public class LayoutTests
     }
     
     [Fact]
-    public void LayoutEngine_MeasuresStackWithStarUnits()
+    public void LayoutEngine_MeasuresStackWithFractionalUnits()
     {
         var stack = new Stack { Orientation = Orientation.Horizontal, Spacing = 0, Width = UnitValue.OneFR, Height = UnitValue.Auto };
         var child1 = new Label { Width = new UnitValue(1, UnitType.Fr), Height = new UnitValue(50, UnitType.Pixels) };
@@ -171,19 +171,19 @@ public class LayoutTests
     }
     
     [Fact]
-    public void StarUnitResolver_ResolveSimpleStars()
+    public void FrUnitResolver_ResolveSimpleFractionalUnits()
     {
-        var starValues = new float[] { 1, 2 };
-        var result = StarUnitResolver.ResolveStarUnits(starValues, 300);
+        var values = new float[] { 1, 2 };
+        var result = FractionalUnitResolver.ResolveFractionalUnits(values, 300);
         Assert.Equal(100, result[0]); // 1 * (300 / 3)
         Assert.Equal(200, result[1]); // 2 * (300 / 3)
     }
     
     [Fact]
-    public void StarUnitResolver_ResolveSingleStar()
+    public void FrUnitResolver_ResolveSingleFractionalUnit()
     {
-        var starValues = new float[] { 1 };
-        var result = StarUnitResolver.ResolveStarUnits(starValues, 200);
+        var values = new float[] { 1 };
+        var result = FractionalUnitResolver.ResolveFractionalUnits(values, 200);
         Assert.Equal(200, result[0]); // 1 * (200 / 1)
     }
 }

@@ -26,8 +26,8 @@ public record struct UnitValue(float Value, UnitType Type = UnitType.Pixels)
             return new UnitValue(0, UnitType.None);
             
         value = value.Trim();
-        
-        // Handle fr units (fractional units - web-friendly replacement for star units)
+
+        // Handle fr units (fractional units - web-friendly replacement for FractionalUnits)
         if (value.EndsWith("fr", StringComparison.OrdinalIgnoreCase))
         {
             if (value.Equals("fr", StringComparison.OrdinalIgnoreCase))

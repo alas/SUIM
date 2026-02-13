@@ -27,13 +27,8 @@ public static class MarkupParser
             styles = ParseStyles(styleContent);
         }
 
-        var element = ParseElement(root, model2) ?? throw new InvalidOperationException("Root element not found.");
-
-        // Apply styles after parsing the tree
-        if (styles != null && styles.Count > 0)
-        {
-            element = ApplyStylesToElement(element, styles);
-        }
+        var element = ParseElement(root, styles, model2)
+            ?? throw new InvalidOperationException("Root element not found.");
 
         return (element, model2);
     }
@@ -88,7 +83,7 @@ public static class MarkupParser
         return styles;
     }
 
-    private static UIElement ApplyStylesToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles)
+    private static UIElement ApplyStylesToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles, dynamic? model)
     {
         var elementTag = element.GetType().Name.ToLowerInvariant();
         var elementId = element.GetAttribute("id") as string;
@@ -147,16 +142,12 @@ public static class MarkupParser
 
         if (mergedProperties.Count > 0)
         {
-            element = ApplyStylePropertiesToElement(element, mergedProperties, styles);
-            return element;
+            element = ApplyStylePropertiesToElement(element, mergedProperties, styles, model);
         }
-
-        // Recursively apply to children
-        ApplyStylesToChildren(element, styles);
         return element;
     }
 
-    private static UIElement ApplyStylePropertiesToElement(UIElement element, Dictionary<string, string> properties, Dictionary<string, Dictionary<string, string>> allStyles)
+    private static UIElement ApplyStylePropertiesToElement(UIElement element, Dictionary<string, string> properties, Dictionary<string, Dictionary<string, string>> allStyles, dynamic? model)
     {
         // Extract border and scroll attributes for special handling
         string? borderAttr = null;
@@ -197,9 +188,6 @@ public static class MarkupParser
         {
             element.SetAttribute(kvp.Key, kvp.Value);
         }
-
-        // First, apply styles to children of the original element
-        ApplyStylesToChildren(element, allStyles);
 
         // Handle scroll wrapper
         if (!string.IsNullOrEmpty(scrollAttr))
@@ -264,17 +252,7 @@ public static class MarkupParser
         return element;
     }
 
-    private static void ApplyStylesToChildren(UIElement element, Dictionary<string, Dictionary<string, string>> styles)
-    {
-        var newList = element.Children.Select(x => ApplyStylesToElement(x, styles)).ToList();
-        element.ClearChildren();
-        foreach (var child in newList)
-        {
-            element.AddChild(child, null);
-        }
-    }
-
-    private static UIElement? ParseElement(XElement element, dynamic? model)
+    private static UIElement? ParseElement(XElement element, Dictionary<string, Dictionary<string, string>> styles, dynamic? model)
     {
         var innerElement = ParseElementTag(element);
         if (innerElement == null) return null;
@@ -312,27 +290,6 @@ public static class MarkupParser
             rootElement = border;
         }
 
-        foreach (var attr in attributes)
-        {
-            var name = attr.Name.LocalName;
-            if (name.Equals("scroll", StringComparison.OrdinalIgnoreCase) || name.Equals("border", StringComparison.OrdinalIgnoreCase)) continue;
-
-            var target = IsLayoutAttribute(name) ? rootElement : innerElement;
-
-            if (attr.Value.StartsWith('@'))
-            {
-                // Dynamic Binding: <grid width="@myVar" />
-                string modelPropName = attr.Value.Substring(1);
-                var binding = new PropertyBinding(model, modelPropName, target, name);
-                target.Bindings.Add(binding);
-                binding.Apply();
-            }
-            else
-            {
-                target.SetAttribute(name, attr.Value);
-            }
-        }
-
         // Handle both text nodes and element children
         // Use innerElement for children as it is the content container
         if (innerElement is Grid grid)
@@ -354,7 +311,7 @@ public static class MarkupParser
                     {
                         child.SetAttributeValue("grid.row", rowIndex.ToString());
                         child.SetAttributeValue("grid.column", colIdx.ToString());
-                        var childElement = ParseElement(child, model);
+                        var childElement = ParseElement(child, styles, model);
                         if (childElement == null) continue;
 
                         grid.AddChild(childElement, child);
@@ -376,7 +333,7 @@ public static class MarkupParser
                     {
                         child.SetAttributeValue("grid.column", columnIndex.ToString());
                         child.SetAttributeValue("grid.row", rowIdx.ToString());
-                        var childElement = ParseElement(child, model);
+                        var childElement = ParseElement(child, styles, model);
                         if (childElement == null) continue;
 
                         grid.AddChild(childElement, child);
@@ -387,7 +344,7 @@ public static class MarkupParser
                 }
                 else
                 {
-                    var childElement = ParseElement(node, model);
+                    var childElement = ParseElement(node, styles, model);
                     if (childElement == null) continue;
 
                     grid.AddChild(childElement, node);
@@ -409,7 +366,7 @@ public static class MarkupParser
                 }
                 else if (node is XElement childXElement)
                 {
-                    var childElement = ParseElement(childXElement, model);
+                    var childElement = ParseElement(childXElement, styles, model);
                     if (childElement == null) continue;
 
                     innerElement.AddChild(childElement, childXElement);
@@ -417,7 +374,45 @@ public static class MarkupParser
             }
         }
 
+        foreach (var attr in attributes.Where(x => IsStyleApplicationAttribute(x.Name.LocalName)))
+        {
+            SetAttribute(attr, model, rootElement, innerElement);
+        }
+
+        // Apply styles after parsing the tree
+        if (styles != null && styles.Count > 0)
+        {
+            rootElement = ApplyStylesToElement(rootElement, styles, model);
+        }
+
+        foreach (var attr in attributes)
+        {
+            var name = attr.Name.LocalName;
+            if (name.Equals("scroll", StringComparison.OrdinalIgnoreCase) || name.Equals("border", StringComparison.OrdinalIgnoreCase) || name.Equals("class", StringComparison.OrdinalIgnoreCase)) continue;
+
+            SetAttribute(attr, model, rootElement, innerElement);
+        }
+
         return rootElement;
+    }
+
+    private static void SetAttribute(XAttribute attr, dynamic? model, UIElement rootElement, UIElement innerElement)
+    {
+        var name = attr.Name.LocalName;
+        var target = IsLayoutAttribute(name) ? rootElement : innerElement;
+
+        if (attr.Value.StartsWith('@'))
+        {
+            // Dynamic Binding: <grid width="@myVar" />
+            var modelPropName = attr.Value.Substring(1);
+            var binding = new PropertyBinding(model, modelPropName, target, name);
+            target.Bindings.Add(binding);
+            binding.Apply();
+        }
+        else
+        {
+            target.SetAttribute(name, attr.Value);
+        }
     }
 
     private static readonly HashSet<string> LayoutAttributeNames = new(StringComparer.OrdinalIgnoreCase)
@@ -431,6 +426,16 @@ public static class MarkupParser
     private static bool IsLayoutAttribute(string name)
     {
         return LayoutAttributeNames.Contains(name);
+    }
+
+    private static readonly HashSet<string> StyleApplicationAttributeNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "id", "class"
+    };
+
+    private static bool IsStyleApplicationAttribute(string name)
+    {
+        return StyleApplicationAttributeNames.Contains(name);
     }
 
     private static UIElement? ParseElementTag(XElement element)

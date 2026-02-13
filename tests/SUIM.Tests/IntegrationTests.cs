@@ -22,7 +22,7 @@ public class IntegrationTests
     }
     
     [Fact]
-    public void MarkupParser_WithStarUnits_CreatesProportionalLayout()
+    public void MarkupParser_WithFractionalUnits_CreatesProportionalLayout()
     {
         var markup = @"
             <stack orientation=""horizontal"" spacing=""0"" height=""auto"">
