@@ -31,6 +31,11 @@ public class MainView
         var markup = @"<grid halign=""left"">
 <style>
 * {
+        HorizontalAlignment: Left;
+        VerticalAlignment: Top;
+        Margin: 5;
+}
+text {
         Font: StrideDefaultFont;
         Color: Green;
         FontSize: 16;
@@ -39,13 +44,11 @@ public class MainView
 }
 .mybutton {
         Background: Black;
-        Color: Green;
         Width: 200;
         Height: 50;
-        Margin: 5;
 }
 </style>
-    <stack orientation=""vertical"" margin=""6"" halign=""left"">
+    <stack orientation=""vertical"">
         <button class=""mybutton"" id=""quitButton"">Quit</button>
         <button class=""mybutton"" id=""restartButton"">Restart</button>
         <button class=""mybutton"" id=""loadButton"">Load</button>

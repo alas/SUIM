@@ -42,13 +42,13 @@ public static class LayoutEngine
         var heightInPixels = element.Height.Type == UnitType.Auto ? 0 : element.ToPixels(element.Height);
 
         // Initialize content size
-        if (element is BaseText baseText)
+        if (element is Text baseText)
         {
             // Width: if explicit pixels provided use that, if auto use MetricTable, otherwise constrain to available width
             if (element.Width.Type == UnitType.Auto)
             {
                 var fontName = element.Font ?? element.RootFont ?? "__default__";
-                element.MeasuredContentWidth = MetricTable.MeasureText(baseText.Text ?? string.Empty, fontName, element.CurrentFontSize);
+                element.MeasuredContentWidth = MetricTable.MeasureText(baseText.Value ?? string.Empty, fontName, element.CurrentFontSize);
             }
             else
             {

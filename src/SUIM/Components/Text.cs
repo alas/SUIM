@@ -1,17 +1,17 @@
 namespace SUIM.Components;
 
-public class BaseText : UIElement
+public class Text : UIElement
 {
-    public BaseText() : base() { }
+    public Text() : base() { }
 
-    public string? Text { get; set; }
+    public string? Value { get; set; }
     public bool Wrap { get; set; }
 
     public override void SetAttribute(string name, object? value)
     {
-        if (name.Equals("text", StringComparison.OrdinalIgnoreCase))
+        if (name.Equals("value", StringComparison.OrdinalIgnoreCase))
         {
-            Text = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            Value = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
         else if (name.Equals("wrap", StringComparison.OrdinalIgnoreCase))
         {
@@ -49,7 +49,7 @@ public class TextArea : UIElement, IPlaceholder
     }
 }
 
-public class Label : BaseText
+public class Label : Text
 {
     public string? For { get; set; }
 
@@ -68,20 +68,20 @@ public class Label : BaseText
     }
 }
 
-public class PElement : BaseText { public PElement() : base() { } }
+public class PElement : Text { public PElement() : base() { } }
 
-public class H1Element : BaseText { public H1Element() : base() { } }
+public class H1Element : Text { public H1Element() : base() { } }
 
-public class H2Element : BaseText { public H2Element() : base() { } }
+public class H2Element : Text { public H2Element() : base() { } }
 
-public class H3Element : BaseText { public H3Element() : base() { } }
+public class H3Element : Text { public H3Element() : base() { } }
 
-public class H4Element : BaseText { public H4Element() : base() { } }
+public class H4Element : Text { public H4Element() : base() { } }
 
-public class H5Element : BaseText { public H5Element() : base() { } }
+public class H5Element : Text { public H5Element() : base() { } }
 
-public class H6Element : BaseText { public H6Element() : base() { } }
+public class H6Element : Text { public H6Element() : base() { } }
 
-public class H7Element : BaseText { public H7Element() : base() { } }
+public class H7Element : Text { public H7Element() : base() { } }
 
-public class H8Element : BaseText { public H8Element() : base() { } }
+public class H8Element : Text { public H8Element() : base() { } }

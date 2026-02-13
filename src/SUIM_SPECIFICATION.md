@@ -111,7 +111,6 @@ Forces itself to parent size and intercepts all input. **Overlays always render 
 
 Interactive element for triggering actions.
 
-* `text`: `string` - Optional label inside.
 * `sprite`: `string` - The 9-slice sprite for the "Idle" state.
 * `hoverSprite`: `string` - The sprite for "Hover" state.
 * `pressedSprite`: `string` - The sprite for "Pressed" state.
@@ -140,7 +139,7 @@ Dropdown menu. Supports **multiple** selection attribute.
 
 Text Display.
 
-* `text`: `string` - The string to display.
+* `value`: `string` - The string to display.
 * `font`: `string` - Asset name of the SpriteFont.
 * `fontSize`: `integer` - Base size for measurement.
 * `color`: `Color` - Text color.
@@ -169,7 +168,7 @@ Original.suim
 }
 </style>
 <dock class="myclass" scroll="vertical">
-	<label text="Inventory" />
+	<label value="Inventory" />
 </dock>
 
 ```
@@ -204,7 +203,7 @@ Original.suim
 }
 </style>
 <dock class="myclass">
-	<label text="Inventory" />
+	<label value="Inventory" />
 </dock>
 
 ```
@@ -225,7 +224,7 @@ Original.suim
 }
 </style>
 <dock class="myclass">
-	<label text="Inventory" />
+	<label value="Inventory" />
 </dock>
 
 ```
@@ -304,7 +303,7 @@ Supported syntax is:
 
 @if identifierbool
 {
-	<label text="true" />
+	<label value="true" />
 }
 
 Produces the label if identifierbool exist in the model with a value of true.
@@ -312,26 +311,26 @@ Produces the label if identifierbool exist in the model with a value of true.
 
 @if identifierbool
 {
-	<label text="true" />
+	<label value="true" />
 }
 else
 {
-	<label text="not!" />
+	<label value="not!" />
 }
 
 Produces the correct label depending on the value of identifierbool.
 
 @if identifierbool
 {
-	<label text="true" />
+	<label value="true" />
 }
 else if identifierbool2
 {
-	<label text="true2" />
+	<label value="true2" />
 }
 else
 {
-	<label text="not!" />
+	<label value="not!" />
 }
 
 Produces the correct label depending on the values of identifierbool and identifierbool2.
@@ -360,28 +359,28 @@ Produces the correct p tag depending on the values of identifierany and identifi
 
 @for i=0 count=100
 {
-	<label text="@i" />
+	<label value="@i" />
 }
 
 The parser must clone the inner XML (label in this case) 100 times, i will go from 0 to 99 (100 different values).
 
 @for i=0 count=100 step=-1
 {
-	<label text="@i" />
+	<label value="@i" />
 }
 
 The parser must clone the inner XML (label in this case) 100 times, i will go from 0 to -99 (100 different values, each pass will add -1 to i).
 
 @foreach myitem in Collection
 {
-	<label text="@myitem.Property" />
+	<label value="@myitem.Property" />
 }
 
 The parser must clone the inner XML for every item in the `Collection`.
 
 @foreach i in 0..100
 {
-	<label text="@i" />
+	<label value="@i" />
 }
 
 The parser must clone the inner XML (label in this case) 100 times, i will go from 0 to 99 (not inclusive end value).
@@ -409,7 +408,7 @@ Inventory.suim
 	<vstack>
 		@if (showTitle)
 		{
-			<label text="Inventory" />
+			<label value="Inventory" />
 		}
 		<grid width="@invWidth" />
 	</vstack>
@@ -474,7 +473,7 @@ Result in this output:
 	<vstack>
 		@if (showTitle)
 		{
-			<label text="Inventory" />
+			<label value="Inventory" />
 		}
 		<grid width="@invWidth" />
 	</vstack>
@@ -487,7 +486,7 @@ Result in this output:
 ```xml
 <inventory>
 	<vstack>
-		<label text="Inventory" />
+		<label value="Inventory" />
 		<grid width="@invWidth" />
 	</vstack>
 </inventory>

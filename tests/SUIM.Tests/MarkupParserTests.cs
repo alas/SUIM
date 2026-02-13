@@ -58,7 +58,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_StackHorizontal()
     {
-        var markup = "<stack orientation=\"horizontal\"><label text=\"Hello\" /><button /></stack>";
+        var markup = "<stack orientation=\"horizontal\"><label value=\"Hello\" /><button /></stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
@@ -68,7 +68,7 @@ public class MarkupParserTests
         Assert.IsType<Label>(stack.Children[0]);
         Assert.IsType<Button>(stack.Children[1]);
         var label = (Label)stack.Children[0];
-        Assert.Equal("Hello", label.Text);
+        Assert.Equal("Hello", label.Value);
     }
 
     [Fact]
@@ -130,18 +130,18 @@ public class MarkupParserTests
     [Fact]
     public void Parse_Label()
     {
-        var markup = "<label text=\"Test Label\" />";
+        var markup = "<label value=\"Test Label\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
         var label = (Label)element;
-        Assert.Equal("Test Label", label.Text);
+        Assert.Equal("Test Label", label.Value);
     }
 
     [Fact]
     public void Parse_Button()
     {
-        var markup = "<button><label text=\"Click me\" /></button>";
+        var markup = "<button><label value=\"Click me\" /></button>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Button>(element);
@@ -174,7 +174,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_NestedElements()
     {
-        var markup = "<stack><div><label text=\"Nested\" /></div></stack>";
+        var markup = "<stack><div><label value=\"Nested\" /></div></stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
@@ -183,7 +183,7 @@ public class MarkupParserTests
         var div = (Div)stack.Children[0];
         Assert.Single(div.Children);
         var label = (Label)div.Children[0];
-        Assert.Equal("Nested", label.Text);
+        Assert.Equal("Nested", label.Value);
     }
 
     [Fact]
@@ -262,8 +262,8 @@ public class MarkupParserTests
 
         Assert.IsType<Button>(element);
         var button = (Button)element;
-        var child = button.Children[0] as BaseText;
-        Assert.Equal("idle_sprite", child?.Text);
+        var child = button.Children[0] as Text;
+        Assert.Equal("idle_sprite", child?.Value);
     }
 
     [Fact]
@@ -317,12 +317,12 @@ public class MarkupParserTests
     [Fact]
     public void Parse_Label_WithAllAttributes()
     {
-        var markup = "<label text=\"Hello\" font=\"Arial\" fontsize=\"16\" color=\"#FF0000\" wrap=\"true\" />";
+        var markup = "<label value=\"Hello\" font=\"Arial\" fontsize=\"16\" color=\"#FF0000\" wrap=\"true\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
         var label = (Label)element;
-        Assert.Equal("Hello", label.Text);
+        Assert.Equal("Hello", label.Value);
         Assert.Equal("Arial", label.Font);
         Assert.Equal(16f, label.FontSize);
         Assert.Equal("#FF0000", label.Color);
@@ -397,7 +397,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_VBox_Synonym()
     {
-        var markup = "<vbox><label text=\"A\" /><label text=\"B\" /></vbox>";
+        var markup = "<vbox><label value=\"A\" /><label value=\"B\" /></vbox>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
@@ -420,7 +420,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_HBox_Synonym()
     {
-        var markup = "<hbox><label text=\"X\" /><label text=\"Y\" /></hbox>";
+        var markup = "<hbox><label value=\"X\" /><label value=\"Y\" /></hbox>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
@@ -549,8 +549,8 @@ public class MarkupParserTests
     {
         var markup = @"<grid columns=""*,*"" rows=""auto,*"">
 <stack grid.row=""0"" grid.column=""0"" orientation=""horizontal"" spacing=""10"">
-    <label text=""Top Left"" />
-    <label text=""Top"" />
+    <label value=""Top Left"" />
+    <label value=""Top"" />
 </stack>
 <div grid.row=""1"" grid.column=""0"" grid.columnspan=""2"" bg=""lightgray"" />
 </grid>";
@@ -585,11 +585,11 @@ public class MarkupParserTests
         var markup = @"<button>
 @if identifierbool
 {
-    <label text=""Click Me"" />
+    <label value=""Click Me"" />
 }
 else
 {
-    <label text=""Disabled"" />
+    <label value=""Disabled"" />
 }
 </button>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -598,7 +598,7 @@ else
         var button = (Button)element;
         Assert.Single(button.Children);
         var label = (Label)button.Children[0];
-        Assert.Equal("Click Me", label.Text);
+        Assert.Equal("Click Me", label.Value);
     }
 
     // ============== COLOR FORMATTING TESTS ==============
@@ -665,7 +665,7 @@ else
     [Fact]
     public void Parse_Size_Auto()
     {
-        var markup = "<label text=\"Auto\" width=\"auto\" />";
+        var markup = "<label value=\"Auto\" width=\"auto\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
@@ -801,8 +801,8 @@ else
         var option = (Option)element;
         Assert.Equal("test-value", option.Value);
         Assert.Single(option.Children);
-        var textNode = option.Children[0] as BaseText;
-        Assert.Equal("Test Label", textNode?.Text);
+        var textNode = option.Children[0] as Text;
+        Assert.Equal("Test Label", textNode?.Value);
     }
 
     // ============== IMAGE STRETCH VARIANTS ==============
@@ -1000,7 +1000,7 @@ else
     [Fact]
     public void Parse_Label_WithoutWrap()
     {
-        var markup = "<label text=\"Test\" wrap=\"false\" />";
+        var markup = "<label value=\"Test\" wrap=\"false\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
@@ -1011,7 +1011,7 @@ else
     [Fact]
     public void Parse_Label_WithColor()
     {
-        var markup = "<label text=\"Colored\" color=\"blue\" />";
+        var markup = "<label value=\"Colored\" color=\"blue\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
@@ -1069,7 +1069,7 @@ else
 <stack>
 <div>
 <stack>
-<label text=""Deep"" />
+<label value=""Deep"" />
 </stack>
 </div>
 </stack>
@@ -1082,7 +1082,7 @@ else
         var innerDiv = (Div)stack.Children[0];
         var innerStack = (Stack)innerDiv.Children[0];
         var label = (Label)innerStack.Children[0];
-        Assert.Equal("Deep", label.Text);
+        Assert.Equal("Deep", label.Value);
     }
 
     // ============== BUTTON WITH NESTED CONTENT ==============
@@ -1092,8 +1092,8 @@ else
     {
         var markup = @"<button>
 <stack>
-<label text=""Icon"" />
-<label text=""Label"" />
+<label value=""Icon"" />
+<label value=""Label"" />
 </stack>
 </button>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1129,9 +1129,9 @@ else
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("Simple text", label.Text);
+        Assert.IsType<Text>(div.Children[0]);
+        var label = (Text)div.Children[0];
+        Assert.Equal("Simple text", label.Value);
     }
 
     [Fact]
@@ -1139,7 +1139,7 @@ else
     {
         var markup = @"<stack>
 Text before
-<label text=""Label"" />
+<label value=""Label"" />
 Text after
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1149,16 +1149,16 @@ Text after
         Assert.Equal(3, stack.Children.Count);
         
         // First child: text "Text before"
-        Assert.IsType<Label>(stack.Children[0]);
-        Assert.Equal("Text before", ((Label)stack.Children[0]).Text);
+        Assert.IsType<Text>(stack.Children[0]);
+        Assert.Equal("Text before", ((Text)stack.Children[0]).Value);
         
         // Second child: label element
         Assert.IsType<Label>(stack.Children[1]);
-        Assert.Equal("Label", ((Label)stack.Children[1]).Text);
+        Assert.Equal("Label", ((Label)stack.Children[1]).Value);
         
         // Third child: text "Text after"
-        Assert.IsType<Label>(stack.Children[2]);
-        Assert.Equal("Text after", ((Label)stack.Children[2]).Text);
+        Assert.IsType<Text>(stack.Children[2]);
+        Assert.Equal("Text after", ((Text)stack.Children[2]).Value);
     }
 
     [Fact]
@@ -1173,9 +1173,9 @@ Text after
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Single(div.Children);
-        var label = (Label)div.Children[0];
+        var label = (Text)div.Children[0];
         // Should be trimmed and preserved as single text
-        Assert.Contains("Multi-line", label.Text);
+        Assert.Contains("Multi-line", label.Value);
     }
 
     [Fact]
@@ -1183,7 +1183,7 @@ Text after
     {
         var markup = @"<div>
             
-            <label text=""Only label"" />
+            <label value=""Only label"" />
             
         </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1201,9 +1201,9 @@ Text after
     public void Parse_Stack_WithScroll_Vertical()
     {
         var markup = @"<stack orientation=""vertical"" scroll=""vertical"">
-<label text=""Item 1"" />
-<label text=""Item 2"" />
-<label text=""Item 3"" />
+<label value=""Item 1"" />
+<label value=""Item 2"" />
+<label value=""Item 3"" />
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1222,8 +1222,8 @@ Text after
     public void Parse_Stack_WithScroll_Horizontal()
     {
         var markup = @"<stack orientation=""horizontal"" scroll=""horizontal"">
-<label text=""Item 1"" />
-<label text=""Item 2"" />
+<label value=""Item 1"" />
+<label value=""Item 2"" />
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1258,9 +1258,9 @@ Text after
     public void Parse_Stack_WithScroll_WithAllAttributes()
     {
         var markup = @"<stack orientation=""vertical"" scroll=""vertical"" width=""400"" height=""300"" spacing=""5"">
-<label text=""Scrollable Item 1"" />
-<label text=""Scrollable Item 2"" />
-<label text=""Scrollable Item 3"" />
+<label value=""Scrollable Item 1"" />
+<label value=""Scrollable Item 2"" />
+<label value=""Scrollable Item 3"" />
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1286,7 +1286,7 @@ Text after
     public void Parse_Border_WithThicknessAndColor()
     {
         var markup = @"<border thickness=""2"" color=""#FF0000"">
-<label text=""Bordered Content"" />
+<label value=""Bordered Content"" />
 </border>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1315,7 +1315,7 @@ Text after
     public void Parse_Border_WithTwoValueThickness()
     {
         var markup = @"<border thickness=""3,6"" color=""green"">
-<label text=""Border Test"" />
+<label value=""Border Test"" />
 </border>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1330,7 +1330,7 @@ Text after
     {
         var markup = @"<div width=""300"" height=""200"" bg=""lightgray"">
 <border thickness=""2"" color=""red"">
-<label text=""Bordered Inner Content"" />
+<label value=""Bordered Inner Content"" />
 </border>
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1346,7 +1346,7 @@ Text after
         Assert.Equal("red", border.Color);
         Assert.Single(border.Children);
         var label = (Label)border.Children[0];
-        Assert.Equal("Bordered Inner Content", label.Text);
+        Assert.Equal("Bordered Inner Content", label.Value);
     }
 
     [Fact]
@@ -1367,7 +1367,7 @@ Text after
     public void Parse_Div_WithBorderAttribute()
     {
         var markup = @"<div width=""300"" height=""200"" bg=""lightgray"" border=""2 red"">
-<label text=""Bordered Div"" />
+<label value=""Bordered Div"" />
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1412,7 +1412,7 @@ Text after
         // Note: Styles are not applied in MarkupParser, so we test inline attribute to ensure wrapper creation logic works.
         // Fixed XML hierarchy and tag matching.
         var markup = @"<div width=""500"" height=""400"" border=""5 #FF0000"">
-<label text=""Bordered Content"" />
+<label value=""Bordered Content"" />
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1440,7 +1440,7 @@ Text after
                 }
                 </style>
                 <div class=""myclass"">
-                    <label text=""Bordered Content"" />
+                    <label value=""Bordered Content"" />
                 </div>
             </window>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1522,8 +1522,8 @@ Text after
     <model></model>
     <style>.btn { }</style>
     <stack orientation=""vertical"">
-        <label text=""Item 1"" />
-        <label text=""Item 2"" />
+        <label value=""Item 1"" />
+        <label value=""Item 2"" />
     </stack>
 </window>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1539,7 +1539,7 @@ Text after
         var markup = @"<button>
 <model>{ ""value"": ""ignored"" }</model>
 <style>.button { color: red; }</style>
-    <label text=""Click"" />
+    <label value=""Click"" />
 </button>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1605,7 +1605,7 @@ Text after
     {
         var markup = @"<window>
     <model>{ ""title"": ""Hello World"", ""description"": ""Test"" }</model>
-    <label text=""@title"" />
+    <label value=""@title"" />
 </window>";
         var (element, model) = MarkupParser.Parse(markup);
 
@@ -1614,7 +1614,7 @@ Text after
         Assert.Equal("Test", model.description);
         
         var label = element?.Children.Single() as Label;
-        Assert.Equal("Hello World", label?.Text);
+        Assert.Equal("Hello World", label?.Value);
     }
 
     [Fact]
@@ -1738,7 +1738,7 @@ Text after
     {
         var markup = @"<window>
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
-    <button><label text=""@buttonText"" /></button>
+    <button><label value=""@buttonText"" /></button>
 </window>";
         var (element, model) = MarkupParser.Parse(markup);
 
@@ -1747,7 +1747,7 @@ Text after
         Assert.Single(button.Children);
         var label = (Label)button.Children[0];
         Assert.NotNull(label);
-        Assert.Equal("Click Me", label.Text);
+        Assert.Equal("Click Me", label.Value);
 
         Assert.NotNull(model);
         Assert.Equal("Click Me", model!.buttonText);

@@ -25,7 +25,7 @@ public class SUIMStride
         UIElement strideElement = element switch
         {
             Components.Button b => MapButton(b),
-            Components.BaseText t => MapText(t),
+            Components.Text t => MapText(t),
             Components.Stack s => MapStack(s),
             Components.Grid g => MapGrid(g),
             Components.Input i => MapInput(i),
@@ -71,11 +71,11 @@ public class SUIMStride
         return btn;
     }
 
-    private TextBlock MapText(Components.BaseText text)
+    private TextBlock MapText(Components.Text text)
     {
         var tb = new TextBlock
         {
-            Text = text.Text ?? "",
+            Text = text.Value ?? "",
             TextSize = text.FontSize > 0f ? text.FontSize : 14f,
         };
 

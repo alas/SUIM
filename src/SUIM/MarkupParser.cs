@@ -360,7 +360,11 @@ public static class MarkupParser
                     var text = textNode.Value.Trim();
                     if (!string.IsNullOrEmpty(text))
                     {
-                        var textElement = new Label { Text = text };
+                        var textElement = new Text { Value = text };
+                        if (styles != null && styles.Count > 0)
+                        {
+                            textElement = ApplyStylesToElement(textElement, styles, model);
+                        }
                         innerElement.AddChild(textElement, element);
                     }
                 }
@@ -379,7 +383,6 @@ public static class MarkupParser
             SetAttribute(attr, model, rootElement, innerElement);
         }
 
-        // Apply styles after parsing the tree
         if (styles != null && styles.Count > 0)
         {
             rootElement = ApplyStylesToElement(rootElement, styles, model);
