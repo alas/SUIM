@@ -183,7 +183,7 @@ public class MainView
     private void ShowBlocker(string message)
     {
         var blockMessage = GetText(message);
-        var blocker = new Canvas
+        var blocker = new Grid
         {
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
