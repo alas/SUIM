@@ -2,18 +2,16 @@ namespace SUIM;
 
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Xml.Linq;
 using SUIM.Components;
 using SUIM.Layout;
 
-public class MarkupParser(object? model = null)
+public static class MarkupParser
 {
-    private dynamic? model = model == null ? null : Create(model);
-
-    public (UIElement, dynamic?) Parse(string markup)
+    public static (UIElement, dynamic?) Parse(string markup, object? model = null)
     {
-        var controlFlowParser = new ControlFlowParser(model);
+        dynamic? model2 = model == null ? null : ModelLogic.Create(model);
+        var controlFlowParser = new ControlFlowParser(model2);
         var expandedMarkup = controlFlowParser.ExpandDirectives(markup);
 
         var doc = XDocument.Parse(expandedMarkup);
@@ -21,11 +19,7 @@ public class MarkupParser(object? model = null)
 
         Dictionary<string, Dictionary<string, string>>? styles = null;
 
-        var modelJson = ExtractModel(root);
-        if (!string.IsNullOrEmpty(modelJson))
-        {
-            model = MergeModels(model, modelJson);
-        }
+        model2 = ModelLogic.ExtractModel(root, model2);
 
         var styleContent = ExtractStyles(root);
         if (!string.IsNullOrEmpty(styleContent))
@@ -33,11 +27,7 @@ public class MarkupParser(object? model = null)
             styles = ParseStyles(styleContent);
         }
 
-        var element = ParseElement(root);
-        if (element == null)
-        {
-            throw new InvalidOperationException("Root element not found.");
-        }
+        var element = ParseElement(root, model2) ?? throw new InvalidOperationException("Root element not found.");
 
         // Apply styles after parsing the tree
         if (styles != null && styles.Count > 0)
@@ -45,128 +35,7 @@ public class MarkupParser(object? model = null)
             element = ApplyStylesToElement(element, styles);
         }
 
-        return (element, model);
-    }
-
-    private dynamic? MergeModels(dynamic? existingModel, string modelJson)
-    {
-        try
-        {
-            // Parse JSON into a dictionary
-            var jsonObject = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(modelJson);
-            if (jsonObject == null)
-            {
-                return existingModel;
-            }
-
-            // Convert JsonElement objects to standard .NET types
-            var modelDict = ConvertJsonElementDictionary(jsonObject);
-
-            // If no existing model, create from JSON
-            if (existingModel == null)
-            {
-                return MarkupParser.CreateDynamicFromDictionary(modelDict);
-            }
-
-            // Merge: extract properties from existing model, then update with JSON values
-            var mergedDict = ExtractPropertiesAsDictionary(existingModel);
-            foreach (var kvp in modelDict)
-            {
-                mergedDict[kvp.Key] = kvp.Value;
-            }
-
-            return CreateDynamicFromDictionary(mergedDict);
-        }
-        catch (JsonException ex)
-        {
-            throw new InvalidOperationException($"Failed to parse model JSON: {ex.Message}", ex);
-        }
-    }
-
-    private Dictionary<string, object?> ConvertJsonElementDictionary(Dictionary<string, JsonElement> jsonObject)
-    {
-        var result = new Dictionary<string, object?>();
-        foreach (var kvp in jsonObject)
-        {
-            result[kvp.Key] = ConvertJsonElement(kvp.Value);
-        }
-        return result;
-    }
-
-    private object? ConvertJsonElement(JsonElement element)
-    {
-        return element.ValueKind switch
-        {
-            JsonValueKind.String => element.GetString(),
-            JsonValueKind.Number => element.TryGetInt32(out var intVal) ? intVal : element.GetDouble(),
-            JsonValueKind.True => true,
-            JsonValueKind.False => false,
-            JsonValueKind.Null => null,
-            JsonValueKind.Array => element.EnumerateArray().Select(ConvertJsonElement).ToArray(),
-            JsonValueKind.Object => ConvertJsonElementDictionary(
-                element.EnumerateObject().ToDictionary(p => p.Name, p => p.Value)
-            ),
-            _ => null
-        };
-    }
-
-    private static Dictionary<string, object?> ExtractPropertiesAsDictionary(dynamic? model)
-    {
-        var dict = new Dictionary<string, object?>();
-        if (model == null)
-        {
-            return dict;
-        }
-
-        // If it's an ObservableObject, try to extract its properties
-        if (model is ObservableObject)
-        {
-            var modelType = model.GetType();
-            var propertiesField = modelType.GetField("_properties", 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            
-            if (propertiesField?.GetValue(model) is Dictionary<string, object?> properties)
-            {
-                return new Dictionary<string, object?>(properties);
-            }
-        }
-
-        // Otherwise, extract using reflection
-        foreach (var prop in model.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
-        {
-            if (prop.CanRead)
-            {
-                dict[prop.Name] = prop.GetValue(model);
-            }
-        }
-
-        return dict;
-    }
-
-    private static dynamic CreateDynamicFromDictionary(Dictionary<string, object?> dict)
-    {
-        var observable = new ObservableObject();
-        // Set properties directly into the observable
-        foreach (var kvp in dict)
-        {
-            observable.SetValue(kvp.Key, kvp.Value);
-        }
-        return observable;
-    }
-
-    private static string? ExtractModel(XElement root)
-    {
-        var modelElement = root.Elements()
-            .FirstOrDefault(e => e.Name.LocalName.Equals("model", StringComparison.OrdinalIgnoreCase));
-        
-        if (modelElement == null)
-        {
-            return null;
-        }
-
-        // Get the content of the model element
-        var content = modelElement.Value.Trim();
-        return string.IsNullOrEmpty(content) ? null : content;
+        return (element, model2);
     }
 
     private static string? ExtractStyles(XElement root)
@@ -405,16 +274,7 @@ public class MarkupParser(object? model = null)
         }
     }
 
-    private static dynamic Create(object model)
-    {
-        if (model is ObservableObject oo) return oo;
-
-        var observable = new ObservableObject();
-        observable.Initialize(model);
-        return observable;
-    }
-
-    private UIElement? ParseElement(XElement element)
+    private static UIElement? ParseElement(XElement element, dynamic? model)
     {
         var innerElement = ParseElementTag(element);
         if (innerElement == null) return null;
@@ -494,7 +354,7 @@ public class MarkupParser(object? model = null)
                     {
                         child.SetAttributeValue("grid.row", rowIndex.ToString());
                         child.SetAttributeValue("grid.column", colIdx.ToString());
-                        var childElement = ParseElement(child);
+                        var childElement = ParseElement(child, model);
                         if (childElement == null) continue;
 
                         grid.AddChild(childElement, child);
@@ -516,7 +376,7 @@ public class MarkupParser(object? model = null)
                     {
                         child.SetAttributeValue("grid.column", columnIndex.ToString());
                         child.SetAttributeValue("grid.row", rowIdx.ToString());
-                        var childElement = ParseElement(child);
+                        var childElement = ParseElement(child, model);
                         if (childElement == null) continue;
 
                         grid.AddChild(childElement, child);
@@ -527,7 +387,7 @@ public class MarkupParser(object? model = null)
                 }
                 else
                 {
-                    var childElement = ParseElement(node);
+                    var childElement = ParseElement(node, model);
                     if (childElement == null) continue;
 
                     grid.AddChild(childElement, node);
@@ -549,7 +409,7 @@ public class MarkupParser(object? model = null)
                 }
                 else if (node is XElement childXElement)
                 {
-                    var childElement = ParseElement(childXElement);
+                    var childElement = ParseElement(childXElement, model);
                     if (childElement == null) continue;
 
                     innerElement.AddChild(childElement, childXElement);

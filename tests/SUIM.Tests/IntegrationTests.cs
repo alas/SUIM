@@ -14,7 +14,7 @@ public class IntegrationTests
                 <label width=""100"" height=""30"" />
             </stack>";
             
-        var (element, _) = new MarkupParser().Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup);
         LayoutEngine.Layout(element, 16, 200, 200);
         
         Assert.Equal(100, element.ActualWidth);
@@ -30,7 +30,7 @@ public class IntegrationTests
                 <label width=""2fr"" height=""50"" />
             </stack>";
             
-        var (element, _) = new MarkupParser().Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup);
         LayoutEngine.Layout(element, 16, 300, 100);
         
         Assert.Equal(300, element.ActualWidth);
@@ -46,7 +46,7 @@ public class IntegrationTests
                 <label width=""1rem"" height=""2rem"" />
             </stack>";
             
-        var (element, _) = new MarkupParser().Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup);
         LayoutEngine.Layout(element, 16, 200, 200);
         
         // 2rem = 32px, 1rem = 16px
@@ -71,7 +71,7 @@ public class IntegrationTests
                 <label width=""1rem"" height=""2rem"" />
             </stack>";
 
-        var (element, _) = new MarkupParser().Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup);
         LayoutEngine.Layout(element, 16, 200, 200);
 
         // 2rem = 32px, 1rem = 16px
@@ -106,7 +106,7 @@ public class IntegrationTests
                 </stack>
             </stack>";
 
-        var (element, _) = new MarkupParser().Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup);
         LayoutEngine.Layout(element, 25, 640, 480);
 
         Assert.Equal(640, element.ActualWidth);

@@ -1,12 +1,12 @@
 namespace SUIM.StrideIntegration;
 
-using System;
 using Stride.Core.Mathematics;
+using Stride.Core.Serialization.Contents;
+using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
-using Stride.Graphics;
-using Stride.Core.Serialization.Contents;
+using System;
 using StrideGrid = Stride.UI.Panels.Grid;
 
 public class SUIMStride
@@ -16,8 +16,7 @@ public class SUIMStride
 
     public (UIElement, dynamic?) Parse(string markup)
     {
-        var parser = new MarkupParser();
-        var (suimRoot, model) = parser.Parse(markup);
+        var (suimRoot, model) = MarkupParser.Parse(markup);
         return (MapElement(suimRoot), model);
     }
 

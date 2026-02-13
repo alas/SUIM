@@ -103,7 +103,7 @@ public class PropertyBindingTests
     public void Parse_DataBinding_Width()
     {
         var markup = "<div width=\"@currentWidth\" height=\"100\" />";
-        var (element, _) = new MarkupParser(_model).Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -115,7 +115,7 @@ public class PropertyBindingTests
     public void Parse_DataBinding_Text()
     {
         var markup = "<label text=\"@stringValue\" />";
-        var (element, _) = new MarkupParser(_model).Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
         var label = (Label)element;
@@ -131,7 +131,7 @@ public class PropertyBindingTests
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
     <button><label text=""@buttonText"" /></button>
 </window>";
-        var (element, model) = new MarkupParser().Parse(markup);
+        var (element, model) = MarkupParser.Parse(markup);
 
         var label = element?.Children?.Single().Children?.Single() as Label;
         Assert.Equal("Click Me", label?.Text);
