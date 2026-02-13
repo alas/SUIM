@@ -36,7 +36,6 @@ public class MainView
         Margin: 5;
 }
 text {
-        Font: StrideDefaultFont;
         Color: Green;
         FontSize: 16;
         HorizontalAlignment: Center;

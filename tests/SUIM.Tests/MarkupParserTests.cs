@@ -1467,12 +1467,13 @@ Text after
     public void ParseStyles_ClassWithBorderAndSizes_AssignsProperties()
     {
         var styleContent = ".myclass { width: 500; height: 400; border: 5 #FF0000; }";
+        Dictionary<string, Dictionary<string, string>> styleDictionary = [];
         var mi = typeof(MarkupParser).GetMethod("ParseStyles", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
             ?? throw new Exception();
-        var styles = (Dictionary<string, Dictionary<string, string>>)mi.Invoke(null, [styleContent])!;
+        var styles = mi.Invoke(null, [styleContent, styleDictionary])!;
 
-        Assert.True(styles.ContainsKey(".myclass"));
-        var props = styles[".myclass"];
+        Assert.True(styleDictionary.ContainsKey(".myclass"));
+        var props = styleDictionary[".myclass"];
         Assert.Equal("500", props["width"]);
         Assert.Equal("400", props["height"]);
         Assert.Equal("5 #FF0000", props["border"]);

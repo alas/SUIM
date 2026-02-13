@@ -81,29 +81,27 @@ public class SUIMStride
 
         // Resolve SpriteFont by name (from style/attribute) using optional resolver.
         // Consumers (e.g. example app) should set SUIMStride.FontResolver = name => game.Content.Load<SpriteFont>(name);
-        if (!string.IsNullOrEmpty(text.Font))
+        try
         {
-            try
+            var fontName = text.Font ?? "StrideDefaultFont";
+            SpriteFont? sf = Fonts.TryGetValue(fontName, out SpriteFont? value) ? value : null;
+            if (sf == null && !Fonts.ContainsKey(fontName) && ContentManager != null)
             {
-                SpriteFont? sf = Fonts.TryGetValue(text.Font, out SpriteFont? value) ? value : null;
-                if (sf == null && !Fonts.ContainsKey(text.Font) && ContentManager != null)
-                {
-                    sf = ContentManager?.Load<SpriteFont>(text.Font);
-                    if (sf != null)
-                    {
-                        Fonts[text.Font] = sf;
-                    }
-                }
-
+                sf = ContentManager?.Load<SpriteFont>(fontName);
                 if (sf != null)
                 {
-                    tb.Font = sf;
+                    Fonts[fontName] = sf;
                 }
             }
-            catch
+
+            if (sf != null)
             {
-                // If resolver fails, fall back to Stride default font silently.
+                tb.Font = sf;
             }
+        }
+        catch
+        {
+            // If resolver fails, fall back to Stride default font silently.
         }
         
         if (text.Wrap)

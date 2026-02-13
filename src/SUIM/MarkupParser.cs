@@ -17,15 +17,9 @@ public static class MarkupParser
         var doc = XDocument.Parse(expandedMarkup);
         var root = doc.Root!;
 
-        Dictionary<string, Dictionary<string, string>>? styles = null;
+        Dictionary<string, Dictionary<string, string>> styles = [];
 
         model2 = ModelLogic.ExtractModel(root, model2);
-
-        var styleContent = ExtractStyles(root);
-        if (!string.IsNullOrEmpty(styleContent))
-        {
-            styles = ParseStyles(styleContent);
-        }
 
         var element = ParseElement(root, styles, model2)
             ?? throw new InvalidOperationException("Root element not found.");
@@ -33,25 +27,8 @@ public static class MarkupParser
         return (element, model2);
     }
 
-    private static string? ExtractStyles(XElement root)
-    {
-        var styleElement = root.Elements()
-            .FirstOrDefault(e => e.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase));
-        
-        if (styleElement == null)
-        {
-            return null;
-        }
-
-        // Get the content of the style element
-        var content = styleElement.Value.Trim();
-        return string.IsNullOrEmpty(content) ? null : content;
-    }
-
-    private static Dictionary<string, Dictionary<string, string>> ParseStyles(string styleContent)
-    {
-        var styles = new Dictionary<string, Dictionary<string, string>>();
-        
+    private static void ParseStyles(string styleContent, Dictionary<string, Dictionary<string, string>> styles)
+    {        
         // CSS-like parser supporting: .classname, #id, tagname, and *
         // Format: selector { property: value; property: value; }
         var selectorRegex = new System.Text.RegularExpressions.Regex(@"([#.]?[a-zA-Z0-9_*-]+)\s*\{([^}]*)\}");
@@ -79,8 +56,6 @@ public static class MarkupParser
                 styles[selector] = properties;
             }
         }
-
-        return styles;
     }
 
     private static UIElement ApplyStylesToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles, dynamic? model)
@@ -255,7 +230,18 @@ public static class MarkupParser
     private static UIElement? ParseElement(XElement element, Dictionary<string, Dictionary<string, string>> styles, dynamic? model)
     {
         var innerElement = ParseElementTag(element);
-        if (innerElement == null) return null;
+        if (innerElement == null)
+        {
+            if (element.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))
+            {
+                var content = element.Value.Trim();
+                if (!string.IsNullOrEmpty(content))
+                {
+                    ParseStyles(content, styles);
+                }
+            }
+            return null;
+        }
 
         var rootElement = innerElement;
 
