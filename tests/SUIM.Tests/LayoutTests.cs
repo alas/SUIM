@@ -9,7 +9,7 @@ public class LayoutTests
     [Fact]
     public void LayoutEngine_MeasuresStackWithPixels()
     {
-        var stack = new Stack { Orientation = Orientation.Vertical, Spacing = 10 };
+        var stack = new Stack { Orientation = Orientation.Vertical, Spacing = 10, Width = UnitValue.Auto, Height = UnitValue.Auto };
         var child1 = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(50, UnitType.Pixels) };
         var child2 = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(30, UnitType.Pixels) };
         
@@ -25,7 +25,7 @@ public class LayoutTests
     [Fact]
     public void LayoutEngine_MeasuresStackWithStarUnits()
     {
-        var stack = new Stack { Orientation = Orientation.Horizontal, Spacing = 0 };
+        var stack = new Stack { Orientation = Orientation.Horizontal, Spacing = 0, Width = UnitValue.OneFR, Height = UnitValue.Auto };
         var child1 = new Label { Width = new UnitValue(1, UnitType.Fr), Height = new UnitValue(50, UnitType.Pixels) };
         var child2 = new Label { Width = new UnitValue(2, UnitType.Fr), Height = new UnitValue(50, UnitType.Pixels) };
         
@@ -71,7 +71,7 @@ public class LayoutTests
     [Fact]
     public void LayoutEngine_MeasuresWindow()
     {
-        var window = new Window();
+        var window = new Window { Width = UnitValue.Auto, Height = UnitValue.Auto };
         var child = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(50, UnitType.Pixels) };
         
         window.AddChild(child, null);
