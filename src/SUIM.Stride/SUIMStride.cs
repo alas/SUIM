@@ -12,12 +12,39 @@ using StrideGrid = Stride.UI.Panels.Grid;
 public class SUIMStride
 {
     public ContentManager? ContentManager { get; init; }
-    private readonly Dictionary<string, SpriteFont> Fonts = new();
+    private readonly Dictionary<string, SpriteFont> Fonts = [];
 
-    public (UIElement, dynamic?) Parse(string markup)
+    private readonly Dictionary<string, (Components.UIElement SuimRoot, UIElement StrideRoot, dynamic? Model)> _parseCache = [];
+
+    public (UIElement, dynamic?) Parse(string markup, bool createNewInstance = false)
     {
+        ArgumentNullException.ThrowIfNull(markup);
+
+        // Return cached instance when available and caller doesn't request a new one
+        lock (_parseCache)
+        {
+            if (_parseCache.TryGetValue(markup, out var cached))
+            {
+                if (!createNewInstance)
+                {
+                    return (cached.StrideRoot, cached.Model);
+                }
+
+                // createNewInstance==true -> return a fresh Stride tree by remapping the cached SUIM tree
+                return (MapElement(cached.SuimRoot), cached.Model);
+            }
+        }
+
+        // Not cached: parse markup, map and store the canonical instance
         var (suimRoot, model) = MarkupParser.Parse(markup);
-        return (MapElement(suimRoot), model);
+        var strideRoot = MapElement(suimRoot);
+
+        lock (_parseCache)
+        {
+            _parseCache[markup] = (suimRoot, strideRoot, model);
+        }
+
+        return createNewInstance ? (MapElement(suimRoot), model) : (strideRoot, model);
     }
 
     private UIElement MapElement(Components.UIElement element)
