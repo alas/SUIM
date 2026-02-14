@@ -441,7 +441,6 @@ public static class MarkupParser
         if (tag.Equals("grid", StringComparison.OrdinalIgnoreCase)) return new Grid();
         if (tag.Equals("dock", StringComparison.OrdinalIgnoreCase)) return new Dock();
         if (tag.Equals("overlay", StringComparison.OrdinalIgnoreCase)) return new Overlay();
-        if (tag.Equals("window", StringComparison.OrdinalIgnoreCase)) return new Window();
         if (tag.Equals("border", StringComparison.OrdinalIgnoreCase)) return new Border();
         
         // Content tags

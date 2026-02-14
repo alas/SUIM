@@ -89,10 +89,6 @@ public static class LayoutEngine
         {
             MeasureDiv(div, availableContentWidth, availableContentHeight);
         }
-        else if (element is Window window)
-        {
-            MeasureWindow(window, availableContentWidth, availableContentHeight);
-        }
         else
         {
             // Measure children for generic elements
@@ -159,7 +155,7 @@ public static class LayoutEngine
     private static void PositionElement(UIElement element, float parentX, float parentY)
     {
         // Position the element itself
-        if (element is Stack or Grid or Dock or Div or Window)
+        if (element is Stack or Grid or Dock or Div)
         {
             // Container positioning handled by specific methods
         }
@@ -184,9 +180,6 @@ public static class LayoutEngine
                 break;
             case Div div:
                 PositionDiv(div);
-                break;
-            case Window window:
-                PositionWindow(window);
                 break;
         }
 
@@ -319,20 +312,43 @@ public static class LayoutEngine
 
     private static void MeasureGrid(Grid grid, float availableWidth, float availableHeight)
     {
-        var columnWidths = ParseGridUnits(grid.Columns, availableWidth, grid);
-        var rowHeights = ParseGridUnits(grid.Rows, availableHeight, grid);
-
-        foreach (var gridChild in grid.GridChildren)
+        // When grid has no explicit columns/rows and is auto-sized, 
+        // measure children with auto space and let content drive sizing
+        if (string.IsNullOrWhiteSpace(grid.Columns) && string.IsNullOrWhiteSpace(grid.Rows) 
+            && grid.Width.Type == UnitType.Auto && grid.Height.Type == UnitType.Auto)
         {
-            var childWidth = GetGridSpanWidth(columnWidths, gridChild.Column, gridChild.ColumnSpan);
-            var childHeight = GetGridSpanHeight(rowHeights, gridChild.Row, gridChild.RowSpan);
+            float maxWidth = 0;
+            float maxHeight = 0;
 
-            gridChild.Element.CurrentFontSize = grid.CurrentFontSize;
-            MeasureElement(gridChild.Element, childWidth, childHeight);
+            foreach (var gridChild in grid.GridChildren)
+            {
+                gridChild.Element.CurrentFontSize = grid.CurrentFontSize;
+                // Measure with effectively unlimited space to get content-driven size
+                MeasureElement(gridChild.Element, float.MaxValue, float.MaxValue);
+                maxWidth = Math.Max(maxWidth, gridChild.Element.ActualWidth);
+                maxHeight = Math.Max(maxHeight, gridChild.Element.ActualHeight);
+            }
+
+            grid.MeasuredContentWidth = maxWidth;
+            grid.MeasuredContentHeight = maxHeight;
         }
+        else
+        {
+            var columnWidths = ParseGridUnits(grid.Columns, availableWidth, grid);
+            var rowHeights = ParseGridUnits(grid.Rows, availableHeight, grid);
 
-        grid.MeasuredContentWidth = columnWidths.Sum();
-        grid.MeasuredContentHeight = rowHeights.Sum();
+            foreach (var gridChild in grid.GridChildren)
+            {
+                var childWidth = GetGridSpanWidth(columnWidths, gridChild.Column, gridChild.ColumnSpan);
+                var childHeight = GetGridSpanHeight(rowHeights, gridChild.Row, gridChild.RowSpan);
+
+                gridChild.Element.CurrentFontSize = grid.CurrentFontSize;
+                MeasureElement(gridChild.Element, childWidth, childHeight);
+            }
+
+            grid.MeasuredContentWidth = columnWidths.Sum();
+            grid.MeasuredContentHeight = rowHeights.Sum();
+        }
     }
 
     private static void MeasureDock(Dock dock, float availableWidth, float availableHeight)
@@ -436,23 +452,6 @@ public static class LayoutEngine
             div.MeasuredContentWidth = maxWidth > 0 ? maxWidth : availableWidth;
             div.MeasuredContentHeight = maxHeight > 0 ? maxHeight : availableHeight;
         }
-    }
-
-    private static void MeasureWindow(Window window, float availableWidth, float availableHeight)
-    {
-        float maxWidth = 0;
-        float maxHeight = 0;
-
-        foreach (var child in window.Children)
-        {
-            child.CurrentFontSize = window.CurrentFontSize;
-            MeasureElement(child, availableWidth, availableHeight);
-            maxWidth = Math.Max(maxWidth, child.ActualWidth);
-            maxHeight = Math.Max(maxHeight, child.ActualHeight);
-        }
-
-        window.MeasuredContentWidth = maxWidth > 0 ? maxWidth : availableWidth;
-        window.MeasuredContentHeight = maxHeight > 0 ? maxHeight : availableHeight;
     }
 
     private static void PositionStack(Stack stack)
@@ -611,12 +610,6 @@ public static class LayoutEngine
             ApplyHorizontalAlignment(child, baseX, div.MeasuredContentWidth);
             currentY += child.ActualHeight;
         }
-    }
-
-    private static void PositionWindow(Window window)
-    {
-        window.ActualX = 0;
-        window.ActualY = 0;
     }
 
     private static void PositionWithAnchor(UIElement element)

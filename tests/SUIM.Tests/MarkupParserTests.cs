@@ -1431,7 +1431,7 @@ Text after
     [Fact]
     public void Parse_BorderAttribute_WithThicknessAndColorInStyle()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
                 <style>
                 .myclass {
 	                width: 500;
@@ -1442,7 +1442,7 @@ Text after
                 <div class=""myclass"">
                     <label value=""Bordered Content"" />
                 </div>
-            </window>";
+            </grid>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         var border = element?.Children.Single() as Border;
@@ -1479,24 +1479,24 @@ Text after
         Assert.Equal("5 #FF0000", props["border"]);
     }
 
-    // ============== Window TESTS ==============
+    // ============== Grid TESTS ==============
 
     [Fact]
-    public void Parse_Window_WithDivElement()
+    public void Parse_Grid_WithDivElement()
     {
-        var markup = @"<window><div /></window>";
+        var markup = @"<grid><div /></grid>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element!.Children.Single());
     }
 
     [Fact]
-    public void Parse_Window_WithStyleAndDiv()
+    public void Parse_Grid_WithStyleAndDiv()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <style>.class { width: 100; }</style>
     <div width=""200"" />
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         var div = element?.Children.Single() as Div;
@@ -1504,12 +1504,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_WithModelAndDiv()
+    public void Parse_Grid_WithModelAndDiv()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model></model>
     <div width=""150"" />
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         var div = element?.Children.Single() as Div;
@@ -1517,16 +1517,16 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_WithModelStyleAndStack()
+    public void Parse_Grid_WithModelStyleAndStack()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model></model>
     <style>.btn { }</style>
     <stack orientation=""vertical"">
         <label value=""Item 1"" />
         <label value=""Item 2"" />
     </stack>
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         var stack = element?.Children.Single() as Stack;
@@ -1535,7 +1535,7 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_IgnoresModelAndStyle()
+    public void Parse_Grid_IgnoresModelAndStyle()
     {
         var markup = @"<button>
 <model>{ ""value"": ""ignored"" }</model>
@@ -1570,12 +1570,12 @@ Text after
     // ============== MODEL PARSING TESTS ==============
 
     [Fact]
-    public void Parse_Window_WithJsonModel()
+    public void Parse_Grid_WithJsonModel()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ ""name"": ""John"", ""age"": 30 }</model>
     <div />
-</window>";
+</grid>";
         var (_, model) = MarkupParser.Parse(markup);
 
         Assert.NotNull(model);
@@ -1584,13 +1584,13 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_WithJsonModelAndProvidedModel()
+    public void Parse_Grid_WithJsonModelAndProvidedModel()
     {
         var providedModel = new { firstName = "Jane", age = 25 };
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ ""lastName"": ""Doe"", ""age"": 30 }</model>
     <div />
-</window>";
+</grid>";
         var (element, model) = MarkupParser.Parse(markup, providedModel);
 
         Assert.NotNull(model);
@@ -1602,12 +1602,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_WithJsonModelStringProperty()
+    public void Parse_Grid_WithJsonModelStringProperty()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ ""title"": ""Hello World"", ""description"": ""Test"" }</model>
     <label value=""@title"" />
-</window>";
+</grid>";
         var (element, model) = MarkupParser.Parse(markup);
 
         Assert.NotNull(model);
@@ -1619,12 +1619,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_WithJsonModelNumberProperty()
+    public void Parse_Grid_WithJsonModelNumberProperty()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ ""width"": 500, ""height"": 300 }</model>
     <div width=""@width"" height=""@height"" />
-</window>";
+</grid>";
         var (_, model) = MarkupParser.Parse(markup);
 
         Assert.NotNull(model);
@@ -1633,12 +1633,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_WithJsonModelBooleanProperty()
+    public void Parse_Grid_WithJsonModelBooleanProperty()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ ""isVisible"": true, ""isEnabled"": false }</model>
     <div />
-</window>";
+</grid>";
         var (_, model) = MarkupParser.Parse(markup);
 
         Assert.NotNull(model);
@@ -1647,12 +1647,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_WithJsonModelArrayProperty()
+    public void Parse_Grid_WithJsonModelArrayProperty()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ ""items"": [1, 2, 3], ""names"": [""Alice"", ""Bob""] }</model>
     <div />
-</window>";
+</grid>";
         var (_, model) = MarkupParser.Parse(markup);
 
         Assert.NotNull(model);
@@ -1667,12 +1667,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_WithJsonModelNullProperty()
+    public void Parse_Grid_WithJsonModelNullProperty()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ ""value"": null }</model>
     <div />
-</window>";
+</grid>";
         var (_, model) = MarkupParser.Parse(markup);
 
         Assert.NotNull(model);
@@ -1680,12 +1680,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_WithEmptyJsonModel()
+    public void Parse_Grid_WithEmptyJsonModel()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ }</model>
     <div />
-</window>";
+</grid>";
         var (_, model) = MarkupParser.Parse(markup);
 
         // Should create an observable object even if empty
@@ -1693,12 +1693,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_WithNoModel()
+    public void Parse_Grid_WithNoModel()
     {
         var providedModel = new { value = "test" };
-        var markup = @"<window>
+        var markup = @"<grid>
     <div />
-</window>";
+</grid>";
         var (_, model) = MarkupParser.Parse(markup, providedModel);
 
         // Should only have provided model properties
@@ -1707,23 +1707,23 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_WithInvalidJsonModel()
+    public void Parse_Grid_WithInvalidJsonModel()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ invalid json }</model>
     <div />
-</window>";
+</grid>";
         
         Assert.Throws<InvalidOperationException>(() => MarkupParser.Parse(markup));
     }
 
     [Fact]
-    public void Parse_Window_ModelWithComplexObject()
+    public void Parse_Grid_ModelWithComplexObject()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ ""user"": { ""name"": ""John"", ""age"": 30 }, ""settings"": { ""theme"": ""dark"" } }</model>
     <div />
-</window>";
+</grid>";
         var (_, model) = MarkupParser.Parse(markup);
 
         Assert.NotNull(model);
@@ -1735,12 +1735,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_ModelPropertiesAccessible()
+    public void Parse_Grid_ModelPropertiesAccessible()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
     <button><label value=""@buttonText"" /></button>
-</window>";
+</grid>";
         var (element, model) = MarkupParser.Parse(markup);
 
         var button = element?.Children.Single() as Button;
@@ -1756,13 +1756,13 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_MergesProvidedAndJsonModel()
+    public void Parse_Grid_MergesProvidedAndJsonModel()
     {
         var providedModel = new { existing = "value" };
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ ""newProp"": ""new"" }</model>
     <div />
-</window>";
+</grid>";
         var (_, model) = MarkupParser.Parse(markup, providedModel);
 
         Assert.NotNull(model);
@@ -1771,12 +1771,12 @@ Text after
     }
 
     [Fact]
-    public void Parse_Window_ModelWithMixedTypes()
+    public void Parse_Grid_ModelWithMixedTypes()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ ""str"": ""text"", ""num"": 123, ""bool"": true, ""arr"": [1, 2], ""obj"": { ""key"": ""val"" }, ""nil"": null }</model>
     <div />
-</window>";
+</grid>";
         var (element, model) = MarkupParser.Parse(markup);
 
         Assert.NotNull(model);
@@ -1796,12 +1796,12 @@ Text after
     [Fact]
     public void Parse_Style_ClassSelector()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <style>
         .header { padding: 10; margin: 5; }
     </style>
     <div class=""header"" />
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
@@ -1813,12 +1813,12 @@ Text after
     [Fact]
     public void Parse_Style_IdSelector()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <style>
         #main { width: 500; height: 300; }
     </style>
     <div id=""main"" />
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
@@ -1830,12 +1830,12 @@ Text after
     [Fact]
     public void Parse_Style_TagSelector()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <style>
         div { padding: 8; background: blue; }
     </style>
     <div />
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
@@ -1847,12 +1847,12 @@ Text after
     [Fact]
     public void Parse_Style_UniversalSelector()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <style>
         * { margin: 5; padding: 3; }
     </style>
     <stack><div /><label /></stack>
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
         var stack = element.Children.Single() as Stack;
@@ -1872,14 +1872,14 @@ Text after
     [Fact]
     public void Parse_Style_MergeMultipleSelectors()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <style>
         * { padding: 5; }
         .container { margin: 10; }
         div { background: gray; }
     </style>
     <div class=""container"" />
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
@@ -1892,7 +1892,7 @@ Text after
     [Fact]
     public void Parse_Style_PrecedenceOverride()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <style>
         * { padding: 5; margin: 1; }
         div { padding: 8; background: blue; }
@@ -1900,7 +1900,7 @@ Text after
         #unique { padding: 20; }
     </style>
     <div id=""unique"" class=""special"" />
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
@@ -1913,14 +1913,14 @@ Text after
     [Fact]
     public void Parse_Style_ClassSelectorOverridesTagAndUniversal()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <style>
         * { padding: 5; }
         div { padding: 8; }
         .highlight { padding: 12; }
     </style>
     <div class=""highlight"" />
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
@@ -1931,12 +1931,12 @@ Text after
     [Fact]
     public void Parse_Style_TagSelectorAppliedToChildren()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <style>
         label { padding: 6; }
     </style>
     <stack><label /><button /></stack>
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
         var stack = element.Children.Single() as Stack;
@@ -1952,12 +1952,12 @@ Text after
     public void Parse_Style_MultipleClassesNotSupported()
     {
         // Currently only single class is supported, test verifies behavior
-        var markup = @"<window>
+        var markup = @"<grid>
     <style>
         .header { padding: 10; }
     </style>
     <div class=""header_other"" />
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
@@ -1980,7 +1980,7 @@ Text after
     [Fact]
     public void Parse_Style_WrapperWithOnlyVisualRoot()
     {
-        var markup = @"<window><div padding=""5"" /></window>";
+        var markup = @"<grid><div padding=""5"" /></grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
@@ -1991,13 +1991,13 @@ Text after
     [Fact]
     public void Parse_Style_WrapperWithModelAndStyle()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <model>{ ""name"": ""test"" }</model>
     <style>
         div { padding: 8; }
     </style>
     <div />
-</window>";
+</grid>";
         var (element, model) = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
@@ -2010,14 +2010,14 @@ Text after
     [Fact]
     public void Parse_Style_IdPrecedenceOverClassAndTag()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <style>
         div { padding: 5; }
         .btn { padding: 8; }
         #submit { padding: 15; }
     </style>
     <div id=""submit"" class=""btn"" />
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
@@ -2028,14 +2028,14 @@ Text after
     [Fact]
     public void Parse_Style_MergeWithNoOverlap()
     {
-        var markup = @"<window>
+        var markup = @"<grid>
     <style>
         * { margin: 5; }
         .card { padding: 10; }
         div { background: white; }
     </style>
     <div class=""card"" />
-</window>";
+</grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
