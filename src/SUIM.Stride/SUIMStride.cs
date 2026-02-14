@@ -282,6 +282,11 @@ public class SUIMStride
         {
             stride.BackgroundColor = ParseColor(suim.BackgroundColor);
         }
+
+        if (suim.StopClicks)
+        {
+            stride.CanBeHitByUser = true;
+        }
     }
 
     private static Thickness ComponentsThicknessToStride(Layout.Thickness thickness, Components.UIElement suim)

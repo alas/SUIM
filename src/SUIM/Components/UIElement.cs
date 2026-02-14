@@ -35,6 +35,7 @@ public abstract class UIElement
     public string? Sprite { get; set; }
     public string? HoverSprite { get; set; }
     public string? PressedSprite { get; set; }
+    public bool StopClicks { get; set; }
     public Dictionary<string, List<Action<UIElement>>> EventHandlers { get; set; } = [];
     public List<UIElement> Children { get; } = [];
 
@@ -160,6 +161,14 @@ public abstract class UIElement
         {
             BackgroundColor = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
         }
+        else if (name.Equals("readonly", StringComparison.OrdinalIgnoreCase))
+        {
+            ReadOnly = value is bool b ? b : Convert.ToBoolean(value);
+        }
+        else if (name.Equals("stopclicks", StringComparison.OrdinalIgnoreCase))
+        {
+            StopClicks = value is bool b ? b : Convert.ToBoolean(value);
+        }
         else if (name.Contains('.'))
         {
             // ignore parent properties
@@ -248,15 +257,15 @@ public abstract class UIElement
 
 public class LayoutElement : UIElement
 {
+    public int Spacing { get; set; }
+    public bool Clip { get; set; }
+    public Thickness SliceWidth { get; set; } = Thickness.None;
+
     public LayoutElement() : base()
     {
         Width = UnitValue.OneFR;
         Height = UnitValue.OneFR;
     }
-
-    public int Spacing { get; set; }
-    public bool Clip { get; set; }
-    public Thickness SliceWidth { get; set; } = Thickness.None;
 
     public override void SetAttribute(string name, object? value)
     {

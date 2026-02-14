@@ -2,7 +2,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Stride.Core.Mathematics;
 using Stride.Engine;
 using Stride.Graphics;
 using Stride.UI;
@@ -14,8 +13,80 @@ public class MainView
 {
     private readonly SpriteFont Font;
     private readonly UIPage Page;
-    private readonly UIElement rootUI;
     private bool IsWorkInProgress;
+    private readonly dynamic Model;
+    private readonly UIElement MainUI;
+    private const string MainUIMarkup = @"<grid halign=""left"">
+<model>
+{
+    ""blockerMessage"": """",
+    ""popupTitle"": """",
+    ""popupMessage"": """"
+}
+</model>
+<style>
+* {
+    HorizontalAlignment: Left;
+    VerticalAlignment: Top;
+}
+text {
+    Color: Green;
+    FontSize: 16;
+    HorizontalAlignment: Center;
+    VerticalAlignment: Center;
+}
+.mybutton {
+    Background: Black;
+    Width: 200;
+    Height: 50;
+    Margin: 5;
+}
+.overlay {
+    HorizontalAlignment: Center;
+    VerticalAlignment: Center;
+    Width: 1280;
+    Height: 720;
+    visibility: collapse;
+}
+.container {
+    HorizontalAlignment: Center;
+    VerticalAlignment: Center;
+    Background: rgba(0, 0, 0, 0.5);
+    Padding: 10;
+    Border: 5;
+}
+</style>
+    <vstack id=""buttonsUI"" class=""container"">
+        <button class=""mybutton"" id=""quitButton"">Quit</button>
+        <button class=""mybutton"" id=""restartButton"">Restart</button>
+        <button class=""mybutton"" id=""loadButton"">Load</button>
+        <button class=""mybutton"" id=""saveButton"">Save</button>
+    </vstack>
+
+  <overlay id=""popup"" class=""overlay"" visibility=""visible"">
+    <grid width=""360"" height=""180"">
+        <vstack>
+            <hstack>
+                <label value=""@popupTitle"" />
+            </hstack>
+            <vstack margin=""6"">
+                <label value=""@popupMessage"" />
+            </vstack>
+            <hstack>
+                <button id=""yesButton"" class=""mybutton"">YES</button>
+                <button id=""noButton"" class=""mybutton"">NO</button>
+            </hstack>
+        </vstack>
+    </grid>
+  </overlay>
+
+  <overlay id=""screenOverlay"" class=""overlay"">
+    <grid halign=""center"" valign=""center"">
+      <label value=""@blockerMessage"" />
+    </grid>
+  </overlay>
+</grid>";
+    private readonly List<EventHandler<Stride.UI.Events.RoutedEventArgs>> popupYesHandlers;
 
     public MainView(Game game, UIComponent component)
     {
@@ -28,40 +99,14 @@ public class MainView
         IsWorkInProgress = false;
         Font = game.Content.Load<SpriteFont>("StrideDefaultFont");
 
-        var markup = @"<grid halign=""left"">
-<style>
-* {
-        HorizontalAlignment: Left;
-        VerticalAlignment: Top;
-        Margin: 5;
-}
-text {
-        Color: Green;
-        FontSize: 16;
-        HorizontalAlignment: Center;
-        VerticalAlignment: Center;
-}
-.mybutton {
-        Background: Black;
-        Width: 200;
-        Height: 50;
-}
-</style>
-    <stack orientation=""vertical"">
-        <button class=""mybutton"" id=""quitButton"">Quit</button>
-        <button class=""mybutton"" id=""restartButton"">Restart</button>
-        <button class=""mybutton"" id=""loadButton"">Load</button>
-        <button class=""mybutton"" id=""saveButton"">Save</button>
-    </stack>
-</grid>";
         var mapper = new SUIMStride
         {
             ContentManager = game.Content
         };
-        (rootUI, _) = mapper.Parse(markup);
+        (MainUI, Model) = mapper.Parse(MainUIMarkup);
         Page = new UIPage
         {
-            RootElement = rootUI
+            RootElement = MainUI
         };
         component.Page = Page;
 
@@ -69,10 +114,10 @@ text {
         var restartButton = FindStrideElementByName(Page.RootElement, "restartButton") as Button;
         var loadButton = FindStrideElementByName(Page.RootElement, "loadButton") as Button;
         var saveButton = FindStrideElementByName(Page.RootElement, "saveButton") as Button;
-        quitButton!.Click += (s, e) => OpenModal("Are you sure you want to quit?", QuitHandler);
-        restartButton!.Click += (s, e) => OpenModal("Are you sure you want to start over?", RestartHandler);
-        loadButton!.Click += (s, e) => OpenModal("Load() Not implemented yet!", LoadHandler);
-        saveButton!.Click += (s, e) => OpenModal("Save() Not implemented yet!", SaveHandler);
+        quitButton!.Click += (s, e) => OpenPopup("Quit", "Are you sure you want to quit?", QuitHandler);
+        restartButton!.Click += (s, e) => OpenPopup("Restart", "Are you sure you want to start over?", RestartHandler);
+        loadButton!.Click += (s, e) => OpenPopup("Load", "Load() Not implemented yet!", LoadHandler);
+        saveButton!.Click += (s, e) => OpenPopup("Save", "Save() Not implemented yet!", SaveHandler);
         
         void QuitHandler(object? sender, EventArgs args)
         {
@@ -86,9 +131,9 @@ text {
             IsWorkInProgress = true;
             ShowBlocker("Working...");
             BoardManager.GetInstance().InitBoard();
-            Page.RootElement = rootUI;
+            UnshowBlocker();
+            UnshowPopup();
             IsWorkInProgress = false;
-            ShowUI();
         }
         
         void LoadHandler(object? sender, EventArgs args)
@@ -100,9 +145,9 @@ text {
             //BoardManager.GetInstance().LoadFromFile(GetFileName());
             Task.Delay(5000).ContinueWith(t =>
             {
-                Page.RootElement = rootUI;
+                UnshowBlocker();
+                UnshowPopup();
                 IsWorkInProgress = false;
-                ShowUI();
             });
         }
         
@@ -115,108 +160,52 @@ text {
             ShowBlocker("Not implemented yet!");
             Task.Delay(1000).ContinueWith(t =>
             {
-                Page.RootElement = rootUI;
+                UnshowBlocker();
+                UnshowPopup();
                 IsWorkInProgress = false;
-                ShowUI();
             });
         }
+        popupYesHandlers =
+        [
+            QuitHandler,
+            RestartHandler,
+            LoadHandler,
+            SaveHandler
+        ];
     }
 
-    private void ShowUI()
+    private void OpenPopup(string title, string message, EventHandler<Stride.UI.Events.RoutedEventArgs> yesClickHandler)
     {
-        if (IsWorkInProgress == true)
-        {
-            return;
-        }
-
-        Page.RootElement = rootUI;
+        Model.popupTitle = title;
+        Model.popupMessage = message;
+        var popup = FindStrideElementByName(MainUI, "popup");
+        popup!.Visibility = Visibility.Visible;
+        var yesButton = FindStrideElementByName(MainUI, "yesButton") as Button;
+        yesButton!.Click += yesClickHandler;
+        var noButton = FindStrideElementByName(MainUI, "noButton") as Button;
+        noButton!.Click += (_, _) => UnshowPopup();
     }
 
-    private void OpenModal(string message, EventHandler<Stride.UI.Events.RoutedEventArgs> yesClickHandler)
+    private void UnshowPopup()
     {
-        var modalMessage = GetText(string.Empty);
-        var yesButton = GetButton("Yes");
-        var noButton = GetButton("No");
-
-        var modalContent = new StackPanel
-        {
-            Margin = new Thickness(6, 6, 6, 6),
-            Orientation = Orientation.Vertical,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-        };
-        modalContent.Children.Add(modalMessage);
-
-        var modalButtons = new StackPanel
-        {
-            Margin = new Thickness(6, 6, 6, 6),
-            Orientation = Orientation.Horizontal,
-        };
-        modalButtons.Children.Add(yesButton);
-        modalButtons.Children.Add(noButton);
-        modalContent.Children.Add(modalButtons);
-        var header = new StackPanel
-        {
-            Margin = new Thickness(6, 6, 6, 6),
-            Orientation = Orientation.Horizontal,
-        };
-        var titleLabel = GetText(string.Empty);
-        header.Children.Add(titleLabel);
-        var windowContent = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-        };
-        windowContent.Children.Add(header);
-        windowContent.Children.Add(modalContent);
-        var modalWindow = new ModalElement
-        {
-            Width = 360,
-            Height = 180,
-            IsModal = true,
-            Content = windowContent
-        };
-
-        modalMessage.Text = message;
-        Page.RootElement = modalWindow;
-        yesButton.Click += yesClickHandler;
-        noButton.Click += (_, _) => ShowUI();
+        var blocker = FindStrideElementByName(MainUI, "popup");
+        blocker!.Visibility = Visibility.Collapsed;
+        var yesButton = FindStrideElementByName(MainUI, "yesButton") as Button;
+        popupYesHandlers.ForEach(x => yesButton!.Click -= x);
     }
 
     private void ShowBlocker(string message)
     {
-        var blockMessage = GetText(message);
-        var blocker = new Grid
-        {
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-            CanBeHitByUser = true,
-            Width = 1280,
-            Height = 720,
-            BackgroundColor = new Color(0, 0, 0, 0.6f),
-        };
-        blocker.Children.Add(blockMessage);
-        Page.RootElement = blocker;
+        Model.blockerMessage = message;
+        var blocker = FindStrideElementByName(MainUI, "screenOverlay");
+        blocker!.Visibility = Visibility.Visible;
     }
 
-    private TextBlock GetText(string text) => new()
+    private void UnshowBlocker()
     {
-        Text = text,
-        Font = Font,
-        TextColor = Color.Green,
-        TextSize = 16,
-        HorizontalAlignment = HorizontalAlignment.Center,
-        VerticalAlignment = VerticalAlignment.Center,
-    };
-
-    private Button GetButton(string text) => new()
-    {
-        Content = GetText(text),
-        BackgroundColor = Color.Black,
-        Color = Color.Green,
-        Width = 200,
-        Height = 50,
-        Margin = new Thickness(5, 5, 5, 5),
-    };
+        var blocker = FindStrideElementByName(MainUI, "screenOverlay");
+        blocker!.Visibility = Visibility.Collapsed;
+    }
 
     private static UIElement? FindStrideElementByName(UIElement root, string name)
     {
