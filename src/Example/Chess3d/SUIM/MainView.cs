@@ -56,14 +56,14 @@ text {
     Border: 5;
 }
 </style>
-    <vstack id=""buttonsUI"" class=""container"">
+    <vstack id=""buttonsUI"" class=""container"" halign=""left"">
         <button class=""mybutton"" id=""quitButton"">Quit</button>
         <button class=""mybutton"" id=""restartButton"">Restart</button>
         <button class=""mybutton"" id=""loadButton"">Load</button>
         <button class=""mybutton"" id=""saveButton"">Save</button>
     </vstack>
 
-  <overlay id=""popup"" class=""overlay"" visibility=""visible"">
+  <overlay id=""popup"" class=""overlay"">
     <grid width=""360"" height=""180"">
         <vstack>
             <hstack>
