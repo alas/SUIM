@@ -171,7 +171,7 @@ public class IntegrationTests
         Assert.Equal(720, root.ActualHeight);
         
         // Find the overlays in the grid's children
-        var overlays = root.Children.OfType<SUIM.Components.Overlay>().ToList();
+        var overlays = root.Children.OfType<Components.Overlay>().ToList();
         Assert.Equal(2, overlays.Count);
         
         var popup = overlays.FirstOrDefault(o => o.Id == "popup");
@@ -209,7 +209,7 @@ public class IntegrationTests
                     </grid>
                 </overlay>
                 
-                <overlay id=""screenOverlay"">
+                <overlay id=""screenOverlay"" visibility=""collapse"">
                     <grid>
                         <label value=""Blocker"" />
                     </grid>

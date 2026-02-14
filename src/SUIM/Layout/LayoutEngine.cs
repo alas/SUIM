@@ -752,10 +752,6 @@ public static class LayoutEngine
             case HorizontalAlignment.Right:
                 element.ActualX = baseX + containerWidth - element.ActualWidth;
                 break;
-            case HorizontalAlignment.Stretch:
-                element.ActualWidth = containerWidth;
-                element.ActualX = baseX;
-                break;
         }
     }
 
@@ -771,10 +767,6 @@ public static class LayoutEngine
                 break;
             case VerticalAlignment.Bottom:
                 element.ActualY = baseY + containerHeight - element.ActualHeight;
-                break;
-            case VerticalAlignment.Stretch:
-                element.ActualHeight = containerHeight;
-                element.ActualY = baseY;
                 break;
         }
     }

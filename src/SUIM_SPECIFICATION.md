@@ -21,8 +21,8 @@ Every element exists within a rectangular box. Spacing is governed by **margin**
 
 All layout containers support the following for child positioning:
 
-* **horizontalalignment** (synonym: **halign**): left, center, right, stretch.
-* **verticalalignment** (synonym: **valign**): top, center, bottom, stretch.
+* **horizontalalignment** (synonym: **halign**): left, center, right.
+* **verticalalignment** (synonym: **valign**): top, center, bottom.
 
 ### 1.3 Anchoring
 
@@ -252,8 +252,8 @@ Every element in SUIM inherits a set of **Common Attributes** for layout and sty
 | `height` | `integer/string` | Fixed pixels or `@variable`. |
 | `padding` | `integer/string` | Shorthand for all sides (e.g., `10`). |
 | `margin` | `integer/string` | External spacing (e.g., `5`). |
-| `horizontalalignment` | `enum` | `Left`, `Center`, `Right`, `Stretch`. |
-| `verticalalignment` | `enum` | `Top`, `Center`, `Bottom`, `Stretch`. |
+| `horizontalalignment` | `enum` | `Left`, `Center`, `Right`. |
+| `verticalalignment` | `enum` | `Top`, `Center`, `Bottom`. |
 | `visibility` | `enum/bool` | `Visible`, `Collapsed`, `Hidden`. |
 | `opacity` | `integer` | Transparency `0.0` to `1.0`. |
 | `background` | `string/Color` | Hex code, color name. Alias: bg |

@@ -89,9 +89,9 @@ public class SUIMStride
         };
 
         ApplyCommonProperties(element, strideElement);
-        
+
         // Handle Children for generic containers if not already handled
-        if (strideElement is Panel panel && element.Children.Count > 0 && element is not Components.Grid) // Grid handles its own children
+        if (strideElement is Panel panel && element.Children.Count > 0 && element is not Components.Grid)
         {
             foreach (var child in element.Children)
             {
@@ -100,20 +100,19 @@ public class SUIMStride
         }
         else if (strideElement is ContentControl contentControl && element.Children.Count > 0)
         {
-             if (element.Children.Count == 1)
-             {
-                 contentControl.Content = MapElement(element.Children[0]);
-             }
-             else
-             {
-                 // Create a stack panel to hold multiple children if the control can only hold one
-                 var stack = new StackPanel { Orientation = Orientation.Vertical };
-                 foreach (var child in element.Children)
-                 {
-                     stack.Children.Add(MapElement(child));
-                 }
-                 contentControl.Content = stack;
-             }
+            if (element.Children.Count == 1)
+            {
+                contentControl.Content = MapElement(element.Children[0]);
+            }
+            else
+            {
+                var stack = new StackPanel { Orientation = Orientation.Vertical };
+                foreach (var child in element.Children)
+                {
+                    stack.Children.Add(MapElement(child));
+                }
+                contentControl.Content = stack;
+            }
         }
 
         return strideElement;
@@ -277,32 +276,39 @@ public class SUIMStride
         // Alignment
         stride.HorizontalAlignment = suim.HorizontalAlignment switch
         {
-            Components.HorizontalAlignment.Left => HorizontalAlignment.Left,
             Components.HorizontalAlignment.Center => HorizontalAlignment.Center,
             Components.HorizontalAlignment.Right => HorizontalAlignment.Right,
-            Components.HorizontalAlignment.Stretch => HorizontalAlignment.Stretch,
             _ => HorizontalAlignment.Left
         };
 
         stride.VerticalAlignment = suim.VerticalAlignment switch
         {
-            Components.VerticalAlignment.Top => VerticalAlignment.Top,
             Components.VerticalAlignment.Center => VerticalAlignment.Center,
             Components.VerticalAlignment.Bottom => VerticalAlignment.Bottom,
-            Components.VerticalAlignment.Stretch => VerticalAlignment.Stretch,
             _ => VerticalAlignment.Top
         };
 
-        var width = suim.ToPixels(suim.Width);
-        if (width != 0f)
+        // For overlays, always use ActualWidth/ActualHeight from layout
+        if (suim is Components.Overlay)
         {
-             stride.Width = width;
+            if (!float.IsNaN(suim.ActualWidth) && suim.ActualWidth > 0)
+                stride.Width = suim.ActualWidth;
+            if (!float.IsNaN(suim.ActualHeight) && suim.ActualHeight > 0)
+                stride.Height = suim.ActualHeight;
         }
-
-        var height = suim.ToPixels(suim.Height);
-        if (height != 0f)
+        else
         {
-             stride.Height = height;
+            var width = suim.ToPixels(suim.Width);
+            if (width != 0f)
+            {
+                stride.Width = width;
+            }
+
+            var height = suim.ToPixels(suim.Height);
+            if (height != 0f)
+            {
+                stride.Height = height;
+            }
         }
 
         if (suim.BackgroundColor != null)
