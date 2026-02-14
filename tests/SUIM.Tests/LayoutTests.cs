@@ -71,15 +71,15 @@ public class LayoutTests
     [Fact]
     public void LayoutEngine_MeasuresWindow()
     {
-        var window = new Window { Width = UnitValue.Auto, Height = UnitValue.Auto };
+        var grid = new Grid { Width = UnitValue.Auto, Height = UnitValue.Auto };
         var child = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(50, UnitType.Pixels) };
+
+        grid.AddChild(child, null);
         
-        window.AddChild(child, null);
+        LayoutEngine.Layout(grid, 16, 800, 600);
         
-        LayoutEngine.Layout(window, 16, 800, 600);
-        
-        Assert.Equal(100, window.ActualWidth);
-        Assert.Equal(50, window.ActualHeight);
+        Assert.Equal(100, grid.ActualWidth);
+        Assert.Equal(50, grid.ActualHeight);
     }
     
     [Fact]

@@ -2,11 +2,11 @@ namespace SUIM.StrideIntegration;
 
 using Stride.Core.Mathematics;
 using Stride.Core.Serialization.Contents;
+using Stride.Engine;
 using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
-using System;
 using StrideGrid = Stride.UI.Panels.Grid;
 
 public class SUIMStride
@@ -16,7 +16,7 @@ public class SUIMStride
 
     private readonly Dictionary<string, (Components.UIElement SuimRoot, UIElement StrideRoot, dynamic? Model)> _parseCache = [];
 
-    public (UIElement, dynamic?) Parse(string markup, bool createNewInstance = false)
+    public (UIElement, dynamic?) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
         ArgumentNullException.ThrowIfNull(markup);
 
@@ -36,15 +36,38 @@ public class SUIMStride
         }
 
         // Not cached: parse markup, map and store the canonical instance
-        var (suimRoot, model) = MarkupParser.Parse(markup);
+        var (suimRoot, model2) = MarkupParser.Parse(markup, model);
+        Layout(suimRoot, game, defaultFontSize, fullscreen);
         var strideRoot = MapElement(suimRoot);
 
         lock (_parseCache)
         {
-            _parseCache[markup] = (suimRoot, strideRoot, model);
+            _parseCache[markup] = (suimRoot, strideRoot, model2);
         }
 
-        return createNewInstance ? (MapElement(suimRoot), model) : (strideRoot, model);
+        return createNewInstance ? (MapElement(suimRoot), model2) : (strideRoot, model2);
+    }
+
+    private static void Layout(Components.UIElement root, Game game, int defaultFontSize, bool fullscreen)
+    {
+        int preferredWidth;
+        int preferredHeight;
+        if (fullscreen)
+        {
+            var adapterOutput = game.GraphicsDevice.Adapter.Outputs[0];
+            var currentMonitorResolution = adapterOutput.CurrentDisplayMode;
+            preferredWidth = currentMonitorResolution.Width;
+            preferredHeight = currentMonitorResolution.Height;
+            game.Window.PreferredWindowedSize = new Int2(preferredWidth, preferredHeight);
+            game.Window.FullscreenIsBorderlessWindow = true;
+            game.Window.IsFullscreen = true;
+        }
+        else
+        {
+            preferredWidth = game.GraphicsDeviceManager.PreferredBackBufferWidth;
+            preferredHeight = game.GraphicsDeviceManager.PreferredBackBufferHeight;
+        }
+        SUIM.Layout.LayoutEngine.Layout(root, defaultFontSize, preferredWidth, preferredHeight);
     }
 
     private UIElement MapElement(Components.UIElement element)

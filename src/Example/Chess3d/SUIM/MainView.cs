@@ -16,7 +16,7 @@ public class MainView
     private bool IsWorkInProgress;
     private readonly dynamic Model;
     private readonly UIElement MainUI;
-    private const string MainUIMarkup = @"<grid halign=""left"">
+    private const string MainUIMarkup = @"<grid>
 <model>
 {
     ""blockerMessage"": """",
@@ -42,10 +42,6 @@ text {
     Margin: 5;
 }
 .overlay {
-    HorizontalAlignment: Center;
-    VerticalAlignment: Center;
-    Width: 1280;
-    Height: 720;
     visibility: collapse;
 }
 .container {
@@ -63,39 +59,33 @@ text {
         <button class=""mybutton"" id=""saveButton"">Save</button>
     </vstack>
 
-  <overlay id=""popup"" class=""overlay"">
-    <grid width=""360"" height=""180"">
-        <vstack>
-            <hstack>
-                <label value=""@popupTitle"" />
-            </hstack>
-            <vstack margin=""6"">
-                <label value=""@popupMessage"" />
+    <overlay id=""popup"" class=""overlay"">
+        <grid width=""360"" height=""180"" halign=""center"" valign=""center"">
+            <vstack>
+                <hstack>
+                    <label value=""@popupTitle"" />
+                </hstack>
+                <vstack margin=""6"">
+                    <label value=""@popupMessage"" />
+                </vstack>
+                <hstack>
+                    <button id=""yesButton"" class=""mybutton"">YES</button>
+                    <button id=""noButton"" class=""mybutton"">NO</button>
+                </hstack>
             </vstack>
-            <hstack>
-                <button id=""yesButton"" class=""mybutton"">YES</button>
-                <button id=""noButton"" class=""mybutton"">NO</button>
-            </hstack>
-        </vstack>
-    </grid>
-  </overlay>
+        </grid>
+    </overlay>
 
-  <overlay id=""screenOverlay"" class=""overlay"">
-    <grid halign=""center"" valign=""center"">
-      <label value=""@blockerMessage"" />
-    </grid>
-  </overlay>
+    <overlay id=""screenOverlay"" class=""overlay"">
+        <grid halign=""center"" valign=""center"">
+            <label value=""@blockerMessage"" />
+        </grid>
+    </overlay>
 </grid>";
     private readonly List<EventHandler<Stride.UI.Events.RoutedEventArgs>> popupYesHandlers;
 
     public MainView(Game game, UIComponent component)
     {
-        //var adapterOutput = game.GraphicsDevice.Adapter.Outputs[0];
-        //var currentMonitorResolution = adapterOutput.CurrentDisplayMode;
-        //game.Window.PreferredWindowedSize = new Int2(currentMonitorResolution.Width, currentMonitorResolution.Height);
-        //game.Window.FullscreenIsBorderlessWindow = true;
-        //game.Window.IsFullscreen = true;
-
         IsWorkInProgress = false;
         Font = game.Content.Load<SpriteFont>("StrideDefaultFont");
 
@@ -103,7 +93,7 @@ text {
         {
             ContentManager = game.Content
         };
-        (MainUI, Model) = mapper.Parse(MainUIMarkup);
+        (MainUI, Model) = mapper.Parse(MainUIMarkup, game);
         Page = new UIPage
         {
             RootElement = MainUI

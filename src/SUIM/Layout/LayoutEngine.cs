@@ -520,8 +520,14 @@ public static class LayoutEngine
             for (int i = 0; i < gridChild.Row; i++)
                 y += rowHeights[i];
 
+            var cellWidth = GetGridSpanWidth(columnWidths, gridChild.Column, gridChild.ColumnSpan);
+            var cellHeight = GetGridSpanHeight(rowHeights, gridChild.Row, gridChild.RowSpan);
+
             gridChild.Element.ActualX = x;
             gridChild.Element.ActualY = y;
+
+            ApplyHorizontalAlignment(gridChild.Element, x, cellWidth);
+            ApplyVerticalAlignment(gridChild.Element, y, cellHeight);
         }
     }
 
