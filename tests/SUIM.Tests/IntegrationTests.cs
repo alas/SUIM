@@ -238,5 +238,15 @@ public class IntegrationTests
         // This verifies the mapping doesn't lose dimension data
         var strideChildren = strideGrid.Children.ToList();
         Assert.True(strideChildren.Count >= 2, $"Expected at least 2 children, got {strideChildren.Count}");
+
+        var popup = strideChildren.FirstOrDefault(c => c.Name == "popup");
+        Assert.NotNull(popup);
+        Assert.Equal(1280, popup.Width);
+        Assert.Equal(720, popup.Height);
+
+        var screenOverlay = strideChildren.FirstOrDefault(c => c.Name == "screenOverlay");
+        Assert.NotNull(screenOverlay);
+        Assert.Equal(1280, screenOverlay.Width);
+        Assert.Equal(720, screenOverlay.Height);
     }
 }
