@@ -85,6 +85,10 @@ public static class LayoutEngine
         {
             MeasureDock(dock, availableContentWidth, availableContentHeight);
         }
+        else if (element is Overlay overlay)
+        {
+            MeasureOverlay(overlay, availableWidth, availableHeight);
+        }
         else if (element is Div div)
         {
             MeasureDiv(div, availableContentWidth, availableContentHeight);
@@ -177,6 +181,9 @@ public static class LayoutEngine
                 break;
             case Dock dock:
                 PositionDock(dock);
+                break;
+            case Overlay overlay:
+                PositionOverlay(overlay);
                 break;
             case Div div:
                 PositionDiv(div);
@@ -361,6 +368,57 @@ public static class LayoutEngine
 
         dock.MeasuredContentWidth = availableWidth;
         dock.MeasuredContentHeight = availableHeight;
+    }
+
+    private static void MeasureOverlay(Overlay overlay, float availableWidth, float availableHeight)
+    {
+        // Overlays should fill available space, BUT:
+        // When measured with float.MaxValue (auto-sized parent), measure content instead
+        // When measured with actual size (explicit parent dimensions), use that space
+        
+        float contentWidth = availableWidth;
+        float contentHeight = availableHeight;
+        
+        // If available space is unreasonably large (from auto-sized parent),
+        // measure to content size instead
+        if (availableWidth > 10000)  // float.MaxValue is much larger, this catches it
+        {
+            // Measure children to get content-driven size
+            float maxWidth = 0;
+            float maxHeight = 0;
+            foreach (var child in overlay.Children)
+            {
+                child.CurrentFontSize = overlay.CurrentFontSize;
+                MeasureElement(child, float.MaxValue, float.MaxValue);
+                maxWidth = Math.Max(maxWidth, child.ActualWidth);
+                maxHeight = Math.Max(maxHeight, child.ActualHeight);
+            }
+            contentWidth = maxWidth;
+            contentHeight = maxHeight;
+        }
+        else
+        {
+            // Normal case: fill available space
+            // If explicit pixel size is set, use that instead
+            if (overlay.Width.Type != UnitType.Auto && overlay.Width.Type != UnitType.None)
+            {
+                contentWidth = overlay.ToPixels(overlay.Width);
+            }
+            if (overlay.Height.Type != UnitType.Auto && overlay.Height.Type != UnitType.None)
+            {
+                contentHeight = overlay.ToPixels(overlay.Height);
+            }
+
+            // Measure children with the calculated dimensions
+            foreach (var child in overlay.Children)
+            {
+                child.CurrentFontSize = overlay.CurrentFontSize;
+                MeasureElement(child, contentWidth, contentHeight);
+            }
+        }
+
+        overlay.MeasuredContentWidth = contentWidth;
+        overlay.MeasuredContentHeight = contentHeight;
     }
 
     private static void MeasureDiv(Div div, float availableWidth, float availableHeight)
@@ -596,6 +654,14 @@ public static class LayoutEngine
         {
             PositionVerticalDiv(div);
         }
+    }
+
+    private static void PositionOverlay(Overlay overlay)
+    {
+        // Overlays fill the entire available space of their parent
+        // Position at the content area of the parent
+        overlay.ActualX = 0;
+        overlay.ActualY = 0;
     }
 
     private static void PositionVerticalDiv(Div div)

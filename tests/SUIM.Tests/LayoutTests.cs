@@ -186,4 +186,48 @@ public class LayoutTests
         var result = FractionalUnitResolver.ResolveFractionalUnits(values, 200);
         Assert.Equal(200, result[0]); // 1 * (200 / 1)
     }
+
+    [Fact]
+    public void LayoutEngine_OverlaysShouldFillParentSize()
+    {
+        // Create a grid with explicit size (simulating main UI container)
+        // When overlays are inside, they should fill the grid's dimensions
+        var grid = new Grid();
+        
+        // Create main UI container (like buttonsUI in MainView)
+        var mainUI = new Stack 
+        { 
+            Width = new UnitValue(400), 
+            Height = new UnitValue(300) 
+        };
+        grid.AddChild(mainUI, null);
+        
+        // Create overlays - when grid has explicit size, overlays should fill it
+        var overlay1 = new Overlay();
+        var popupContent = new Grid
+        {
+            Width = new UnitValue(360),
+            Height = new UnitValue(180)
+        };
+        overlay1.AddChild(popupContent, null);
+        grid.AddChild(overlay1, null);
+        
+        var overlay2 = new Overlay();
+        overlay2.AddChild(new Label(), null);
+        grid.AddChild(overlay2, null);
+        
+        // Layout with screen size
+        LayoutEngine.Layout(grid, 16, 1280, 720);
+        
+        // Grid should size to its explicit dimensions
+        Assert.Equal(1280, grid.ActualWidth);
+        Assert.Equal(720, grid.ActualHeight);
+        
+        // Overlays should fill the grid container when it has explicit size
+        // Add some tolerance for padding
+        Assert.True(overlay1.ActualWidth >= 1270 && overlay1.ActualWidth <= 1280, 
+            $"overlay1.ActualWidth was {overlay1.ActualWidth}, expected ~1280");
+        Assert.True(overlay1.ActualHeight >= 710 && overlay1.ActualHeight <= 720,
+            $"overlay1.ActualHeight was {overlay1.ActualHeight}, expected ~720");
+    }
 }
