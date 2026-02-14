@@ -376,14 +376,12 @@ public static class LayoutEngine
         // When measured with float.MaxValue (auto-sized parent), measure content instead
         // When measured with actual size (explicit parent dimensions), use that space
         
-        float contentWidth = availableWidth;
-        float contentHeight = availableHeight;
-        
-        // If available space is unreasonably large (from auto-sized parent),
-        // measure to content size instead
-        if (availableWidth > 10000)  // float.MaxValue is much larger, this catches it
+        float contentWidth;
+        float contentHeight;
+
+        // measure to content size
+        if (availableWidth == float.MaxValue)
         {
-            // Measure children to get content-driven size
             float maxWidth = 0;
             float maxHeight = 0;
             foreach (var child in overlay.Children)
@@ -398,18 +396,17 @@ public static class LayoutEngine
         }
         else
         {
-            // Normal case: fill available space
-            // If explicit pixel size is set, use that instead
-            if (overlay.Width.Type != UnitType.Auto && overlay.Width.Type != UnitType.None)
-            {
+            // Always fill available space unless explicit pixel size is set
+            if (overlay.Width.Type == UnitType.Auto || overlay.Width.Type == UnitType.None)
+                contentWidth = availableWidth;
+            else
                 contentWidth = overlay.ToPixels(overlay.Width);
-            }
-            if (overlay.Height.Type != UnitType.Auto && overlay.Height.Type != UnitType.None)
-            {
-                contentHeight = overlay.ToPixels(overlay.Height);
-            }
 
-            // Measure children with the calculated dimensions
+            if (overlay.Height.Type == UnitType.Auto || overlay.Height.Type == UnitType.None)
+                contentHeight = availableHeight;
+            else
+                contentHeight = overlay.ToPixels(overlay.Height);
+
             foreach (var child in overlay.Children)
             {
                 child.CurrentFontSize = overlay.CurrentFontSize;
@@ -417,6 +414,11 @@ public static class LayoutEngine
             }
         }
 
+        // Guarantee overlays always get valid size for mapping
+        if (float.IsNaN(contentWidth) || contentWidth == 0)
+            contentWidth = availableWidth;
+        if (float.IsNaN(contentHeight) || contentHeight == 0)
+            contentHeight = availableHeight;
         overlay.MeasuredContentWidth = contentWidth;
         overlay.MeasuredContentHeight = contentHeight;
     }
