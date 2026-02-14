@@ -15,6 +15,8 @@ public class SUIMStride
     private readonly Dictionary<string, SpriteFont> Fonts = [];
 
     private readonly Dictionary<string, (Components.UIElement SuimRoot, UIElement StrideRoot, dynamic? Model)> _parseCache = [];
+    private dynamic? _currentModel;
+    private readonly List<(dynamic? Model, string PropertyName, UIElement Target, string TargetProperty)> _bindings = [];
 
     public (UIElement, dynamic?) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
@@ -38,7 +40,9 @@ public class SUIMStride
         // Not cached: parse markup, map and store the canonical instance
         var (suimRoot, model2) = MarkupParser.Parse(markup, model);
         Layout(suimRoot, game, defaultFontSize, fullscreen);
+        _currentModel = model2;
         var strideRoot = MapElement(suimRoot);
+        _currentModel = null;
 
         lock (_parseCache)
         {
@@ -89,6 +93,8 @@ public class SUIMStride
         };
 
         ApplyCommonProperties(element, strideElement);
+        
+        TransferBindings(element, strideElement);
 
         // Handle Children for generic containers if not already handled
         if (strideElement is Panel panel && element.Children.Count > 0 && element is not Components.Grid)
@@ -366,5 +372,94 @@ public class SUIMStride
         if (string.Equals(colorStr, "transparent", StringComparison.OrdinalIgnoreCase)) return Color.Transparent;
         //if (string.Equals(colorStr, "white", StringComparison.OrdinalIgnoreCase)
         return Color.White;
+    }
+    
+    private void TransferBindings(Components.UIElement suimElement, UIElement strideElement)
+    {
+        if (suimElement.Bindings.Count == 0 || _currentModel == null) return;
+        
+        foreach (var binding in suimElement.Bindings)
+        {
+            SetupBinding(_currentModel, binding.ModelPropName, binding.TargetPropertyName, strideElement);
+        }
+    }
+    
+    private void SetupBinding(dynamic? model, string modelPropertyName, string targetPropertyName, UIElement strideElement)
+    {
+        if (model == null) return;
+        
+        // Initial value - use GetValue for ObservableObject
+        try
+        {
+            object? value = null;
+            if (model is ObservableObject oo)
+            {
+                value = oo.GetValue(modelPropertyName);
+            }
+            else
+            {
+                value = model.GetType().GetProperty(modelPropertyName)?.GetValue(model);
+            }
+            ApplyBindingValue(strideElement, targetPropertyName, value);
+        }
+        catch { }
+        
+        // Store binding for updates
+        _bindings.Add((model, modelPropertyName, strideElement, targetPropertyName));
+        
+        // Subscribe to property changes if model implements INotifyPropertyChanged
+        if (model is System.ComponentModel.INotifyPropertyChanged inpc)
+        {
+            void OnPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == modelPropertyName)
+                {
+                    try
+                    {
+                        object? newValue = null;
+                        if (model is ObservableObject oo2)
+                        {
+                            newValue = oo2.GetValue(modelPropertyName);
+                        }
+                        else
+                        {
+                            newValue = model.GetType().GetProperty(modelPropertyName)?.GetValue(model);
+                        }
+                        ApplyBindingValue(strideElement, targetPropertyName, newValue);
+                    }
+                    catch { }
+                }
+            }
+            inpc.PropertyChanged += OnPropertyChanged;
+        }
+    }
+    
+    private static void ApplyBindingValue(UIElement strideElement, string targetPropertyName, object? value)
+    {
+        try
+        {
+            // Handle Text property
+            if (string.Equals(targetPropertyName, "text", StringComparison.OrdinalIgnoreCase) || string.Equals(targetPropertyName, "value", StringComparison.OrdinalIgnoreCase))
+            {
+                if (strideElement is TextBlock tb)
+                    tb.Text = value?.ToString() ?? "";
+                else if (strideElement is EditText et)
+                    et.Text = value?.ToString() ?? "";
+                else if (strideElement is Button btn && btn.Content is TextBlock btnText)
+                    btnText.Text = value?.ToString() ?? "";
+            }
+            // Handle other common properties
+            else if (string.Equals(targetPropertyName, "visibility", StringComparison.OrdinalIgnoreCase))
+            {
+                if (value != null && Enum.TryParse<Visibility>(value.ToString(), out var vis))
+                    strideElement.Visibility = vis;
+            }
+            else if (string.Equals(targetPropertyName, "opacity", StringComparison.OrdinalIgnoreCase))
+            {
+                if (float.TryParse(value?.ToString() ?? "1", out var opacity))
+                    strideElement.Opacity = opacity;
+            }
+        }
+        catch { }
     }
 }

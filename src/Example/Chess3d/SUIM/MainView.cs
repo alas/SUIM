@@ -28,10 +28,10 @@ public class MainView
 * {
     HorizontalAlignment: Left;
     VerticalAlignment: Top;
-}
-text {
     Color: Green;
     FontSize: 16;
+}
+text {
     HorizontalAlignment: Center;
     VerticalAlignment: Center;
 }
@@ -45,14 +45,12 @@ text {
     visibility: collapse;
 }
 .container {
-    HorizontalAlignment: Center;
-    VerticalAlignment: Center;
-    Background: rgba(0, 0, 0, 0.5);
+    HorizontalAlignment: Left;
+    VerticalAlignment: Top;
     Padding: 10;
-    Border: 5;
 }
 </style>
-    <vstack id=""buttonsUI"" class=""container"" halign=""left"" valign=""top"">
+    <vstack class=""container"">
         <button class=""mybutton"" id=""quitButton"">Quit</button>
         <button class=""mybutton"" id=""restartButton"">Restart</button>
         <button class=""mybutton"" id=""loadButton"">Load</button>
@@ -202,7 +200,6 @@ text {
         if (root == null) return null;
         if (string.Equals(root.Name, name, StringComparison.OrdinalIgnoreCase)) return root;
 
-        // Panels with Children
         if (root is Panel panel)
         {
             foreach (var child in panel.Children)
@@ -212,19 +209,10 @@ text {
             }
         }
 
-        // Grid (inherits Panel) already handled above
-
         // Content Controls
         if (root is ContentControl cc && cc.Content is UIElement contentElem)
         {
             var found = FindStrideElementByName(contentElem, name);
-            if (found != null) return found;
-        }
-
-        // Border has Content
-        if (root is Border br && br.Content is UIElement borderContent)
-        {
-            var found = FindStrideElementByName(borderContent, name);
             if (found != null) return found;
         }
 
