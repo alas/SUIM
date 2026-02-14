@@ -52,7 +52,7 @@ text {
     Border: 5;
 }
 </style>
-    <vstack id=""buttonsUI"" class=""container"" halign=""left"">
+    <vstack id=""buttonsUI"" class=""container"" halign=""left"" valign=""top"">
         <button class=""mybutton"" id=""quitButton"">Quit</button>
         <button class=""mybutton"" id=""restartButton"">Restart</button>
         <button class=""mybutton"" id=""loadButton"">Load</button>
