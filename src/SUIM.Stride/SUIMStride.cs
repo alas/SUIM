@@ -70,7 +70,11 @@ public class SUIMStride
         SUIM.Layout.LayoutEngine.Layout(root, defaultFontSize, preferredWidth, preferredHeight);
     }
 
-    private UIElement MapElement(Components.UIElement element)
+    /// <summary>
+    /// Maps an already-parsed and laid-out SUIM element tree to Stride UI elements.
+    /// It is public for testing or when you have a SUIM tree that's already been processed.
+    /// </summary>
+    public UIElement MapElement(Components.UIElement element)
     {
         UIElement strideElement = element switch
         {

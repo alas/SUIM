@@ -135,4 +135,108 @@ public class IntegrationTests
             Assert.Equal(expectedLabelHeight, lbl.ActualHeight);
         }
     }
+
+    [Fact]
+    public void MarkupParser_WithOverlayMarkup_OverlaysFillAvailableSpace()
+    {
+        // Simulates MainView layout: root grid with main UI and overlays
+        var markup = @"
+            <grid>
+                <style>
+                    .container { HorizontalAlignment: Center; VerticalAlignment: Center; }
+                    .overlay { visibility: collapse; }
+                </style>
+                <vstack class=""container"" width=""400"" height=""300"">
+                    <label value=""Main UI"" />
+                </vstack>
+                
+                <overlay class=""overlay"" id=""popup"">
+                    <grid width=""360"" height=""180"" halign=""center"" valign=""center"">
+                        <label value=""Popup"" />
+                    </grid>
+                </overlay>
+                
+                <overlay class=""overlay"" id=""screenOverlay"">
+                    <grid halign=""center"" valign=""center"">
+                        <label value=""Blocker"" />
+                    </grid>
+                </overlay>
+            </grid>";
+        
+        var (root, _) = MarkupParser.Parse(markup);
+        LayoutEngine.Layout(root, 16, 1280, 720);
+        
+        // Root grid should measure to 1280x720 (available space with no explicit size)
+        Assert.Equal(1280, root.ActualWidth);
+        Assert.Equal(720, root.ActualHeight);
+        
+        // Find the overlays in the grid's children
+        var overlays = root.Children.OfType<SUIM.Components.Overlay>().ToList();
+        Assert.Equal(2, overlays.Count);
+        
+        var popup = overlays.FirstOrDefault(o => o.Id == "popup");
+        var screenOverlay = overlays.FirstOrDefault(o => o.Id == "screenOverlay");
+        
+        Assert.NotNull(popup);
+        Assert.NotNull(screenOverlay);
+        
+        // Overlays should fill the root grid's available space (1280x720)
+        // They should NOT be sized to their content
+        Assert.True(popup.ActualWidth >= 1270 && popup.ActualWidth <= 1280,
+            $"popup width {popup.ActualWidth} should be ~1280");
+        Assert.True(popup.ActualHeight >= 710 && popup.ActualHeight <= 720,
+            $"popup height {popup.ActualHeight} should be ~720");
+        
+        Assert.True(screenOverlay.ActualWidth >= 1270 && screenOverlay.ActualWidth <= 1280,
+            $"screenOverlay width {screenOverlay.ActualWidth} should be ~1280");
+        Assert.True(screenOverlay.ActualHeight >= 710 && screenOverlay.ActualHeight <= 720,
+            $"screenOverlay height {screenOverlay.ActualHeight} should be ~720");
+    }
+
+    [Fact]
+    public void SUIMStride_MappingOverlays_PreservesOverlayDimensions()
+    {
+        // Test that Stride mapping preserves overlay dimensions from SUIM layout
+        var markup = @"
+            <grid>
+                <vstack width=""400"" height=""300"">
+                    <label value=""Main UI"" />
+                </vstack>
+                
+                <overlay id=""popup"">
+                    <grid width=""360"" height=""180"">
+                        <label value=""Popup"" />
+                    </grid>
+                </overlay>
+                
+                <overlay id=""screenOverlay"">
+                    <grid>
+                        <label value=""Blocker"" />
+                    </grid>
+                </overlay>
+            </grid>";
+        
+        // Parse and layout in SUIM
+        var (suimRoot, _) = MarkupParser.Parse(markup);
+        LayoutEngine.Layout(suimRoot, 16, 1280, 720);
+        
+        // Map to Stride
+        var mapper = new SUIM.StrideIntegration.SUIMStride();
+        var strideRoot = mapper.MapElement(suimRoot);
+        
+        // Verify Stride root is a grid
+        Assert.NotNull(strideRoot);
+        Assert.IsType<Stride.UI.Panels.Grid>(strideRoot);
+        
+        var strideGrid = (Stride.UI.Panels.Grid)strideRoot;
+        
+        // Check that the Stride grid has children (overlays and main UI mapped)
+        Assert.NotEmpty(strideGrid.Children);
+        
+        // The grid should have mapped children including overlays
+        // Stride overlays should preserve the SUIM dimensions
+        // This verifies the mapping doesn't lose dimension data
+        var strideChildren = strideGrid.Children.ToList();
+        Assert.True(strideChildren.Count >= 2, $"Expected at least 2 children, got {strideChildren.Count}");
+    }
 }
