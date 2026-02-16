@@ -19,13 +19,6 @@ public class MainView
     private readonly Game Game;
 
     private const string MainUIMarkup = @"<grid>
-<model>
-{
-    ""blockerMessage"": """",
-    ""popupTitle"": """",
-    ""popupMessage"": """"
-}
-</model>
 <style>
 * {
     HorizontalAlignment: Left;
@@ -70,7 +63,7 @@ text {
                 </vstack>
                 <hstack>
                     <button id=""yesButton"" class=""mybutton"">YES</button>
-                    <button id=""noButton"" class=""mybutton"">NO</button>
+                    <button id=""noButton"" class=""mybutton"" onclick=""NoHandler"">NO</button>
                 </hstack>
             </vstack>
         </grid>
@@ -82,7 +75,6 @@ text {
         </grid>
     </overlay>
 </grid>";
-    private readonly List<EventHandler<Stride.UI.Events.RoutedEventArgs>> popupYesHandlers;
 
     public MainView(Game game, UIComponent component)
     {
@@ -95,21 +87,26 @@ text {
             ContentManager = game.Content
         };
 
+        var model =
+        new
+        {
+            blockerMessage = "",
+            popupTitle = "",
+            popupMessage = "",
+            QuitHandler = new Action(() => QuitHandler()),
+            RestartHandler = new Action(() => RestartHandler()),
+            LoadHandler = new Action(() => LoadHandler()),
+            SaveHandler = new Action(() => SaveHandler()),
+            NoHandler = new Action(() => NoHandler()),
+        };
+
         // Pass 'this' as the model so methods on MainView can be bound
-        (MainUI, Model) = mapper.Parse(MainUIMarkup, game, model: this);
+        (MainUI, Model) = mapper.Parse(MainUIMarkup, game, model: model);
         Page = new UIPage
         {
             RootElement = MainUI
         };
         component.Page = Page;
-
-        popupYesHandlers =
-        [
-            QuitHandler,
-            RestartHandler,
-            LoadHandler,
-            SaveHandler
-        ];
     }
 
     private void QuitHandler(object? sender, EventArgs args)
@@ -164,6 +161,7 @@ text {
     public void RestartHandler() => OpenPopup("Restart", "Are you sure you want to start over?", RestartHandler);
     public void LoadHandler() => OpenPopup("Load", "Load() Not implemented yet!", LoadHandler);
     public void SaveHandler() => OpenPopup("Save", "Save() Not implemented yet!", SaveHandler);
+    public void NoHandler() => UnshowPopup();
 
     private void OpenPopup(string title, string message, EventHandler<Stride.UI.Events.RoutedEventArgs> yesClickHandler)
     {
@@ -173,14 +171,17 @@ text {
         popup!.Visibility = Visibility.Visible;
         var yesButton = FindStrideElementByName(MainUI, "yesButton") as Button;
         yesButton!.Click += yesClickHandler;
-        var noButton = FindStrideElementByName(MainUI, "noButton") as Button;
-        noButton!.Click += (_, _) => UnshowPopup();
     }
 
     private void UnshowPopup()
     {
         var blocker = FindStrideElementByName(MainUI, "popup");
         blocker!.Visibility = Visibility.Collapsed;
+        var yesButton = FindStrideElementByName(MainUI, "yesButton") as Button;
+        yesButton!.Click -= QuitHandler;
+        yesButton!.Click -= RestartHandler;
+        yesButton!.Click -= LoadHandler;
+        yesButton!.Click -= SaveHandler;
     }
 
     private void ShowBlocker(string message)
