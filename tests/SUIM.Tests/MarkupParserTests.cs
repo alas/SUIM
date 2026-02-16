@@ -267,17 +267,6 @@ public class MarkupParserTests
     }
 
     [Fact]
-    public void Parse_Button_WithOnClick()
-    {
-        var markup = "<button onclick=\"HandleSubmit\">Submit</button>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
-
-        Assert.IsType<Button>(element);
-        var button = (Button)element;
-        Assert.True(button.EventHandlers.ContainsKey("click"));
-    }
-
-    [Fact]
     public void Parse_Input_TextType()
     {
         var markup = "<input type=\"text\" placeholder=\"Enter name\" />";
@@ -1615,7 +1604,10 @@ Text after
         Assert.Equal("Test", model.description);
         
         var label = element?.Children.Single() as Label;
-        Assert.Equal("Hello World", label?.Value);
+        Assert.NotNull(label);
+        Assert.Single(label!.Bindings);
+        Assert.Equal("value", label.Bindings[0].TargetPropertyName);
+        Assert.Equal("title", label.Bindings[0].ModelPropertyName);
     }
 
     [Fact]
@@ -1748,7 +1740,9 @@ Text after
         Assert.Single(button.Children);
         var label = (Label)button.Children[0];
         Assert.NotNull(label);
-        Assert.Equal("Click Me", label.Value);
+        Assert.Single(label.Bindings);
+        Assert.Equal("value", label.Bindings[0].TargetPropertyName);
+        Assert.Equal("buttonText", label.Bindings[0].ModelPropertyName);
 
         Assert.NotNull(model);
         Assert.Equal("Click Me", model!.buttonText);

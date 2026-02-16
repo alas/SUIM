@@ -16,6 +16,8 @@ public class MainView
     private bool IsWorkInProgress;
     private readonly dynamic Model;
     private readonly UIElement MainUI;
+    private readonly Game Game;
+
     private const string MainUIMarkup = @"<grid>
 <model>
 {
@@ -51,10 +53,10 @@ text {
 }
 </style>
     <vstack class=""container"">
-        <button class=""mybutton"" id=""quitButton"">Quit</button>
-        <button class=""mybutton"" id=""restartButton"">Restart</button>
-        <button class=""mybutton"" id=""loadButton"">Load</button>
-        <button class=""mybutton"" id=""saveButton"">Save</button>
+        <button class=""mybutton"" onclick=""QuitHandler"">Quit</button>
+        <button class=""mybutton"" onclick=""RestartHandler"">Restart</button>
+        <button class=""mybutton"" onclick=""LoadHandler"">Load</button>
+        <button class=""mybutton"" onclick=""SaveHandler"">Save</button>
     </vstack>
 
     <overlay id=""popup"" class=""overlay"">
@@ -84,6 +86,7 @@ text {
 
     public MainView(Game game, UIComponent component)
     {
+        Game = game;
         IsWorkInProgress = false;
         Font = game.Content.Load<SpriteFont>("StrideDefaultFont");
 
@@ -91,68 +94,15 @@ text {
         {
             ContentManager = game.Content
         };
-        (MainUI, Model) = mapper.Parse(MainUIMarkup, game);
+
+        // Pass 'this' as the model so methods on MainView can be bound
+        (MainUI, Model) = mapper.Parse(MainUIMarkup, game, model: this);
         Page = new UIPage
         {
             RootElement = MainUI
         };
         component.Page = Page;
 
-        var quitButton = FindStrideElementByName(Page.RootElement, "quitButton") as Button;
-        var restartButton = FindStrideElementByName(Page.RootElement, "restartButton") as Button;
-        var loadButton = FindStrideElementByName(Page.RootElement, "loadButton") as Button;
-        var saveButton = FindStrideElementByName(Page.RootElement, "saveButton") as Button;
-        quitButton!.Click += (s, e) => OpenPopup("Quit", "Are you sure you want to quit?", QuitHandler);
-        restartButton!.Click += (s, e) => OpenPopup("Restart", "Are you sure you want to start over?", RestartHandler);
-        loadButton!.Click += (s, e) => OpenPopup("Load", "Load() Not implemented yet!", LoadHandler);
-        saveButton!.Click += (s, e) => OpenPopup("Save", "Save() Not implemented yet!", SaveHandler);
-        
-        void QuitHandler(object? sender, EventArgs args)
-        {
-            game.Exit();
-        }
-        
-        void RestartHandler(object? sender, EventArgs args)
-        {
-            if (IsWorkInProgress) return;
-        
-            IsWorkInProgress = true;
-            ShowBlocker("Working...");
-            BoardManager.GetInstance().InitBoard();
-            UnshowBlocker();
-            UnshowPopup();
-            IsWorkInProgress = false;
-        }
-        
-        void LoadHandler(object? sender, EventArgs args)
-        {
-            if (IsWorkInProgress) return;
-        
-            IsWorkInProgress = true;
-            ShowBlocker("Not implemented yet!");
-            //BoardManager.GetInstance().LoadFromFile(GetFileName());
-            Task.Delay(5000).ContinueWith(t =>
-            {
-                UnshowBlocker();
-                UnshowPopup();
-                IsWorkInProgress = false;
-            });
-        }
-        
-        void SaveHandler(object? sender, EventArgs args)
-        {
-            if (IsWorkInProgress) return;
-        
-            IsWorkInProgress = true;
-            //BoardManager.GetInstance().SaveBoardStateToFile(GetFileName());
-            ShowBlocker("Not implemented yet!");
-            Task.Delay(1000).ContinueWith(t =>
-            {
-                UnshowBlocker();
-                UnshowPopup();
-                IsWorkInProgress = false;
-            });
-        }
         popupYesHandlers =
         [
             QuitHandler,
@@ -161,6 +111,59 @@ text {
             SaveHandler
         ];
     }
+
+    private void QuitHandler(object? sender, EventArgs args)
+    {
+        Game.Exit();
+    }
+    
+    private void RestartHandler(object? sender, EventArgs args)
+    {
+        if (IsWorkInProgress) return;
+    
+        IsWorkInProgress = true;
+        ShowBlocker("Working...");
+        BoardManager.GetInstance().InitBoard();
+        UnshowBlocker();
+        UnshowPopup();
+        IsWorkInProgress = false;
+    }
+    
+    private void LoadHandler(object? sender, EventArgs args)
+    {
+        if (IsWorkInProgress) return;
+    
+        IsWorkInProgress = true;
+        ShowBlocker("Not implemented yet!");
+        //BoardManager.GetInstance().LoadFromFile(GetFileName());
+        Task.Delay(5000).ContinueWith(t =>
+        {
+            UnshowBlocker();
+            UnshowPopup();
+            IsWorkInProgress = false;
+        });
+    }
+    
+    private void SaveHandler(object? sender, EventArgs args)
+    {
+        if (IsWorkInProgress) return;
+    
+        IsWorkInProgress = true;
+        //BoardManager.GetInstance().SaveBoardStateToFile(GetFileName());
+        ShowBlocker("Not implemented yet!");
+        Task.Delay(1000).ContinueWith(t =>
+        {
+            UnshowBlocker();
+            UnshowPopup();
+            IsWorkInProgress = false;
+        });
+    }
+
+    // Methods bound from markup
+    public void QuitHandler() => OpenPopup("Quit", "Are you sure you want to quit?", QuitHandler);
+    public void RestartHandler() => OpenPopup("Restart", "Are you sure you want to start over?", RestartHandler);
+    public void LoadHandler() => OpenPopup("Load", "Load() Not implemented yet!", LoadHandler);
+    public void SaveHandler() => OpenPopup("Save", "Save() Not implemented yet!", SaveHandler);
 
     private void OpenPopup(string title, string message, EventHandler<Stride.UI.Events.RoutedEventArgs> yesClickHandler)
     {
@@ -179,7 +182,6 @@ text {
         var blocker = FindStrideElementByName(MainUI, "popup");
         blocker!.Visibility = Visibility.Collapsed;
         var yesButton = FindStrideElementByName(MainUI, "yesButton") as Button;
-        popupYesHandlers.ForEach(x => yesButton!.Click -= x);
     }
 
     private void ShowBlocker(string message)

@@ -127,6 +127,7 @@ public class SUIMStride
     private static Button MapButton(Components.Button button)
     {
         var btn = new Button();
+        // Click handler will be bound in TransferEvents
         return btn;
     }
 
@@ -376,11 +377,72 @@ public class SUIMStride
     
     private void TransferBindings(Components.UIElement suimElement, UIElement strideElement)
     {
-        if (suimElement.Bindings.Count == 0 || _currentModel == null) return;
+        if (_currentModel == null) return;
         
         foreach (var binding in suimElement.Bindings)
         {
-            SetupBinding(_currentModel, binding.ModelPropName, binding.TargetPropertyName, strideElement);
+            SetupBinding(_currentModel, binding.ModelPropertyName, binding.TargetPropertyName, strideElement);
+        }
+
+        TransferEvents(suimElement, strideElement);
+    }
+
+    private void TransferEvents(Components.UIElement suimElement, UIElement strideElement)
+    {
+        if (suimElement.Events.Count == 0 || _currentModel == null) return;
+
+        foreach (var kvp in suimElement.Events)
+        {
+            var eventName = kvp.Key;
+            var handlerName = kvp.Value;
+            
+            // Resolve handler
+            Delegate? handler = null;
+            if (_currentModel is ObservableObject oo)
+            {
+                handler = oo.GetHandler(handlerName);
+            }
+            else
+            {
+                // Try reflection on raw object
+                var method = _currentModel.GetType().GetMethod(handlerName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                if (method != null)
+                {
+                    // Create delegate based on signature? 
+                    // For now, support EventHandler and Action
+                     var parameters = method.GetParameters();
+                     if (parameters.Length == 2 && typeof(EventHandler).IsAssignableFrom(method.DeclaringType?.GetEvent(eventName)?.EventHandlerType ?? typeof(EventHandler)))
+                     {
+                         try { handler = Delegate.CreateDelegate(typeof(EventHandler<Stride.UI.Events.RoutedEventArgs>), _currentModel, method); } catch {}
+                         if (handler == null) try { handler = Delegate.CreateDelegate(typeof(EventHandler), _currentModel, method); } catch {}
+                     }
+                     else if (parameters.Length == 0)
+                     {
+                         handler = Delegate.CreateDelegate(typeof(Action), _currentModel, method);
+                     }
+                }
+            }
+
+            if (handler != null)
+            {
+                // Map to Stride event
+                if (string.Equals(eventName, "click", StringComparison.OrdinalIgnoreCase) && strideElement is Button btn)
+                {
+                    if (handler is EventHandler<Stride.UI.Events.RoutedEventArgs> routedHandler)
+                    {
+                        btn.Click += routedHandler;
+                    }
+                    else if (handler is EventHandler eh)
+                    {
+                        btn.Click += (s, e) => eh(s, e);
+                    }
+                    else if (handler is Action a)
+                    {
+                        btn.Click += (s, e) => a();
+                    }
+                }
+                // Add more event types here as needed
+            }
         }
     }
     

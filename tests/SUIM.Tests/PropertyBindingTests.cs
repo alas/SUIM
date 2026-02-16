@@ -23,109 +23,41 @@ public class PropertyBindingTests
         };
 
     [Fact]
-    public void PropertyBinding_Should_Update_Target_On_Initialize()
-    {
-        var model = Create(new { Text = "Hello" });
-        var element = new Text();
-        var binding = new PropertyBinding(model, "Text", element, "value");
-
-        binding.Apply();
-
-        Assert.Equal("Hello", element.Value);
-    }
-
-    [Fact]
-    public void PropertyBinding_Should_Update_Target_When_Model_Changes()
-    {
-        var model = Create(new { Text = "Initial" });
-        var element = new Text();
-        using var binding = new PropertyBinding(model, "Text", element, "value");
-        binding.Apply();
-
-        Assert.Equal("Initial", element.Value);
-
-        model.Text = "Updated";
-
-        Assert.Equal("Updated", element.Value);
-    }
-
-    [Fact]
-    public void PropertyBinding_Should_Stop_Updating_After_Dispose()
-    {
-        var model = Create(new { FontSize = 10 });
-        var element = new Text();
-        var binding = new PropertyBinding(model, "FontSize", element, "fontsize");
-        binding.Apply();
-
-        Assert.Equal(10f, element.FontSize);
-
-        binding.Dispose();
-
-        model.FontSize = 20;
-
-        Assert.Equal(10f, element.FontSize);
-    }
-
-    [Fact]
-    public void PropertyBinding_Should_Work_With_SUIM_Create_And_AnonymousTypes()
-    {
-        var model = Create(new { Text = "Dynamic", FontSize = 42 });
-        var element = new Text();
-
-        var binder1 = new PropertyBinding(model, "Text", element, "value");
-        binder1.Apply();
-
-        var binder2 = new PropertyBinding(model, "FontSize", element, "fontsize");
-        binder2.Apply();
-
-        Assert.Equal("Dynamic", element.Value);
-        Assert.Equal(42f, element.FontSize);
-    }
-
-    [Fact]
-    public void PropertyBinding_Should_Update_When_Dynamic_Property_Set()
-    {
-        var model = Create(new { Text = "Initial" });
-        var element = new Text();
-        var binding = new PropertyBinding(model, "Text", element, "value");
-        binding.Apply();
-
-        Assert.Equal("Initial", element.Value);
-
-        model.Text = "Updated";
-
-        Assert.Equal("Updated", element.Value);
-    }
-
-    // ============== DATA BINDING TESTS ==============
-
-    [Fact]
-    public void Parse_DataBinding_Width()
+    public void Parse_DataBinding_Width_CreatesBindingDefinition()
     {
         var markup = "<div width=\"@currentWidth\" height=\"100\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        // Property binding should be created for width
-        Assert.Equal(new UnitValue(250), div.Width);
+        
+        // Should have a binding for "width" -> "currentWidth"
+        Assert.Single(div.Bindings);
+        var binding = div.Bindings[0];
+        Assert.Equal("width", binding.TargetPropertyName);
+        Assert.Equal("currentWidth", binding.ModelPropertyName);
+        
+        // Initial value is NOT applied during parse anymore, binding is deferred to mapper
+        // Assert.Equal(new UnitValue(250), div.Width); // This would fail now
     }
 
     [Fact]
-    public void Parse_DataBinding_Text()
+    public void Parse_DataBinding_Text_CreatesBindingDefinition()
     {
         var markup = "<label value=\"@stringValue\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
         var label = (Label)element;
-        // Property binding should be created for text
-        Assert.NotNull(label.Value);
-        Assert.Equal("test", label.Value);
+        
+        Assert.Single(label.Bindings);
+        var binding = label.Bindings[0];
+        Assert.Equal("value", binding.TargetPropertyName);
+        Assert.Equal("stringValue", binding.ModelPropertyName);
     }
 
     [Fact]
-    public void Parse_Suim_ModelPropertiesAccessibleAndBindingWorks()
+    public void Parse_Suim_ModelProperties_CreatesBindings()
     {
         var markup = @"<grid>
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
@@ -133,16 +65,12 @@ public class PropertyBindingTests
 </grid>";
         var (element, model) = MarkupParser.Parse(markup);
 
-        var label = element?.Children?.Single().Children?.Single() as Label;
-        Assert.Equal("Click Me", label?.Value);
-        model!.buttonText = "Updated Text";
-        Assert.Equal("Updated Text", label!.Value);
-    }
-
-    private static dynamic Create(object model)
-    {
-        var observable = new ObservableObject();
-        observable.Initialize(model);
-        return observable;
+        var button = element.Children.Single() as Button;
+        var label = button?.Children.Single() as Label;
+        
+        Assert.NotNull(label);
+        Assert.Single(label!.Bindings);
+        Assert.Equal("value", label.Bindings[0].TargetPropertyName);
+        Assert.Equal("buttonText", label.Bindings[0].ModelPropertyName);
     }
 }

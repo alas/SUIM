@@ -390,13 +390,19 @@ public static class MarkupParser
         var name = attr.Name.LocalName;
         var target = IsLayoutAttribute(name) ? rootElement : innerElement;
 
+        if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
+        {
+            // Event Binding: onclick="MethodName"
+            var handlerName = attr.Value;
+            target.Events[name.Substring(2)] = handlerName;
+            return;
+        }
+
         if (attr.Value.StartsWith('@'))
         {
             // Dynamic Binding: <grid width="@myVar" />
             var modelPropName = attr.Value.Substring(1);
-            var binding = new PropertyBinding(model, modelPropName, target, name);
-            target.Bindings.Add(binding);
-            binding.Apply();
+            target.Bindings.Add(new BindingDefinition(name, modelPropName));
         }
         else
         {

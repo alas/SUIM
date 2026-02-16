@@ -31,12 +31,12 @@ public abstract class UIElement
     public int ZIndex { get; set; }
     public string? Visibility { get; set; }
     public bool ReadOnly { get; set; }
-    public List<PropertyBinding> Bindings { get; } = [];
+    public List<BindingDefinition> Bindings { get; } = [];
     public string? Sprite { get; set; }
     public string? HoverSprite { get; set; }
     public string? PressedSprite { get; set; }
     public bool StopClicks { get; set; }
-    public Dictionary<string, List<Action<UIElement>>> EventHandlers { get; set; } = [];
+    public Dictionary<string, string> Events { get; set; } = [];
     public List<UIElement> Children { get; } = [];
 
     // Layout calculation properties (transient, used during measurement/positioning)
@@ -139,7 +139,7 @@ public abstract class UIElement
         else if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
         {
             var handlerName = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-            On(name.Substring(2), GetHandler(handlerName));
+            Events[name.Substring(2)] = handlerName;
         }
         else if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase))
         {
@@ -179,12 +179,6 @@ public abstract class UIElement
         }
     }
 
-    private static Action<UIElement>? GetHandler(string value)
-    {
-        //throw new NotImplementedException();
-        return null;
-    }
-
     public virtual object? GetAttribute(string name)
     {
         if (name.Equals("id", StringComparison.OrdinalIgnoreCase)) return Id;
@@ -203,29 +197,6 @@ public abstract class UIElement
         if (name.Equals("height", StringComparison.OrdinalIgnoreCase)) return Height;
         if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase)) return Anchor;
         return null;
-    }
-
-    public virtual void On(string eventName, Action<UIElement>? handler)
-    {
-        if (!EventHandlers.TryGetValue(eventName, out List<Action<UIElement>>? value))
-        {
-            value = [];
-            EventHandlers[eventName] = value;
-        }
-
-        if (handler != null)
-            value.Add(handler);
-    }
-
-    public virtual void Trigger(string eventName)
-    {
-        if (EventHandlers.TryGetValue(eventName, out var handlers))
-        {
-            foreach (var handler in handlers)
-            {
-                handler?.Invoke(this);
-            }
-        }
     }
 
     private static Anchor ParseAnchor(string value)
