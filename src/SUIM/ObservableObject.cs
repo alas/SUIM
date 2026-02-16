@@ -2,6 +2,7 @@ namespace SUIM;
 
 using System.ComponentModel;
 using System.Dynamic;
+using System.Linq;
 using System.Reflection;
 
 public class ObservableObject : DynamicObject, INotifyPropertyChanged
@@ -36,29 +37,62 @@ public class ObservableObject : DynamicObject, INotifyPropertyChanged
             return d;
         }
 
-        // 2. Check for a method on the source object
-        var method = _source.GetType().GetMethod(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
-        if (method != null)
+        // 2. Check for methods with matching name (multiple methods with same name = overloading)
+        var methods = _source.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+        var matchingMethods = methods.Where(m => m.Name == name).ToList();
+
+        if (matchingMethods.Count == 0)
+            return null;
+
+        // Priority-based resolution for overloaded methods:
+        // 1. Parameterless method (Action)
+        var parameterlessMethod = matchingMethods.FirstOrDefault(m => m.GetParameters().Length == 0);
+        if (parameterlessMethod != null)
         {
-            // Create a delegate. We don't know the exact type, but we can try to create an Action or similar.
-            // For now, let's return the method info wrapped or loosely typed if possible, 
-            // but the caller expects a Delegate. 
-            // We'll try to create an Action or Action<arg> based on parameters.
+            return parameterlessMethod.CreateDelegate(typeof(Action), _source);
+        }
+
+        // 2. Method taking single UIElement (Action<UIElement>)
+        var uiElementMethod = matchingMethods.FirstOrDefault(m =>
+            m.GetParameters().Length == 1 &&
+            typeof(SUIM.Components.UIElement).IsAssignableFrom(m.GetParameters()[0].ParameterType));
+        if (uiElementMethod != null)
+        {
+            return uiElementMethod.CreateDelegate(typeof(Action<SUIM.Components.UIElement>), _source);
+        }
+
+        // 3. EventHandler pattern (object sender, EventArgs e)
+        var eventHandlerMethod = matchingMethods.FirstOrDefault(m =>
+        {
+            var parms = m.GetParameters();
+            return parms.Length == 2 &&
+                parms[0].ParameterType == typeof(object) &&
+                typeof(EventArgs).IsAssignableFrom(parms[1].ParameterType);
+        });
+        if (eventHandlerMethod != null)
+        {
+            return eventHandlerMethod.CreateDelegate(typeof(EventHandler), _source);
+        }
+
+        // 4. Fall back to first method if others don't match
+        if (matchingMethods.Count > 0)
+        {
+            var fallbackMethod = matchingMethods[0];
+            var parameters = fallbackMethod.GetParameters();
             
-            var parameters = method.GetParameters();
-            if (parameters.Length == 0)
+            try
             {
-                return method.CreateDelegate(typeof(Action), _source);
+                if (parameters.Length == 0)
+                    return fallbackMethod.CreateDelegate(typeof(Action), _source);
+                else if (parameters.Length == 1 && typeof(SUIM.Components.UIElement).IsAssignableFrom(parameters[0].ParameterType))
+                    return fallbackMethod.CreateDelegate(typeof(Action<SUIM.Components.UIElement>), _source);
+                else if (parameters.Length == 2)
+                    return fallbackMethod.CreateDelegate(typeof(EventHandler), _source);
             }
-            if (parameters.Length == 1 && typeof(SUIM.Components.UIElement).IsAssignableFrom(parameters[0].ParameterType))
+            catch
             {
-                return method.CreateDelegate(typeof(Action<SUIM.Components.UIElement>), _source);
+                // If delegate creation fails, return null
             }
-             if (parameters.Length == 2 && typeof(EventArgs).IsAssignableFrom(parameters[1].ParameterType)) 
-             {
-                 // Handle standard EventHandler pattern: void Method(object sender, EventArgs e)
-                  return method.CreateDelegate(typeof(EventHandler), _source);
-             }
         }
 
         return null;

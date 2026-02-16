@@ -8,6 +8,9 @@ using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
 using StrideGrid = Stride.UI.Panels.Grid;
+using System.Collections.Generic;
+using System.Linq;
+using System;
 
 public class SUIMStride
 {
@@ -404,23 +407,8 @@ public class SUIMStride
             }
             else
             {
-                // Try reflection on raw object
-                var method = _currentModel.GetType().GetMethod(handlerName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                if (method != null)
-                {
-                    // Create delegate based on signature? 
-                    // For now, support EventHandler and Action
-                     var parameters = method.GetParameters();
-                     if (parameters.Length == 2 && typeof(EventHandler).IsAssignableFrom(method.DeclaringType?.GetEvent(eventName)?.EventHandlerType ?? typeof(EventHandler)))
-                     {
-                         try { handler = Delegate.CreateDelegate(typeof(EventHandler<Stride.UI.Events.RoutedEventArgs>), _currentModel, method); } catch {}
-                         if (handler == null) try { handler = Delegate.CreateDelegate(typeof(EventHandler), _currentModel, method); } catch {}
-                     }
-                     else if (parameters.Length == 0)
-                     {
-                         handler = Delegate.CreateDelegate(typeof(Action), _currentModel, method);
-                     }
-                }
+                // Try reflection on raw object using same priority-based resolution as ObservableObject
+                handler = ResolveMethodAsDelegate(handlerName, _currentModel);
             }
 
             if (handler != null)
@@ -428,22 +416,100 @@ public class SUIMStride
                 // Map to Stride event
                 if (string.Equals(eventName, "click", StringComparison.OrdinalIgnoreCase) && strideElement is Button btn)
                 {
-                    if (handler is EventHandler<Stride.UI.Events.RoutedEventArgs> routedHandler)
-                    {
-                        btn.Click += routedHandler;
-                    }
-                    else if (handler is EventHandler eh)
-                    {
-                        btn.Click += (s, e) => eh(s, e);
-                    }
-                    else if (handler is Action a)
-                    {
-                        btn.Click += (s, e) => a();
-                    }
+                    BindClickHandler(btn, handler, suimElement);
                 }
                 // Add more event types here as needed
             }
         }
+    }
+
+    private void BindClickHandler(Button btn, Delegate handler, Components.UIElement suimElement)
+    {
+        // Support multiple handler types for click events
+        if (handler is EventHandler<Stride.UI.Events.RoutedEventArgs> routedHandler)
+        {
+            btn.Click += routedHandler;
+        }
+        else if (handler is EventHandler eh)
+        {
+            EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => eh(s, e);
+            btn.Click += wrappedHandler;
+        }
+        else if (handler is Action<Components.UIElement> actionWithElement)
+        {
+            EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => actionWithElement(suimElement);
+            btn.Click += wrappedHandler;
+        }
+        else if (handler is Action a)
+        {
+            EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => a();
+            btn.Click += wrappedHandler;
+        }
+    }
+
+    /// <summary>
+    /// Resolves a method name to a delegate using priority-based resolution.
+    /// Priority: Parameterless -> UIElement parameter -> EventHandler pattern
+    /// </summary>
+    private static Delegate? ResolveMethodAsDelegate(string methodName, dynamic model)
+    {
+        if (model == null) return null;
+
+        // Cast to object to avoid dynamic dispatch issues
+        object targetObject = (object)model;
+        var methods = targetObject.GetType().GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        var matchingMethods = methods.Where(m => m.Name == methodName).ToList();
+
+        if (matchingMethods.Count == 0)
+            return null;
+
+        // 1. Priority: Parameterless method (Action)
+        var parameterlessMethod = matchingMethods.FirstOrDefault(m => m.GetParameters().Length == 0);
+        if (parameterlessMethod != null)
+        {
+            try { return Delegate.CreateDelegate(typeof(Action), targetObject, parameterlessMethod); }
+            catch { /* Fall through to next priority */ }
+        }
+
+        // 2. Priority: Method taking single UIElement (Action<UIElement>)
+        var uiElementMethod = matchingMethods.FirstOrDefault(m =>
+            m.GetParameters().Length == 1 &&
+            typeof(Components.UIElement).IsAssignableFrom(m.GetParameters()[0].ParameterType));
+        if (uiElementMethod != null)
+        {
+            try { return Delegate.CreateDelegate(typeof(Action<Components.UIElement>), targetObject, uiElementMethod); }
+            catch { /* Fall through to next priority */ }
+        }
+
+        // 3. Priority: EventHandler pattern (object sender, EventArgs e)
+        var eventHandlerMethod = matchingMethods.FirstOrDefault(m =>
+        {
+            var parms = m.GetParameters();
+            return parms.Length == 2 &&
+                parms[0].ParameterType == typeof(object) &&
+                typeof(EventArgs).IsAssignableFrom(parms[1].ParameterType);
+        });
+        if (eventHandlerMethod != null)
+        {
+            try { return Delegate.CreateDelegate(typeof(EventHandler), targetObject, eventHandlerMethod); }
+            catch { /* Fall through to next priority */ }
+        }
+
+        // 4. Try EventHandler<RoutedEventArgs> pattern (Stride specific)
+        var routedHandlerMethod = matchingMethods.FirstOrDefault(m =>
+        {
+            var parms = m.GetParameters();
+            return parms.Length == 2 &&
+                parms[0].ParameterType == typeof(object) &&
+                parms[1].ParameterType == typeof(Stride.UI.Events.RoutedEventArgs);
+        });
+        if (routedHandlerMethod != null)
+        {
+            try { return Delegate.CreateDelegate(typeof(EventHandler<Stride.UI.Events.RoutedEventArgs>), targetObject, routedHandlerMethod); }
+            catch { /* Fall through */ }
+        }
+
+        return null;
     }
     
     private void SetupBinding(dynamic? model, string modelPropertyName, string targetPropertyName, UIElement strideElement)

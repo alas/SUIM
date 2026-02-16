@@ -61,7 +61,15 @@ public static class ModelLogic
                 mergedDict[kvp.Key] = kvp.Value;
             }
 
-            return CreateDynamicFromDictionary(mergedDict);
+            // Preserve the source object if we had one
+            object? source = null;
+            if (existingModel is ObservableObject oo)
+            {
+                var sourceField = typeof(ObservableObject).GetField("_source", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                source = sourceField?.GetValue(oo);
+            }
+
+            return CreateDynamicFromDictionary(mergedDict, source);
         }
         catch (JsonException ex)
         {
@@ -129,10 +137,15 @@ public static class ModelLogic
         return dict;
     }
 
-    private static dynamic CreateDynamicFromDictionary(Dictionary<string, object?> dict)
+    private static dynamic CreateDynamicFromDictionary(Dictionary<string, object?> dict, object? source = null)
     {
         var observable = new ObservableObject();
-        // Set properties directly into the observable
+        if (source != null)
+        {
+            observable.Initialize(source);
+        }
+        
+        // Set properties directly into the observable (this overrides/sets dictionary values)
         foreach (var kvp in dict)
         {
             observable.SetValue(kvp.Key, kvp.Value);

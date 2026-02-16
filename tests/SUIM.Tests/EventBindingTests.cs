@@ -50,18 +50,63 @@ public class EventBindingTests
         Assert.Equal("OnMessage", root.Events["click"]);
     }
 
-    [Fact]
-    public void MarkupParser_BindsEvent_ToDelegate()
+    public class TestModelWithOverloading
     {
-        var model = new {
-            MyHandler = new Action(() => { })
-        };
+        public bool ParameterlessClicked { get; private set; }
+        public string UIElementSenderName { get; private set; } = "";
+        public bool EventHandlerClicked { get; private set; }
 
-        var markup = @"<button onclick=""MyHandler"" />";
+        // Overloaded QuitHandler methods with different priorities
+        // Priority 1: Parameterless (should be selected first)
+        public void QuitHandler()
+        {
+            ParameterlessClicked = true;
+        }
+
+        // Priority 2: Takes UIElement (should be selected if parameterless unavailable)
+        public void QuitHandler(UIElement sender)
+        {
+            UIElementSenderName = sender.Id ?? "Unknown";
+        }
+
+        // Priority 3: EventHandler pattern (should be selected if above unavailable)
+        public void QuitHandler(object sender, EventArgs e)
+        {
+            EventHandlerClicked = true;
+        }
+    }
+
+    [Fact]
+    public void GetHandler_WithOverloadedMethods_SelectsParameterlessFirst()
+    {
+        var model = new TestModelWithOverloading();
+        var observableModel = new ObservableObject();
+        observableModel.Initialize(model);
+
+        // Get the parameterless handler
+        var handler = observableModel.GetHandler("QuitHandler");
+
+        Assert.NotNull(handler);
+        Assert.IsType<Action>(handler);
+
+        // Invoke and verify the parameterless method was called
+        ((Action)handler)();
+        Assert.True(model.ParameterlessClicked);
+        Assert.Empty(model.UIElementSenderName);
+        Assert.False(model.EventHandlerClicked);
+    }
+
+    [Fact]
+    public void MarkupParser_BindsOverloadedEventHandler_ToParameterlessMethod()
+    {
+        var model = new TestModelWithOverloading();
+        var markup = @"<button id=""quitBtn"" onclick=""QuitHandler"" />";
         
         var (root, _) = MarkupParser.Parse(markup, model);
         
+        Assert.NotNull(root);
+        Assert.IsType<Button>(root);
         Assert.True(root.Events.ContainsKey("click"));
-        Assert.Equal("MyHandler", root.Events["click"]);
+        Assert.Equal("QuitHandler", root.Events["click"]);
     }
 }

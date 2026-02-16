@@ -181,7 +181,6 @@ text {
     {
         var blocker = FindStrideElementByName(MainUI, "popup");
         blocker!.Visibility = Visibility.Collapsed;
-        var yesButton = FindStrideElementByName(MainUI, "yesButton") as Button;
     }
 
     private void ShowBlocker(string message)
