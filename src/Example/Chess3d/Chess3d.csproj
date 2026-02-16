@@ -19,4 +19,9 @@
     <ProjectReference Include="..\..\SUIM.Stride\SUIM.Stride.csproj" />
     <ProjectReference Include="..\..\SUIM\SUIM.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Resources\skybox_texture_hdr.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
