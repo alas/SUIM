@@ -3,7 +3,6 @@
 using System;
 using System.Threading.Tasks;
 using Stride.Engine;
-using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
@@ -11,7 +10,6 @@ using SUIM.StrideIntegration;
 
 public class MainView
 {
-    private readonly SpriteFont Font;
     private readonly UIPage Page;
     private bool IsWorkInProgress;
     private readonly dynamic Model;
@@ -22,10 +20,6 @@ public class MainView
     {
         Game = game;
         IsWorkInProgress = false;
-        Font = game.Content.Load<SpriteFont>("StrideDefaultFont");
-
-        SUIM.ComponentRegistry.Register("MyPopup", "SUIM/Components/Popup.suim");
-        SUIM.ComponentRegistry.Register("MyScreenOverlay", "SUIM/Components/ScreenOverlay.suim");
 
         var model =
             new
@@ -40,6 +34,8 @@ public class MainView
                 NoHandler = new Action(() => NoHandler()),
             };
 
+        SUIM.ComponentRegistry.Register("MyPopup", "SUIM/Components/Popup.suim");
+        SUIM.ComponentRegistry.Register("MyScreenOverlay", "SUIM/Components/ScreenOverlay.suim");
         var markup = File.ReadAllText("SUIM/Pages/MainUI.suim");
         var mapper = new SUIMStride();
         (MainUI, Model) = mapper.Parse(markup, game, model: model);
