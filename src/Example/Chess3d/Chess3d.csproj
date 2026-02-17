@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net10.0-windows</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -29,8 +29,8 @@
     <None Update="SUIM\Components\ScreenOverlay.suim">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="SUIM\Pages\" />
+    <None Update="SUIM\Pages\MainUI.suim">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

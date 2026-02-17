@@ -18,41 +18,6 @@ public class MainView
     private readonly UIElement MainUI;
     private readonly Game Game;
 
-    private const string MainUIMarkup = @"<grid>
-<style>
-* {
-    HorizontalAlignment: Left;
-    VerticalAlignment: Top;
-    Color: Green;
-    FontSize: 16;
-}
-text {
-    HorizontalAlignment: Center;
-    VerticalAlignment: Center;
-}
-.mybutton {
-    Background: Black;
-    Width: 200;
-    Height: 50;
-    Margin: 5;
-}
-.container {
-    HorizontalAlignment: Left;
-    VerticalAlignment: Top;
-    Padding: 10;
-}
-</style>
-    <vstack class=""container"">
-        <button class=""mybutton"" onclick=""QuitHandler"">Quit</button>
-        <button class=""mybutton"" onclick=""RestartHandler"">Restart</button>
-        <button class=""mybutton"" onclick=""LoadHandler"">Load</button>
-        <button class=""mybutton"" onclick=""SaveHandler"">Save</button>
-    </vstack>
-
-    <MyPopup />
-    <MyScreenOverlay />
-</grid>";
-
     public MainView(Game game, UIComponent component)
     {
         Game = game;
@@ -62,26 +27,22 @@ text {
         SUIM.ComponentRegistry.Register("MyPopup", "SUIM/Components/Popup.suim");
         SUIM.ComponentRegistry.Register("MyScreenOverlay", "SUIM/Components/ScreenOverlay.suim");
 
-        var mapper = new SUIMStride
-        {
-            ContentManager = game.Content
-        };
-
         var model =
-        new
-        {
-            blockerMessage = "",
-            popupTitle = "",
-            popupMessage = "",
-            QuitHandler = new Action(() => QuitHandler()),
-            RestartHandler = new Action(() => RestartHandler()),
-            LoadHandler = new Action(() => LoadHandler()),
-            SaveHandler = new Action(() => SaveHandler()),
-            NoHandler = new Action(() => NoHandler()),
-        };
+            new
+            {
+                blockerMessage = "",
+                popupTitle = "",
+                popupMessage = "",
+                QuitHandler = new Action(() => QuitHandler()),
+                RestartHandler = new Action(() => RestartHandler()),
+                LoadHandler = new Action(() => LoadHandler()),
+                SaveHandler = new Action(() => SaveHandler()),
+                NoHandler = new Action(() => NoHandler()),
+            };
 
-        // Pass 'this' as the model so methods on MainView can be bound
-        (MainUI, Model) = mapper.Parse(MainUIMarkup, game, model: model);
+        var markup = File.ReadAllText("SUIM/Pages/MainUI.suim");
+        var mapper = new SUIMStride();
+        (MainUI, Model) = mapper.Parse(markup, game, model: model);
         Page = new UIPage
         {
             RootElement = MainUI

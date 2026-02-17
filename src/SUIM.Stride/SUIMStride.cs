@@ -14,13 +14,23 @@ using StrideGrid = Stride.UI.Panels.Grid;
 
 public class SUIMStride
 {
-    public ContentManager? ContentManager { get; init; }
+    private ContentManager ContentManager = null!;
     private readonly Dictionary<string, SpriteFont> Fonts = [];
-
     private readonly Dictionary<string, (Components.UIElement SuimRoot, UIElement StrideRoot, dynamic? Model)> _parseCache = [];
     private dynamic? _currentModel;
 
+    public (UIElement, dynamic?) ParseFromFile(string path, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    {
+        var markup = File.ReadAllText(path);
+        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance);
+    }
+
     public (UIElement, dynamic?) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    {
+        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance);
+    }
+
+    private (UIElement, dynamic?) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance)
     {
         ArgumentNullException.ThrowIfNull(markup);
 
@@ -38,6 +48,8 @@ public class SUIMStride
                 return (MapElement(cached.SuimRoot), cached.Model);
             }
         }
+
+        ContentManager = game.Content;
 
         // Not cached: parse markup, map and store the canonical instance
         var (suimRoot, model2) = MarkupParser.Parse(markup, model);
@@ -147,9 +159,9 @@ public class SUIMStride
         {
             var fontName = text.Font ?? "StrideDefaultFont";
             SpriteFont? sf = Fonts.TryGetValue(fontName, out SpriteFont? value) ? value : null;
-            if (sf == null && !Fonts.ContainsKey(fontName) && ContentManager != null)
+            if (sf == null && !Fonts.ContainsKey(fontName))
             {
-                sf = ContentManager?.Load<SpriteFont>(fontName);
+                sf = ContentManager.Load<SpriteFont>(fontName);
                 if (sf != null)
                 {
                     Fonts[fontName] = sf;
