@@ -382,6 +382,11 @@ public static class MarkupParser
             SetAttribute(attr, model, rootElement, innerElement);
         }
 
+        if (rootElement is CustomComponent custom)
+        {
+            custom.Expand(model);
+        }
+
         return rootElement;
     }
 
@@ -461,6 +466,12 @@ public static class MarkupParser
         // Special tags
         if (tag.Equals("style", StringComparison.OrdinalIgnoreCase)) return null;
         if (tag.Equals("model", StringComparison.OrdinalIgnoreCase)) return null;
+
+        // Custom tags
+        if (ComponentRegistry.IsRegistered(tag))
+        {
+            return ComponentRegistry.Create(tag);
+        }
 
         throw new NotSupportedException($"Unknown tag: {element.Name.LocalName}");
     }

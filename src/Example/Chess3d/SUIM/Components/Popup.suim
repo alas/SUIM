@@ -1,0 +1,16 @@
+<overlay id="popup" visibility="collapse">
+    <grid width="360" height="180" halign="center" valign="center">
+        <vstack>
+            <hstack>
+                <label value="@popupTitle" />
+            </hstack>
+            <vstack margin="6">
+                <label value="@popupMessage" />
+            </vstack>
+            <hstack>
+                <button id="yesButton" class="mybutton">YES</button>
+                <button id="noButton" class="mybutton" onclick="NoHandler">NO</button>
+            </hstack>
+        </vstack>
+    </grid>
+</overlay>

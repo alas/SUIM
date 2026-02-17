@@ -36,9 +36,6 @@ text {
     Height: 50;
     Margin: 5;
 }
-.overlay {
-    visibility: collapse;
-}
 .container {
     HorizontalAlignment: Left;
     VerticalAlignment: Top;
@@ -52,28 +49,8 @@ text {
         <button class=""mybutton"" onclick=""SaveHandler"">Save</button>
     </vstack>
 
-    <overlay id=""popup"" class=""overlay"">
-        <grid width=""360"" height=""180"" halign=""center"" valign=""center"">
-            <vstack>
-                <hstack>
-                    <label value=""@popupTitle"" />
-                </hstack>
-                <vstack margin=""6"">
-                    <label value=""@popupMessage"" />
-                </vstack>
-                <hstack>
-                    <button id=""yesButton"" class=""mybutton"">YES</button>
-                    <button id=""noButton"" class=""mybutton"" onclick=""NoHandler"">NO</button>
-                </hstack>
-            </vstack>
-        </grid>
-    </overlay>
-
-    <overlay id=""screenOverlay"" class=""overlay"">
-        <grid halign=""center"" valign=""center"">
-            <label value=""@blockerMessage"" />
-        </grid>
-    </overlay>
+    <MyPopup />
+    <MyScreenOverlay />
 </grid>";
 
     public MainView(Game game, UIComponent component)
@@ -81,6 +58,9 @@ text {
         Game = game;
         IsWorkInProgress = false;
         Font = game.Content.Load<SpriteFont>("StrideDefaultFont");
+
+        SUIM.ComponentRegistry.Register("MyPopup", "SUIM/Components/Popup.suim");
+        SUIM.ComponentRegistry.Register("MyScreenOverlay", "SUIM/Components/ScreenOverlay.suim");
 
         var mapper = new SUIMStride
         {

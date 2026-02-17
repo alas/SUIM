@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net10.0-windows</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -23,5 +23,14 @@
     <None Update="Resources\skybox_texture_hdr.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="SUIM\Components\Popup.suim">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SUIM\Components\ScreenOverlay.suim">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SUIM\Pages\" />
   </ItemGroup>
 </Project>
