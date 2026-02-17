@@ -19,7 +19,6 @@ public class SUIMStride
 
     private readonly Dictionary<string, (Components.UIElement SuimRoot, UIElement StrideRoot, dynamic? Model)> _parseCache = [];
     private dynamic? _currentModel;
-    private readonly List<(dynamic? Model, string PropertyName, UIElement Target, string TargetProperty)> _bindings = [];
 
     public (UIElement, dynamic?) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
@@ -531,9 +530,6 @@ public class SUIMStride
             ApplyBindingValue(strideElement, targetPropertyName, value);
         }
         catch { }
-        
-        // Store binding for updates
-        _bindings.Add((model, modelPropertyName, strideElement, targetPropertyName));
         
         // Subscribe to property changes if model implements INotifyPropertyChanged
         if (model is System.ComponentModel.INotifyPropertyChanged inpc)
