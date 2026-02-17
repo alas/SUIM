@@ -22,6 +22,7 @@ text {
     Padding: 10;
 }
 </style>
+
     <vstack class="container">
         <button class="mybutton" onclick="QuitHandler">Quit</button>
         <button class="mybutton" onclick="RestartHandler">Restart</button>

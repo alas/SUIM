@@ -29,7 +29,7 @@
     <None Update="SUIM\Components\ScreenOverlay.suim">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="SUIM\Pages\MainUI.suim">
+    <None Update="SUIM\Views\MainUI.suim">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -36,7 +36,7 @@ public class MainView
 
         SUIM.ComponentRegistry.Register("MyPopup", "SUIM/Components/Popup.suim");
         SUIM.ComponentRegistry.Register("MyScreenOverlay", "SUIM/Components/ScreenOverlay.suim");
-        var markup = File.ReadAllText("SUIM/Pages/MainUI.suim");
+        var markup = File.ReadAllText("SUIM/Views/MainUI.suim");
         var mapper = new SUIMStride();
         (MainUI, Model) = mapper.Parse(markup, game, model: model);
         Page = new UIPage
