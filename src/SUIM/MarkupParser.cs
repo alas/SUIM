@@ -8,7 +8,7 @@ using SUIM.Layout;
 
 public static class MarkupParser
 {
-    public static (UIElement, dynamic?) Parse(string markup, object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null)
+    public static (UIElement, dynamic?) Parse(string markup, object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
     {
         dynamic? model2 = model == null ? null : ModelLogic.Create(model);
         var controlFlowParser = new ControlFlowParser(model2);
@@ -21,7 +21,7 @@ public static class MarkupParser
 
         model2 = ModelLogic.ExtractModel(root, model2);
 
-        var element = ParseElement(root, styles, model2)
+        var element = ParseElement(root, styles, model2, basePath)
             ?? throw new InvalidOperationException("Root element not found.");
 
         return (element, model2);
@@ -227,13 +227,25 @@ public static class MarkupParser
         return element;
     }
 
-    private static UIElement? ParseElement(XElement element, Dictionary<string, Dictionary<string, string>> styles, dynamic? model)
+    private static UIElement? ParseElement(XElement element, Dictionary<string, Dictionary<string, string>> styles, dynamic? model, string? basePath = null)
     {
         var innerElement = ParseElementTag(element);
         if (innerElement == null)
         {
             if (element.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))
             {
+                var sourceAttr = element.Attribute("source") ?? element.Attribute("src");
+                if (sourceAttr != null && !string.IsNullOrEmpty(basePath))
+                {
+                    var stylePath = Path.Combine(basePath, sourceAttr.Value);
+                    if (!File.Exists(stylePath))
+                    {
+                        throw new FileNotFoundException($"Style file not found: {stylePath}");
+                    }
+
+                    ParseStyles(File.ReadAllText(stylePath), styles);
+                }
+
                 var content = element.Value.Trim();
                 if (!string.IsNullOrEmpty(content))
                 {
@@ -297,7 +309,7 @@ public static class MarkupParser
                     {
                         child.SetAttributeValue("grid.row", rowIndex.ToString());
                         child.SetAttributeValue("grid.column", colIdx.ToString());
-                        var childElement = ParseElement(child, styles, model);
+                        var childElement = ParseElement(child, styles, model, basePath);
                         if (childElement == null) continue;
 
                         grid.AddChild(childElement, child);
@@ -319,7 +331,7 @@ public static class MarkupParser
                     {
                         child.SetAttributeValue("grid.column", columnIndex.ToString());
                         child.SetAttributeValue("grid.row", rowIdx.ToString());
-                        var childElement = ParseElement(child, styles, model);
+                        var childElement = ParseElement(child, styles, model, basePath);
                         if (childElement == null) continue;
 
                         grid.AddChild(childElement, child);
@@ -330,7 +342,7 @@ public static class MarkupParser
                 }
                 else
                 {
-                    var childElement = ParseElement(node, styles, model);
+                    var childElement = ParseElement(node, styles, model, basePath);
                     if (childElement == null) continue;
 
                     grid.AddChild(childElement, node);
@@ -356,7 +368,7 @@ public static class MarkupParser
                 }
                 else if (node is XElement childXElement)
                 {
-                    var childElement = ParseElement(childXElement, styles, model);
+                    var childElement = ParseElement(childXElement, styles, model, basePath);
                     if (childElement == null) continue;
 
                     innerElement.AddChild(childElement, childXElement);

@@ -29,6 +29,9 @@
     <None Update="SUIM\Components\ScreenOverlay.suim">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="SUIM\Styles\Main.style">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="SUIM\Views\MainUI.suim">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

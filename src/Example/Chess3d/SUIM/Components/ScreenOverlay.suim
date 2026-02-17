@@ -1,5 +1,5 @@
 <overlay id="screenOverlay" visibility="collapse">
     <grid halign="center" valign="center">
-        <label value="@blockerMessage" />
+        <label value="@BlockerMessage" />
     </grid>
 </overlay>

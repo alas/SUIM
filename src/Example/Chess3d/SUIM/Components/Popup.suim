@@ -2,10 +2,10 @@
     <grid width="360" height="180" halign="center" valign="center">
         <vstack>
             <hstack>
-                <label value="@popupTitle" />
+                <label value="@PopupTitle" />
             </hstack>
             <vstack margin="6">
-                <label value="@popupMessage" />
+                <label value="@PopupMessage" />
             </vstack>
             <hstack>
                 <button id="yesButton" class="mybutton">YES</button>

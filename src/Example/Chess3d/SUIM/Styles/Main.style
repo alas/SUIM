@@ -1,0 +1,21 @@
+* {
+    HorizontalAlignment: Left;
+    VerticalAlignment: Top;
+    Color: Green;
+    FontSize: 16;
+}
+text {
+    HorizontalAlignment: Center;
+    VerticalAlignment: Center;
+}
+.mybutton {
+    Background: Black;
+    Width: 200;
+    Height: 50;
+    Margin: 5;
+}
+.container {
+    HorizontalAlignment: Left;
+    VerticalAlignment: Top;
+    Padding: 10;
+}

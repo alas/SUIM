@@ -19,28 +19,31 @@ public class CustomComponent(string tagName) : UIElement(tagName)
         }
     }
 
-    public void Expand(object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null)
+    public void Expand(object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
     {
         if (string.IsNullOrEmpty(Source)) return;
 
-        string markup;
-        if (File.Exists(Source))
+        string finalPath = Source;
+        if (!Path.IsPathRooted(finalPath) && !string.IsNullOrEmpty(basePath))
         {
-            markup = File.ReadAllText(Source);
-        }
-        else
-        {
-            // Fallback for relative paths or embedded resources? 
-            // For now, let's assume absolute or relative to CWD.
-            // If it's a relative path, we might need a search strategy.
-            throw new FileNotFoundException($"SUIM markup file not found: {Source}");
+            // If it's a relative path, try to find it in the components folder of the project
+            finalPath = Path.Combine(basePath, "components", Source);
+            if (!File.Exists(finalPath))
+            {
+                // Fallback to just relative to basePath
+                finalPath = Path.Combine(basePath, Source);
+            }
         }
 
-        var (element, _) = MarkupParser.Parse(markup, model, inheritedStyles);
+        if (!File.Exists(finalPath))
+        {
+            throw new FileNotFoundException($"SUIM markup file not found: {finalPath}");
+        }
+
+        string markup = File.ReadAllText(finalPath);
+        var (element, _) = MarkupParser.Parse(markup, model, inheritedStyles, basePath);
         
         // Transfer children from the parsed root to this component
-        // Typically a custom component should be replaced by its content, 
-        // but here we act as a container that expands into its children.
         ClearChildren();
         AddChild(element, null);
     }

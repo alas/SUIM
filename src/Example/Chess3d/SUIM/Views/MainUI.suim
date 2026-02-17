@@ -1,27 +1,6 @@
 <grid>
-<style>
-* {
-    HorizontalAlignment: Left;
-    VerticalAlignment: Top;
-    Color: Green;
-    FontSize: 16;
-}
-text {
-    HorizontalAlignment: Center;
-    VerticalAlignment: Center;
-}
-.mybutton {
-    Background: Black;
-    Width: 200;
-    Height: 50;
-    Margin: 5;
-}
-.container {
-    HorizontalAlignment: Left;
-    VerticalAlignment: Top;
-    Padding: 10;
-}
-</style>
+    <style src="Styles/Main.style" />
+	
     <vstack class="container">
         <button class="mybutton" onclick="QuitHandler">Quit</button>
         <button class="mybutton" onclick="RestartHandler">Restart</button>
@@ -29,6 +8,6 @@ text {
         <button class="mybutton" onclick="SaveHandler">Save</button>
     </vstack>
 
-    <MyPopup />
-    <MyScreenOverlay />
+    <Popup />
+    <ScreenOverlay />
 </grid>

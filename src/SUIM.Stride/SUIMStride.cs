@@ -18,19 +18,34 @@ public class SUIMStride
     private readonly Dictionary<string, SpriteFont> Fonts = [];
     private readonly Dictionary<string, (Components.UIElement SuimRoot, UIElement StrideRoot, dynamic? Model)> _parseCache = [];
     private dynamic? _currentModel;
+    public string? RootPath { get; set; }
 
     public (UIElement, dynamic?) ParseFromFile(string path, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
         var markup = File.ReadAllText(path);
-        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance);
+        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, Path.GetDirectoryName(path));
     }
 
     public (UIElement, dynamic?) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
-        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance);
+        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, null);
     }
 
-    private (UIElement, dynamic?) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance)
+    public (UIElement, dynamic?) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    {
+        if (string.IsNullOrEmpty(RootPath)) throw new InvalidOperationException("RootPath must be set before calling GetView.");
+        
+        var project = new SUIMProject(RootPath);
+        var viewPath = Path.Combine(RootPath, "views", $"{viewName}.suim");
+        if (!File.Exists(viewPath)) throw new FileNotFoundException($"View not found: {viewPath}");
+
+        var markup = File.ReadAllText(viewPath);
+        project.ResolveDependencies(markup);
+
+        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath);
+    }
+
+    private (UIElement, dynamic?) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath)
     {
         ArgumentNullException.ThrowIfNull(markup);
 
@@ -52,7 +67,7 @@ public class SUIMStride
         ContentManager = game.Content;
 
         // Not cached: parse markup, map and store the canonical instance
-        var (suimRoot, model2) = MarkupParser.Parse(markup, model);
+        var (suimRoot, model2) = MarkupParser.Parse(markup, model, basePath: basePath);
         Layout(suimRoot, game, defaultFontSize, fullscreen);
         _currentModel = model2;
         var strideRoot = MapElement(suimRoot);
