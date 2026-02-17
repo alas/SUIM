@@ -1,5 +1,8 @@
 namespace SUIM.StrideIntegration;
 
+using System.Collections.Generic;
+using System.Linq;
+using System;
 using Stride.Core.Mathematics;
 using Stride.Core.Serialization.Contents;
 using Stride.Engine;
@@ -8,9 +11,6 @@ using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
 using StrideGrid = Stride.UI.Panels.Grid;
-using System.Collections.Generic;
-using System.Linq;
-using System;
 
 public class SUIMStride
 {
