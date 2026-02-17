@@ -1,13 +1,11 @@
 ﻿namespace SUIM.Components;
 
-public class Select : UIElement
+public class Select() : UIElement(nameof(Select))
 {
     public string? SelectedValue { get; set; }
     public int SelectedIndex { get; set; }
     public bool Multiple { get; set; }
     public List<Option> Options { get; set; } = [];
-
-    public Select() : base() { }
 
     public override void SetAttribute(string name, object? value)
     {
@@ -22,10 +20,8 @@ public class Select : UIElement
     }
 }
 
-public class Option : UIElement
+public class Option() : UIElement(nameof(Option))
 {
-    public Option() : base() { }
-
     public string? Value { get; set; }
 
     public override void SetAttribute(string name, object? value)

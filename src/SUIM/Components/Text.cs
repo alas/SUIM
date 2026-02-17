@@ -1,9 +1,7 @@
 namespace SUIM.Components;
 
-public class Text : UIElement
+public class Text(string? tagName = null) : UIElement(tagName ?? nameof(Text))
 {
-    public Text() : base() { }
-
     public string? Value { get; set; }
     public bool Wrap { get; set; }
 
@@ -24,13 +22,11 @@ public class Text : UIElement
     }
 }
 
-public class TextArea : UIElement, IPlaceholder
+public class TextArea() : UIElement(nameof(TextArea)), IPlaceholder
 {
     public string? Placeholder { get; set; }
     public int Rows { get; set; }
     public int Columns { get; set; }
-
-    public TextArea() : base() { }
 
     public override void SetAttribute(string name, object? value)
     {
@@ -49,11 +45,9 @@ public class TextArea : UIElement, IPlaceholder
     }
 }
 
-public class Label : Text
+public class Label() : Text(nameof(Label))
 {
     public string? For { get; set; }
-
-    public Label() : base() { }
 
     public override void SetAttribute(string name, object? value)
     {
@@ -68,20 +62,20 @@ public class Label : Text
     }
 }
 
-public class PElement : Text { public PElement() : base() { } }
+public class P() : Text(nameof(P)) { }
 
-public class H1Element : Text { public H1Element() : base() { } }
+public class H1() : Text(nameof(H1)) { }
 
-public class H2Element : Text { public H2Element() : base() { } }
+public class H2() : Text(nameof(H2)) { }
 
-public class H3Element : Text { public H3Element() : base() { } }
+public class H3() : Text(nameof(H3)) { }
 
-public class H4Element : Text { public H4Element() : base() { } }
+public class H4() : Text(nameof(H4)) { }
 
-public class H5Element : Text { public H5Element() : base() { } }
+public class H5() : Text(nameof(H5)) { }
 
-public class H6Element : Text { public H6Element() : base() { } }
+public class H6() : Text(nameof(H6)) { }
 
-public class H7Element : Text { public H7Element() : base() { } }
+public class H7() : Text(nameof(H7)) { }
 
-public class H8Element : Text { public H8Element() : base() { } }
+public class H8() : Text(nameof(H8)) { }

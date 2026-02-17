@@ -2,12 +2,10 @@ namespace SUIM.Components;
 
 using System.Xml.Linq;
 
-public class Dock : LayoutElement
+public class Dock() : LayoutElement(nameof(Dock))
 {
     public bool LastChildFill { get; set; } = true;
     public List<DockChild> DockChildren { get; } = [];
-
-    public Dock() : base() { }
 
     public override void AddChild(UIElement child, XElement? element)
     {

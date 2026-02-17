@@ -1,10 +1,8 @@
 namespace SUIM.Components;
 
-public class Stack : LayoutElement
+public class Stack() : LayoutElement(nameof(Stack))
 {
     public Orientation Orientation { get; set; } = Orientation.Vertical;
-
-    public Stack() : base() { }
 
     public override void SetAttribute(string name, object? value)
     {

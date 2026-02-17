@@ -3,9 +3,10 @@ namespace SUIM.Components;
 using System.Xml.Linq;
 using SUIM.Layout;
 
-public abstract class UIElement
+public abstract class UIElement(string tagName)
 {
     public string? Id { get; set; }
+    public string TagName { get; } = tagName.ToLowerInvariant();
     public string? Class { get; set; }
     public UIElement? Parent { get; set; }
     public HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.Left;
@@ -232,7 +233,7 @@ public class LayoutElement : UIElement
     public bool Clip { get; set; }
     public Thickness SliceWidth { get; set; } = Thickness.None;
 
-    public LayoutElement() : base()
+    public LayoutElement(string tagName) : base(tagName)
     {
         Width = UnitValue.OneFR;
         Height = UnitValue.OneFR;

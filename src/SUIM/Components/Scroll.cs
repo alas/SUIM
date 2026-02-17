@@ -1,9 +1,7 @@
 ﻿namespace SUIM.Components;
 
-public class Scroll : LayoutElement
+public class Scroll() : LayoutElement(nameof(Scroll))
 {
-    public Scroll() : base() { }
-
     public ScrollDirection Direction { get; set; } = ScrollDirection.Vertical;
     public float ScrollX { get; set; }
     public float ScrollY { get; set; }

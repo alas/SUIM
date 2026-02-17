@@ -3,13 +3,11 @@ namespace SUIM.Components;
 using System;
 using System.Xml.Linq;
 
-public class Grid : LayoutElement
+public class Grid() : LayoutElement(nameof(Grid))
 {
     public string? Columns { get; set; }
     public string? Rows { get; set; }
     public List<GridChild> GridChildren { get; } = [];
-
-    public Grid() : base() { }
 
     public override void AddChild(UIElement child, XElement? element)
     {

@@ -1,11 +1,9 @@
 namespace SUIM.Components;
 
-public class Image : UIElement
+public class Image() : UIElement(nameof(Image))
 {
     public string? Source { get; set; }
     public ImageStretch Stretch { get; set; }
-
-    public Image() : base() { }
 
     public override void SetAttribute(string name, object? value)
     {

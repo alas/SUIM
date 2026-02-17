@@ -8,7 +8,7 @@ using SUIM.Layout;
 
 public static class MarkupParser
 {
-    public static (UIElement, dynamic?) Parse(string markup, object? model = null)
+    public static (UIElement, dynamic?) Parse(string markup, object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null)
     {
         dynamic? model2 = model == null ? null : ModelLogic.Create(model);
         var controlFlowParser = new ControlFlowParser(model2);
@@ -17,7 +17,7 @@ public static class MarkupParser
         var doc = XDocument.Parse(expandedMarkup);
         var root = doc.Root!;
 
-        Dictionary<string, Dictionary<string, string>> styles = [];
+        Dictionary<string, Dictionary<string, string>> styles = inheritedStyles != null ? new(inheritedStyles) : [];
 
         model2 = ModelLogic.ExtractModel(root, model2);
 
@@ -36,7 +36,7 @@ public static class MarkupParser
 
         foreach (System.Text.RegularExpressions.Match match in matches)
         {
-            var selector = match.Groups[1].Value.Trim();
+            var selector = match.Groups[1].Value.Trim().ToLowerInvariant();
             var propertiesContent = match.Groups[2].Value;
 
             var properties = new Dictionary<string, string>();
@@ -60,7 +60,7 @@ public static class MarkupParser
 
     private static UIElement ApplyStylesToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles, dynamic? model)
     {
-        var elementTag = element.GetType().Name.ToLowerInvariant();
+        var elementTag = element.TagName;
         var elementId = element.GetAttribute("id") as string;
         var elementClass = element.GetAttribute("class") as string;
         
@@ -384,7 +384,7 @@ public static class MarkupParser
 
         if (rootElement is CustomComponent custom)
         {
-            custom.Expand(model);
+            custom.Expand(model, styles);
         }
 
         return rootElement;

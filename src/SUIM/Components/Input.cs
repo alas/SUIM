@@ -1,6 +1,6 @@
 ﻿namespace SUIM.Components;
 
-public class Input : UIElement, IPlaceholder
+public class Input() : UIElement(nameof(Input)), IPlaceholder
 {
     public string? Value { get; set; }
     public string? Placeholder { get; set; }
@@ -9,8 +9,6 @@ public class Input : UIElement, IPlaceholder
     public int? Min { get; set; }
     public int? Max { get; set; }
     public int? Step { get; set; }
-
-    public Input() : base() { }
 
     public override void SetAttribute(string name, object? value)
     {

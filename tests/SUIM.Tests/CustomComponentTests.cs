@@ -54,4 +54,36 @@ public class CustomComponentTests
         Assert.IsType<Stack>(element);
         Assert.Equal("programmatic", element.Id);
     }
+
+    [Fact]
+    public void Parse_CustomTag_AppliesStylesByTagName()
+    {
+        // 1. Create a dummy .suim file
+        var tempFile = Path.GetTempFileName() + ".suim";
+        File.WriteAllText(tempFile, "<div id=\"inner\" />");
+
+        try
+        {
+            // 2. Register the custom tag
+            ComponentRegistry.Register("StyledTag", tempFile);
+
+            // 3. Parse markup with a style for StyledTag
+            var markup = @"<grid>
+<style>
+StyledTag { width: 450; background: red; }
+</style>
+<StyledTag />
+</grid>";
+            var (element, _) = MarkupParser.Parse(markup);
+
+            // 4. Verify style application
+            var custom = Assert.IsType<CustomComponent>(element.Children[0]);
+            Assert.Equal(450f, custom.Width.Value);
+            Assert.Equal("red", custom.BackgroundColor);
+        }
+        finally
+        {
+            if (File.Exists(tempFile)) File.Delete(tempFile);
+        }
+    }
 }

@@ -3,10 +3,9 @@ namespace SUIM.Components;
 using System;
 using System.IO;
 
-public class CustomComponent : UIElement
+public class CustomComponent(string tagName) : UIElement(tagName)
 {
     public string? Source { get; set; }
-    public string? TagName { get; set; }
 
     public override void SetAttribute(string name, object? value)
     {
@@ -20,7 +19,7 @@ public class CustomComponent : UIElement
         }
     }
 
-    public void Expand(object? model = null)
+    public void Expand(object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null)
     {
         if (string.IsNullOrEmpty(Source)) return;
 
@@ -37,7 +36,7 @@ public class CustomComponent : UIElement
             throw new FileNotFoundException($"SUIM markup file not found: {Source}");
         }
 
-        var (element, _) = MarkupParser.Parse(markup, model);
+        var (element, _) = MarkupParser.Parse(markup, model, inheritedStyles);
         
         // Transfer children from the parsed root to this component
         // Typically a custom component should be replaced by its content, 

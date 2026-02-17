@@ -28,12 +28,13 @@ public static class ComponentRegistry
     {
         if (_factoryRegistrations.TryGetValue(tag, out var factory))
         {
-            return factory();
+            var element = factory();
+            return element;
         }
 
         if (_fileRegistrations.TryGetValue(tag, out var filePath))
         {
-            return new CustomComponent { Source = filePath, TagName = tag };
+            return new CustomComponent(tag) { Source = filePath };
         }
 
         throw new NotSupportedException($"Unknown custom tag: {tag}");

@@ -2,10 +2,8 @@ namespace SUIM.Components;
 
 using SUIM.Layout;
 
-public class Border : UIElement
+public class Border() : UIElement(nameof(Border))
 {
-    public Border() : base() { }
-
     public Thickness Thickness { get; set; } = new Thickness(0f);
 
     public override void SetAttribute(string name, object? value)
