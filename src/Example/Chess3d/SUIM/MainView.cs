@@ -36,7 +36,9 @@ public class MainView
         {
             RootPath = "SUIM"
         };
-        (RootElement, Model) = mapper.GetView("MainUI", game, model: model);
+        var (rootElement, modelResult) = mapper.GetView("MainUI", game, model: model);
+        RootElement = rootElement ?? throw new Exception("Failed to load MainUI view.");
+        Model = modelResult ?? throw new Exception("Failed to map model.");
         component.Page = new()
         {
             RootElement = RootElement

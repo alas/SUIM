@@ -1,8 +1,9 @@
 namespace SUIM.StrideIntegration;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
+using System.Reflection;
 using Stride.Core.Mathematics;
 using Stride.Core.Serialization.Contents;
 using Stride.Engine;
@@ -10,11 +11,12 @@ using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
+using SUIM;
 using StrideGrid = Stride.UI.Panels.Grid;
 
 public class SUIMStride
 {
-    private ContentManager ContentManager = null!;
+    private ContentManager? ContentManager = null;
     private readonly Dictionary<string, SpriteFont> Fonts = [];
     private readonly Dictionary<string, (Components.UIElement SuimRoot, UIElement StrideRoot, dynamic? Model)> _parseCache = [];
     private dynamic? _currentModel;
@@ -170,27 +172,20 @@ public class SUIMStride
 
         // Resolve SpriteFont by name (from style/attribute) using optional resolver.
         // Consumers (e.g. example app) should set SUIMStride.FontResolver = name => game.Content.Load<SpriteFont>(name);
-        try
+        var fontName = text.Font ?? "StrideDefaultFont";
+        SpriteFont? sf = Fonts.TryGetValue(fontName, out SpriteFont? value) ? value : null;
+        if (sf == null && !Fonts.ContainsKey(fontName))
         {
-            var fontName = text.Font ?? "StrideDefaultFont";
-            SpriteFont? sf = Fonts.TryGetValue(fontName, out SpriteFont? value) ? value : null;
-            if (sf == null && !Fonts.ContainsKey(fontName))
-            {
-                sf = ContentManager.Load<SpriteFont>(fontName);
-                if (sf != null)
-                {
-                    Fonts[fontName] = sf;
-                }
-            }
-
+            sf = ContentManager?.Load<SpriteFont>(fontName);
             if (sf != null)
             {
-                tb.Font = sf;
+                Fonts[fontName] = sf;
             }
         }
-        catch
+
+        if (sf != null)
         {
-            // If resolver fails, fall back to Stride default font silently.
+            tb.Font = sf;
         }
         
         if (text.Wrap)
@@ -369,39 +364,8 @@ public class SUIMStride
 
     private static Color ParseColor(string colorStr)
     {
-        // Helper to parse hex or named colors
-        if (colorStr.StartsWith('#'))
-        {
-             // #RRGGBB or #AARRGGBB
-             string hex = colorStr.Substring(1);
-             if (hex.Length == 6)
-             {
-                 return new Color(
-                     Convert.ToByte(hex.Substring(0, 2), 16),
-                     Convert.ToByte(hex.Substring(2, 2), 16),
-                     Convert.ToByte(hex.Substring(4, 2), 16),
-                     255);
-             }
-             else if (hex.Length == 8)
-             {
-                 return new Color(
-                     Convert.ToByte(hex.Substring(2, 2), 16),
-                     Convert.ToByte(hex.Substring(4, 2), 16),
-                     Convert.ToByte(hex.Substring(6, 2), 16),
-                     Convert.ToByte(hex.Substring(0, 2), 16));
-             }
-        }
-
-        if (string.Equals(colorStr, "red", StringComparison.OrdinalIgnoreCase)) return Color.Red;
-        if (string.Equals(colorStr, "green", StringComparison.OrdinalIgnoreCase)) return Color.Green;
-        if (string.Equals(colorStr, "blue", StringComparison.OrdinalIgnoreCase)) return Color.Blue;
-        if (string.Equals(colorStr, "black", StringComparison.OrdinalIgnoreCase)) return Color.Black;
-        if (string.Equals(colorStr, "yellow", StringComparison.OrdinalIgnoreCase)) return Color.Yellow;
-        if (string.Equals(colorStr, "cyan", StringComparison.OrdinalIgnoreCase)) return Color.Cyan;
-        if (string.Equals(colorStr, "magenta", StringComparison.OrdinalIgnoreCase)) return Color.Magenta;
-        if (string.Equals(colorStr, "transparent", StringComparison.OrdinalIgnoreCase)) return Color.Transparent;
-        //if (string.Equals(colorStr, "white", StringComparison.OrdinalIgnoreCase)
-        return Color.White;
+        var pc = BackendHelpers.ParseColor(colorStr);
+        return new Color(pc.R, pc.G, pc.B, pc.A);
     }
     
     private void TransferBindings(Components.UIElement suimElement, UIElement strideElement)
@@ -424,17 +388,19 @@ public class SUIMStride
         {
             var eventName = kvp.Key;
             var handlerName = kvp.Value;
-            
+
             // Resolve handler
-            Delegate? handler = null;
+            Delegate? handler;
             if (_currentModel is ObservableObject oo)
             {
                 handler = oo.GetHandler(handlerName);
             }
             else
             {
-                // Try reflection on raw object using same priority-based resolution as ObservableObject
-                handler = ResolveMethodAsDelegate(handlerName, _currentModel);
+                // Try reflection on raw object using shared helper
+                handler = BackendHelpers.ResolveMethodAsDelegate(handlerName, (object?)_currentModel);
+                // If generic resolver didn't find anything, try Stride-specific resolver that understands RoutedEventArgs
+                handler ??= ResolveMethodAsDelegate(handlerName, _currentModel);
             }
 
             if (handler != null)
@@ -449,7 +415,7 @@ public class SUIMStride
         }
     }
 
-    private void BindClickHandler(Button btn, Delegate handler, Components.UIElement suimElement)
+    private static void BindClickHandler(Button btn, Delegate handler, Components.UIElement suimElement)
     {
         // Support multiple handler types for click events
         if (handler is EventHandler<Stride.UI.Events.RoutedEventArgs> routedHandler)
@@ -479,49 +445,17 @@ public class SUIMStride
     /// </summary>
     private static Delegate? ResolveMethodAsDelegate(string methodName, dynamic model)
     {
+        // Keep a Stride-specific variant that supports RoutedEventArgs in addition to the generic helper
         if (model == null) return null;
 
         // Cast to object to avoid dynamic dispatch issues
-        object targetObject = (object)model;
-        var methods = targetObject.GetType().GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        object targetObject = model;
+        var methods = targetObject.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
         var matchingMethods = methods.Where(m => m.Name == methodName).ToList();
-
         if (matchingMethods.Count == 0)
             return null;
 
-        // 1. Priority: Parameterless method (Action)
-        var parameterlessMethod = matchingMethods.FirstOrDefault(m => m.GetParameters().Length == 0);
-        if (parameterlessMethod != null)
-        {
-            try { return Delegate.CreateDelegate(typeof(Action), targetObject, parameterlessMethod); }
-            catch { /* Fall through to next priority */ }
-        }
-
-        // 2. Priority: Method taking single UIElement (Action<UIElement>)
-        var uiElementMethod = matchingMethods.FirstOrDefault(m =>
-            m.GetParameters().Length == 1 &&
-            typeof(Components.UIElement).IsAssignableFrom(m.GetParameters()[0].ParameterType));
-        if (uiElementMethod != null)
-        {
-            try { return Delegate.CreateDelegate(typeof(Action<Components.UIElement>), targetObject, uiElementMethod); }
-            catch { /* Fall through to next priority */ }
-        }
-
-        // 3. Priority: EventHandler pattern (object sender, EventArgs e)
-        var eventHandlerMethod = matchingMethods.FirstOrDefault(m =>
-        {
-            var parms = m.GetParameters();
-            return parms.Length == 2 &&
-                parms[0].ParameterType == typeof(object) &&
-                typeof(EventArgs).IsAssignableFrom(parms[1].ParameterType);
-        });
-        if (eventHandlerMethod != null)
-        {
-            try { return Delegate.CreateDelegate(typeof(EventHandler), targetObject, eventHandlerMethod); }
-            catch { /* Fall through to next priority */ }
-        }
-
-        // 4. Try EventHandler<RoutedEventArgs> pattern (Stride specific)
+        // Try EventHandler<RoutedEventArgs> pattern (Stride specific)
         var routedHandlerMethod = matchingMethods.FirstOrDefault(m =>
         {
             var parms = m.GetParameters();
@@ -538,51 +472,12 @@ public class SUIMStride
         return null;
     }
     
-    private void SetupBinding(dynamic? model, string modelPropertyName, string targetPropertyName, UIElement strideElement)
+    private static void SetupBinding(dynamic? model, string modelPropertyName, string targetPropertyName, UIElement strideElement)
     {
         if (model == null) return;
         
-        // Initial value - use GetValue for ObservableObject
-        try
-        {
-            object? value = null;
-            if (model is ObservableObject oo)
-            {
-                value = oo.GetValue(modelPropertyName);
-            }
-            else
-            {
-                value = model.GetType().GetProperty(modelPropertyName)?.GetValue(model);
-            }
-            ApplyBindingValue(strideElement, targetPropertyName, value);
-        }
-        catch { }
-        
-        // Subscribe to property changes if model implements INotifyPropertyChanged
-        if (model is System.ComponentModel.INotifyPropertyChanged inpc)
-        {
-            void OnPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-            {
-                if (e.PropertyName == modelPropertyName)
-                {
-                    try
-                    {
-                        object? newValue = null;
-                        if (model is ObservableObject oo2)
-                        {
-                            newValue = oo2.GetValue(modelPropertyName);
-                        }
-                        else
-                        {
-                            newValue = model.GetType().GetProperty(modelPropertyName)?.GetValue(model);
-                        }
-                        ApplyBindingValue(strideElement, targetPropertyName, newValue);
-                    }
-                    catch { }
-                }
-            }
-            inpc.PropertyChanged += OnPropertyChanged;
-        }
+        // Use shared helper to setup binding and handle updates
+        BackendHelpers.SetupPropertyBinding((object?)model, modelPropertyName, newValue => ApplyBindingValue(strideElement, targetPropertyName, newValue));
     }
     
     private static void ApplyBindingValue(UIElement strideElement, string targetPropertyName, object? value)
