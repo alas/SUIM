@@ -32,7 +32,7 @@
     <None Update="SUIM\Styles\Main.style">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="SUIM\Views\MainUI.suim">
+    <None Update="SUIM\Views\MainView.suim">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

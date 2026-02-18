@@ -68,6 +68,7 @@ public static class BackendHelpers
     /// Resolve a method name on a model object into a Delegate using priority-based resolution.
     /// Priority: parameterless -> UIElement parameter -> EventHandler pattern -> fallback.
     /// This does not have any engine-specific RoutedEventArgs knowledge.
+    /// Also supports returning a Delegate stored in a property whose name matches methodName.
     /// </summary>
     public static Delegate? ResolveMethodAsDelegate(string methodName, object? model)
     {
@@ -78,6 +79,17 @@ public static class BackendHelpers
         {
             return oo.GetHandler(methodName);
         }
+
+        // If model has a property with the name that contains a Delegate, return it directly
+        try
+        {
+            var prop = model.GetType().GetProperty(methodName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+            if (prop != null && typeof(Delegate).IsAssignableFrom(prop.PropertyType))
+            {
+                if (prop.GetValue(model) is Delegate val) return val;
+            }
+        }
+        catch { }
 
         // Cast to object to avoid dynamic dispatch issues
         object targetObject = (object)model;
