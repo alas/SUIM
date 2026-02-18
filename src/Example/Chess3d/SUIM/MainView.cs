@@ -4,7 +4,6 @@ using System;
 using System.Threading.Tasks;
 using Stride.Engine;
 using Stride.UI;
-using Stride.UI.Controls;
 using SUIM.StrideIntegration;
 
 public class MainView
@@ -28,7 +27,8 @@ public class MainView
                 RestartHandler = new Action(ShowRestartPopup),
                 LoadHandler = new Action(ShowLoadPopup),
                 SaveHandler = new Action(ShowSavePopup),
-                NoHandler = new Action(() => UnshowPopup()),
+                YesHandler = new Action(YesHandlerAction),
+                NoHandler = new Action(UnshowPopup),
             };
 
         var mapper = new SUIMStride
@@ -44,12 +44,31 @@ public class MainView
         };
     }
 
-    private void QuitHandler(object? sender, EventArgs args)
+    private void YesHandlerAction()
+    {
+        switch (Model.PopupTitle)
+        {
+            case "Quit":
+                QuitGame();
+                break;
+            case "Restart":
+                RestartHandler();
+                break;
+            case "Load":
+                LoadHandler();
+                break;
+            case "Save":
+                SaveHandler();
+                break;
+        }
+    }
+
+    private void QuitGame()
     {
         Game.Exit();
     }
     
-    private void RestartHandler(object? sender, EventArgs args)
+    private void RestartHandler()
     {
         if (Model.IsWorkInProgress) return;
 
@@ -61,7 +80,7 @@ public class MainView
         Model.IsWorkInProgress = false;
     }
     
-    private void LoadHandler(object? sender, EventArgs args)
+    private void LoadHandler()
     {
         if (Model.IsWorkInProgress) return;
 
@@ -76,7 +95,7 @@ public class MainView
         });
     }
     
-    private void SaveHandler(object? sender, EventArgs args)
+    private void SaveHandler()
     {
         if (Model.IsWorkInProgress) return;
 
@@ -92,42 +111,35 @@ public class MainView
     }
 
     // Methods bound from markup
-    private void ShowQuitPopup() => OpenPopup("Quit", "Are you sure you want to quit?", QuitHandler);
-    private void ShowRestartPopup() => OpenPopup("Restart", "Are you sure you want to start over?", RestartHandler);
-    private void ShowLoadPopup() => OpenPopup("Load", "Load() Not implemented yet!", LoadHandler);
-    private void ShowSavePopup() => OpenPopup("Save", "Save() Not implemented yet!", SaveHandler);
+    private void ShowQuitPopup() => OpenPopup("Quit", "Are you sure you want to quit?");
+    private void ShowRestartPopup() => OpenPopup("Restart", "Are you sure you want to start over?");
+    private void ShowLoadPopup() => OpenPopup("Load", "Load() Not implemented yet!");
+    private void ShowSavePopup() => OpenPopup("Save", "Save() Not implemented yet!");
 
-    private void OpenPopup(string title, string message, EventHandler<Stride.UI.Events.RoutedEventArgs> yesClickHandler)
+    private void OpenPopup(string title, string message)
     {
         Model.PopupTitle = title;
         Model.PopupMessage = message;
         var popup = XPath.Find(RootElement, "popup");
         popup!.Visibility = Visibility.Visible;
-        var yesButton = XPath.Find(RootElement, "yesButton") as Button;
-        yesButton!.Click += yesClickHandler;
     }
 
     private void UnshowPopup()
     {
-        var blocker = XPath.Find(RootElement, "popup") as UIElement;
+        var blocker = XPath.Find(RootElement, "popup");
         blocker!.Visibility = Visibility.Collapsed;
-        var yesButton = XPath.Find(RootElement, "yesButton") as Button;
-        yesButton!.Click -= QuitHandler;
-        yesButton!.Click -= RestartHandler;
-        yesButton!.Click -= LoadHandler;
-        yesButton!.Click -= SaveHandler;
     }
 
     private void ShowBlocker(string message)
     {
         Model.BlockerMessage = message;
-        var blocker = XPath.Find(RootElement, "screenOverlay") as UIElement;
+        var blocker = XPath.Find(RootElement, "screenOverlay");
         blocker!.Visibility = Visibility.Visible;
     }
 
     private void UnshowBlocker()
     {
-        var blocker = XPath.Find(RootElement, "screenOverlay") as UIElement;
+        var blocker = XPath.Find(RootElement, "screenOverlay");
         blocker!.Visibility = Visibility.Collapsed;
     }
 }

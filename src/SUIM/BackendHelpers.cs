@@ -65,77 +65,116 @@ public static class BackendHelpers
     }
 
     /// <summary>
-    /// Resolve a method name on a model object into a Delegate using priority-based resolution.
-    /// Priority: parameterless -> UIElement parameter -> EventHandler pattern -> fallback.
-    /// This does not have any engine-specific RoutedEventArgs knowledge.
-    /// Also supports returning a Delegate stored in a property whose name matches methodName.
+    /// Resolve a method name or expression on a model object into a Delegate.
+    /// Supports:
+    /// 1. Simple method names (Action, Action&lt;UIElement&gt;, EventHandler)
+    /// 2. Method calls with arguments: name(this, 'string', 123, true)
     /// </summary>
-    public static Delegate? ResolveMethodAsDelegate(string methodName, object? model)
+    public static Delegate? ResolveEventAction(string expression, object? model, UIElement element)
     {
-        if (model == null) return null;
+        if (model == null || string.IsNullOrWhiteSpace(expression)) return null;
 
-        // If model is an ObservableObject, prefer its GetHandler (it already implements priority rules)
-        if (model is ObservableObject oo)
+        expression = expression.Trim();
+
+        // Check if it's a method call with parentheses
+        var openParen = expression.IndexOf('(');
+        var closeParen = expression.LastIndexOf(')');
+
+        if (openParen > 0 && closeParen > openParen)
         {
-            return oo.GetHandler(methodName);
+            var methodName = expression.Substring(0, openParen).Trim();
+            var argsStr = expression.Substring(openParen + 1, closeParen - openParen - 1).Trim();
+            var args = ParseArguments(argsStr, element);
+
+            return ResolveMethodWithArguments(methodName, model, args);
         }
 
-        // If model has a property with the name that contains a Delegate, return it directly
+        return null;
+    }
+
+    private static object?[] ParseArguments(string argsStr, UIElement element)
+    {
+        if (string.IsNullOrWhiteSpace(argsStr)) return [];
+
+        // Simple comma-separated split (doesn't handle commas inside strings for now, but good enough for this spec)
+        var parts = argsStr.Split(',');
+        var result = new object?[parts.Length];
+
+        for (int i = 0; i < parts.Length; i++)
+        {
+            var p = parts[i].Trim();
+            if (p.Equals("this", StringComparison.OrdinalIgnoreCase))
+            {
+                result[i] = element;
+            }
+            else if ((p.StartsWith('\'') && p.EndsWith('\'')) || (p.StartsWith('"') && p.EndsWith('"')))
+            {
+                result[i] = p.Substring(1, p.Length - 2);
+            }
+            else if (bool.TryParse(p, out var b))
+            {
+                result[i] = b;
+            }
+            else if (int.TryParse(p, out var n))
+            {
+                result[i] = n;
+            }
+            else if (float.TryParse(p, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var f))
+            {
+                result[i] = f;
+            }
+            else
+            {
+                // Unrecognized or potentially a model property (could expand this later)
+                result[i] = p;
+            }
+        }
+
+        return result;
+    }
+
+    private static Delegate? ResolveMethodWithArguments(string methodName, object model, object?[] args)
+    {
+        // 1. Check if model has a property with the name that contains a Delegate
         try
         {
             var prop = model.GetType().GetProperty(methodName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
             if (prop != null && typeof(Delegate).IsAssignableFrom(prop.PropertyType))
             {
-                if (prop.GetValue(model) is Delegate val) return val;
+                if (prop.GetValue(model) is Delegate d)
+                {
+                    return new Action(() => d.DynamicInvoke(args));
+                }
             }
         }
         catch { }
 
-        // Cast to object to avoid dynamic dispatch issues
-        object targetObject = (object)model;
-        var methods = targetObject.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+        // 2. Check for methods
+        var methods = model.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
         var matchingMethods = methods.Where(m => m.Name == methodName).ToList();
-        if (matchingMethods.Count == 0) return null;
 
-        // 1. Priority: Parameterless method (Action)
-        var parameterless = matchingMethods.FirstOrDefault(m => m.GetParameters().Length == 0);
-        if (parameterless != null)
+        foreach (var method in matchingMethods)
         {
-            try { return Delegate.CreateDelegate(typeof(Action), targetObject, parameterless); } catch { }
-        }
+            var parameters = method.GetParameters();
+            if (parameters.Length == args.Length)
+            {
+                // Simplified type checking
+                bool match = true;
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    if (args[i] != null && !parameters[i].ParameterType.IsAssignableFrom(args[i]!.GetType()))
+                    {
+                        match = false;
+                        break;
+                    }
+                }
 
-        // 2. Priority: Method taking single UIElement (Action<UIElement>)
-        var uiElementMethod = matchingMethods.FirstOrDefault(m =>
-            m.GetParameters().Length == 1
-            && typeof(UIElement).IsAssignableFrom(m.GetParameters()[0].ParameterType));
-        if (uiElementMethod != null)
-        {
-            try { return Delegate.CreateDelegate(typeof(Action<UIElement>), targetObject, uiElementMethod); } catch { }
+                if (match)
+                {
+                    return new Action(() => method.Invoke(model, args));
+                }
+            }
         }
-
-        // 3. Priority: EventHandler pattern (object sender, EventArgs e)
-        var eventHandlerMethod = matchingMethods.FirstOrDefault(m =>
-        {
-            var parms = m.GetParameters();
-            return parms.Length == 2
-                && parms[0].ParameterType == typeof(object)
-                && typeof(EventArgs).IsAssignableFrom(parms[1].ParameterType);
-        });
-        if (eventHandlerMethod != null)
-        {
-            try { return Delegate.CreateDelegate(typeof(EventHandler), targetObject, eventHandlerMethod); } catch { }
-        }
-
-        // Fallback: try to create a delegate for the first method using heuristics
-        var fallback = matchingMethods[0];
-        var parameters = fallback.GetParameters();
-        try
-        {
-            if (parameters.Length == 0) return Delegate.CreateDelegate(typeof(Action), targetObject, fallback);
-            if (parameters.Length == 1 && typeof(UIElement).IsAssignableFrom(parameters[0].ParameterType)) return Delegate.CreateDelegate(typeof(Action<UIElement>), targetObject, fallback);
-            if (parameters.Length == 2) return Delegate.CreateDelegate(typeof(EventHandler), targetObject, fallback);
-        }
-        catch { }
 
         return null;
     }

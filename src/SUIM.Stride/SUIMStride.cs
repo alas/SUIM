@@ -398,7 +398,7 @@ public class SUIMStride
             else
             {
                 // Try reflection on raw object using shared helper
-                handler = BackendHelpers.ResolveMethodAsDelegate(handlerName, (object?)_currentModel);
+                handler = BackendHelpers.ResolveEventAction(handlerName, _currentModel, suimElement);
                 // If generic resolver didn't find anything, try Stride-specific resolver that understands RoutedEventArgs
                 handler ??= ResolveMethodAsDelegate(handlerName, _currentModel);
             }

@@ -2,12 +2,12 @@
     <style src="Styles/Main.style" />
 	
     <vstack class="container">
-        <button class="mybutton" onclick="QuitHandler">Quit</button>
-        <button class="mybutton" onclick="RestartHandler">Restart</button>
-        <button class="mybutton" onclick="LoadHandler">Load</button>
-        <button class="mybutton" onclick="SaveHandler">Save</button>
+        <button class="mybutton" onclick="QuitHandler()">Quit</button>
+        <button class="mybutton" onclick="RestartHandler()">Restart</button>
+        <button class="mybutton" onclick="LoadHandler()">Load</button>
+        <button class="mybutton" onclick="SaveHandler()">Save</button>
     </vstack>
 
-    <Popup />
+	<Popup />
     <ScreenOverlay />
 </grid>

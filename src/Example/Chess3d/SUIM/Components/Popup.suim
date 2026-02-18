@@ -8,8 +8,8 @@
                 <label value="@PopupMessage" />
             </vstack>
             <hstack>
-                <button id="yesButton" class="mybutton">YES</button>
-                <button id="noButton" class="mybutton" onclick="NoHandler">NO</button>
+                <button id="yesButton" class="mybutton" onclick="YesHandler()">YES</button>
+                <button id="noButton" class="mybutton" onclick="NoHandler()">NO</button>
             </hstack>
         </vstack>
     </grid>
