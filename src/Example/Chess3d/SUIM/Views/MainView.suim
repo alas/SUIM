@@ -2,10 +2,10 @@
     <style src="Styles/Main.style" />
 	
     <vstack class="container">
-        <button class="mybutton" onclick="QuitHandler()">Quit</button>
-        <button class="mybutton" onclick="RestartHandler()">Restart</button>
-        <button class="mybutton" onclick="LoadHandler()">Load</button>
-        <button class="mybutton" onclick="SaveHandler()">Save</button>
+        <button class="mybutton" onclick="OpenPopup('Quit', 'Are you sure you want to quit?')">Quit</button>
+        <button class="mybutton" onclick="OpenPopup('Restart', 'Are you sure you want to start over?')">Restart</button>
+        <button class="mybutton" onclick="OpenPopup('Load', 'Load() Not implemented yet!')">Load</button>
+        <button class="mybutton" onclick="OpenPopup('Save', 'Save() Not implemented yet!')">Save</button>
     </vstack>
 
 	<Popup />

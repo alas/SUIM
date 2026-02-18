@@ -23,10 +23,7 @@ public class MainView
                 BlockerMessage = "",
                 PopupTitle = "",
                 PopupMessage = "",
-                QuitHandler = new Action(ShowQuitPopup),
-                RestartHandler = new Action(ShowRestartPopup),
-                LoadHandler = new Action(ShowLoadPopup),
-                SaveHandler = new Action(ShowSavePopup),
+                OpenPopup = new Action<string, string>(OpenPopupHandler),
                 YesHandler = new Action(YesHandlerAction),
                 NoHandler = new Action(UnshowPopup),
             };
@@ -105,12 +102,7 @@ public class MainView
         });
     }
 
-    private void ShowQuitPopup() => OpenPopup("Quit", "Are you sure you want to quit?");
-    private void ShowRestartPopup() => OpenPopup("Restart", "Are you sure you want to start over?");
-    private void ShowLoadPopup() => OpenPopup("Load", "Load() Not implemented yet!");
-    private void ShowSavePopup() => OpenPopup("Save", "Save() Not implemented yet!");
-
-    private void OpenPopup(string title, string message)
+    private void OpenPopupHandler(string title, string message)
     {
         Model.PopupTitle = title;
         Model.PopupMessage = message;
