@@ -105,7 +105,6 @@ public class MainView
         });
     }
 
-    // Methods bound from markup
     private void ShowQuitPopup() => OpenPopup("Quit", "Are you sure you want to quit?");
     private void ShowRestartPopup() => OpenPopup("Restart", "Are you sure you want to start over?");
     private void ShowLoadPopup() => OpenPopup("Load", "Load() Not implemented yet!");
