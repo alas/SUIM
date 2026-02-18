@@ -28,7 +28,7 @@ public class MainView
                 RestartHandler = new Action(ShowRestartPopup),
                 LoadHandler = new Action(ShowLoadPopup),
                 SaveHandler = new Action(ShowSavePopup),
-                NoHandler = new Action(() => NoHandler()),
+                NoHandler = new Action(() => UnshowPopup()),
             };
 
         var mapper = new SUIMStride
@@ -96,7 +96,6 @@ public class MainView
     private void ShowRestartPopup() => OpenPopup("Restart", "Are you sure you want to start over?", RestartHandler);
     private void ShowLoadPopup() => OpenPopup("Load", "Load() Not implemented yet!", LoadHandler);
     private void ShowSavePopup() => OpenPopup("Save", "Save() Not implemented yet!", SaveHandler);
-    private void NoHandler() => UnshowPopup();
 
     private void OpenPopup(string title, string message, EventHandler<Stride.UI.Events.RoutedEventArgs> yesClickHandler)
     {
