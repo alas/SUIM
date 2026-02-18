@@ -84,7 +84,7 @@ public class EventBindingTests
         observableModel.Initialize(model);
 
         // Get the parameterless handler
-        var handler = observableModel.GetHandler("QuitHandler");
+        var handler = observableModel.GetHandler("QuitHandler()");
 
         Assert.NotNull(handler);
         Assert.IsType<Action>(handler);

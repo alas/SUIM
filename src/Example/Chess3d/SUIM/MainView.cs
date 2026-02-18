@@ -49,7 +49,7 @@ public class MainView
         switch (Model.PopupTitle)
         {
             case "Quit":
-                QuitGame();
+                Game.Exit();
                 break;
             case "Restart":
                 RestartHandler();
@@ -61,11 +61,6 @@ public class MainView
                 SaveHandler();
                 break;
         }
-    }
-
-    private void QuitGame()
-    {
-        Game.Exit();
     }
     
     private void RestartHandler()

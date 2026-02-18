@@ -221,7 +221,7 @@ public class IntegrationTests
         LayoutEngine.Layout(suimRoot, 16, 1280, 720);
         
         // Map to Stride
-        var mapper = new SUIM.StrideIntegration.SUIMStride();
+        var mapper = new StrideIntegration.SUIMStride();
         var strideRoot = mapper.MapElement(suimRoot);
         
         // Verify Stride root is a grid

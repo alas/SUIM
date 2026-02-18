@@ -409,7 +409,7 @@ public static class MarkupParser
 
         if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
         {
-            // Event Binding: onclick="MethodName"
+            // Event Binding: onclick="MethodName()"
             var handlerName = attr.Value;
             target.Events[name.Substring(2)] = handlerName;
             return;

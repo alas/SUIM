@@ -38,7 +38,7 @@ public class ObservableObject : DynamicObject, INotifyPropertyChanged
         }
 
         // 2. Check for methods with matching name (multiple methods with same name = overloading)
-        var methods = _source.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+        var methods = _source.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.IgnoreReturn);
         var matchingMethods = methods.Where(m => m.Name == name).ToList();
 
         if (matchingMethods.Count == 0)
@@ -49,16 +49,16 @@ public class ObservableObject : DynamicObject, INotifyPropertyChanged
         var parameterlessMethod = matchingMethods.FirstOrDefault(m => m.GetParameters().Length == 0);
         if (parameterlessMethod != null)
         {
-            return parameterlessMethod.CreateDelegate(typeof(Action), _source);
+            return parameterlessMethod.CreateDelegate<Action>(_source);
         }
 
         // 2. Method taking single UIElement (Action<UIElement>)
         var uiElementMethod = matchingMethods.FirstOrDefault(m =>
             m.GetParameters().Length == 1 &&
-            typeof(SUIM.Components.UIElement).IsAssignableFrom(m.GetParameters()[0].ParameterType));
+            typeof(Components.UIElement).IsAssignableFrom(m.GetParameters()[0].ParameterType));
         if (uiElementMethod != null)
         {
-            return uiElementMethod.CreateDelegate(typeof(Action<SUIM.Components.UIElement>), _source);
+            return uiElementMethod.CreateDelegate<Action<Components.UIElement>>(_source);
         }
 
         // 3. EventHandler pattern (object sender, EventArgs e)
@@ -71,7 +71,7 @@ public class ObservableObject : DynamicObject, INotifyPropertyChanged
         });
         if (eventHandlerMethod != null)
         {
-            return eventHandlerMethod.CreateDelegate(typeof(EventHandler), _source);
+            return eventHandlerMethod.CreateDelegate<EventHandler>(_source);
         }
 
         // 4. Fall back to first method if others don't match
@@ -83,11 +83,11 @@ public class ObservableObject : DynamicObject, INotifyPropertyChanged
             try
             {
                 if (parameters.Length == 0)
-                    return fallbackMethod.CreateDelegate(typeof(Action), _source);
-                else if (parameters.Length == 1 && typeof(SUIM.Components.UIElement).IsAssignableFrom(parameters[0].ParameterType))
-                    return fallbackMethod.CreateDelegate(typeof(Action<SUIM.Components.UIElement>), _source);
+                    return fallbackMethod.CreateDelegate<Action>(_source);
+                else if (parameters.Length == 1 && typeof(Components.UIElement).IsAssignableFrom(parameters[0].ParameterType))
+                    return fallbackMethod.CreateDelegate<Action<Components.UIElement>>(_source);
                 else if (parameters.Length == 2)
-                    return fallbackMethod.CreateDelegate(typeof(EventHandler), _source);
+                    return fallbackMethod.CreateDelegate<EventHandler>(_source);
             }
             catch
             {

@@ -61,7 +61,7 @@ public class EventHandlerStrideTests
     public void MarkupParser_ParsesEventAttribute_StoredInElementEvents()
     {
         // Arrange
-        var markup = @"<button id=""testBtn"" onclick=""OnSimpleClick"" />";
+        var markup = @"<button id=""testBtn"" onclick=""OnSimpleClick()"" />";
         var model = new TestModel();
 
         // Act
@@ -80,7 +80,7 @@ public class EventHandlerStrideTests
     public void MarkupParser_ParsesMultipleEventAttributes()
     {
         // Arrange
-        var markup = @"<button id=""btn"" onclick=""OnSimpleClick"" />";
+        var markup = @"<button id=""btn"" onclick=""OnSimpleClick()"" />";
         var model = new TestModel();
 
         // Act
@@ -99,7 +99,7 @@ public class EventHandlerStrideTests
     public void MarkupParser_PreservesEventHandlerName()
     {
         // Arrange
-        var markup = @"<button id=""btn1"" onclick=""OnSimpleClick"" />";
+        var markup = @"<button id=""btn1"" onclick=""OnSimpleClick()"" />";
         var model = new TestModel();
 
         // Act
@@ -119,7 +119,7 @@ public class EventHandlerStrideTests
     public void SUIMStride_ParsesMarkupWithEventHandler_NoThrow()
     {
         // Arrange
-        var markup = @"<button id=""testBtn"" onclick=""OnSimpleClick"" />";
+        var markup = @"<button id=""testBtn"" onclick=""OnSimpleClick()"" />";
         var model = new TestModel();
         var suim = new SUIMStride();
 
@@ -140,7 +140,7 @@ public class EventHandlerStrideTests
     public void SUIMStride_ResolvesEventHandler_FromModel()
     {
         // Arrange
-        var markup = @"<button id=""testBtn"" onclick=""OnSimpleClick"" />";
+        var markup = @"<button id=""testBtn"" onclick=""OnSimpleClick()"" />";
         var model = new TestModel();
         var suim = new SUIMStride();
 
@@ -164,7 +164,7 @@ public class EventHandlerStrideTests
     public void SUIMStride_MissingEventHandler_DoesNotThrow()
     {
         // Arrange
-        var markup = @"<button id=""testBtn"" onclick=""NonExistentHandler"" />";
+        var markup = @"<button id=""testBtn"" onclick=""NonExistentHandler()"" />";
         var model = new TestModel();
         var suim = new SUIMStride();
 
@@ -187,9 +187,9 @@ public class EventHandlerStrideTests
         // Arrange
         var markup = @"
             <stack orientation=""vertical"">
-                <button id=""btn1"" onclick=""OnSimpleClick"" />
+                <button id=""btn1"" onclick=""OnSimpleClick()"" />
                 <div>
-                    <button id=""btn2"" onclick=""OnAlternateClick"" />
+                    <button id=""btn2"" onclick=""OnAlternateClick()"" />
                 </div>
             </stack>";
         var model = new TestModel();
@@ -207,7 +207,7 @@ public class EventHandlerStrideTests
         var btn1 = stack.Children[0] as Button;
         Assert.NotNull(btn1);
         Assert.True(btn1!.Events.ContainsKey("click"));
-        Assert.Equal("OnSimpleClick", btn1.Events["click"]);
+        Assert.Equal("OnSimpleClick()", btn1.Events["click"]);
     }
 
     /// <summary>
@@ -218,7 +218,7 @@ public class EventHandlerStrideTests
     public void SUIMStride_MapElement_ConvertsEventButtonToStrideButton()
     {
         // Arrange
-        var markup = @"<button id=""testBtn"" onclick=""OnSimpleClick"">Click Me</button>";
+        var markup = @"<button id=""testBtn"" onclick=""OnSimpleClick()"">Click Me</button>";
         var model = new TestModel();
         var suim = new SUIMStride();
 
@@ -240,7 +240,7 @@ public class EventHandlerStrideTests
     public void SUIMStride_Parse_WithDifferentModels_CreatesIndependentInstances()
     {
         // Arrange
-        var markup = @"<button id=""btn"" onclick=""OnSimpleClick"" />";
+        var markup = @"<button id=""btn"" onclick=""OnSimpleClick()"" />";
         var model1 = new TestModel();
         var model2 = new TestModel();
         var suim = new SUIMStride();
@@ -262,7 +262,7 @@ public class EventHandlerStrideTests
     public void SUIMStride_PreservesEventInformation_ThroughMapping()
     {
         // Arrange
-        var markup = @"<button id=""testBtn"" onclick=""OnSimpleClick"" />";
+        var markup = @"<button id=""testBtn"" onclick=""OnSimpleClick()"" />";
         var model = new TestModel();
         
         // First parse to SUIM
@@ -290,7 +290,7 @@ public class EventHandlerStrideTests
         var markup = @"
             <grid>
                 <model>{ ""title"": ""Click Button"" }</model>
-                <button id=""btn"" onclick=""OnSimpleClick"">Click</button>
+                <button id=""btn"" onclick=""OnSimpleClick()"">Click</button>
             </grid>";
         var model = new TestModel();
         var suim = new SUIMStride();
@@ -320,7 +320,7 @@ public class EventHandlerStrideTests
         // Try to get a handler delegate for the method
         if (observable is ObservableObject obs)
         {
-            var handler = obs.GetHandler("OnSimpleClick");
+            var handler = obs.GetHandler("OnSimpleClick()");
             
             // Assert
             // Should be able to get a handler (either as Delegate or null if not bindable)
@@ -337,8 +337,8 @@ public class EventHandlerStrideTests
         // Arrange
         var markup = @"
             <stack orientation=""vertical"">
-                <button id=""btn1"" onclick=""OnSimpleClick"">Button 1</button>
-                <button id=""btn2"" onclick=""OnAlternateClick"">Button 2</button>
+                <button id=""btn1"" onclick=""OnSimpleClick()"">Button 1</button>
+                <button id=""btn2"" onclick=""OnAlternateClick()"">Button 2</button>
             </stack>";
         var model = new TestModel();
 
