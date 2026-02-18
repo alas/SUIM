@@ -31,20 +31,72 @@ public class ObservableObject : DynamicObject, INotifyPropertyChanged
     {
         if (_source == null) return null;
 
-        // 1. Check if the property itself is a delegate
-        if (_properties.TryGetValue(name, out var val) && val is Delegate d)
+        if (string.IsNullOrWhiteSpace(name)) return null;
+
+        name = name.Trim();
+
+        // If the name is a call expression like "Func()" or "Func(this, 'a', 1)",
+        // extract the method name and arguments.
+        string methodName = name;
+        string? argsStr = null;
+        var open = name.IndexOf('(');
+        var close = name.LastIndexOf(')');
+        if (open > 0 && close > open)
         {
-            return d;
+            methodName = name.Substring(0, open).Trim();
+            argsStr = name.Substring(open + 1, close - open - 1).Trim();
+        }
+
+        // 1. Check if the property itself is a delegate (use methodName without parentheses)
+        if (_properties.TryGetValue(methodName, out var val) && val is Delegate pd)
+        {
+            if (argsStr == null)
+                return pd;
+
+            // If arguments provided, return an Action that will invoke the delegate with parsed args
+            var args = ParseArguments(argsStr);
+            return new Action(() => pd.DynamicInvoke(args));
         }
 
         // 2. Check for methods with matching name (multiple methods with same name = overloading)
-        var methods = _source.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.IgnoreReturn);
-        var matchingMethods = methods.Where(m => m.Name == name).ToList();
+        var methods = _source.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
+        var matchingMethods = methods.Where(m => m.Name == methodName).ToList();
 
         if (matchingMethods.Count == 0)
             return null;
 
-        // Priority-based resolution for overloaded methods:
+        // If explicit arguments were provided in the expression, try to resolve by matching parameter count/types
+        if (argsStr != null)
+        {
+            var args = ParseArguments(argsStr);
+
+            foreach (var method in matchingMethods)
+            {
+                var parms = method.GetParameters();
+                if (parms.Length != args.Length) continue;
+
+                bool match = true;
+                for (int i = 0; i < parms.Length; i++)
+                {
+                    var a = args[i];
+                    if (a == null) continue; // allow null for reference types
+                    if (!parms[i].ParameterType.IsAssignableFrom(a.GetType()))
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (!match) continue;
+
+                // Return an Action that invokes the method with the parsed arguments
+                return new Action(() => method.Invoke(_source, args));
+            }
+
+            return null;
+        }
+
+        // No explicit arguments: use priority-based resolution for overloaded methods
         // 1. Parameterless method (Action)
         var parameterlessMethod = matchingMethods.FirstOrDefault(m => m.GetParameters().Length == 0);
         if (parameterlessMethod != null)
@@ -96,6 +148,46 @@ public class ObservableObject : DynamicObject, INotifyPropertyChanged
         }
 
         return null;
+    }
+
+    private object?[] ParseArguments(string argsStr)
+    {
+        if (string.IsNullOrWhiteSpace(argsStr)) return [];
+
+        var parts = argsStr.Split(',');
+        var result = new object?[parts.Length];
+
+        for (int i = 0; i < parts.Length; i++)
+        {
+            var p = parts[i].Trim();
+            if (p.Equals("this", System.StringComparison.OrdinalIgnoreCase))
+            {
+                // ObservableObject has no UIElement context; map to null
+                result[i] = null;
+            }
+            else if ((p.StartsWith("'") && p.EndsWith("'")) || (p.StartsWith("\"") && p.EndsWith("\"")))
+            {
+                result[i] = p.Substring(1, p.Length - 2);
+            }
+            else if (bool.TryParse(p, out var b))
+            {
+                result[i] = b;
+            }
+            else if (int.TryParse(p, out var n))
+            {
+                result[i] = n;
+            }
+            else if (float.TryParse(p, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var f))
+            {
+                result[i] = f;
+            }
+            else
+            {
+                result[i] = p;
+            }
+        }
+
+        return result;
     }
 
     public override bool TryGetMember(GetMemberBinder binder, out object? result)

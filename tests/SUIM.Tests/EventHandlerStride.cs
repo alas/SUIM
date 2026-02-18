@@ -70,7 +70,7 @@ public class EventHandlerStrideTests
         // Assert
         Assert.IsType<Button>(root);
         Assert.True(root.Events.ContainsKey("click"));
-        Assert.Equal("OnSimpleClick", root.Events["click"]);
+        Assert.Equal("OnSimpleClick()", root.Events["click"]);
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public class EventHandlerStrideTests
         // Assert
         var button = root as Button;
         Assert.NotNull(button);
-        Assert.Equal("OnSimpleClick", button.Events["click"]);
+        Assert.Equal("OnSimpleClick()", button.Events["click"]);
     }
 
     /// <summary>
@@ -353,8 +353,8 @@ public class EventHandlerStrideTests
         var btn1 = stack.Children[0] as Button;
         var btn2 = stack.Children[1] as Button;
         
-        Assert.Equal("OnSimpleClick", btn1!.Events["click"]);
-        Assert.Equal("OnAlternateClick", btn2!.Events["click"]);
+        Assert.Equal("OnSimpleClick()", btn1!.Events["click"]);
+        Assert.Equal("OnAlternateClick()", btn2!.Events["click"]);
     }
 
 
