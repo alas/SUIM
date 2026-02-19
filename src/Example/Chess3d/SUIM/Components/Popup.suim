@@ -1,11 +1,17 @@
 <overlay id="popup" visibility="collapse">
+	<model>
+		{
+		    "title": "",
+		    "message": ""
+		}
+	</model>
     <grid width="360" height="180" halign="center" valign="center">
         <vstack>
             <hstack>
-                <label value="@PopupTitle" />
+                <label value="@title" />
             </hstack>
             <vstack margin="6">
-                <label value="@PopupMessage" />
+                <label value="@message" />
             </vstack>
             <hstack>
                 <button id="yesButton" class="mybutton" onclick="YesHandler()">YES</button>

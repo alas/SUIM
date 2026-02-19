@@ -8,6 +8,6 @@
         <button class="mybutton" onclick="OpenPopup('Save', 'Save() Not implemented yet!')">Save</button>
     </vstack>
 
-	<Popup />
-    <ScreenOverlay />
+	<Popup title="@PopupTitle" message="@PopupMessage" />
+    <ScreenOverlay message="@BlockerMessage" />
 </grid>

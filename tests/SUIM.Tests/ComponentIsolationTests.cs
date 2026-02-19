@@ -1,13 +1,12 @@
 namespace SUIM.Tests;
 
+using System;
+using System.IO;
 using Xunit;
+using Stride.Engine;
 using SUIM;
 using SUIM.Components;
 using SUIM.StrideIntegration;
-using System.IO;
-using System.Collections.Generic;
-using Stride.Engine;
-using System;
 
 public class ComponentIsolationTests
 {

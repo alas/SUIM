@@ -23,14 +23,20 @@ public class CustomComponent(string tagName) : UIElement(tagName)
     {
         if (string.IsNullOrEmpty(Source)) return;
 
-        string finalPath = Source;
-        if (!Path.IsPathRooted(finalPath) && !string.IsNullOrEmpty(basePath))
+        var finalPath = Source;
+        var fileExists = File.Exists(finalPath);
+        if (!fileExists && !Path.IsPathRooted(finalPath) && !string.IsNullOrEmpty(basePath))
         {
             finalPath = Path.Combine(basePath, "components", Source);
-            if (!File.Exists(finalPath)) finalPath = Path.Combine(basePath, Source);
+            fileExists = fileExists || File.Exists(finalPath);
+            if (!File.Exists(finalPath))
+            {
+                finalPath = Path.Combine(basePath, Source);
+                fileExists = fileExists || File.Exists(finalPath);
+            }
         }
 
-        if (!File.Exists(finalPath)) throw new FileNotFoundException($"SUIM markup file not found: {finalPath}");
+        if (!fileExists) throw new FileNotFoundException($"SUIM markup file not found: {finalPath}");
 
         string componentName = Path.GetFileNameWithoutExtension(finalPath);
         string markup = File.ReadAllText(finalPath);
@@ -45,9 +51,8 @@ public class CustomComponent(string tagName) : UIElement(tagName)
             foreach (var attr in Attributes)
             {
                 var name = attr.Key;
-                var val = attr.Value as string;
 
-                if (val != null && val.StartsWith('@'))
+                if (attr.Value is string val && val.StartsWith('@'))
                 {
                     // Binding to parent model
                     if (parentModel is ObservableObject parentOO)
