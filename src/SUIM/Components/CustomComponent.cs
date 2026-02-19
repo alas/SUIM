@@ -59,6 +59,19 @@ public class CustomComponent(string tagName) : UIElement(tagName)
                     {
                         var parentPropName = val.Substring(1);
                         oo.SetProxy(name, () => parentOO.GetValue(parentPropName), (v) => parentOO.SetValue(parentPropName, v));
+
+                        // When parent changes, notify the component model so bindings inside the component update.
+                        parentOO.PropertyChanged += (s, e) =>
+                        {
+                            try
+                            {
+                                if (e.PropertyName == parentPropName)
+                                {
+                                    oo.NotifyChanged(name);
+                                }
+                            }
+                            catch { }
+                        };
                     }
                 }
                 else

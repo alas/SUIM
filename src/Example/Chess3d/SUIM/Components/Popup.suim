@@ -2,7 +2,9 @@
 	<model>
 		{
 		    "title": "",
-		    "message": ""
+		    "message": "",
+			"onYes": null,
+            "onNo": null
 		}
 	</model>
     <grid width="360" height="180" halign="center" valign="center">
@@ -14,8 +16,8 @@
                 <label value="@message" />
             </vstack>
             <hstack>
-                <button id="yesButton" class="mybutton" onclick="YesHandler()">YES</button>
-                <button id="noButton" class="mybutton" onclick="NoHandler()">NO</button>
+                <button id="yesButton" class="mybutton" onclick="onYes()">YES</button>
+                <button id="noButton" class="mybutton" onclick="onNo()">NO</button>
             </hstack>
         </vstack>
     </grid>
