@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using Xunit;
 using Stride.Engine;
+using Stride.UI.Events;
 using SUIM;
 using SUIM.Components;
 using SUIM.StrideIntegration;
@@ -18,28 +19,6 @@ public class ComponentIsolationTests
         return path;
     }
 
-    private static Stride.UI.Controls.TextBlock? FindFirstTextBlock(Stride.UI.UIElement node)
-    {
-        if (node == null) return null;
-        if (node is Stride.UI.Controls.TextBlock tb) return tb;
-
-        if (node is Stride.UI.Panels.Panel panel)
-        {
-            foreach (var child in panel.Children)
-            {
-                var r = FindFirstTextBlock(child);
-                if (r != null) return r;
-            }
-        }
-        else if (node is Stride.UI.Controls.ContentControl cc && cc.Content is Stride.UI.UIElement ce)
-        {
-            var r = FindFirstTextBlock(ce);
-            if (r != null) return r;
-        }
-
-        return null;
-    }
-
     [Fact]
     public void Component_Attribute_Binding_Propagates_To_Internal_Label()
     {
@@ -47,7 +26,7 @@ public class ComponentIsolationTests
         var componentMarkup = """
             <div id="popuproot">
                 <model>{ "title": "" }</model>
-                <label value="@title" />
+                <label id="thelabel" value="@title" />
             </div>
             """;
         File.WriteAllText(compPath, componentMarkup);
@@ -65,12 +44,51 @@ public class ComponentIsolationTests
         var (strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
 
         // Find first TextBlock in the mapped Stride UI tree and assert its text was set from parent model
-        var found = FindFirstTextBlock(strideRoot);
+        var found = XPath.Find(strideRoot, "thelabel") as Stride.UI.Controls.TextBlock;
         Assert.NotNull(found);
         Assert.Equal("HelloWorld", found!.Text);
 
         model!.PopupTitle = "Changed";
         Assert.Equal("Changed", found!.Text);
+    }
+
+    [Fact]
+    public void Component_Attribute_Binding_Propagates_To_Internal_ButtonClick()
+    {
+        var compPath = GetTestPath("PopupTestComp.suim");
+        var componentMarkup = """
+            <div id="popuproot">
+                <model>{ "onbuttonclick": null }</model>
+                <button id="thebutton" onclick="@onbuttonclick"></button>
+            </div>
+            """;
+        File.WriteAllText(compPath, componentMarkup);
+
+        ComponentRegistry.Register("PopupTestComp", compPath);
+
+        var markup = @"<div><PopupTestComp onbuttonclick=""MyHandler()"" /></div>";
+
+        var suim = new SUIMStride
+        {
+            RootPath = AppDomain.CurrentDomain.BaseDirectory
+        };
+
+        var called = false;
+        var parentModel = new { MyHandler = 
+            new Action(() => 
+            {
+                called = true;
+            }) };
+        var game = new Game();
+        var (strideRoot, model) = suim.Parse(markup, game, model: parentModel);
+
+        var found = XPath.Find(strideRoot, "thebutton") as Stride.UI.Controls.Button;
+        Assert.NotNull(found);
+        //found.RaiseEvent(new Stride.UI.Events.RoutedEventArgs());
+
+        found.RaiseEvent(new RoutedEventArgs());
+        game.Tick(); // Process events
+        Assert.True(called);
     }
 
     [Fact]
