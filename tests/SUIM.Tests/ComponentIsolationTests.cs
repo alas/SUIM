@@ -84,8 +84,11 @@ public class ComponentIsolationTests
 
         var found = XPath.Find(strideRoot, "thebutton") as Stride.UI.Controls.Button;
         Assert.NotNull(found);
-        //todo: simulate click event on found button and assert handler was called.
-        //This is currently not working because the event handler is not being wired up correctly in SUIMStride, investigate and fix.
+        // simulate click by invoking the bound handler (test hook)
+        var handler = suim.GetBoundClickHandler(found!);
+        Assert.NotNull(handler);
+        // Invoke as RoutedEvent handler
+        handler!.DynamicInvoke(found, new RoutedEventArgs());
         Assert.True(called);
     }
 

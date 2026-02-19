@@ -52,26 +52,43 @@ public class CustomComponent(string tagName) : UIElement(tagName)
             {
                 var name = attr.Key;
 
-                if (attr.Value is string val && val.StartsWith('@'))
+                if (attr.Value is string val)
                 {
-                    // Binding to parent model
-                    if (parentModel is ObservableObject parentOO)
+                    if (val.StartsWith('@'))
                     {
-                        var parentPropName = val.Substring(1);
-                        oo.SetProxy(name, () => parentOO.GetValue(parentPropName), (v) => parentOO.SetValue(parentPropName, v));
-
-                        // When parent changes, notify the component model so bindings inside the component update.
-                        parentOO.PropertyChanged += (s, e) =>
+                        // Binding to parent model property
+                        if (parentModel is ObservableObject parentOO)
                         {
-                            try
+                            var parentPropName = val.Substring(1);
+                            oo.SetProxy(name, () => parentOO.GetValue(parentPropName), (v) => parentOO.SetValue(parentPropName, v));
+
+                            // When parent changes, notify the component model so bindings inside the component update.
+                            parentOO.PropertyChanged += (s, e) =>
                             {
-                                if (e.PropertyName == parentPropName)
+                                try
                                 {
-                                    oo.NotifyChanged(name);
+                                    if (e.PropertyName == parentPropName)
+                                    {
+                                        oo.NotifyChanged(name);
+                                    }
                                 }
-                            }
-                            catch { }
-                        };
+                                catch { }
+                            };
+                        }
+                        else
+                        {
+                            oo.SetValue(name, attr.Value);
+                        }
+                    }
+                    else if (val.Contains('(') && parentModel is ObservableObject parentOO2)
+                    {
+                        // Attribute looks like a method call expression (e.g. "MyHandler()") coming from parent.
+                        // Create a proxy that resolves to a Delegate from the parent model so component internals can invoke it.
+                        oo.SetProxy(name, () => parentOO2.GetHandler(val), null);
+                    }
+                    else
+                    {
+                        oo.SetValue(name, attr.Value);
                     }
                 }
                 else

@@ -155,7 +155,18 @@ public abstract class UIElement(string tagName)
         else if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
         {
             var handlerName = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-            Events[name.Substring(2)] = handlerName;
+            // Treat only known event attributes (e.g., onclick) as events. Attributes that simply start with "on" but
+            // are intended as component properties (like "onbuttonclick") should be preserved as regular attributes.
+            var eventName = name.Substring(2);
+            if (string.Equals(eventName, "click", StringComparison.OrdinalIgnoreCase))
+            {
+                Events[eventName] = handlerName;
+            }
+            else
+            {
+                // Preserve as regular attribute for components or custom usage
+                Attributes[name] = value;
+            }
         }
         else if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase))
         {

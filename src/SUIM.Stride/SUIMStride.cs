@@ -16,6 +16,8 @@ using StrideGrid = Stride.UI.Panels.Grid;
 
 public class SUIMStride
 {
+    // Test hook: keep track of click handlers bound to Stride Buttons so tests can simulate clicks.
+    private readonly Dictionary<Button, Delegate> _clickHandlers = [];
     private ContentManager? ContentManager = null;
     private readonly Dictionary<string, SpriteFont> Fonts = [];
     private readonly Dictionary<string, (Components.UIElement SuimRoot, UIElement StrideRoot, dynamic? Model)> _parseCache = [];
@@ -401,17 +403,38 @@ public class SUIMStride
                 throw new InvalidOperationException($"Event '{eventName}' found on tag '{suimElement.TagName}' but no model context is available.");
 
             // Resolve handler using the effective model for this element (components must be isolated)
-            Delegate? handler;
-            if (model is ObservableObject oo)
+            Delegate? handler = null;
+
+            if (!string.IsNullOrEmpty(handlerName) && handlerName.StartsWith('@'))
             {
-                handler = oo.GetHandler(handlerName);
+                var propName = handlerName.Substring(1);
+                if (model is ObservableObject mOO)
+                {
+                    var val = mOO.GetValue(propName);
+                    if (val is Delegate d)
+                    {
+                        handler = d;
+                    }
+                    else if (val is string s)
+                    {
+                        // Try to interpret the string as a handler expression on the component model (or parent proxy)
+                        handler = mOO.GetHandler(s) ?? BackendHelpers.ResolveEventAction(s, (object)model, suimElement) ?? ResolveMethodAsDelegate(s, model);
+                    }
+                }
             }
             else
             {
-                // Try reflection on raw object using shared helper
-                handler = BackendHelpers.ResolveEventAction(handlerName, (object)model, suimElement);
-                // If generic resolver didn't find anything, try Stride-specific resolver that understands RoutedEventArgs
-                handler ??= ResolveMethodAsDelegate(handlerName, model);
+                if (model is ObservableObject oo)
+                {
+                    handler = oo.GetHandler(handlerName);
+                }
+                else
+                {
+                    // Try reflection on raw object using shared helper
+                    handler = BackendHelpers.ResolveEventAction(handlerName, (object)model, suimElement);
+                    // If generic resolver didn't find anything, try Stride-specific resolver that understands RoutedEventArgs
+                    handler ??= ResolveMethodAsDelegate(handlerName, model);
+                }
             }
 
             if (handler != null)
@@ -426,28 +449,38 @@ public class SUIMStride
         }
     }
 
-    private static void BindClickHandler(Button btn, Delegate handler, Components.UIElement suimElement)
+    private void BindClickHandler(Button btn, Delegate handler, Components.UIElement suimElement)
     {
         // Support multiple handler types for click events
         if (handler is EventHandler<Stride.UI.Events.RoutedEventArgs> routedHandler)
         {
             btn.Click += routedHandler;
+            _clickHandlers[btn] = routedHandler;
         }
         else if (handler is EventHandler eh)
         {
             EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => eh(s, e);
             btn.Click += wrappedHandler;
+            _clickHandlers[btn] = wrappedHandler;
         }
         else if (handler is Action<Components.UIElement> actionWithElement)
         {
             EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => actionWithElement(suimElement);
             btn.Click += wrappedHandler;
+            _clickHandlers[btn] = wrappedHandler;
         }
         else if (handler is Action a)
         {
             EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => a();
             btn.Click += wrappedHandler;
+            _clickHandlers[btn] = wrappedHandler;
         }
+    }
+
+    // Test helper to retrieve a bound click handler (returns null if none)
+    public Delegate? GetBoundClickHandler(Button btn)
+    {
+        return _clickHandlers.TryGetValue(btn, out var d) ? d : null;
     }
 
     /// <summary>

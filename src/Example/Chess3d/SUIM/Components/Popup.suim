@@ -16,8 +16,8 @@
                 <label value="@message" />
             </vstack>
             <hstack>
-                <button id="yesButton" class="mybutton" onclick="onYes()">YES</button>
-                <button id="noButton" class="mybutton" onclick="onNo()">NO</button>
+                <button id="yesButton" class="mybutton" onclick="@onYes">YES</button>
+                <button id="noButton" class="mybutton" onclick="@onNo">NO</button>
             </hstack>
         </vstack>
     </grid>

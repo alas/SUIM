@@ -8,6 +8,6 @@
         <button class="mybutton" onclick="OpenPopup('Save', 'Save() Not implemented yet!')">Save</button>
     </vstack>
 
-	<Popup title="@PopupTitle" message="@PopupMessage" onyes="YesHandler()" onNo="NoHandler()" />
+	<Popup title="@PopupTitle" message="@PopupMessage" onYes="YesHandler()" onNo="NoHandler()" />
     <ScreenOverlay message="@BlockerMessage" />
 </grid>
