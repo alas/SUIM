@@ -10,12 +10,67 @@ using SUIM.StrideIntegration;
 
 public class ComponentIsolationTests
 {
-    private string GetTestPath(string filename)
+    private static string GetTestPath(string filename)
     {
         var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename);
         var dir = Path.GetDirectoryName(path);
         if (!Directory.Exists(dir)) Directory.CreateDirectory(dir!);
         return path;
+    }
+
+    private static Stride.UI.Controls.TextBlock? FindFirstTextBlock(Stride.UI.UIElement node)
+    {
+        if (node == null) return null;
+        if (node is Stride.UI.Controls.TextBlock tb) return tb;
+
+        if (node is Stride.UI.Panels.Panel panel)
+        {
+            foreach (var child in panel.Children)
+            {
+                var r = FindFirstTextBlock(child);
+                if (r != null) return r;
+            }
+        }
+        else if (node is Stride.UI.Controls.ContentControl cc && cc.Content is Stride.UI.UIElement ce)
+        {
+            var r = FindFirstTextBlock(ce);
+            if (r != null) return r;
+        }
+
+        return null;
+    }
+
+    [Fact]
+    public void Component_Attribute_Binding_Propagates_To_Internal_Label()
+    {
+        var compPath = GetTestPath("PopupTestComp.suim");
+        var componentMarkup = """
+            <div id="popuproot">
+                <model>{ "title": "" }</model>
+                <label value="@title" />
+            </div>
+            """;
+        File.WriteAllText(compPath, componentMarkup);
+
+        ComponentRegistry.Register("PopupTestComp", compPath);
+
+        var markup = "<div><PopupTestComp title=\"@PopupTitle\" /></div>";
+
+        var suim = new SUIMStride
+        {
+            RootPath = AppDomain.CurrentDomain.BaseDirectory
+        };
+
+        var parentModel = new { PopupTitle = "HelloWorld" };
+        var (strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
+
+        // Find first TextBlock in the mapped Stride UI tree and assert its text was set from parent model
+        var found = FindFirstTextBlock(strideRoot);
+        Assert.NotNull(found);
+        Assert.Equal("HelloWorld", found!.Text);
+
+        model!.PopupTitle = "Changed";
+        Assert.Equal("Changed", found!.Text);
     }
 
     [Fact]

@@ -400,9 +400,9 @@ public class SUIMStride
             if (model == null)
                 throw new InvalidOperationException($"Event '{eventName}' found on tag '{suimElement.TagName}' but no model context is available.");
 
-            // Resolve handler
+            // Resolve handler using the effective model for this element (components must be isolated)
             Delegate? handler;
-            if (_currentModel is ObservableObject oo)
+            if (model is ObservableObject oo)
             {
                 handler = oo.GetHandler(handlerName);
             }
