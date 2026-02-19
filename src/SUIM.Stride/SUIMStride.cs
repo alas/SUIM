@@ -25,7 +25,8 @@ public class SUIMStride
     public (UIElement, dynamic?) ParseFromFile(string path, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
         var markup = File.ReadAllText(path);
-        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, Path.GetDirectoryName(path));
+        var viewName = Path.GetFileNameWithoutExtension(path);
+        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, Path.GetDirectoryName(path), viewName);
     }
 
     public (UIElement, dynamic?) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
@@ -44,10 +45,10 @@ public class SUIMStride
         var markup = File.ReadAllText(viewPath);
         project.ResolveDependencies(markup);
 
-        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath);
+        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath, viewName);
     }
 
-    private (UIElement, dynamic?) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath)
+    private (UIElement, dynamic?) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null)
     {
         ArgumentNullException.ThrowIfNull(markup);
 
@@ -69,7 +70,7 @@ public class SUIMStride
         ContentManager = game.Content;
 
         // Not cached: parse markup, map and store the canonical instance
-        var (suimRoot, model2) = MarkupParser.Parse(markup, model, basePath: basePath);
+        var (suimRoot, model2) = MarkupParser.Parse(markup, model, basePath: basePath, componentName: viewName);
         Layout(suimRoot, game, defaultFontSize, fullscreen);
         _currentModel = model2;
         var strideRoot = MapElement(suimRoot);
@@ -370,11 +371,17 @@ public class SUIMStride
     
     private void TransferBindings(Components.UIElement suimElement, UIElement strideElement)
     {
-        if (_currentModel == null) return;
+        var model = suimElement.GetEffectiveModel();
         
         foreach (var binding in suimElement.Bindings)
         {
-            SetupBinding(_currentModel, binding.ModelPropertyName, binding.TargetPropertyName, strideElement);
+            if (model == null)
+            {
+                if (suimElement.IsComponentRoot || suimElement.Parent?.GetEffectiveModel() == null)
+                    throw new InvalidOperationException($"Binding '{binding.ModelPropertyName}' found on tag '{suimElement.TagName}' but no model context is available.");
+                continue;
+            }
+            SetupBinding(model, binding.ModelPropertyName, binding.TargetPropertyName, strideElement);
         }
 
         TransferEvents(suimElement, strideElement);
@@ -382,12 +389,16 @@ public class SUIMStride
 
     private void TransferEvents(Components.UIElement suimElement, UIElement strideElement)
     {
-        if (suimElement.Events.Count == 0 || _currentModel == null) return;
+        if (suimElement.Events.Count == 0) return;
+        var model = suimElement.GetEffectiveModel();
 
         foreach (var kvp in suimElement.Events)
         {
             var eventName = kvp.Key;
             var handlerName = kvp.Value;
+
+            if (model == null)
+                throw new InvalidOperationException($"Event '{eventName}' found on tag '{suimElement.TagName}' but no model context is available.");
 
             // Resolve handler
             Delegate? handler;
@@ -398,9 +409,9 @@ public class SUIMStride
             else
             {
                 // Try reflection on raw object using shared helper
-                handler = BackendHelpers.ResolveEventAction(handlerName, _currentModel, suimElement);
+                handler = BackendHelpers.ResolveEventAction(handlerName, (object)model, suimElement);
                 // If generic resolver didn't find anything, try Stride-specific resolver that understands RoutedEventArgs
-                handler ??= ResolveMethodAsDelegate(handlerName, _currentModel);
+                handler ??= ResolveMethodAsDelegate(handlerName, model);
             }
 
             if (handler != null)
@@ -476,7 +487,27 @@ public class SUIMStride
     {
         if (model == null) return;
         
-        // Use shared helper to setup binding and handle updates
+        // 2-way: UI -> model (via proxy)
+        if (model is ObservableObject oo)
+        {
+            if (strideElement is EditText et && (targetPropertyName.Equals("text", StringComparison.OrdinalIgnoreCase) || targetPropertyName.Equals("value", StringComparison.OrdinalIgnoreCase)))
+            {
+                oo.SetProxy(modelPropertyName, () => et.Text, (val) => et.Text = val?.ToString() ?? "");
+                et.TextChanged += (s, e) => oo.NotifyChanged(modelPropertyName);
+                return; // Proxy handles everything
+            }
+            /*
+            else if (strideElement is ToggleButton tb && (targetPropertyName.Equals("checked", StringComparison.OrdinalIgnoreCase) || targetPropertyName.Equals("value", StringComparison.OrdinalIgnoreCase)))
+            {
+                oo.SetProxy(modelPropertyName, () => tb.Checked, (val) => tb.Checked = val is bool b ? b : (val != null && bool.Parse(val.ToString()!)));
+                tb.Checked += (s, e) => oo.NotifyChanged(modelPropertyName);
+                tb.Unchecked += (s, e) => oo.NotifyChanged(modelPropertyName);
+                return; // Proxy handles everything
+            }
+            */
+        }
+
+        // 1-way fallback (model -> UI)
         BackendHelpers.SetupPropertyBinding((object?)model, modelPropertyName, newValue => ApplyBindingValue(strideElement, targetPropertyName, newValue));
     }
     

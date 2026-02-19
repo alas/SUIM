@@ -8,7 +8,7 @@ using SUIM.Layout;
 
 public static class MarkupParser
 {
-    public static (UIElement, dynamic?) Parse(string markup, object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
+    public static (UIElement, dynamic?) Parse(string markup, object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null, string? componentName = null)
     {
         dynamic? model2 = model == null ? null : ModelLogic.Create(model);
         var controlFlowParser = new ControlFlowParser(model2);
@@ -19,10 +19,64 @@ public static class MarkupParser
 
         Dictionary<string, Dictionary<string, string>> styles = inheritedStyles != null ? new(inheritedStyles) : [];
 
+        // Extract model from root children (flexible position)
         model2 = ModelLogic.ExtractModel(root, model2);
 
-        var element = ParseElement(root, styles, model2, basePath)
-            ?? throw new InvalidOperationException("Root element not found.");
+        UIElement element;
+        if (componentName != null && string.Equals(root.Name.LocalName, componentName, StringComparison.OrdinalIgnoreCase))
+        {
+            // Root tag matches component name: bypass redundant wrapper and process children
+            element = new Div(componentName);
+            element.Model = model2;
+            element.IsComponentRoot = true;
+
+            foreach (var node in root.Nodes())
+            {
+                if (node is XElement childX && (childX.Name.LocalName.Equals("model", StringComparison.OrdinalIgnoreCase) || childX.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase)))
+                {
+                    if (childX.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Process styles as usual
+                        var sourceAttr = childX.Attribute("source") ?? childX.Attribute("src");
+                        if (sourceAttr != null && !string.IsNullOrEmpty(basePath))
+                        {
+                            var stylePath = Path.Combine(basePath, sourceAttr.Value);
+                            if (File.Exists(stylePath)) ParseStyles(File.ReadAllText(stylePath), styles);
+                        }
+                        var content = childX.Value.Trim();
+                        if (!string.IsNullOrEmpty(content)) ParseStyles(content, styles);
+                    }
+                    continue;
+                }
+
+                if (node is XText textNode)
+                {
+                    var text = textNode.Value.Trim();
+                    if (!string.IsNullOrEmpty(text))
+                    {
+                        var textElement = new Text { Value = text };
+                        if (styles.Count > 0) textElement = ApplyStylesToElement(textElement, styles, model2);
+                        element.AddChild(textElement, root);
+                    }
+                }
+                else if (node is XElement childE)
+                {
+                    var childElement = ParseElement(childE, styles, model2, basePath);
+                    if (childElement != null) element.AddChild(childElement, childE);
+                }
+            }
+        }
+        else
+        {
+            element = ParseElement(root, styles, model2, basePath)
+                ?? throw new InvalidOperationException("Root element not found.");
+            
+            if (componentName != null)
+            {
+                element.IsComponentRoot = true;
+                element.Model = model2;
+            }
+        }
 
         return (element, model2);
     }
@@ -185,9 +239,9 @@ public static class MarkupParser
             if (properties.TryGetValue("width", out var pw) && !string.IsNullOrWhiteSpace(pw)) scroll.Width = UnitValue.Parse(pw);
             if (properties.TryGetValue("height", out var ph) && !string.IsNullOrWhiteSpace(ph)) scroll.Height = UnitValue.Parse(ph);
 
-            // When a style creates a scroll wrapper, the inner element should default to `auto` if it was the structural (1fr) default.
-            if (element.Width.Type == UnitType.Fr) element.Width = UnitValue.Auto;
-            if (element.Height.Type == UnitType.Fr) element.Height = UnitValue.Auto;
+            // When a style creates a scroll wrapper, the inner element should default to `auto` if it was unspecified.
+            if (element.Width.Type == UnitType.None) element.Width = UnitValue.Auto;
+            if (element.Height.Type == UnitType.None) element.Height = UnitValue.Auto;
 
             scroll.AddChild(element, null);
             element = scroll;
@@ -218,8 +272,8 @@ public static class MarkupParser
                 border.Height = UnitValue.Parse(ph);
             }
 
-            if (element.Width.Type == UnitType.Fr) element.Width = UnitValue.Auto;
-            if (element.Height.Type == UnitType.Fr) element.Height = UnitValue.Auto;
+            if (element.Width.Type == UnitType.None) element.Width = UnitValue.Auto;
+            if (element.Height.Type == UnitType.None) element.Height = UnitValue.Auto;
             border.AddChild(element, null);
             element = border;
         }
@@ -268,9 +322,9 @@ public static class MarkupParser
             {
                 scroll.Direction = dir;
             }
-            // If the inner element was using the parser default (1fr), change it to auto when wrapped by a scroll-viewport.
-            if (rootElement.Width.Type == UnitType.Fr) rootElement.Width = UnitValue.Auto;
-            if (rootElement.Height.Type == UnitType.Fr) rootElement.Height = UnitValue.Auto;
+            // If the inner element was unspecified, change it to auto when wrapped by a scroll-viewport.
+            if (rootElement.Width.Type == UnitType.None) rootElement.Width = UnitValue.Auto;
+            if (rootElement.Height.Type == UnitType.None) rootElement.Height = UnitValue.Auto;
 
             scroll.AddChild(rootElement, element);
             rootElement = scroll;
@@ -280,9 +334,9 @@ public static class MarkupParser
         {
             var border = new Border();
             border.SetAttribute("border", borderAttr.Value);
-            // Similar behavior for border wrapper: inner element should become `auto` for sizing if it was the parser default (1fr).
-            if (rootElement.Width.Type == UnitType.Fr) rootElement.Width = UnitValue.Auto;
-            if (rootElement.Height.Type == UnitType.Fr) rootElement.Height = UnitValue.Auto;
+            // Similar behavior for border wrapper: inner element should become `auto` for sizing if it was unspecified.
+            if (rootElement.Width.Type == UnitType.None) rootElement.Width = UnitValue.Auto;
+            if (rootElement.Height.Type == UnitType.None) rootElement.Height = UnitValue.Auto;
 
             border.AddChild(rootElement, element);
             rootElement = border;
@@ -396,7 +450,7 @@ public static class MarkupParser
 
         if (rootElement is CustomComponent custom)
         {
-            custom.Expand(model, styles);
+            custom.Expand(model, styles, basePath);
         }
 
         return rootElement;

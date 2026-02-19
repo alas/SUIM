@@ -19,31 +19,52 @@ public class CustomComponent(string tagName) : UIElement(tagName)
         }
     }
 
-    public void Expand(object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
+    public void Expand(object? parentModel = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
     {
         if (string.IsNullOrEmpty(Source)) return;
 
         string finalPath = Source;
         if (!Path.IsPathRooted(finalPath) && !string.IsNullOrEmpty(basePath))
         {
-            // If it's a relative path, try to find it in the components folder of the project
             finalPath = Path.Combine(basePath, "components", Source);
-            if (!File.Exists(finalPath))
+            if (!File.Exists(finalPath)) finalPath = Path.Combine(basePath, Source);
+        }
+
+        if (!File.Exists(finalPath)) throw new FileNotFoundException($"SUIM markup file not found: {finalPath}");
+
+        string componentName = Path.GetFileNameWithoutExtension(finalPath);
+        string markup = File.ReadAllText(finalPath);
+        var (element, componentModel) = MarkupParser.Parse(markup, null, inheritedStyles, basePath, componentName);
+        
+        this.Model = componentModel;
+        this.IsComponentRoot = true;
+
+        // Map attributes from this tag to the component model
+        if (componentModel is ObservableObject oo)
+        {
+            foreach (var attr in Attributes)
             {
-                // Fallback to just relative to basePath
-                finalPath = Path.Combine(basePath, Source);
+                var name = attr.Key;
+                var val = attr.Value as string;
+
+                if (val != null && val.StartsWith('@'))
+                {
+                    // Binding to parent model
+                    if (parentModel is ObservableObject parentOO)
+                    {
+                        var parentPropName = val.Substring(1);
+                        // Setup 2-way proxy link between component model and parent model
+                        oo.SetProxy(name, () => parentOO.GetValue(parentPropName), (v) => parentOO.SetValue(parentPropName, v));
+                    }
+                }
+                else
+                {
+                    // Literal value
+                    oo.SetValue(name, attr.Value);
+                }
             }
         }
 
-        if (!File.Exists(finalPath))
-        {
-            throw new FileNotFoundException($"SUIM markup file not found: {finalPath}");
-        }
-
-        string markup = File.ReadAllText(finalPath);
-        var (element, _) = MarkupParser.Parse(markup, model, inheritedStyles, basePath);
-        
-        // Transfer children from the parsed root to this component
         ClearChildren();
         AddChild(element, null);
     }

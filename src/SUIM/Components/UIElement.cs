@@ -9,12 +9,16 @@ public abstract class UIElement(string tagName)
     public string TagName { get; } = tagName.ToLowerInvariant();
     public string? Class { get; set; }
     public UIElement? Parent { get; set; }
-    public HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.Left;
-    public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.Top;
-    public UnitValue X { get; set; }
-    public UnitValue Y { get; set; }
-    public UnitValue Width { get; set; } = UnitValue.Auto;
-    public UnitValue Height { get; set; } = UnitValue.Auto;
+    public HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.Unspecified;
+    public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.Unspecified;
+    public HorizontalAlignment ContentHorizontalAlignment { get; set; } = HorizontalAlignment.Unspecified;
+    public VerticalAlignment ContentVerticalAlignment { get; set; } = VerticalAlignment.Unspecified;
+    public dynamic? Model { get; set; }
+    public bool IsComponentRoot { get; set; }
+    public UnitValue X { get; set; } = UnitValue.None;
+    public UnitValue Y { get; set; } = UnitValue.None;
+    public UnitValue Width { get; set; } = UnitValue.None;
+    public UnitValue Height { get; set; } = UnitValue.None;
     public Thickness Margin { get; set; } = Thickness.None;
     public Thickness Padding { get; set; } = Thickness.None;
     public float ActualX { get; set; } = float.NaN;
@@ -28,7 +32,7 @@ public abstract class UIElement(string tagName)
     public Anchor? Anchor { get; set; }
     public string? Color { get; set; }
     public string? BackgroundColor { get; set; }
-    public float Opacity { get; set; } = 1.0f;
+    public float Opacity { get; set; } = float.NaN;
     public int ZIndex { get; set; }
     public string? Visibility { get; set; }
     public bool ReadOnly { get; set; }
@@ -39,6 +43,7 @@ public abstract class UIElement(string tagName)
     public bool StopClicks { get; set; }
     public Dictionary<string, string> Events { get; set; } = [];
     public List<UIElement> Children { get; } = [];
+    public Dictionary<string, object?> Attributes { get; } = [];
 
     // Layout calculation properties (transient, used during measurement/positioning)
     internal float MeasuredContentWidth { get; set; }
@@ -112,6 +117,16 @@ public abstract class UIElement(string tagName)
             var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
             VerticalAlignment = Enum.Parse<VerticalAlignment>(s, true);
         }
+        else if (name.Equals("chalign", StringComparison.OrdinalIgnoreCase) || name.Equals("contenthorizontalalignment", StringComparison.OrdinalIgnoreCase))
+        {
+            var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            ContentHorizontalAlignment = Enum.Parse<HorizontalAlignment>(s, true);
+        }
+        else if (name.Equals("cvalign", StringComparison.OrdinalIgnoreCase) || name.Equals("contentverticalalignment", StringComparison.OrdinalIgnoreCase))
+        {
+            var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            ContentVerticalAlignment = Enum.Parse<VerticalAlignment>(s, true);
+        }
         else if (name.Equals("margin", StringComparison.OrdinalIgnoreCase))
         {
             Margin = Thickness.FromObject(value);
@@ -176,7 +191,7 @@ public abstract class UIElement(string tagName)
         }
         else
         {
-            throw new NotSupportedException($"Attribute '{name}' is not supported on {GetType().Name}");
+            Attributes[name] = value;
         }
     }
 
@@ -191,6 +206,8 @@ public abstract class UIElement(string tagName)
         if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase)) return Visibility;
         if (name.Equals("halign", StringComparison.OrdinalIgnoreCase) || name.Equals("horizontalalignment", StringComparison.OrdinalIgnoreCase)) return HorizontalAlignment;
         if (name.Equals("valign", StringComparison.OrdinalIgnoreCase) || name.Equals("verticalalignment", StringComparison.OrdinalIgnoreCase)) return VerticalAlignment;
+        if (name.Equals("chalign", StringComparison.OrdinalIgnoreCase) || name.Equals("contenthorizontalalignment", StringComparison.OrdinalIgnoreCase)) return ContentHorizontalAlignment;
+        if (name.Equals("cvalign", StringComparison.OrdinalIgnoreCase) || name.Equals("contentverticalalignment", StringComparison.OrdinalIgnoreCase)) return ContentVerticalAlignment;
         if (name.Equals("margin", StringComparison.OrdinalIgnoreCase)) return Margin;
         if (name.Equals("padding", StringComparison.OrdinalIgnoreCase)) return Padding;
         if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase)) return BackgroundColor;
@@ -225,6 +242,13 @@ public abstract class UIElement(string tagName)
         UnitType.Fr => 0f, // Will be calculated during fr distribution
         _ => 0f
     };
+
+    public dynamic? GetEffectiveModel()
+    {
+        if (Model != null) return Model;
+        if (IsComponentRoot) return null;
+        return Parent?.GetEffectiveModel();
+    }
 }
 
 public class LayoutElement : UIElement
@@ -235,8 +259,6 @@ public class LayoutElement : UIElement
 
     public LayoutElement(string tagName) : base(tagName)
     {
-        Width = UnitValue.OneFR;
-        Height = UnitValue.OneFR;
     }
 
     public override void SetAttribute(string name, object? value)
@@ -267,6 +289,7 @@ public interface IPlaceholder
 
 public enum HorizontalAlignment
 {
+    Unspecified = 0,
     Left,
     Center,
     Right
@@ -274,6 +297,7 @@ public enum HorizontalAlignment
 
 public enum VerticalAlignment
 {
+    Unspecified = 0,
     Top,
     Center,
     Bottom
