@@ -9,8 +9,6 @@ Prefer shader masking
 
 please review the current implementation of SUIM against this specification document, if you find that things are missing implement them, thanks
 
-Custom Component Expansion
-
 Dual-axis Spacing: The specification mentions spacing supporting 2 values (e.g., spacing="10 20"), but current implementation only supports a single int.
 Z-Index Layering: ZIndex is tracked but doesn't seem to be used in the layout engine for global ordering.
 
