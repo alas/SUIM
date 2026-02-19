@@ -496,15 +496,16 @@ public class SUIMStride
                 et.TextChanged += (s, e) => oo.NotifyChanged(modelPropertyName);
                 return; // Proxy handles everything
             }
-            /*
             else if (strideElement is ToggleButton tb && (targetPropertyName.Equals("checked", StringComparison.OrdinalIgnoreCase) || targetPropertyName.Equals("value", StringComparison.OrdinalIgnoreCase)))
             {
-                oo.SetProxy(modelPropertyName, () => tb.Checked, (val) => tb.Checked = val is bool b ? b : (val != null && bool.Parse(val.ToString()!)));
+                oo.SetProxy(modelPropertyName, 
+                    () => tb.State == ToggleState.Checked, 
+                    (val) => tb.State = (val is bool b && b) ? ToggleState.Checked : ToggleState.UnChecked);
+                
                 tb.Checked += (s, e) => oo.NotifyChanged(modelPropertyName);
                 tb.Unchecked += (s, e) => oo.NotifyChanged(modelPropertyName);
                 return; // Proxy handles everything
             }
-            */
         }
 
         // 1-way fallback (model -> UI)

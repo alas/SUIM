@@ -70,13 +70,10 @@ public static class MarkupParser
         {
             element = ParseElement(root, styles, model2, basePath)
                 ?? throw new InvalidOperationException("Root element not found.");
-            
-            if (componentName != null)
-            {
-                element.IsComponentRoot = true;
-                element.Model = model2;
-            }
         }
+
+        element.Model = model2;
+        if (componentName != null) element.IsComponentRoot = true;
 
         return (element, model2);
     }
@@ -461,6 +458,9 @@ public static class MarkupParser
         var name = attr.Name.LocalName;
         var target = IsLayoutAttribute(name) ? rootElement : innerElement;
 
+        // Store raw attribute for CustomComponent expansion or other metadata
+        target.SetAttribute(name, attr.Value);
+
         if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
         {
             // Event Binding: onclick="MethodName()"
@@ -474,10 +474,6 @@ public static class MarkupParser
             // Dynamic Binding: <grid width="@myVar" />
             var modelPropName = attr.Value.Substring(1);
             target.Bindings.Add(new BindingDefinition(name, modelPropName));
-        }
-        else
-        {
-            target.SetAttribute(name, attr.Value);
         }
     }
 

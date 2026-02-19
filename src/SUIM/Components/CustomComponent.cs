@@ -53,13 +53,11 @@ public class CustomComponent(string tagName) : UIElement(tagName)
                     if (parentModel is ObservableObject parentOO)
                     {
                         var parentPropName = val.Substring(1);
-                        // Setup 2-way proxy link between component model and parent model
                         oo.SetProxy(name, () => parentOO.GetValue(parentPropName), (v) => parentOO.SetValue(parentPropName, v));
                     }
                 }
                 else
                 {
-                    // Literal value
                     oo.SetValue(name, attr.Value);
                 }
             }
