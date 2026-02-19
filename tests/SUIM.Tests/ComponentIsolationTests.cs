@@ -84,10 +84,8 @@ public class ComponentIsolationTests
 
         var found = XPath.Find(strideRoot, "thebutton") as Stride.UI.Controls.Button;
         Assert.NotNull(found);
-        //found.RaiseEvent(new Stride.UI.Events.RoutedEventArgs());
-
-        found.RaiseEvent(new RoutedEventArgs());
-        game.Tick(); // Process events
+        //todo: simulate click event on found button and assert handler was called.
+        //This is currently not working because the event handler is not being wired up correctly in SUIMStride, investigate and fix.
         Assert.True(called);
     }
 
