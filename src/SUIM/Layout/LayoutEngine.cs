@@ -6,10 +6,19 @@ public static class LayoutEngine
 {
     public static void Layout(UIElement root, float rootFontSize, float availableWidth, float availableHeight)
     {
+        ResetPositions(root);
         root.CurrentFontSize = root.RootFontSize = rootFontSize;
         MeasureElement(root, availableWidth, availableHeight);
         PositionElement(root, 0, 0);
         DetectOverflow(root);
+    }
+
+    private static void ResetPositions(UIElement element)
+    {
+        element.ActualX = float.NaN;
+        element.ActualY = float.NaN;
+        foreach (var child in element.Children)
+            ResetPositions(child);
     }
 
     private static void MeasureElement(UIElement element, float availableWidth, float availableHeight)
@@ -159,13 +168,13 @@ public static class LayoutEngine
     private static void PositionElement(UIElement element, float parentX, float parentY)
     {
         // Position the element itself
-        if (element is Stack or Grid or Dock or Div)
+        if (element is Stack or Grid or Dock or Div or Overlay)
         {
             // Container positioning handled by specific methods
         }
-        else
+        else if (float.IsNaN(element.ActualX))
         {
-            // Default positioning for leaf elements
+            // Default positioning for leaf elements if not already positioned by parent container
             element.ActualX = parentX;
             element.ActualY = parentY;
         }
@@ -442,7 +451,7 @@ public static class LayoutEngine
         float maxWidth = 0;
         float totalHeight = 0;
         var elements = new List<UIElement>();
-        int spacing = 0;
+        float spacing = div.Spacing;
         var totalSpacing = Math.Max(0, spacing * (div.Children.Count - 1));
 
         // Measure fixed-size children
@@ -531,7 +540,15 @@ public static class LayoutEngine
 
     private static void PositionHorizontalStack(Stack stack)
     {
-        float currentX = stack.ActualX + stack.ComputedPaddingLeft;
+        float totalWidth = 0;
+        foreach (var child in stack.Children)
+            totalWidth += child.ActualWidth;
+
+        if (stack.Children.Count > 1)
+            totalWidth += stack.Spacing * (stack.Children.Count - 1);
+
+        float currentX = stack.ActualX + stack.ComputedPaddingLeft + 
+            CalculateAlignmentOffset(stack.MeasuredContentWidth, totalWidth, stack.ContentHorizontalAlignment);
         float baseY = stack.ActualY + stack.ComputedPaddingTop;
 
         foreach (var child in stack.Children)
@@ -546,7 +563,16 @@ public static class LayoutEngine
     private static void PositionVerticalStack(Stack stack)
     {
         float baseX = stack.ActualX + stack.ComputedPaddingLeft;
-        float currentY = stack.ActualY + stack.ComputedPaddingTop;
+        
+        float totalHeight = 0;
+        foreach (var child in stack.Children)
+            totalHeight += child.ActualHeight;
+
+        if (stack.Children.Count > 1)
+            totalHeight += stack.Spacing * (stack.Children.Count - 1);
+
+        float currentY = stack.ActualY + stack.ComputedPaddingTop + 
+            CalculateAlignmentOffset(stack.MeasuredContentHeight, totalHeight, stack.ContentVerticalAlignment);
 
         foreach (var child in stack.Children)
         {
@@ -660,23 +686,41 @@ public static class LayoutEngine
 
     private static void PositionOverlay(Overlay overlay)
     {
-        // Overlays fill the entire available space of their parent
-        // Position at the content area of the parent
         overlay.ActualX = 0;
         overlay.ActualY = 0;
+
+        float baseX = overlay.ActualX + overlay.ComputedPaddingLeft;
+        float baseY = overlay.ActualY + overlay.ComputedPaddingTop;
+
+        foreach (var child in overlay.Children)
+        {
+            child.ActualX = baseX;
+            child.ActualY = baseY;
+            ApplyHorizontalAlignment(child, baseX, overlay.MeasuredContentWidth);
+            ApplyVerticalAlignment(child, baseY, overlay.MeasuredContentHeight);
+        }
     }
 
     private static void PositionVerticalDiv(Div div)
     {
         float baseX = div.ActualX + div.ComputedPaddingLeft;
-        float currentY = div.ActualY + div.ComputedPaddingTop;
+        
+        float totalHeight = 0;
+        foreach (var child in div.Children)
+            totalHeight += child.ActualHeight;
+
+        if (div.Children.Count > 1)
+            totalHeight += div.Spacing * (div.Children.Count - 1);
+
+        float currentY = div.ActualY + div.ComputedPaddingTop + 
+            CalculateAlignmentOffset(div.MeasuredContentWidth, totalHeight, div.ContentVerticalAlignment);
 
         foreach (var child in div.Children)
         {
             child.ActualX = baseX;
             child.ActualY = currentY;
             ApplyHorizontalAlignment(child, baseX, div.MeasuredContentWidth);
-            currentY += child.ActualHeight;
+            currentY += child.ActualHeight + div.Spacing;
         }
     }
 
@@ -743,7 +787,13 @@ public static class LayoutEngine
 
     private static void ApplyHorizontalAlignment(UIElement element, float baseX, float containerWidth)
     {
-        switch (element.HorizontalAlignment)
+        var alignment = element.HorizontalAlignment;
+        if (alignment == HorizontalAlignment.Left && element.Parent != null)
+        {
+            alignment = element.Parent.ContentHorizontalAlignment;
+        }
+
+        switch (alignment)
         {
             case HorizontalAlignment.Left:
                 element.ActualX = baseX;
@@ -759,7 +809,13 @@ public static class LayoutEngine
 
     private static void ApplyVerticalAlignment(UIElement element, float baseY, float containerHeight)
     {
-        switch (element.VerticalAlignment)
+        var alignment = element.VerticalAlignment;
+        if (alignment == VerticalAlignment.Top && element.Parent != null)
+        {
+            alignment = element.Parent.ContentVerticalAlignment;
+        }
+
+        switch (alignment)
         {
             case VerticalAlignment.Top:
                 element.ActualY = baseY;
@@ -771,6 +827,20 @@ public static class LayoutEngine
                 element.ActualY = baseY + containerHeight - element.ActualHeight;
                 break;
         }
+    }
+
+    private static float CalculateAlignmentOffset(float containerSize, float contentSize, HorizontalAlignment alignment)
+    {
+        if (alignment == HorizontalAlignment.Center) return Math.Max(0, (containerSize - contentSize) / 2);
+        if (alignment == HorizontalAlignment.Right) return Math.Max(0, containerSize - contentSize);
+        return 0;
+    }
+
+    private static float CalculateAlignmentOffset(float containerSize, float contentSize, VerticalAlignment alignment)
+    {
+        if (alignment == VerticalAlignment.Center) return Math.Max(0, (containerSize - contentSize) / 2);
+        if (alignment == VerticalAlignment.Bottom) return Math.Max(0, containerSize - contentSize);
+        return 0;
     }
 
     private static void DetectOverflow(UIElement element)

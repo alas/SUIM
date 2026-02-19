@@ -6,8 +6,6 @@ SUIM is a performance-first markup language architected for absolute layout pred
 SUIM also incorporates foundational concepts from WinForms, such as explicit anchoring and docking logic, for desktop-grade application development.
 SUIM aims to be familiar to web developers while also being easy to implement on top of existing layout engines.
 The engine utilizes a top-down single-pass architecture to ensure $O(N)$ performance, providing high-speed rendering and zero layout jitter by eliminating expensive reflow cycles.
-SUIM maps markup tags to native widgets.
-
 
 ---
 
@@ -20,6 +18,11 @@ Every element exists within a rectangular box. Spacing is governed by **margin**
 ### 1.2 Layout Alignment
 
 All layout containers support the following for child positioning:
+
+* **contenthorizontalalignment** (synonym: **chalign**): left, center, right.
+* **contentverticalalignment** (synonym: **cvalign**): top, center, bottom.
+
+All tags support the following for positioning inside the parent:
 
 * **horizontalalignment** (synonym: **halign**): left, center, right.
 * **verticalalignment** (synonym: **valign**): top, center, bottom.
