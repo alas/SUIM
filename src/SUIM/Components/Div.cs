@@ -1,3 +1,3 @@
 namespace SUIM.Components;
 
-public class Div() : LayoutElement(nameof(Div)) { }
+public class Div(string tagName = "div") : LayoutElement(tagName) { }

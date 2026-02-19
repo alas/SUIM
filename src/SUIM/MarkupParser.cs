@@ -8,7 +8,7 @@ using SUIM.Layout;
 
 public static class MarkupParser
 {
-    public static (UIElement, dynamic?) Parse(string markup, object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
+    public static (UIElement, dynamic?) Parse(string markup, object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null, string? componentName = null)
     {
         dynamic? model2 = model == null ? null : ModelLogic.Create(model);
         var controlFlowParser = new ControlFlowParser(model2);
@@ -19,10 +19,64 @@ public static class MarkupParser
 
         Dictionary<string, Dictionary<string, string>> styles = inheritedStyles != null ? new(inheritedStyles) : [];
 
+        // Extract model from root children (flexible position)
         model2 = ModelLogic.ExtractModel(root, model2);
 
-        var element = ParseElement(root, styles, model2, basePath)
-            ?? throw new InvalidOperationException("Root element not found.");
+        UIElement element;
+        if (componentName != null && string.Equals(root.Name.LocalName, componentName, StringComparison.OrdinalIgnoreCase))
+        {
+            // Root tag matches component name: bypass redundant wrapper and process children
+            element = new Div(componentName);
+            element.Model = model2;
+            element.IsComponentRoot = true;
+
+            foreach (var node in root.Nodes())
+            {
+                if (node is XElement childX && (childX.Name.LocalName.Equals("model", StringComparison.OrdinalIgnoreCase) || childX.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase)))
+                {
+                    if (childX.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Process styles as usual
+                        var sourceAttr = childX.Attribute("source") ?? childX.Attribute("src");
+                        if (sourceAttr != null && !string.IsNullOrEmpty(basePath))
+                        {
+                            var stylePath = Path.Combine(basePath, sourceAttr.Value);
+                            if (File.Exists(stylePath)) ParseStyles(File.ReadAllText(stylePath), styles);
+                        }
+                        var content = childX.Value.Trim();
+                        if (!string.IsNullOrEmpty(content)) ParseStyles(content, styles);
+                    }
+                    continue;
+                }
+
+                if (node is XText textNode)
+                {
+                    var text = textNode.Value.Trim();
+                    if (!string.IsNullOrEmpty(text))
+                    {
+                        var textElement = new Text { Value = text };
+                        if (styles.Count > 0) textElement = ApplyStylesToElement(textElement, styles, model2);
+                        element.AddChild(textElement, root);
+                    }
+                }
+                else if (node is XElement childE)
+                {
+                    var childElement = ParseElement(childE, styles, model2, basePath);
+                    if (childElement != null) element.AddChild(childElement, childE);
+                }
+            }
+        }
+        else
+        {
+            element = ParseElement(root, styles, model2, basePath)
+                ?? throw new InvalidOperationException("Root element not found.");
+            
+            if (componentName != null)
+            {
+                element.IsComponentRoot = true;
+                element.Model = model2;
+            }
+        }
 
         return (element, model2);
     }
@@ -396,7 +450,7 @@ public static class MarkupParser
 
         if (rootElement is CustomComponent custom)
         {
-            custom.Expand(model, styles);
+            custom.Expand(model, styles, basePath);
         }
 
         return rootElement;

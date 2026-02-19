@@ -13,6 +13,8 @@ public abstract class UIElement(string tagName)
     public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.Unspecified;
     public HorizontalAlignment ContentHorizontalAlignment { get; set; } = HorizontalAlignment.Unspecified;
     public VerticalAlignment ContentVerticalAlignment { get; set; } = VerticalAlignment.Unspecified;
+    public dynamic? Model { get; set; }
+    public bool IsComponentRoot { get; set; }
     public UnitValue X { get; set; } = UnitValue.None;
     public UnitValue Y { get; set; } = UnitValue.None;
     public UnitValue Width { get; set; } = UnitValue.None;
@@ -41,6 +43,7 @@ public abstract class UIElement(string tagName)
     public bool StopClicks { get; set; }
     public Dictionary<string, string> Events { get; set; } = [];
     public List<UIElement> Children { get; } = [];
+    public Dictionary<string, object?> Attributes { get; } = [];
 
     // Layout calculation properties (transient, used during measurement/positioning)
     internal float MeasuredContentWidth { get; set; }
@@ -188,7 +191,7 @@ public abstract class UIElement(string tagName)
         }
         else
         {
-            throw new NotSupportedException($"Attribute '{name}' is not supported on {GetType().Name}");
+            Attributes[name] = value;
         }
     }
 
@@ -239,6 +242,13 @@ public abstract class UIElement(string tagName)
         UnitType.Fr => 0f, // Will be calculated during fr distribution
         _ => 0f
     };
+
+    public dynamic? GetEffectiveModel()
+    {
+        if (Model != null) return Model;
+        if (IsComponentRoot) return null;
+        return Parent?.GetEffectiveModel();
+    }
 }
 
 public class LayoutElement : UIElement

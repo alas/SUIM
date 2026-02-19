@@ -13,7 +13,6 @@ public static class ModelLogic
         observable.Initialize(model);
         return observable;
     }
-
     public static dynamic? ExtractModel(XElement root, dynamic? model)
     {
         var modelElement = root.Elements()
@@ -23,11 +22,10 @@ public static class ModelLogic
         {
             // Get the content of the model element
             var content = modelElement.Value.Trim();
-            var result = string.IsNullOrEmpty(content) ? null : content;
 
-            if (!string.IsNullOrEmpty(result))
+            if (!string.IsNullOrEmpty(content))
             {
-                model = ModelLogic.MergeModels(model, result);
+                model = ModelLogic.MergeModels(model, content);
             }
         }
 
