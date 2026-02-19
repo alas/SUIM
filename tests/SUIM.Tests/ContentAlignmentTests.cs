@@ -81,4 +81,37 @@ public class ContentAlignmentTests
         // Center vertical: (500 - 50) / 2 = 225
         Assert.Equal(225, label.ActualY);
     }
+    [Fact]
+    public void Child_WithUnspecifiedAlignment_InheritsParentContentAlignment()
+    {
+        var div = new Div { Width = new UnitValue(200, UnitType.Pixels), Height = new UnitValue(200, UnitType.Pixels) };
+        div.ContentHorizontalAlignment = HorizontalAlignment.Center;
+        div.ContentVerticalAlignment = VerticalAlignment.Center;
+
+        var label = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(20, UnitType.Pixels) };
+        // HorizontalAlignment and VerticalAlignment are Unspecified by default
+        
+        div.AddChild(label, null);
+        LayoutEngine.Layout(div, 16, 200, 200);
+
+        // (200 - 100) / 2 = 50
+        Assert.Equal(50, label.ActualX);
+        // (200 - 20) / 2 = 90
+        Assert.Equal(90, label.ActualY);
+    }
+
+    [Fact]
+    public void Child_WithUnspecifiedAlignment_DefaultsToLeftTopIfParentHasNoContentAlignment()
+    {
+        var div = new Div { Width = new UnitValue(200, UnitType.Pixels), Height = new UnitValue(200, UnitType.Pixels) };
+        // div.ContentHorizontalAlignment and ContentVerticalAlignment are Unspecified by default
+
+        var label = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(20, UnitType.Pixels) };
+        
+        div.AddChild(label, null);
+        LayoutEngine.Layout(div, 16, 200, 200);
+
+        Assert.Equal(0, label.ActualX); // Defaults to Left
+        Assert.Equal(0, label.ActualY); // Defaults to Top
+    }
 }

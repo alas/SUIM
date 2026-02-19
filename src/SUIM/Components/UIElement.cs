@@ -9,14 +9,14 @@ public abstract class UIElement(string tagName)
     public string TagName { get; } = tagName.ToLowerInvariant();
     public string? Class { get; set; }
     public UIElement? Parent { get; set; }
-    public HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.Left;
-    public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.Top;
-    public HorizontalAlignment ContentHorizontalAlignment { get; set; } = HorizontalAlignment.Left;
-    public VerticalAlignment ContentVerticalAlignment { get; set; } = VerticalAlignment.Top;
-    public UnitValue X { get; set; }
-    public UnitValue Y { get; set; }
-    public UnitValue Width { get; set; } = UnitValue.Auto;
-    public UnitValue Height { get; set; } = UnitValue.Auto;
+    public HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.Unspecified;
+    public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.Unspecified;
+    public HorizontalAlignment ContentHorizontalAlignment { get; set; } = HorizontalAlignment.Unspecified;
+    public VerticalAlignment ContentVerticalAlignment { get; set; } = VerticalAlignment.Unspecified;
+    public UnitValue X { get; set; } = UnitValue.None;
+    public UnitValue Y { get; set; } = UnitValue.None;
+    public UnitValue Width { get; set; } = UnitValue.None;
+    public UnitValue Height { get; set; } = UnitValue.None;
     public Thickness Margin { get; set; } = Thickness.None;
     public Thickness Padding { get; set; } = Thickness.None;
     public float ActualX { get; set; } = float.NaN;
@@ -30,7 +30,7 @@ public abstract class UIElement(string tagName)
     public Anchor? Anchor { get; set; }
     public string? Color { get; set; }
     public string? BackgroundColor { get; set; }
-    public float Opacity { get; set; } = 1.0f;
+    public float Opacity { get; set; } = float.NaN;
     public int ZIndex { get; set; }
     public string? Visibility { get; set; }
     public bool ReadOnly { get; set; }
@@ -249,8 +249,6 @@ public class LayoutElement : UIElement
 
     public LayoutElement(string tagName) : base(tagName)
     {
-        Width = UnitValue.OneFR;
-        Height = UnitValue.OneFR;
     }
 
     public override void SetAttribute(string name, object? value)
@@ -281,6 +279,7 @@ public interface IPlaceholder
 
 public enum HorizontalAlignment
 {
+    Unspecified = 0,
     Left,
     Center,
     Right
@@ -288,6 +287,7 @@ public enum HorizontalAlignment
 
 public enum VerticalAlignment
 {
+    Unspecified = 0,
     Top,
     Center,
     Bottom

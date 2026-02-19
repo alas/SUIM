@@ -185,9 +185,9 @@ public static class MarkupParser
             if (properties.TryGetValue("width", out var pw) && !string.IsNullOrWhiteSpace(pw)) scroll.Width = UnitValue.Parse(pw);
             if (properties.TryGetValue("height", out var ph) && !string.IsNullOrWhiteSpace(ph)) scroll.Height = UnitValue.Parse(ph);
 
-            // When a style creates a scroll wrapper, the inner element should default to `auto` if it was the structural (1fr) default.
-            if (element.Width.Type == UnitType.Fr) element.Width = UnitValue.Auto;
-            if (element.Height.Type == UnitType.Fr) element.Height = UnitValue.Auto;
+            // When a style creates a scroll wrapper, the inner element should default to `auto` if it was unspecified.
+            if (element.Width.Type == UnitType.None) element.Width = UnitValue.Auto;
+            if (element.Height.Type == UnitType.None) element.Height = UnitValue.Auto;
 
             scroll.AddChild(element, null);
             element = scroll;
@@ -218,8 +218,8 @@ public static class MarkupParser
                 border.Height = UnitValue.Parse(ph);
             }
 
-            if (element.Width.Type == UnitType.Fr) element.Width = UnitValue.Auto;
-            if (element.Height.Type == UnitType.Fr) element.Height = UnitValue.Auto;
+            if (element.Width.Type == UnitType.None) element.Width = UnitValue.Auto;
+            if (element.Height.Type == UnitType.None) element.Height = UnitValue.Auto;
             border.AddChild(element, null);
             element = border;
         }
@@ -268,9 +268,9 @@ public static class MarkupParser
             {
                 scroll.Direction = dir;
             }
-            // If the inner element was using the parser default (1fr), change it to auto when wrapped by a scroll-viewport.
-            if (rootElement.Width.Type == UnitType.Fr) rootElement.Width = UnitValue.Auto;
-            if (rootElement.Height.Type == UnitType.Fr) rootElement.Height = UnitValue.Auto;
+            // If the inner element was unspecified, change it to auto when wrapped by a scroll-viewport.
+            if (rootElement.Width.Type == UnitType.None) rootElement.Width = UnitValue.Auto;
+            if (rootElement.Height.Type == UnitType.None) rootElement.Height = UnitValue.Auto;
 
             scroll.AddChild(rootElement, element);
             rootElement = scroll;
@@ -280,9 +280,9 @@ public static class MarkupParser
         {
             var border = new Border();
             border.SetAttribute("border", borderAttr.Value);
-            // Similar behavior for border wrapper: inner element should become `auto` for sizing if it was the parser default (1fr).
-            if (rootElement.Width.Type == UnitType.Fr) rootElement.Width = UnitValue.Auto;
-            if (rootElement.Height.Type == UnitType.Fr) rootElement.Height = UnitValue.Auto;
+            // Similar behavior for border wrapper: inner element should become `auto` for sizing if it was unspecified.
+            if (rootElement.Width.Type == UnitType.None) rootElement.Width = UnitValue.Auto;
+            if (rootElement.Height.Type == UnitType.None) rootElement.Height = UnitValue.Auto;
 
             border.AddChild(rootElement, element);
             rootElement = border;

@@ -46,9 +46,22 @@ public static class LayoutEngine
         var availableContentWidth = Math.Max(0, availableWidth - element.ComputedMarginLeft - element.ComputedMarginRight - element.ComputedPaddingLeft - element.ComputedPaddingRight);
         var availableContentHeight = Math.Max(0, availableHeight - element.ComputedMarginTop - element.ComputedMarginBottom - element.ComputedPaddingTop - element.ComputedPaddingBottom);
 
+        // For most containers and Text elements, default to Auto if unspecified
+        // For LayoutElement derivatives (like Stack, Grid, Div), default to 1fr if unspecified
+        if (element is LayoutElement layoutElem)
+        {
+            if (element.Width.Type == UnitType.None) element.Width = UnitValue.OneFR;
+            if (element.Height.Type == UnitType.None) element.Height = UnitValue.OneFR;
+        }
+        else if (element is Stack or Grid or Dock or Overlay or Text)
+        {
+            if (element.Width.Type == UnitType.None) element.Width = UnitValue.Auto;
+            if (element.Height.Type == UnitType.None) element.Height = UnitValue.Auto;
+        }
+
         // Convert explicit sizes to pixels
-        var widthInPixels = element.Width.Type == UnitType.Auto ? 0 : element.ToPixels(element.Width);
-        var heightInPixels = element.Height.Type == UnitType.Auto ? 0 : element.ToPixels(element.Height);
+        var widthInPixels = (element.Width.Type == UnitType.Auto || element.Width.Type == UnitType.None) ? 0 : element.ToPixels(element.Width);
+        var heightInPixels = (element.Height.Type == UnitType.Auto || element.Height.Type == UnitType.None) ? 0 : element.ToPixels(element.Height);
 
         // Initialize content size
         if (element is Text baseText)
@@ -310,6 +323,8 @@ public static class LayoutEngine
         for (int i = 0; i < elements.Count; i++)
         {
             elements[i].CurrentFontSize = (elements[i].Parent as Stack)?.CurrentFontSize ?? 16f;
+            var width = elements[i].Width;
+            if (width.Type == UnitType.None) width = new UnitValue(resolvedValues[i], UnitType.Pixels);
             MeasureElement(elements[i], resolvedValues[i], availableHeight);
         }
     }
@@ -322,6 +337,8 @@ public static class LayoutEngine
         for (int i = 0; i < elements.Count; i++)
         {
             elements[i].CurrentFontSize = (elements[i].Parent as Stack)?.CurrentFontSize ?? 16f;
+            var height = elements[i].Height;
+            if (height.Type == UnitType.None) height = new UnitValue(resolvedValues[i], UnitType.Pixels);
             MeasureElement(elements[i], availableWidth, resolvedValues[i]);
         }
     }
@@ -454,6 +471,13 @@ public static class LayoutEngine
         float spacing = div.Spacing;
         var totalSpacing = Math.Max(0, spacing * (div.Children.Count - 1));
 
+        // Resolve unspecified width for Div (default to 1fr)
+        if (div.Width.Type == UnitType.None)
+            div.Width = UnitValue.OneFR;
+        // Resolve unspecified height for Div (default to Auto)
+        if (div.Height.Type == UnitType.None)
+            div.Height = UnitValue.Auto;
+
         // Measure fixed-size children
         foreach (var child in div.Children)
         {
@@ -490,7 +514,7 @@ public static class LayoutEngine
         }
         else
         {
-            div.MeasuredContentWidth = maxWidth;
+            div.MeasuredContentWidth = Math.Max(maxWidth, availableWidth <= 0 || availableWidth == float.MaxValue ? 0 : availableWidth);
         }
 
         if (div.Height.Type != UnitType.None && div.Height.Type != UnitType.Auto)
@@ -788,10 +812,13 @@ public static class LayoutEngine
     private static void ApplyHorizontalAlignment(UIElement element, float baseX, float containerWidth)
     {
         var alignment = element.HorizontalAlignment;
-        if (alignment == HorizontalAlignment.Left && element.Parent != null)
+        if (alignment == HorizontalAlignment.Unspecified && element.Parent != null)
         {
             alignment = element.Parent.ContentHorizontalAlignment;
         }
+        
+        if (alignment == HorizontalAlignment.Unspecified)
+            alignment = HorizontalAlignment.Left;
 
         switch (alignment)
         {
@@ -810,10 +837,13 @@ public static class LayoutEngine
     private static void ApplyVerticalAlignment(UIElement element, float baseY, float containerHeight)
     {
         var alignment = element.VerticalAlignment;
-        if (alignment == VerticalAlignment.Top && element.Parent != null)
+        if (alignment == VerticalAlignment.Unspecified && element.Parent != null)
         {
             alignment = element.Parent.ContentVerticalAlignment;
         }
+
+        if (alignment == VerticalAlignment.Unspecified)
+            alignment = VerticalAlignment.Top;
 
         switch (alignment)
         {
@@ -833,14 +863,14 @@ public static class LayoutEngine
     {
         if (alignment == HorizontalAlignment.Center) return Math.Max(0, (containerSize - contentSize) / 2);
         if (alignment == HorizontalAlignment.Right) return Math.Max(0, containerSize - contentSize);
-        return 0;
+        return 0; // Default or Left or Unspecified
     }
 
     private static float CalculateAlignmentOffset(float containerSize, float contentSize, VerticalAlignment alignment)
     {
         if (alignment == VerticalAlignment.Center) return Math.Max(0, (containerSize - contentSize) / 2);
         if (alignment == VerticalAlignment.Bottom) return Math.Max(0, containerSize - contentSize);
-        return 0;
+        return 0; // Default or Top or Unspecified
     }
 
     private static void DetectOverflow(UIElement element)
