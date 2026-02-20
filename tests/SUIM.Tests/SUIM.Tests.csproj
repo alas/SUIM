@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SUIM\SUIM.csproj" />
-    <ProjectReference Include="..\..\src\SUIM.Stride\SUIM.Stride.csproj" />
+    <ProjectReference Include="..\..\src\SUIMStride\SUIMStride.csproj" />
   </ItemGroup>
 
 </Project>

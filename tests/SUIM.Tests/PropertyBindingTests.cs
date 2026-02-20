@@ -2,7 +2,6 @@ namespace SUIM.Tests;
 
 using Xunit;
 using SUIM.Components;
-using SUIM.Layout;
 
 public class PropertyBindingTests
 {

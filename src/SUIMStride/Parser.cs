@@ -1,4 +1,4 @@
-namespace SUIM.StrideIntegration;
+namespace SUIMStride;
 
 using System;
 using System.Collections.Generic;
@@ -14,13 +14,13 @@ using Stride.UI.Panels;
 using SUIM;
 using StrideGrid = Stride.UI.Panels.Grid;
 
-public class SUIMStride
+public class Parser
 {
     // Test hook: keep track of click handlers bound to Stride Buttons so tests can simulate clicks.
     private readonly Dictionary<Button, Delegate> _clickHandlers = [];
     private ContentManager? ContentManager = null;
     private readonly Dictionary<string, SpriteFont> Fonts = [];
-    private readonly Dictionary<string, (Components.UIElement SuimRoot, UIElement StrideRoot, dynamic? Model)> _parseCache = [];
+    private readonly Dictionary<string, (SUIM.Components.UIElement SuimRoot, UIElement StrideRoot, dynamic? Model)> _parseCache = [];
     private dynamic? _currentModel;
     public string? RootPath { get; set; }
 
@@ -86,7 +86,7 @@ public class SUIMStride
         return createNewInstance ? (MapElement(suimRoot), model2) : (strideRoot, model2);
     }
 
-    private static void Layout(Components.UIElement root, Game game, int defaultFontSize, bool fullscreen)
+    private static void Layout(SUIM.Components.UIElement root, Game game, int defaultFontSize, bool fullscreen)
     {
         int preferredWidth;
         int preferredHeight;
@@ -112,17 +112,17 @@ public class SUIMStride
     /// Maps an already-parsed and laid-out SUIM element tree to Stride UI elements.
     /// It is public for testing or when you have a SUIM tree that's already been processed.
     /// </summary>
-    public UIElement MapElement(Components.UIElement element)
+    public UIElement MapElement(SUIM.Components.UIElement element)
     {
         UIElement strideElement = element switch
         {
-            Components.Button b => MapButton(b),
-            Components.Text t => MapText(t),
-            Components.Stack s => MapStack(s),
-            Components.Grid g => MapGrid(g),
-            Components.Input i => MapInput(i),
-            Components.Image img => MapImage(img),
-            Components.Border br => MapBorder(br),
+            SUIM.Components.Button b => MapButton(b),
+            SUIM.Components.Text t => MapText(t),
+            SUIM.Components.Stack s => MapStack(s),
+            SUIM.Components.Grid g => MapGrid(g),
+            SUIM.Components.Input i => MapInput(i),
+            SUIM.Components.Image img => MapImage(img),
+            SUIM.Components.Border br => MapBorder(br),
             _ => new StrideGrid() // Fallback
         };
 
@@ -131,7 +131,7 @@ public class SUIMStride
         TransferBindings(element, strideElement);
 
         // Handle Children for generic containers if not already handled
-        if (strideElement is Panel panel && element.Children.Count > 0 && element is not Components.Grid)
+        if (strideElement is Panel panel && element.Children.Count > 0 && element is not SUIM.Components.Grid)
         {
             foreach (var child in element.Children)
             {
@@ -158,14 +158,14 @@ public class SUIMStride
         return strideElement;
     }
 
-    private static Button MapButton(Components.Button button)
+    private static Button MapButton(SUIM.Components.Button button)
     {
         var btn = new Button();
         // Click handler will be bound in TransferEvents
         return btn;
     }
 
-    private TextBlock MapText(Components.Text text)
+    private TextBlock MapText(SUIM.Components.Text text)
     {
         var tb = new TextBlock
         {
@@ -204,13 +204,13 @@ public class SUIMStride
         return tb;
     }
 
-    private static UIElement MapInput(Components.Input input)
+    private static UIElement MapInput(SUIM.Components.Input input)
     {
         // Map based on the input type
         return input.Type switch
         {
-            Components.InputType.Checkbox => new ToggleButton(),
-            // Components.InputType.Radio => new ToggleButton(), // Stride doesn't have a direct RadioButton in all versions; use ToggleButton for now
+            SUIM.Components.InputType.Checkbox => new ToggleButton(),
+            // SUIM.Components.InputType.Radio => new ToggleButton(), // Stride doesn't have a direct RadioButton in all versions; use ToggleButton for now
             _ => new EditText
             {
                 Text = input.Value ?? ""
@@ -218,7 +218,7 @@ public class SUIMStride
         };
     }
 
-    private static ImageElement MapImage(Components.Image image)
+    private static ImageElement MapImage(SUIM.Components.Image image)
     {
         var img = new ImageElement();
 
@@ -229,17 +229,17 @@ public class SUIMStride
 
         img.StretchType = image.Stretch switch
         {
-            Components.ImageStretch.Uniform => StretchType.Uniform,
-            Components.ImageStretch.UniformToFill => StretchType.UniformToFill,
-            Components.ImageStretch.Fill => StretchType.Fill,
-            Components.ImageStretch.FillOnStretch => StretchType.FillOnStretch,
+            SUIM.Components.ImageStretch.Uniform => StretchType.Uniform,
+            SUIM.Components.ImageStretch.UniformToFill => StretchType.UniformToFill,
+            SUIM.Components.ImageStretch.Fill => StretchType.Fill,
+            SUIM.Components.ImageStretch.FillOnStretch => StretchType.FillOnStretch,
             _ => StretchType.None
         };
 
         return img;
     }
 
-    private Border MapBorder(Components.Border border)
+    private Border MapBorder(SUIM.Components.Border border)
     {
         var borderElem = new Border
         {
@@ -267,7 +267,7 @@ public class SUIMStride
         return borderElem;
     }
 
-    private StrideGrid MapGrid(Components.Grid grid)
+    private StrideGrid MapGrid(SUIM.Components.Grid grid)
     {
         var g = new StrideGrid();
 
@@ -284,17 +284,17 @@ public class SUIMStride
         return g;
     }
 
-    private static StackPanel MapStack(Components.Stack stack)
+    private static StackPanel MapStack(SUIM.Components.Stack stack)
     {
         return new StackPanel
         {
-            Orientation = stack.Orientation == Components.Orientation.Horizontal 
+            Orientation = stack.Orientation == SUIM.Components.Orientation.Horizontal 
                 ? Orientation.Horizontal 
                 : Orientation.Vertical
         };
     }
 
-    private static void ApplyCommonProperties(Components.UIElement suim, UIElement stride)
+    private static void ApplyCommonProperties(SUIM.Components.UIElement suim, UIElement stride)
     {
         stride.Name = suim.Id;
         stride.Opacity = suim.Opacity;
@@ -310,20 +310,20 @@ public class SUIMStride
         // Alignment
         stride.HorizontalAlignment = suim.HorizontalAlignment switch
         {
-            Components.HorizontalAlignment.Center => HorizontalAlignment.Center,
-            Components.HorizontalAlignment.Right => HorizontalAlignment.Right,
+            SUIM.Components.HorizontalAlignment.Center => HorizontalAlignment.Center,
+            SUIM.Components.HorizontalAlignment.Right => HorizontalAlignment.Right,
             _ => HorizontalAlignment.Left
         };
 
         stride.VerticalAlignment = suim.VerticalAlignment switch
         {
-            Components.VerticalAlignment.Center => VerticalAlignment.Center,
-            Components.VerticalAlignment.Bottom => VerticalAlignment.Bottom,
+            SUIM.Components.VerticalAlignment.Center => VerticalAlignment.Center,
+            SUIM.Components.VerticalAlignment.Bottom => VerticalAlignment.Bottom,
             _ => VerticalAlignment.Top
         };
 
         // For overlays, always use ActualWidth/ActualHeight from layout
-        if (suim is Components.Overlay)
+        if (suim is SUIM.Components.Overlay)
         {
             if (!float.IsNaN(suim.ActualWidth) && suim.ActualWidth > 0)
                 stride.Width = suim.ActualWidth;
@@ -356,7 +356,7 @@ public class SUIMStride
         }
     }
 
-    private static Thickness ComponentsThicknessToStride(Layout.Thickness thickness, Components.UIElement suim)
+    private static Thickness ComponentsThicknessToStride(SUIM.Layout.Thickness thickness, SUIM.Components.UIElement suim)
     {
         return new Thickness(
             suim.ToPixels(thickness.Left),
@@ -371,7 +371,7 @@ public class SUIMStride
         return new Color(pc.R, pc.G, pc.B, pc.A);
     }
     
-    private void TransferBindings(Components.UIElement suimElement, UIElement strideElement)
+    private void TransferBindings(SUIM.Components.UIElement suimElement, UIElement strideElement)
     {
         var model = suimElement.GetEffectiveModel();
         
@@ -389,7 +389,7 @@ public class SUIMStride
         TransferEvents(suimElement, strideElement);
     }
 
-    private void TransferEvents(Components.UIElement suimElement, UIElement strideElement)
+    private void TransferEvents(SUIM.Components.UIElement suimElement, UIElement strideElement)
     {
         if (suimElement.Events.Count == 0) return;
         var model = suimElement.GetEffectiveModel();
@@ -449,7 +449,7 @@ public class SUIMStride
         }
     }
 
-    private void BindClickHandler(Button btn, Delegate handler, Components.UIElement suimElement)
+    private void BindClickHandler(Button btn, Delegate handler, SUIM.Components.UIElement suimElement)
     {
         // Support multiple handler types for click events
         if (handler is EventHandler<Stride.UI.Events.RoutedEventArgs> routedHandler)
@@ -463,7 +463,7 @@ public class SUIMStride
             btn.Click += wrappedHandler;
             _clickHandlers[btn] = wrappedHandler;
         }
-        else if (handler is Action<Components.UIElement> actionWithElement)
+        else if (handler is Action<SUIM.Components.UIElement> actionWithElement)
         {
             EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => actionWithElement(suimElement);
             btn.Click += wrappedHandler;

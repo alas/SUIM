@@ -7,7 +7,7 @@ using Stride.Engine;
 using Stride.UI.Events;
 using SUIM;
 using SUIM.Components;
-using SUIM.StrideIntegration;
+using SUIMStride;
 
 public class ComponentIsolationTests
 {
@@ -35,7 +35,7 @@ public class ComponentIsolationTests
 
         var markup = "<div><PopupTestComp title=\"@PopupTitle\" /></div>";
 
-        var suim = new SUIMStride
+        var suim = new Parser
         {
             RootPath = AppDomain.CurrentDomain.BaseDirectory
         };
@@ -68,7 +68,7 @@ public class ComponentIsolationTests
 
         var markup = @"<div><PopupTestComp onbuttonclick=""MyHandler()"" /></div>";
 
-        var suim = new SUIMStride
+        var suim = new Parser
         {
             RootPath = AppDomain.CurrentDomain.BaseDirectory
         };
@@ -174,7 +174,7 @@ public class ComponentIsolationTests
         var tagName = "NoModelComp_" + Guid.NewGuid().ToString("N");
         ComponentRegistry.Register(tagName, compPath);
 
-        var suim = new SUIMStride();
+        var suim = new Parser();
         suim.RootPath = AppDomain.CurrentDomain.BaseDirectory;
         var markup = $"<{tagName} />";
 

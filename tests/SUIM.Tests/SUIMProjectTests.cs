@@ -3,7 +3,6 @@ namespace SUIM.Tests;
 using System.IO;
 using Xunit;
 using SUIM.Components;
-using System.Collections.Generic;
 
 public class SUIMProjectTests
 {

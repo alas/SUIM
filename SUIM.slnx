@@ -3,8 +3,8 @@
     <File Path="docs/SUIM_SPECIFICATION.md" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/SUIM.Stride/SUIM.Stride.csproj" />
     <Project Path="src/SUIM/SUIM.csproj" />
+    <Project Path="src/SUIMStride/SUIMStride.csproj" />
   </Folder>
   <Folder Name="/src/Example/">
     <Project Path="src/Example/Chess3d.Windows/Chess3d.Windows.csproj" />

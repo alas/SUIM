@@ -1,6 +1,7 @@
-﻿namespace SUIM.StrideIntegration;
+﻿namespace SUIMStride;
 
 using Stride.UI;
+using SUIM;
 
 public static class XPath
 {

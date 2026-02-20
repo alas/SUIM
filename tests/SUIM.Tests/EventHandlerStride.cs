@@ -1,11 +1,11 @@
 namespace SUIM.Tests;
 
 using Xunit;
-using SUIM;
-using SUIM.StrideIntegration;
-using SUIM.Components;
 using Stride.Engine;
 using StrideButton = Stride.UI.Controls.Button;
+using SUIM;
+using SUIMStride;
+using SUIM.Components;
 
 /// <summary>
 /// Tests for verifying that event handlers on the model are correctly mapped when 
@@ -121,7 +121,7 @@ public class EventHandlerStrideTests
         // Arrange
         var markup = @"<button id=""testBtn"" onclick=""OnSimpleClick()"" />";
         var model = new TestModel();
-        var suim = new SUIMStride();
+        var suim = new Parser();
 
         // Act & Assert - should not throw
         var exception = Record.Exception(() =>
@@ -142,7 +142,7 @@ public class EventHandlerStrideTests
         // Arrange
         var markup = @"<button id=""testBtn"" onclick=""OnSimpleClick()"" />";
         var model = new TestModel();
-        var suim = new SUIMStride();
+        var suim = new Parser();
 
         // Act
         var (strideRoot, returnedModel) = suim.Parse(markup, CreateTestGame(), model: model);
@@ -166,7 +166,7 @@ public class EventHandlerStrideTests
         // Arrange
         var markup = @"<button id=""testBtn"" onclick=""NonExistentHandler()"" />";
         var model = new TestModel();
-        var suim = new SUIMStride();
+        var suim = new Parser();
 
         // Act & Assert - should not throw even if handler doesn't exist
         var exception = Record.Exception(() =>
@@ -220,7 +220,7 @@ public class EventHandlerStrideTests
         // Arrange
         var markup = @"<button id=""testBtn"" onclick=""OnSimpleClick()"">Click Me</button>";
         var model = new TestModel();
-        var suim = new SUIMStride();
+        var suim = new Parser();
 
         // Act
         var (strideRoot, _) = suim.Parse(markup, CreateTestGame(), model: model);
@@ -243,7 +243,7 @@ public class EventHandlerStrideTests
         var markup = @"<button id=""btn"" onclick=""OnSimpleClick()"" />";
         var model1 = new TestModel();
         var model2 = new TestModel();
-        var suim = new SUIMStride();
+        var suim = new Parser();
 
         // Act
         var result1 = suim.Parse(markup, CreateTestGame(), model: model1, createNewInstance: true);
@@ -270,7 +270,7 @@ public class EventHandlerStrideTests
         Assert.True(suimRoot.Events.ContainsKey("click"));
         
         // Then convert to Stride via SUIMStride
-        var suim = new SUIMStride();
+        var suim = new Parser();
         var (strideRoot, _) = suim.Parse(markup, CreateTestGame(), model: model);
 
         // Assert
@@ -293,7 +293,7 @@ public class EventHandlerStrideTests
                 <button id=""btn"" onclick=""OnSimpleClick()"">Click</button>
             </grid>";
         var model = new TestModel();
-        var suim = new SUIMStride();
+        var suim = new Parser();
 
         // Act & Assert - should not throw
         var exception = Record.Exception(() =>

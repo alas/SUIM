@@ -1,8 +1,8 @@
 namespace SUIM.Tests;
 
+using Xunit;
 using SUIM;
 using SUIM.Components;
-using Xunit;
 
 public class EventBindingTests
 {

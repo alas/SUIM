@@ -1,13 +1,11 @@
 namespace SUIM.Tests;
 
 using Xunit;
-using SUIM;
-using SUIM.Components;
-using SUIM.StrideIntegration;
 using Stride.UI.Controls;
 using Stride.UI;
 using Stride.Engine;
-using System;
+using SUIM;
+using SUIMStride;
 
 public class TwoWayBindingStrideTests
 {
@@ -19,7 +17,7 @@ public class TwoWayBindingStrideTests
         var model = new ObservableObject();
         model.SetValue("myText", "initial");
         
-        var suim = new SUIMStride();
+        var suim = new Parser();
         var (strideRoot, _) = suim.Parse(markup, new Game(), model: model);
         var et = strideRoot as EditText;
         Assert.NotNull(et);
@@ -47,7 +45,7 @@ public class TwoWayBindingStrideTests
         var model = new ObservableObject();
         model.SetValue("myBool", false);
         
-        var suim = new SUIMStride();
+        var suim = new Parser();
         var (strideRoot, _) = suim.Parse(markup, new Game(), model: model);
         var tb = strideRoot as ToggleButton;
         Assert.NotNull(tb);

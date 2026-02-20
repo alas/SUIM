@@ -4,7 +4,7 @@ using System;
 using System.Threading.Tasks;
 using Stride.Engine;
 using Stride.UI;
-using SUIM.StrideIntegration;
+using SUIMStride;
 
 public class MainView
 {
@@ -28,7 +28,7 @@ public class MainView
                 NoHandler = new Action(UnshowPopup),
             };
 
-        var mapper = new SUIMStride
+        var mapper = new Parser
         {
             RootPath = "SUIM"
         };

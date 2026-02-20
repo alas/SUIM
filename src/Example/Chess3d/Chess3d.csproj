@@ -16,7 +16,7 @@
     <PackageReference Include="Stride.Core.Assets.CompilerApp" Version="4.3.0.2507" IncludeAssets="build;buildTransitive" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SUIM.Stride\SUIM.Stride.csproj" />
+    <ProjectReference Include="..\..\SUIMStride\SUIMStride.csproj" />
     <ProjectReference Include="..\..\SUIM\SUIM.csproj" />
   </ItemGroup>
   <ItemGroup>
