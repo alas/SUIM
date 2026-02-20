@@ -1,4 +1,4 @@
-﻿namespace Chess3d;
+﻿namespace Chess3d.SUIM;
 
 using System;
 using System.Threading.Tasks;

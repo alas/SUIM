@@ -66,7 +66,11 @@ public static class MetricTable
 
     private static void CollectFontsRecursive(UIElement element, HashSet<(string fontName, float fontSize)> fonts)
     {
-        float fontSize = element.FontSize > 0 ? element.FontSize : (element.RootFontSize > 0 ? element.RootFontSize : 16f);
+        float fontSize = element.FontSize != null
+            ? Convert.ToSingle(element.FontSize)
+            : element.RootFontSize > 0
+                ? element.RootFontSize
+                : 16f;
         string fontName = element.Font ?? element.RootFont ?? "__default__";
         fonts.Add((fontName, fontSize));
 
@@ -151,11 +155,10 @@ public static class MetricTable
     {
         if (fontSize <= 0) fontSize = 16f;
 
-        float multiplier;
         var keyName = fontName ?? "__default__";
         var key = (keyName, fontSize);
 
-        if (!_lineHeightCache.TryGetValue(key, out multiplier))
+        if (!_lineHeightCache.TryGetValue(key, out float multiplier))
         {
             if (_provider != null)
             {

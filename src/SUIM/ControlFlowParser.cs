@@ -4,7 +4,7 @@ using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
 
-public class ControlFlowParser(dynamic model)
+public partial class ControlFlowParser(dynamic model)
 {
     public string ExpandDirectives(string markup)
     {
@@ -125,9 +125,8 @@ public class ControlFlowParser(dynamic model)
                     if (!hasExecuted)
                     {
                         result = elseBlock;
-                        hasExecuted = true;
                     }
-                    
+
                     currentIndex = afterElseIndex + elseBlockLen;
                     break; // 'else' is final
                 }
@@ -214,13 +213,13 @@ public class ControlFlowParser(dynamic model)
         int blockStart = markup.IndexOf('{', currentIndex);
         if (blockStart == -1) return (markup, 0); // Invalid
 
-        string paramStr = markup.Substring(currentIndex, blockStart - currentIndex);
+        string paramStr = markup[currentIndex..blockStart];
         var parameters = ParseParams(paramStr);
 
         var (blockContent, blockLen) = ExtractBlock(markup, blockStart);
 
         string varName = parameters.Keys.FirstOrDefault(k => k != "count" && k != "step") ?? "i";
-        int startVal = int.Parse(parameters.ContainsKey(varName) ? parameters[varName] : "0");
+        int startVal = int.Parse(parameters.TryGetValue(varName, out string? value) ? value : "0");
         int count = int.Parse(parameters.TryGetValue("count", out var c) ? c : "0");
         int step = int.Parse(parameters.TryGetValue("step", out var s) ? s : "1");
 
@@ -240,8 +239,8 @@ public class ControlFlowParser(dynamic model)
         
         // Parse: var in collection
         int blockStart = markup.IndexOf('{', currentIndex);
-        string header = markup.Substring(currentIndex, blockStart - currentIndex).Trim();
-        var parts = Regex.Split(header, @"\s+in\s+");
+        string header = markup[currentIndex..blockStart].Trim();
+        var parts = MyRegex().Split(header);
         var varName = parts[0];
         var collectionName = parts[1];
 
@@ -279,7 +278,7 @@ public class ControlFlowParser(dynamic model)
         {
             index++;
         }
-        return markup.Substring(start, index - start).Trim();
+        return markup[start..index].Trim();
     }
 
     private static (string content, int totalLen) ExtractBlock(string markup, int startIndex)
@@ -302,7 +301,7 @@ public class ControlFlowParser(dynamic model)
         if (balance == 0)
         {
             // Return content inside braces, and total length including braces
-            return (markup.Substring(contentStart, i - 1 - contentStart), i - startIndex);
+            return (markup[contentStart..(i - 1)], i - startIndex);
         }
         
         return (string.Empty, 0); // Unbalanced or EOF
@@ -330,7 +329,7 @@ public class ControlFlowParser(dynamic model)
     private static Dictionary<string, string> ParseParams(string s)
     {
         var dict = new Dictionary<string, string>();
-        var matches = Regex.Matches(s, @"(\w+)=(-?\d+)");
+        var matches = MyRegex1().Matches(s);
         foreach (Match m in matches)
         {
             dict[m.Groups[1].Value] = m.Groups[2].Value;
@@ -346,7 +345,7 @@ public class ControlFlowParser(dynamic model)
         
         // Remove parens if present
         if (condition.StartsWith('(') && condition.EndsWith(')'))
-             condition = condition.Substring(1, condition.Length - 2);
+             condition = condition[1..^1];
 
         return model.GetValue(condition) is bool b && b;
     }
@@ -354,7 +353,7 @@ public class ControlFlowParser(dynamic model)
     private object? GetValue(string key)
     {
         if (string.IsNullOrWhiteSpace(key)) return null;
-        if (key.StartsWith('@')) key = key.Substring(1);
+        if (key.StartsWith('@')) key = key[1..];
         
         return model.GetValue(key);
     }
@@ -388,4 +387,10 @@ public class ControlFlowParser(dynamic model)
             return item.ToString() ?? string.Empty;
         });
     }
+
+    [GeneratedRegex(@"\s+in\s+")]
+    private static partial Regex MyRegex();
+
+    [GeneratedRegex(@"(\w+)=(-?\d+)")]
+    private static partial Regex MyRegex1();
 }

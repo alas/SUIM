@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using SUIM.Components;
 
-public class SUIMProject(string rootPath)
+public partial class SUIMProject(string rootPath)
 {
     public string RootPath { get; } = rootPath;
 
@@ -38,7 +38,7 @@ public class SUIMProject(string rootPath)
             // However, to be safe, let's use a regex to find potential tags first, 
             // then verify if they correspond to component files.
             
-            var potentialTags = System.Text.RegularExpressions.Regex.Matches(markup, @"<([a-zA-Z0-9_]+)")
+            var potentialTags = MyRegex().Matches(markup)
                 .Cast<System.Text.RegularExpressions.Match>()
                 .Select(m => m.Groups[1].Value)
                 .Distinct()
@@ -79,4 +79,7 @@ public class SUIMProject(string rootPath)
         };
         return builtIn.Contains(tag);
     }
+
+    [System.Text.RegularExpressions.GeneratedRegex(@"<([a-zA-Z0-9_]+)")]
+    private static partial System.Text.RegularExpressions.Regex MyRegex();
 }

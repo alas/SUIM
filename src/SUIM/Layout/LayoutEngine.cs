@@ -2,6 +2,7 @@ namespace SUIM.Layout;
 
 using SUIM.Components;
 using SUIM.Components.Attributes;
+using System.Xml.Linq;
 
 public static class LayoutEngine
 {
@@ -33,15 +34,17 @@ public static class LayoutEngine
         }
 
         // Calculate margins and padding in pixels
-        element.ComputedMarginLeft = element.ToPixels(element.Margin.Left);
-        element.ComputedMarginTop = element.ToPixels(element.Margin.Top);
-        element.ComputedMarginRight = element.ToPixels(element.Margin.Right);
-        element.ComputedMarginBottom = element.ToPixels(element.Margin.Bottom);
+        var margin = Thickness.Parse(element.Margin);
+        element.ComputedMarginLeft = element.ToPixels(margin.Left);
+        element.ComputedMarginTop = element.ToPixels(margin.Top);
+        element.ComputedMarginRight = element.ToPixels(margin.Right);
+        element.ComputedMarginBottom = element.ToPixels(margin.Bottom);
 
-        element.ComputedPaddingLeft = element.ToPixels(element.Padding.Left);
-        element.ComputedPaddingTop = element.ToPixels(element.Padding.Top);
-        element.ComputedPaddingRight = element.ToPixels(element.Padding.Right);
-        element.ComputedPaddingBottom = element.ToPixels(element.Padding.Bottom);
+        var padding = Thickness.Parse(element.Padding);
+        element.ComputedPaddingLeft = element.ToPixels(padding.Left);
+        element.ComputedPaddingTop = element.ToPixels(padding.Top);
+        element.ComputedPaddingRight = element.ToPixels(padding.Right);
+        element.ComputedPaddingBottom = element.ToPixels(padding.Bottom);
 
         // Calculate available space for content
         var availableContentWidth = Math.Max(0, availableWidth - element.ComputedMarginLeft - element.ComputedMarginRight - element.ComputedPaddingLeft - element.ComputedPaddingRight);
@@ -49,26 +52,28 @@ public static class LayoutEngine
 
         // For most containers and Text elements, default to Auto if unspecified
         // For LayoutElement derivatives (like Stack, Grid, Div), default to 1fr if unspecified
-        if (element is LayoutElement layoutElem)
+        var width = UnitValue.Parse(element.Width);
+        var height = UnitValue.Parse(element.Height);
+        if (element is LayoutElement)
         {
-            if (element.Width.Type == UnitType.None) element.Width = UnitValue.OneFR;
-            if (element.Height.Type == UnitType.None) element.Height = UnitValue.OneFR;
+            if (width.Type == UnitType.None) element.Width = (width = UnitValue.OneFR).ToString();
+            if (height.Type == UnitType.None) element.Height = (height = UnitValue.OneFR).ToString();
         }
         else if (element is Stack or Grid or Dock or Overlay or Text)
         {
-            if (element.Width.Type == UnitType.None) element.Width = UnitValue.Auto;
-            if (element.Height.Type == UnitType.None) element.Height = UnitValue.Auto;
+            if (width.Type == UnitType.None) element.Width = UnitValue.Auto.ToString();
+            if (height.Type == UnitType.None) element.Height = UnitValue.Auto.ToString();
         }
 
         // Convert explicit sizes to pixels
-        var widthInPixels = (element.Width.Type == UnitType.Auto || element.Width.Type == UnitType.None) ? 0 : element.ToPixels(element.Width);
-        var heightInPixels = (element.Height.Type == UnitType.Auto || element.Height.Type == UnitType.None) ? 0 : element.ToPixels(element.Height);
+        var widthInPixels = (width.Type == UnitType.Auto || width.Type == UnitType.None) ? 0 : element.ToPixels(element.Width);
+        var heightInPixels = (height.Type == UnitType.Auto || height.Type == UnitType.None) ? 0 : element.ToPixels(element.Height);
 
         // Initialize content size
         if (element is Text baseText)
         {
             // Width: if explicit pixels provided use that, if auto use MetricTable, otherwise constrain to available width
-            if (element.Width.Type == UnitType.Auto)
+            if (width.Type == UnitType.Auto)
             {
                 var fontName = element.Font ?? element.RootFont ?? "__default__";
                 element.MeasuredContentWidth = MetricTable.MeasureText(baseText.Value ?? string.Empty, fontName, element.CurrentFontSize);
@@ -79,7 +84,7 @@ public static class LayoutEngine
             }
 
             // Height: auto resolves to single-line height from font metrics. Explicit heights are honored.
-            if (element.Height.Type == UnitType.Auto)
+            if (height.Type == UnitType.Auto)
             {
                 var fontName = element.Font ?? element.RootFont ?? "__default__";
                 element.MeasuredContentHeight = MetricTable.GetLineHeight(fontName, element.CurrentFontSize);
@@ -129,12 +134,12 @@ public static class LayoutEngine
         // Handle root element sizing per-axis (only fill available space for axes without any explicit sizes in the tree)
         if (element.Parent == null)
         {
-            if (!TreeHasAnyExplicitWidth(element) || element.Width.Type == UnitType.Fr)
+            if (!TreeHasAnyExplicitWidth(element) || width.Type == UnitType.Fr)
                 element.MeasuredContentWidth = availableContentWidth;
             else if (widthInPixels == 0)
                 element.MeasuredContentWidth = Math.Min(element.MeasuredContentWidth, availableContentWidth);
 
-            if (!TreeHasAnyExplicitHeight(element) || element.Height.Type == UnitType.Fr)
+            if (!TreeHasAnyExplicitHeight(element) || height.Type == UnitType.Fr)
                 element.MeasuredContentHeight = availableContentHeight;
             else if (heightInPixels == 0)
                 element.MeasuredContentHeight = Math.Min(element.MeasuredContentHeight, availableContentHeight);
@@ -155,10 +160,11 @@ public static class LayoutEngine
 
     private static bool TreeHasAnyExplicitWidth(UIElement element)
     {
-        bool widthExplicit = element.Width.Type != UnitType.None && 
-                            element.Width.Type != UnitType.Rem && 
-                            element.Width.Type != UnitType.Em && 
-                            element.Width.Type != UnitType.Fr;
+        var width = UnitValue.Parse(element.Width);
+        bool widthExplicit = width.Type != UnitType.None && 
+                            width.Type != UnitType.Rem && 
+                            width.Type != UnitType.Em && 
+                            width.Type != UnitType.Fr;
         if (widthExplicit) return true;
         foreach (var child in element.Children)
         {
@@ -169,8 +175,9 @@ public static class LayoutEngine
 
     private static bool TreeHasAnyExplicitHeight(UIElement element)
     {
+        var height = UnitValue.Parse(element.Height);
         // Treat any non-None/non-Fr height (including rem/em/auto) as explicit for height axis
-        bool heightExplicit = element.Height.Type != UnitType.None && element.Height.Type != UnitType.Fr;
+        bool heightExplicit = height.Type != UnitType.None && height.Type != UnitType.Fr;
         if (heightExplicit) return true;
         foreach (var child in element.Children)
         {
@@ -247,7 +254,8 @@ public static class LayoutEngine
         // Measure fixed-size children
         foreach (var child in stack.Children)
         {
-            if (child.Width.Type == UnitType.Fr || (child.Width.Type == UnitType.None && child is LayoutElement))
+            var width = UnitValue.Parse(child.Width);
+            if (width.Type == UnitType.Fr || (width.Type == UnitType.None && child is LayoutElement))
             {
                 frElements.Add(child);
             }
@@ -286,7 +294,8 @@ public static class LayoutEngine
         // Measure fixed-size children
         foreach (var child in stack.Children)
         {
-            if (child.Height.Type == UnitType.Fr || (child.Height.Type == UnitType.None && child is LayoutElement))
+            var height = UnitValue.Parse(child.Height);
+            if (height.Type == UnitType.Fr || (height.Type == UnitType.None && child is LayoutElement))
             {
                 elements.Add(child);
             }
@@ -318,13 +327,13 @@ public static class LayoutEngine
 
     private static void ResolveFractionalUnitWidths(List<UIElement> elements, float remainingSpace, float availableHeight)
     {
-        var values = elements.Select(e => e.Width.Type == UnitType.Fr ? e.Width.Value : 1f).ToArray();
+        var values = elements.Select(e => UnitValue.Parse(e.Width)).Select(w => w.Type == UnitType.Fr ? w.Value : 1f).ToArray();
         var resolvedValues = FractionalUnitResolver.ResolveFractionalUnits(values, remainingSpace);
 
         for (int i = 0; i < elements.Count; i++)
         {
             elements[i].CurrentFontSize = (elements[i].Parent as Stack)?.CurrentFontSize ?? 16f;
-            var width = elements[i].Width;
+            var width = UnitValue.Parse(elements[i].Width);
             if (width.Type == UnitType.None) width = new UnitValue(resolvedValues[i], UnitType.Pixels);
             MeasureElement(elements[i], resolvedValues[i], availableHeight);
         }
@@ -332,13 +341,13 @@ public static class LayoutEngine
 
     private static void ResolveFractionalUnitHeights(List<UIElement> elements, float remainingSpace, float availableWidth)
     {
-        var values = elements.Select(e => e.Height.Type == UnitType.Fr ? e.Height.Value : 1f).ToArray();
+        var values = elements.Select(e => UnitValue.Parse(e.Height)).Select(h => h.Type == UnitType.Fr ? h.Value : 1f).ToArray();
         var resolvedValues = FractionalUnitResolver.ResolveFractionalUnits(values, remainingSpace);
 
         for (int i = 0; i < elements.Count; i++)
         {
             elements[i].CurrentFontSize = (elements[i].Parent as Stack)?.CurrentFontSize ?? 16f;
-            var height = elements[i].Height;
+            var height = UnitValue.Parse(elements[i].Height);
             if (height.Type == UnitType.None) height = new UnitValue(resolvedValues[i], UnitType.Pixels);
             MeasureElement(elements[i], availableWidth, resolvedValues[i]);
         }
@@ -349,7 +358,7 @@ public static class LayoutEngine
         // When grid has no explicit columns/rows and is auto-sized, 
         // measure children with auto space and let content drive sizing
         if (string.IsNullOrWhiteSpace(grid.Columns) && string.IsNullOrWhiteSpace(grid.Rows) 
-            && grid.Width.Type == UnitType.Auto && grid.Height.Type == UnitType.Auto)
+            && UnitValue.Parse(grid.Width).Type == UnitType.Auto && UnitValue.Parse(grid.Height).Type == UnitType.Auto)
         {
             float maxWidth = 0;
             float maxHeight = 0;
@@ -424,15 +433,17 @@ public static class LayoutEngine
         else
         {
             // Always fill available space unless explicit pixel size is set
-            if (overlay.Width.Type == UnitType.Auto || overlay.Width.Type == UnitType.None)
+            var width = UnitValue.Parse(overlay.Width);
+            if (width.Type == UnitType.Auto || width.Type == UnitType.None)
                 contentWidth = availableWidth;
             else
-                contentWidth = overlay.ToPixels(overlay.Width);
+                contentWidth = overlay.ToPixels(width);
 
-            if (overlay.Height.Type == UnitType.Auto || overlay.Height.Type == UnitType.None)
+            var height = UnitValue.Parse(overlay.Height);
+            if (height.Type == UnitType.Auto || height.Type == UnitType.None)
                 contentHeight = availableHeight;
             else
-                contentHeight = overlay.ToPixels(overlay.Height);
+                contentHeight = overlay.ToPixels(height);
 
             foreach (var child in overlay.Children)
             {
@@ -452,7 +463,7 @@ public static class LayoutEngine
 
     private static void MeasureDiv(Div div, float availableWidth, float availableHeight)
     {
-        bool hasExplicitlyPositionedChildren = div.Children.Any(c => c.X.Type != UnitType.None || c.Y.Type != UnitType.None);
+        bool hasExplicitlyPositionedChildren = div.Children.Any(c => UnitValue.Parse(c.X).Type != UnitType.None || UnitValue.Parse(c.Y).Type != UnitType.None);
 
         if (!hasExplicitlyPositionedChildren && div.Children.Count > 0)
         {
@@ -473,16 +484,19 @@ public static class LayoutEngine
         var totalSpacing = Math.Max(0, spacing * (div.Children.Count - 1));
 
         // Resolve unspecified width for Div (default to 1fr)
-        if (div.Width.Type == UnitType.None)
-            div.Width = UnitValue.OneFR;
+        var width = UnitValue.Parse(div.Width);
+        if (width.Type == UnitType.None)
+            div.Width = (width = UnitValue.OneFR).ToString();
         // Resolve unspecified height for Div (default to Auto)
-        if (div.Height.Type == UnitType.None)
-            div.Height = UnitValue.Auto;
+        var height = UnitValue.Parse(div.Height);
+        if (height.Type == UnitType.None)
+            div.Height = (height = UnitValue.Auto).ToString();
 
         // Measure fixed-size children
         foreach (var child in div.Children)
         {
-            if (child.Height.Type == UnitType.Fr || (child.Height.Type == UnitType.None && child is LayoutElement))
+            var cheight = UnitValue.Parse(child.Height);
+            if (cheight.Type == UnitType.Fr || (cheight.Type == UnitType.None && child is LayoutElement))
             {
                 elements.Add(child);
             }
@@ -509,7 +523,7 @@ public static class LayoutEngine
         }
 
         // Preserve explicit dimensions
-        if (div.Width.Type != UnitType.None && div.Width.Type != UnitType.Auto)
+        if (width.Type != UnitType.None && width.Type != UnitType.Auto)
         {
             // Keep explicit width
         }
@@ -518,7 +532,7 @@ public static class LayoutEngine
             div.MeasuredContentWidth = Math.Max(maxWidth, availableWidth <= 0 || availableWidth == float.MaxValue ? 0 : availableWidth);
         }
 
-        if (div.Height.Type != UnitType.None && div.Height.Type != UnitType.Auto)
+        if (height.Type != UnitType.None && height.Type != UnitType.Auto)
         {
             // Keep explicit height
         }
@@ -541,7 +555,9 @@ public static class LayoutEngine
             maxHeight = Math.Max(maxHeight, child.ActualHeight);
         }
 
-        if (div.Width.Type == UnitType.Auto && div.Height.Type == UnitType.Auto)
+        var width = UnitValue.Parse(div.Width);
+        var height = UnitValue.Parse(div.Height);
+        if (width.Type == UnitType.Auto && height.Type == UnitType.Auto)
         {
             div.MeasuredContentWidth = maxWidth > 0 ? maxWidth : availableWidth;
             div.MeasuredContentHeight = maxHeight > 0 ? maxHeight : availableHeight;
@@ -573,7 +589,7 @@ public static class LayoutEngine
             totalWidth += stack.Spacing * (stack.Children.Count - 1);
 
         float currentX = stack.ActualX + stack.ComputedPaddingLeft + 
-            CalculateAlignmentOffset(stack.MeasuredContentWidth, totalWidth, stack.ContentHorizontalAlignment);
+            CalculateHorizontalAlignmentOffset(stack.MeasuredContentWidth, totalWidth, stack.ContentHorizontalAlignment);
         float baseY = stack.ActualY + stack.ComputedPaddingTop;
 
         foreach (var child in stack.Children)
@@ -597,7 +613,7 @@ public static class LayoutEngine
             totalHeight += stack.Spacing * (stack.Children.Count - 1);
 
         float currentY = stack.ActualY + stack.ComputedPaddingTop + 
-            CalculateAlignmentOffset(stack.MeasuredContentHeight, totalHeight, stack.ContentVerticalAlignment);
+            CalculateVerticalAlignmentOffset(stack.MeasuredContentHeight, totalHeight, stack.ContentVerticalAlignment);
 
         foreach (var child in stack.Children)
         {
@@ -686,11 +702,12 @@ public static class LayoutEngine
 
     private static void PositionDiv(Div div)
     {
-        if (div.Anchor.HasValue && div.Anchor != Anchor.None)
+        var anchor = Anchor.Parse(div.Anchor);
+        if (anchor != Anchor.None)
         {
             PositionWithAnchor(div);
         }
-        else if (div.X.Type != UnitType.None || div.Y.Type != UnitType.None)
+        else if (UnitValue.Parse(div.X).Type != UnitType.None || UnitValue.Parse(div.Y).Type != UnitType.None)
         {
             div.ActualX = div.ToPixels(div.X);
             div.ActualY = div.ToPixels(div.Y);
@@ -701,7 +718,7 @@ public static class LayoutEngine
             div.ActualY = 0;
         }
 
-        bool hasExplicitlyPositionedChildren = div.Children.Any(c => c.X.Type != UnitType.None || c.Y.Type != UnitType.None);
+        bool hasExplicitlyPositionedChildren = div.Children.Any(c => UnitValue.Parse(c.X).Type != UnitType.None || UnitValue.Parse(c.Y).Type != UnitType.None);
 
         if (!hasExplicitlyPositionedChildren && div.Children.Count > 0)
         {
@@ -738,7 +755,7 @@ public static class LayoutEngine
             totalHeight += div.Spacing * (div.Children.Count - 1);
 
         float currentY = div.ActualY + div.ComputedPaddingTop + 
-            CalculateAlignmentOffset(div.MeasuredContentWidth, totalHeight, div.ContentVerticalAlignment);
+            CalculateVerticalAlignmentOffset(div.MeasuredContentWidth, totalHeight, div.ContentVerticalAlignment);
 
         foreach (var child in div.Children)
         {
@@ -763,7 +780,7 @@ public static class LayoutEngine
             return;
         }
 
-        var anchor = element.Anchor ?? Anchor.None;
+        var anchor = Anchor.Parse(element.Anchor);
         
         // WinForms-style anchoring: element pins to the specified edges
         // If both opposite edges are anchored, element stretches between them
@@ -812,10 +829,10 @@ public static class LayoutEngine
 
     private static void ApplyHorizontalAlignment(UIElement element, float baseX, float containerWidth)
     {
-        var alignment = element.HorizontalAlignment;
+        var alignment = HorizontalAlignment.Parse(element.HorizontalAlignment);
         if (alignment == HorizontalAlignment.Unspecified && element.Parent != null)
         {
-            alignment = element.Parent.ContentHorizontalAlignment;
+            alignment = HorizontalAlignment.Parse(element.Parent.ContentHorizontalAlignment);
         }
         
         if (alignment == HorizontalAlignment.Unspecified)
@@ -837,10 +854,10 @@ public static class LayoutEngine
 
     private static void ApplyVerticalAlignment(UIElement element, float baseY, float containerHeight)
     {
-        var alignment = element.VerticalAlignment;
+        var alignment = VerticalAlignment.Parse(element.VerticalAlignment);
         if (alignment == VerticalAlignment.Unspecified && element.Parent != null)
         {
-            alignment = element.Parent.ContentVerticalAlignment;
+            alignment = VerticalAlignment.Parse(element.Parent.ContentVerticalAlignment);
         }
 
         if (alignment == VerticalAlignment.Unspecified)
@@ -860,15 +877,17 @@ public static class LayoutEngine
         }
     }
 
-    private static float CalculateAlignmentOffset(float containerSize, float contentSize, HorizontalAlignment alignment)
+    private static float CalculateHorizontalAlignmentOffset(float containerSize, float contentSize, string? alignmentString)
     {
+        var alignment = HorizontalAlignment.Parse(alignmentString);
         if (alignment == HorizontalAlignment.Center) return Math.Max(0, (containerSize - contentSize) / 2);
         if (alignment == HorizontalAlignment.Right) return Math.Max(0, containerSize - contentSize);
         return 0; // Default or Left or Unspecified
     }
 
-    private static float CalculateAlignmentOffset(float containerSize, float contentSize, VerticalAlignment alignment)
+    private static float CalculateVerticalAlignmentOffset(float containerSize, float contentSize, string? alignmentString)
     {
+        var alignment = VerticalAlignment.Parse(alignmentString);
         if (alignment == VerticalAlignment.Center) return Math.Max(0, (containerSize - contentSize) / 2);
         if (alignment == VerticalAlignment.Bottom) return Math.Max(0, containerSize - contentSize);
         return 0; // Default or Top or Unspecified
@@ -876,11 +895,12 @@ public static class LayoutEngine
 
     private static void DetectOverflow(UIElement element)
     {
-        if (element.Width.Type != UnitType.None && element.Width.Type != UnitType.Auto &&
-            element.Height.Type != UnitType.None && element.Height.Type != UnitType.Auto)
+        var width = UnitValue.Parse(element.Width);
+        var height = UnitValue.Parse(element.Height);
+        if (width.IsExplicit() && height.IsExplicit())
         {
-            var explicitWidth = element.ToPixels(element.Width);
-            var explicitHeight = element.ToPixels(element.Height);
+            var explicitWidth = element.ToPixels(width);
+            var explicitHeight = element.ToPixels(height);
 
             element.NeedsHorizontalScroll = element.MeasuredContentWidth > explicitWidth;
             element.NeedsVerticalScroll = element.MeasuredContentHeight > explicitHeight;

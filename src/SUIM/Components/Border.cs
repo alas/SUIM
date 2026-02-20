@@ -4,13 +4,13 @@ using SUIM.Components.Attributes;
 
 public class Border() : UIElement(nameof(Border))
 {
-    public Thickness Thickness { get; set; } = new Thickness(0f);
+    public string? Thickness { get; set; }
 
     public override void SetAttribute(string name, object? value)
     {
         if (name.Equals("thickness", StringComparison.OrdinalIgnoreCase))
         {
-            Thickness = Thickness.FromObject(value);
+            Thickness = value as string;
         }
         else if (name.Equals("border", StringComparison.OrdinalIgnoreCase))
         {
@@ -45,13 +45,13 @@ public class Border() : UIElement(nameof(Border))
         
         if (numCount > 0)
         {
-            string thicknessStr = string.Join(",", parts.Take(numCount));
-            Thickness = Thickness.Parse(thicknessStr);
+            var thicknessStr = string.Join(",", parts.Take(numCount));
+            Thickness = thicknessStr;
         }
         
         if (numCount < parts.Length)
         {
-             Color = parts[parts.Length - 1]; // Color is last
+             Color = parts[^1]; // Color is last
         }
     }
 }

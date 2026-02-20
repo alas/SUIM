@@ -7,8 +7,8 @@ using Stride.Input;
 
 public class OrbitCameraController : SyncScript
 {
-    private float distance = 2.730638f;
-    private float pitch = 28f;
+    private const float distance = 2.730638f;
+    private const float pitch = 28f;
     private float yaw = 90f;
 
     public override void Update()

@@ -10,13 +10,17 @@ public class ContentAlignmentTests
     [Fact]
     public void Div_CentersChildrenVerticallyAndHorizontally()
     {
-        var div = new Div { Width = new UnitValue(200, UnitType.Pixels), Height = new UnitValue(200, UnitType.Pixels) };
-        div.ContentHorizontalAlignment = HorizontalAlignment.Center;
-        div.ContentVerticalAlignment = VerticalAlignment.Center;
+        var div = new Div
+        {
+            Width = new UnitValue(200, UnitType.Pixels).ToString(),
+            Height = new UnitValue(200, UnitType.Pixels).ToString(),
+            ContentHorizontalAlignment = HorizontalAlignment.Center.ToString(),
+            ContentVerticalAlignment = VerticalAlignment.Center.ToString()
+        };
 
-        var label1 = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(20, UnitType.Pixels) };
-        var label2 = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(20, UnitType.Pixels) };
-        var label3 = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(20, UnitType.Pixels) };
+        var label1 = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString() };
+        var label2 = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString() };
+        var label3 = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString() };
 
         div.AddChild(label1, null);
         div.AddChild(label2, null);
@@ -39,11 +43,15 @@ public class ContentAlignmentTests
     [Fact]
     public void Div_ChildAlignmentOverridesParentContentAlignment()
     {
-        var div = new Div { Width = new UnitValue(200, UnitType.Pixels), Height = new UnitValue(200, UnitType.Pixels) };
-        div.ContentHorizontalAlignment = HorizontalAlignment.Center;
+        var div = new Div
+        {
+            Width = new UnitValue(200, UnitType.Pixels).ToString(),
+            Height = new UnitValue(200, UnitType.Pixels).ToString(),
+            ContentHorizontalAlignment = HorizontalAlignment.Center.ToString()
+        };
 
-        var label1 = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(20, UnitType.Pixels), HorizontalAlignment = HorizontalAlignment.Right };
-        var label2 = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(20, UnitType.Pixels) }; // Should use parent Center
+        var label1 = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString(), HorizontalAlignment = HorizontalAlignment.Right.ToString() };
+        var label2 = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString() }; // Should use parent Center
 
         div.AddChild(label1, null);
         div.AddChild(label2, null);
@@ -63,15 +71,15 @@ public class ContentAlignmentTests
         div.SetAttribute("chalign", "center");
         div.SetAttribute("cvalign", "bottom");
 
-        Assert.Equal(HorizontalAlignment.Center, div.ContentHorizontalAlignment);
-        Assert.Equal(VerticalAlignment.Bottom, div.ContentVerticalAlignment);
+        Assert.Equal(HorizontalAlignment.Center, HorizontalAlignment.Parse(div.ContentHorizontalAlignment));
+        Assert.Equal(VerticalAlignment.Bottom, VerticalAlignment.Parse(div.ContentVerticalAlignment));
     }
     
     [Fact]
     public void Overlay_AlignsChildren()
     {
-        var overlay = new Overlay { Width = new UnitValue(500, UnitType.Pixels), Height = new UnitValue(500, UnitType.Pixels) };
-        var label = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(50, UnitType.Pixels), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+        var overlay = new Overlay { Width = new UnitValue(500, UnitType.Pixels).ToString(), Height = new UnitValue(500, UnitType.Pixels).ToString() };
+        var label = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(50, UnitType.Pixels).ToString(), HorizontalAlignment = HorizontalAlignment.Center.ToString(), VerticalAlignment = VerticalAlignment.Center.ToString() };
         
         overlay.AddChild(label, null);
         
@@ -85,11 +93,15 @@ public class ContentAlignmentTests
     [Fact]
     public void Child_WithUnspecifiedAlignment_InheritsParentContentAlignment()
     {
-        var div = new Div { Width = new UnitValue(200, UnitType.Pixels), Height = new UnitValue(200, UnitType.Pixels) };
-        div.ContentHorizontalAlignment = HorizontalAlignment.Center;
-        div.ContentVerticalAlignment = VerticalAlignment.Center;
+        var div = new Div
+        {
+            Width = new UnitValue(200, UnitType.Pixels).ToString(),
+            Height = new UnitValue(200, UnitType.Pixels).ToString(),
+            ContentHorizontalAlignment = HorizontalAlignment.Center.ToString(),
+            ContentVerticalAlignment = VerticalAlignment.Center.ToString()
+        };
 
-        var label = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(20, UnitType.Pixels) };
+        var label = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString() };
         // HorizontalAlignment and VerticalAlignment are Unspecified by default
         
         div.AddChild(label, null);
@@ -104,10 +116,10 @@ public class ContentAlignmentTests
     [Fact]
     public void Child_WithUnspecifiedAlignment_DefaultsToLeftTopIfParentHasNoContentAlignment()
     {
-        var div = new Div { Width = new UnitValue(200, UnitType.Pixels), Height = new UnitValue(200, UnitType.Pixels) };
+        var div = new Div { Width = new UnitValue(200, UnitType.Pixels).ToString(), Height = new UnitValue(200, UnitType.Pixels).ToString() };
         // div.ContentHorizontalAlignment and ContentVerticalAlignment are Unspecified by default
 
-        var label = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(20, UnitType.Pixels) };
+        var label = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString() };
         
         div.AddChild(label, null);
         LayoutEngine.Layout(div, 16, 200, 200);

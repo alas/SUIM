@@ -26,7 +26,14 @@ public class Input() : UIElement(nameof(Input)), IPlaceholder
         }
         else if (name.Equals("value", StringComparison.OrdinalIgnoreCase))
         {
-            Value = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            if (value is bool b)
+            {
+                Value = b ? "true" : "false";
+            }
+            else
+            {
+                Value = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            }
         }
         else if (name.Equals("min", StringComparison.OrdinalIgnoreCase))
         {

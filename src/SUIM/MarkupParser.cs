@@ -6,7 +6,7 @@ using System.Xml.Linq;
 using SUIM.Components;
 using SUIM.Components.Attributes;
 
-public static class MarkupParser
+public static partial class MarkupParser
 {
     public static (UIElement, dynamic?) Parse(string markup, object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null, string? componentName = null)
     {
@@ -26,9 +26,11 @@ public static class MarkupParser
         if (componentName != null && string.Equals(root.Name.LocalName, componentName, StringComparison.OrdinalIgnoreCase))
         {
             // Root tag matches component name: bypass redundant wrapper and process children
-            element = new Div(componentName);
-            element.Model = model2;
-            element.IsComponentRoot = true;
+            element = new Div(componentName)
+            {
+                Model = model2,
+                IsComponentRoot = true
+            };
 
             foreach (var node in root.Nodes())
             {
@@ -55,7 +57,7 @@ public static class MarkupParser
                     if (!string.IsNullOrEmpty(text))
                     {
                         var textElement = new Text { Value = text };
-                        if (styles.Count > 0) textElement = ApplyStylesToElement(textElement, styles, model2);
+                        if (styles.Count > 0) textElement = (Text)ApplyStylesToElement(textElement, styles);
                         element.AddChild(textElement, root);
                     }
                 }
@@ -82,7 +84,7 @@ public static class MarkupParser
     {        
         // CSS-like parser supporting: .classname, #id, tagname, and *
         // Format: selector { property: value; property: value; }
-        var selectorRegex = new System.Text.RegularExpressions.Regex(@"([#.]?[a-zA-Z0-9_*-]+)\s*\{([^}]*)\}");
+        var selectorRegex = MyRegex();
         var matches = selectorRegex.Matches(styleContent);
 
         foreach (System.Text.RegularExpressions.Match match in matches)
@@ -92,7 +94,7 @@ public static class MarkupParser
 
             var properties = new Dictionary<string, string>();
             // Parse properties: "property: value, property: value"
-            var propertyRegex = new System.Text.RegularExpressions.Regex(@"([a-zA-Z0-9\-]+)\s*:\s*([^;}]+)");
+            var propertyRegex = MyRegex1();
             var propMatches = propertyRegex.Matches(propertiesContent);
 
             foreach (System.Text.RegularExpressions.Match propMatch in propMatches)
@@ -109,7 +111,7 @@ public static class MarkupParser
         }
     }
 
-    private static UIElement ApplyStylesToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles, dynamic? model)
+    private static UIElement ApplyStylesToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles)
     {
         var elementTag = element.TagName;
         var elementId = element.GetAttribute("id") as string;
@@ -168,12 +170,12 @@ public static class MarkupParser
 
         if (mergedProperties.Count > 0)
         {
-            element = ApplyStylePropertiesToElement(element, mergedProperties, styles, model);
+            element = ApplyStylePropertiesToElement(element, mergedProperties);
         }
         return element;
     }
 
-    private static UIElement ApplyStylePropertiesToElement(UIElement element, Dictionary<string, string> properties, Dictionary<string, Dictionary<string, string>> allStyles, dynamic? model)
+    private static UIElement ApplyStylePropertiesToElement(UIElement element, Dictionary<string, string> properties)
     {
         // Extract border and scroll attributes for special handling
         string? borderAttr = null;
@@ -232,13 +234,10 @@ public static class MarkupParser
             // Fallback: also apply explicit width/height from properties if present (defensive)
             if (properties.TryGetValue("width", out var w)) scroll.SetAttribute("width", w);
             if (properties.TryGetValue("height", out var h)) scroll.SetAttribute("height", h);
-            // Ensure numeric width/height are parsed/applied directly
-            if (properties.TryGetValue("width", out var pw) && !string.IsNullOrWhiteSpace(pw)) scroll.Width = UnitValue.Parse(pw);
-            if (properties.TryGetValue("height", out var ph) && !string.IsNullOrWhiteSpace(ph)) scroll.Height = UnitValue.Parse(ph);
 
             // When a style creates a scroll wrapper, the inner element should default to `auto` if it was unspecified.
-            if (element.Width.Type == UnitType.None) element.Width = UnitValue.Auto;
-            if (element.Height.Type == UnitType.None) element.Height = UnitValue.Auto;
+            element.Width ??= "auto";
+            element.Height ??= "auto";
 
             scroll.AddChild(element, null);
             element = scroll;
@@ -262,15 +261,15 @@ public static class MarkupParser
             // Ensure numeric width/height in styles are parsed and applied directly (defensive - avoids any SetAttribute parsing quirks)
             if (properties.TryGetValue("width", out var pw) && !string.IsNullOrWhiteSpace(pw))
             {
-                border.Width = UnitValue.Parse(pw);
+                border.Width = pw;
             }
             if (properties.TryGetValue("height", out var ph) && !string.IsNullOrWhiteSpace(ph))
             {
-                border.Height = UnitValue.Parse(ph);
+                border.Height = ph;
             }
 
-            if (element.Width.Type == UnitType.None) element.Width = UnitValue.Auto;
-            if (element.Height.Type == UnitType.None) element.Height = UnitValue.Auto;
+            element.Width ??= "auto";
+            element.Height ??= "auto";
             border.AddChild(element, null);
             element = border;
         }
@@ -320,8 +319,8 @@ public static class MarkupParser
                 scroll.Direction = dir;
             }
             // If the inner element was unspecified, change it to auto when wrapped by a scroll-viewport.
-            if (rootElement.Width.Type == UnitType.None) rootElement.Width = UnitValue.Auto;
-            if (rootElement.Height.Type == UnitType.None) rootElement.Height = UnitValue.Auto;
+            rootElement.Width ??= "auto";
+            rootElement.Height ??= "auto";
 
             scroll.AddChild(rootElement, element);
             rootElement = scroll;
@@ -332,8 +331,8 @@ public static class MarkupParser
             var border = new Border();
             border.SetAttribute("border", borderAttr.Value);
             // Similar behavior for border wrapper: inner element should become `auto` for sizing if it was unspecified.
-            if (rootElement.Width.Type == UnitType.None) rootElement.Width = UnitValue.Auto;
-            if (rootElement.Height.Type == UnitType.None) rootElement.Height = UnitValue.Auto;
+            rootElement.Width ??= "auto";
+            rootElement.Height ??= "auto";
 
             border.AddChild(rootElement, element);
             rootElement = border;
@@ -412,7 +411,7 @@ public static class MarkupParser
                         var textElement = new Text { Value = text };
                         if (styles != null && styles.Count > 0)
                         {
-                            textElement = ApplyStylesToElement(textElement, styles, model);
+                            textElement = (Text)ApplyStylesToElement(textElement, styles);
                         }
                         innerElement.AddChild(textElement, element);
                     }
@@ -434,7 +433,7 @@ public static class MarkupParser
 
         if (styles != null && styles.Count > 0)
         {
-            rootElement = ApplyStylesToElement(rootElement, styles, model);
+            rootElement = ApplyStylesToElement(rootElement, styles);
         }
 
         foreach (var attr in attributes)
@@ -453,30 +452,27 @@ public static class MarkupParser
         return rootElement;
     }
 
-    private static void SetAttribute(XAttribute attr, dynamic? model, UIElement rootElement, UIElement innerElement)
+    private static void SetAttribute(XAttribute attr, ObservableObject? model, UIElement rootElement, UIElement innerElement)
     {
         var name = attr.Name.LocalName;
         var target = IsLayoutAttribute(name) ? rootElement : innerElement;
 
         // Store raw attribute for CustomComponent expansion or other metadata
         var value = attr.Value;
-        if (!value.StartsWith('@'))
-        {
-            target.SetAttribute(name, value);
-        }
+        target.SetAttribute(name, value);
 
         if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
         {
             // Event Binding: onclick="MethodName()"
             var handlerName = value;
-            target.Events[name.Substring(2)] = handlerName;
+            target.Events[name[2..]] = handlerName;
             return;
         }
 
         if (value.StartsWith('@'))
         {
             // Dynamic Binding: <grid width="@myVar" />
-            var modelPropName = value.Substring(1);
+            var modelPropName = value[1..];
             target.Bindings.Add(new BindingDefinition(name, modelPropName));
         }
     }
@@ -541,4 +537,9 @@ public static class MarkupParser
 
         throw new NotSupportedException($"Unknown tag: {element.Name.LocalName}");
     }
+
+    [System.Text.RegularExpressions.GeneratedRegex(@"([#.]?[a-zA-Z0-9_*-]+)\s*\{([^}]*)\}")]
+    private static partial System.Text.RegularExpressions.Regex MyRegex();
+    [System.Text.RegularExpressions.GeneratedRegex(@"([a-zA-Z0-9\-]+)\s*:\s*([^;}]+)")]
+    private static partial System.Text.RegularExpressions.Regex MyRegex1();
 }

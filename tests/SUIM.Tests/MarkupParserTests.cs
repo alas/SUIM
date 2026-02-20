@@ -31,8 +31,8 @@ public class MarkupParserTests
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Equal("main", div.Id);
-        Assert.Equal(new UnitValue(100), div.Width);
-        Assert.Equal(new UnitValue(200), div.Height);
+        Assert.Equal(new UnitValue(100), UnitValue.Parse(div.Width));
+        Assert.Equal(new UnitValue(200), UnitValue.Parse(div.Height));
         Assert.Equal(HorizontalAlignment.Center, div.HorizontalAlignment);
         Assert.Equal(VerticalAlignment.Top, div.VerticalAlignment);
         Assert.Equal(new Thickness(10), div.Margin);
@@ -1459,7 +1459,7 @@ Text after
         Dictionary<string, Dictionary<string, string>> styleDictionary = [];
         var mi = typeof(MarkupParser).GetMethod("ParseStyles", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
             ?? throw new Exception();
-        var styles = mi.Invoke(null, [styleContent, styleDictionary])!;
+        _ = mi.Invoke(null, [styleContent, styleDictionary])!;
 
         Assert.True(styleDictionary.ContainsKey(".myclass"));
         var props = styleDictionary[".myclass"];
@@ -1580,7 +1580,7 @@ Text after
     <model>{ ""lastName"": ""Doe"", ""age"": 30 }</model>
     <div />
 </grid>";
-        var (element, model) = MarkupParser.Parse(markup, providedModel);
+        var (_, model) = MarkupParser.Parse(markup, providedModel);
 
         Assert.NotNull(model);
         // From provided model
@@ -1771,7 +1771,7 @@ Text after
     <model>{ ""str"": ""text"", ""num"": 123, ""bool"": true, ""arr"": [1, 2], ""obj"": { ""key"": ""val"" }, ""nil"": null }</model>
     <div />
 </grid>";
-        var (element, model) = MarkupParser.Parse(markup);
+        var (_, model) = MarkupParser.Parse(markup);
 
         Assert.NotNull(model);
         Assert.Equal("text", model!.str);

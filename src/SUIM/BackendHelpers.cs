@@ -26,12 +26,12 @@ public static class BackendHelpers
 
         if (colorStr.StartsWith('#'))
         {
-            var hex = colorStr.Substring(1);
+            var hex = colorStr[1..];
             if (hex.Length == 6)
             {
                 return new ParsedColor
                 {
-                    R = Convert.ToByte(hex.Substring(0, 2), 16),
+                    R = Convert.ToByte(hex[..2], 16),
                     G = Convert.ToByte(hex.Substring(2, 2), 16),
                     B = Convert.ToByte(hex.Substring(4, 2), 16),
                     A = 255
@@ -41,7 +41,7 @@ public static class BackendHelpers
             {
                 return new ParsedColor
                 {
-                    A = Convert.ToByte(hex.Substring(0, 2), 16),
+                    A = Convert.ToByte(hex[..2], 16),
                     R = Convert.ToByte(hex.Substring(2, 2), 16),
                     G = Convert.ToByte(hex.Substring(4, 2), 16),
                     B = Convert.ToByte(hex.Substring(6, 2), 16)
@@ -82,7 +82,7 @@ public static class BackendHelpers
 
         if (openParen > 0 && closeParen > openParen)
         {
-            var methodName = expression.Substring(0, openParen).Trim();
+            var methodName = expression[..openParen].Trim();
             var argsStr = expression.Substring(openParen + 1, closeParen - openParen - 1).Trim();
             var args = ParseArguments(argsStr, element);
 
@@ -109,7 +109,7 @@ public static class BackendHelpers
             }
             else if ((p.StartsWith('\'') && p.EndsWith('\'')) || (p.StartsWith('"') && p.EndsWith('"')))
             {
-                result[i] = p.Substring(1, p.Length - 2);
+                result[i] = p[1..^1];
             }
             else if (bool.TryParse(p, out var b))
             {

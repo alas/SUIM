@@ -13,6 +13,7 @@ public static class ModelLogic
         observable.Initialize(model);
         return observable;
     }
+
     public static dynamic? ExtractModel(XElement root, dynamic? model)
     {
         var modelElement = root.Elements()

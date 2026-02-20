@@ -6,44 +6,50 @@ using SUIM.Components.Attributes;
 public abstract class UIElement(string tagName)
 {
     public string? Id { get; set; }
-    public string TagName { get; } = tagName.ToLowerInvariant();
     public string? Class { get; set; }
+    public string? HorizontalAlignment { get; set; }
+    public string? VerticalAlignment { get; set; }
+    public string? ContentHorizontalAlignment { get; set; }
+    public string? ContentVerticalAlignment { get; set; }
+    public string? X { get; set; }
+    public string? Y { get; set; }
+    public string? Width { get; set; }
+    public string? Height { get; set; }
+    public string? Margin { get; set; }
+    public string? Padding { get; set; }
+    public string? Font { get; set; }
+    public string? FontSize { get; set; }
+    public string? Anchor { get; set; }
+    public string? Color { get; set; }
+    public string? BackgroundColor { get; set; }
+    public string? Opacity { get; set; }
+    public string? ZIndex { get; set; }
+    public string? Visibility { get; set; }
+    public string? ReadOnly { get; set; }
+    public string? Sprite { get; set; }
+    public string? HoverSprite { get; set; }
+    public string? PressedSprite { get; set; }
+    public string? StopClicks { get; set; }
+
+    // Internal properties calculated during parsing
+    public string TagName { get; } = tagName.ToLowerInvariant();
     public UIElement? Parent { get; set; }
-    public HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.Unspecified;
-    public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.Unspecified;
-    public HorizontalAlignment ContentHorizontalAlignment { get; set; } = HorizontalAlignment.Unspecified;
-    public VerticalAlignment ContentVerticalAlignment { get; set; } = VerticalAlignment.Unspecified;
+    public string? RootFont { get; set; }
+    public float RootFontSize { get; set; }
+
+    // Internal properties to the engine - not directly settable via markup attributes
+    public List<BindingDefinition> Bindings { get; } = [];
     public dynamic? Model { get; set; }
     public bool IsComponentRoot { get; set; }
-    public UnitValue X { get; set; } = UnitValue.None;
-    public UnitValue Y { get; set; } = UnitValue.None;
-    public UnitValue Width { get; set; } = UnitValue.None;
-    public UnitValue Height { get; set; } = UnitValue.None;
-    public Thickness Margin { get; set; } = Thickness.None;
-    public Thickness Padding { get; set; } = Thickness.None;
+    public Dictionary<string, string> Events { get; set; } = [];
+    public List<UIElement> Children { get; } = [];
+    public Dictionary<string, object?> Attributes { get; } = [];
+
+    // Actual layout properties calculated during measurement/arrangement
     public float ActualX { get; set; } = float.NaN;
     public float ActualY { get; set; } = float.NaN;
     public float ActualWidth { get; set; } = float.NaN;
     public float ActualHeight { get; set; } = float.NaN;
-    public string? Font { get; set; }
-    public float FontSize { get; set; }
-    public string? RootFont { get; set; }
-    public float RootFontSize { get; set; }
-    public Anchor? Anchor { get; set; }
-    public string? Color { get; set; }
-    public string? BackgroundColor { get; set; }
-    public float Opacity { get; set; } = float.NaN;
-    public int ZIndex { get; set; }
-    public Visibility Visibility { get; set; }
-    public bool ReadOnly { get; set; }
-    public List<BindingDefinition> Bindings { get; } = [];
-    public string? Sprite { get; set; }
-    public string? HoverSprite { get; set; }
-    public string? PressedSprite { get; set; }
-    public bool StopClicks { get; set; }
-    public Dictionary<string, string> Events { get; set; } = [];
-    public List<UIElement> Children { get; } = [];
-    public Dictionary<string, object?> Attributes { get; } = [];
 
     // Layout calculation properties (transient, used during measurement/positioning)
     internal float MeasuredContentWidth { get; set; }
@@ -85,83 +91,78 @@ public abstract class UIElement(string tagName)
     {
         if (name.Equals("id", StringComparison.OrdinalIgnoreCase))
         {
-            Id = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            Id = value as string;
         }
         else if (name.Equals("x", StringComparison.OrdinalIgnoreCase))
         {
-            X = UnitValue.FromObject(value);
+            X = value as string;
         }
         else if (name.Equals("y", StringComparison.OrdinalIgnoreCase))
         {
-            Y = UnitValue.FromObject(value);
+            Y = value as string;
         }
         else if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase))
         {
-            Opacity = value is float f ? f : Convert.ToSingle(value);
+            Opacity = value as string;
         }
         else if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase))
         {
-            ZIndex = value is int i ? i : Convert.ToInt32(value);
+            ZIndex = value as string;
         }
         else if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase))
         {
-            var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-            Visibility = Enum.Parse<Visibility>(s, true);
+            Visibility = value as string;
         }
         else if (name.Equals("halign", StringComparison.OrdinalIgnoreCase) || name.Equals("horizontalalignment", StringComparison.OrdinalIgnoreCase))
         {
-            var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-            HorizontalAlignment = Enum.Parse<HorizontalAlignment>(s, true);
+            HorizontalAlignment = value as string;
         }
         else if (name.Equals("valign", StringComparison.OrdinalIgnoreCase) || name.Equals("verticalalignment", StringComparison.OrdinalIgnoreCase))
         {
-            var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-            VerticalAlignment = Enum.Parse<VerticalAlignment>(s, true);
+            VerticalAlignment = value as string;
         }
         else if (name.Equals("chalign", StringComparison.OrdinalIgnoreCase) || name.Equals("contenthorizontalalignment", StringComparison.OrdinalIgnoreCase))
         {
-            var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-            ContentHorizontalAlignment = Enum.Parse<HorizontalAlignment>(s, true);
+            ContentHorizontalAlignment = value as string;
         }
         else if (name.Equals("cvalign", StringComparison.OrdinalIgnoreCase) || name.Equals("contentverticalalignment", StringComparison.OrdinalIgnoreCase))
         {
-            var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-            ContentVerticalAlignment = Enum.Parse<VerticalAlignment>(s, true);
+            ContentVerticalAlignment = value as string;
         }
         else if (name.Equals("margin", StringComparison.OrdinalIgnoreCase))
         {
-            Margin = Thickness.FromObject(value);
+            Margin = value as string;
         }
         else if (name.Equals("padding", StringComparison.OrdinalIgnoreCase))
         {
-            Padding = Thickness.FromObject(value);
+            Padding = value as string;
         }
         else if (name.Equals("width", StringComparison.OrdinalIgnoreCase))
         {
-            Width = UnitValue.FromObject(value);
+            Width = value as string;
         }
         else if (name.Equals("height", StringComparison.OrdinalIgnoreCase))
         {
-            Height = UnitValue.FromObject(value);
+            Height = value as string;
         }
         else if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase))
         {
-            var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-            Anchor = ParseAnchor(s);
+            var s = value as string;
+            Anchor = value as string;
         }
         else if (name.Equals("class", StringComparison.OrdinalIgnoreCase))
         {
-            Class = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            Class = value as string;
         }
         else if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
         {
-            var handlerName = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            var handlerName = value as string;
             // Treat only known event attributes (e.g., onclick) as events. Attributes that simply start with "on" but
             // are intended as component properties (like "onbuttonclick") should be preserved as regular attributes.
-            var eventName = name.Substring(2);
+            var eventName = name[2..];
             if (string.Equals(eventName, "click", StringComparison.OrdinalIgnoreCase))
             {
-                Events[eventName] = handlerName;
+                Events[eventName] = handlerName ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
             }
             else
             {
@@ -171,31 +172,31 @@ public abstract class UIElement(string tagName)
         }
         else if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase))
         {
-            (this as IPlaceholder)?.Placeholder = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            (this as IPlaceholder)?.Placeholder = value as string;
         }
         else if (name.Equals("font", StringComparison.OrdinalIgnoreCase))
         {
-            Font = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            Font = value as string;
         }
         else if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase) || name.Equals("font-size", StringComparison.OrdinalIgnoreCase))
         {
-            FontSize = value is float f ? f : Convert.ToSingle(value);
+            FontSize = value as string;
         }
         else if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
         {
-            Color = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            Color = value as string;
         }
         else if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase))
         {
-            BackgroundColor = value as string ?? value?.ToString() ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            BackgroundColor = value as string ?? value?.ToString();
         }
         else if (name.Equals("readonly", StringComparison.OrdinalIgnoreCase))
         {
-            ReadOnly = value is bool b ? b : Convert.ToBoolean(value);
+            ReadOnly = value as string;
         }
         else if (name.Equals("stopclicks", StringComparison.OrdinalIgnoreCase))
         {
-            StopClicks = value is bool b ? b : Convert.ToBoolean(value);
+            StopClicks = value as string;
         }
         else if (name.Contains('.'))
         {
@@ -229,27 +230,13 @@ public abstract class UIElement(string tagName)
         return null;
     }
 
-    private static Anchor ParseAnchor(string value)
-    {
-        var parts = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        Anchor result = Components.Attributes.Anchor.None;
-        
-        foreach (var part in parts)
-        {
-            if (Enum.TryParse<Anchor>(part, true, out var anchor))
-            {
-                result |= anchor;
-            }
-        }
-        
-        return result;
-    }
+    public float ToPixels(string? value) => ToPixels(UnitValue.Parse(value));
 
     public float ToPixels(UnitValue unitValue) => unitValue.Type switch
     {
         UnitType.Pixels => unitValue.Value,
         UnitType.Rem => unitValue.Value * RootFontSize,
-        UnitType.Em => unitValue.Value * (Parent?.FontSize ?? RootFontSize),
+        UnitType.Em => unitValue.Value * (Parent?.FontSize is string s ? Convert.ToSingle(s) : RootFontSize),
         UnitType.Auto => 0f, // Will be calculated during layout
         UnitType.Fr => 0f, // Will be calculated during fr distribution
         _ => 0f
@@ -263,15 +250,11 @@ public abstract class UIElement(string tagName)
     }
 }
 
-public class LayoutElement : UIElement
+public class LayoutElement(string tagName) : UIElement(tagName)
 {
     public int Spacing { get; set; }
     public bool Clip { get; set; }
     public Thickness SliceWidth { get; set; } = Thickness.None;
-
-    public LayoutElement(string tagName) : base(tagName)
-    {
-    }
 
     public override void SetAttribute(string name, object? value)
     {

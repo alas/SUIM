@@ -80,7 +80,7 @@ public class ComponentIsolationTests
                 called = true;
             }) };
         var game = new Game();
-        var (strideRoot, model) = suim.Parse(markup, game, model: parentModel);
+        var (strideRoot, _) = suim.Parse(markup, game, model: parentModel);
 
         var found = XPath.Find(strideRoot, "thebutton") as Stride.UI.Controls.Button;
         Assert.NotNull(found);
@@ -126,7 +126,7 @@ public class ComponentIsolationTests
         Assert.NotSame(model, component.Model);
         
         var compModel = component.Model as ObservableObject;
-        Assert.Equal(123.0, (double)compModel.GetValue("compProp"));
+        Assert.Equal(123.0, (double)compModel!.GetValue("compProp")!);
         
         // Verify parent property was mapped (2-way proxy)
         Assert.Equal("hello", compModel.GetValue("parentProp"));
@@ -174,8 +174,10 @@ public class ComponentIsolationTests
         var tagName = "NoModelComp_" + Guid.NewGuid().ToString("N");
         ComponentRegistry.Register(tagName, compPath);
 
-        var suim = new Parser();
-        suim.RootPath = AppDomain.CurrentDomain.BaseDirectory;
+        var suim = new Parser
+        {
+            RootPath = AppDomain.CurrentDomain.BaseDirectory
+        };
         var markup = $"<{tagName} />";
 
         // Act & Assert

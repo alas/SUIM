@@ -1,8 +1,9 @@
 namespace SUIM.Tests;
 
+using SUIM.Components;
+using SUIM.Components.Attributes;
 using System.IO;
 using Xunit;
-using SUIM.Components;
 
 public class CustomComponentTests
 {
@@ -78,7 +79,7 @@ StyledTag { width: 450; background: red; }
 
             // 4. Verify style application
             var custom = Assert.IsType<CustomComponent>(element.Children[0]);
-            Assert.Equal(450f, custom.Width.Value);
+            Assert.Equal(450f, UnitValue.Parse(custom.Width).Value);
             Assert.Equal("red", custom.BackgroundColor);
         }
         finally

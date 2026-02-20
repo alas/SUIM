@@ -44,7 +44,7 @@ public class ObservableObject : DynamicObject, INotifyPropertyChanged
         var close = name.LastIndexOf(')');
         if (open > 0 && close > open)
         {
-            methodName = name.Substring(0, open).Trim();
+            methodName = name[..open].Trim();
             argsStr = name.Substring(open + 1, close - open - 1).Trim();
         }
 
@@ -151,7 +151,7 @@ public class ObservableObject : DynamicObject, INotifyPropertyChanged
         return null;
     }
 
-    private object?[] ParseArguments(string argsStr)
+    private static object?[] ParseArguments(string argsStr)
     {
         if (string.IsNullOrWhiteSpace(argsStr)) return [];
 
@@ -166,9 +166,9 @@ public class ObservableObject : DynamicObject, INotifyPropertyChanged
                 // ObservableObject has no UIElement context; map to null
                 result[i] = null;
             }
-            else if ((p.StartsWith("'") && p.EndsWith("'")) || (p.StartsWith("\"") && p.EndsWith("\"")))
+            else if ((p.StartsWith('\'') && p.EndsWith('\'')) || (p.StartsWith('"') && p.EndsWith('"')))
             {
-                result[i] = p.Substring(1, p.Length - 2);
+                result[i] = p[1..^1];
             }
             else if (bool.TryParse(p, out var b))
             {

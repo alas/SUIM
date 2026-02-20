@@ -21,7 +21,7 @@ public static class XPathHelper
 
         // Normalize
         path = path.Trim();
-        if (path.StartsWith("/")) path = path.Substring(1);
+        if (path.StartsWith('/')) path = path[1..];
 
         // If simple name (no slash) do a recursive search by Name
         if (!path.Contains('/'))
@@ -94,7 +94,7 @@ public static class XPathHelper
         if (obj == null) yield break;
 
         // If object itself is enumerable (and not a string), yield its items
-        if (obj is IEnumerable ie && !(obj is string))
+        if (obj is IEnumerable ie && obj is not string)
         {
             foreach (var it in ie)
             {
@@ -164,7 +164,7 @@ public static class XPathHelper
             {
                 var numStr = seg.Substring(idxStart + 1, idxEnd - idxStart - 1);
                 if (int.TryParse(numStr, out var num)) idx = num;
-                name = seg.Substring(0, idxStart);
+                name = seg[..idxStart];
             }
         }
         return (name, idx);

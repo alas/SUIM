@@ -7,3 +7,16 @@ public enum VerticalAlignment
     Center,
     Bottom
 }
+
+public static class VerticalAlignmentExtensions
+{
+    extension(VerticalAlignment)
+    {
+        public static VerticalAlignment Parse(string? value)
+        {
+            if (value == null) return default;
+
+            return Enum.TryParse<VerticalAlignment>(value, true, out var r) ? r : default;
+        }
+    }
+}

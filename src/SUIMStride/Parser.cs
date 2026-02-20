@@ -159,7 +159,9 @@ public class Parser
         return strideElement;
     }
 
+#pragma warning disable IDE0060 // Remove unused parameter
     private static Button MapButton(SUIM.Components.Button button)
+#pragma warning restore IDE0060 // Remove unused parameter
     {
         var btn = new Button();
         // Click handler will be bound in TransferEvents
@@ -168,10 +170,15 @@ public class Parser
 
     private TextBlock MapText(SUIM.Components.Text text)
     {
+        var fontSize = text.FontSize != null ? Convert.ToSingle(text.FontSize) : 0f;
+        if (fontSize <= 0f)
+        {
+            fontSize = 14f; // Default font size if not specified or invalid
+        }
         var tb = new TextBlock
         {
             Text = text.Value ?? "",
-            TextSize = text.FontSize > 0f ? text.FontSize : 14f,
+            TextSize = fontSize,
         };
 
         // Resolve SpriteFont by name (from style/attribute) using optional resolver.
@@ -298,10 +305,11 @@ public class Parser
     private static void ApplyCommonProperties(SUIM.Components.UIElement suim, UIElement stride)
     {
         stride.Name = suim.Id;
-        stride.Opacity = suim.Opacity;
-        stride.Visibility = suim.Visibility == SUIM.Components.Attributes.Visibility.Hidden
+        stride.Opacity = suim.Opacity == null ? 1 : Convert.ToSingle(suim.Opacity);
+        var vis = SUIM.Components.Attributes.Visibility.Parse(suim.Visibility);
+        stride.Visibility = vis == SUIM.Components.Attributes.Visibility.Hidden
             ? Stride.UI.Visibility.Hidden
-            : (suim.Visibility == SUIM.Components.Attributes.Visibility.Collapsed
+            : (vis == SUIM.Components.Attributes.Visibility.Collapsed
                 ? Stride.UI.Visibility.Collapsed
                 : Stride.UI.Visibility.Visible);
 
@@ -313,14 +321,15 @@ public class Parser
         }
 
         // Alignment
-        stride.HorizontalAlignment = suim.HorizontalAlignment switch
+        var ha = SUIM.Components.Attributes.HorizontalAlignment.Parse(suim.HorizontalAlignment);
+        stride.HorizontalAlignment = ha switch
         {
             SUIM.Components.Attributes.HorizontalAlignment.Center => Stride.UI.HorizontalAlignment.Center,
             SUIM.Components.Attributes.HorizontalAlignment.Right => Stride.UI.HorizontalAlignment.Right,
             _ => Stride.UI.HorizontalAlignment.Left
         };
 
-        stride.VerticalAlignment = suim.VerticalAlignment switch
+        stride.VerticalAlignment = SUIM.Components.Attributes.VerticalAlignment.Parse(suim.VerticalAlignment) switch
         {
             SUIM.Components.Attributes.VerticalAlignment.Center => Stride.UI.VerticalAlignment.Center,
             SUIM.Components.Attributes.VerticalAlignment.Bottom => Stride.UI.VerticalAlignment.Bottom,
@@ -355,14 +364,15 @@ public class Parser
             stride.BackgroundColor = ParseColor(suim.BackgroundColor);
         }
 
-        if (suim.StopClicks)
+        if (string.Equals(suim.StopClicks, "true", StringComparison.OrdinalIgnoreCase))
         {
             stride.CanBeHitByUser = true;
         }
     }
 
-    private static Stride.UI.Thickness ComponentsThicknessToStride(SUIM.Components.Attributes.Thickness thickness, SUIM.Components.UIElement suim)
+    private static Stride.UI.Thickness ComponentsThicknessToStride(string? thicknessString, SUIM.Components.UIElement suim)
     {
+        var thickness = SUIM.Components.Attributes.Thickness.Parse(thicknessString);
         return new Stride.UI.Thickness(
             suim.ToPixels(thickness.Left),
             suim.ToPixels(thickness.Top),
@@ -412,7 +422,7 @@ public class Parser
 
             if (!string.IsNullOrEmpty(handlerName) && handlerName.StartsWith('@'))
             {
-                var propName = handlerName.Substring(1);
+                var propName = handlerName[1..];
                 if (model is ObservableObject mOO)
                 {
                     var val = mOO.GetValue(propName);

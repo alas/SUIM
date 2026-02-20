@@ -4,7 +4,7 @@ public class Overlay : LayoutElement
 {
     public Overlay() : base(nameof(Overlay))
     {
-        StopClicks = true;
+        StopClicks = "true";
         BackgroundColor = "#80000000";
     }
 }

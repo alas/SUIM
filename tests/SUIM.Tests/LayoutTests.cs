@@ -10,9 +10,9 @@ public class LayoutTests
     [Fact]
     public void LayoutEngine_MeasuresStackWithPixels()
     {
-        var stack = new Stack { Orientation = Orientation.Vertical, Spacing = 10, Width = UnitValue.Auto, Height = UnitValue.Auto };
-        var child1 = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(50, UnitType.Pixels) };
-        var child2 = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(30, UnitType.Pixels) };
+        var stack = new Stack { Orientation = Orientation.Vertical, Spacing = 10, Width = UnitValue.Auto.ToString(), Height = UnitValue.Auto.ToString() };
+        var child1 = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(50, UnitType.Pixels).ToString() };
+        var child2 = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(30, UnitType.Pixels).ToString() };
         
         stack.AddChild(child1, null);
         stack.AddChild(child2, null);
@@ -26,9 +26,9 @@ public class LayoutTests
     [Fact]
     public void LayoutEngine_MeasuresStackWithFractionalUnits()
     {
-        var stack = new Stack { Orientation = Orientation.Horizontal, Spacing = 0, Width = UnitValue.OneFR, Height = UnitValue.Auto };
-        var child1 = new Label { Width = new UnitValue(1, UnitType.Fr), Height = new UnitValue(50, UnitType.Pixels) };
-        var child2 = new Label { Width = new UnitValue(2, UnitType.Fr), Height = new UnitValue(50, UnitType.Pixels) };
+        var stack = new Stack { Orientation = Orientation.Horizontal, Spacing = 0, Width = UnitValue.OneFR.ToString(), Height = UnitValue.Auto.ToString() };
+        var child1 = new Label { Width = new UnitValue(1, UnitType.Fr).ToString(), Height = new UnitValue(50, UnitType.Pixels).ToString() };
+        var child2 = new Label { Width = new UnitValue(2, UnitType.Fr).ToString(), Height = new UnitValue(50, UnitType.Pixels).ToString() };
         
         stack.AddChild(child1, null);
         stack.AddChild(child2, null);
@@ -43,8 +43,8 @@ public class LayoutTests
     public void LayoutEngine_MeasuresGridWithMixedUnits()
     {
         var grid = new Grid { Columns = "100, fr", Rows = "50, fr" };
-        var child1 = new Label { Width = new UnitValue(50, UnitType.Pixels), Height = new UnitValue(25, UnitType.Pixels) };
-        var child2 = new Label { Width = new UnitValue(1, UnitType.Fr), Height = new UnitValue(1, UnitType.Fr) };
+        var child1 = new Label { Width = new UnitValue(50, UnitType.Pixels).ToString(), Height = new UnitValue(25, UnitType.Pixels).ToString() };
+        var child2 = new Label { Width = new UnitValue(1, UnitType.Fr).ToString(), Height = new UnitValue(1, UnitType.Fr).ToString() };
         
         grid.AddChild(child1, null);
         grid.AddChild(child2, null);
@@ -58,8 +58,8 @@ public class LayoutTests
     [Fact]
     public void LayoutEngine_MeasuresDivWithAnchor()
     {
-        var div = new Div { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(50, UnitType.Pixels), Anchor = Anchor.Top };
-        var child = new Label { Width = new UnitValue(50, UnitType.Pixels), Height = new UnitValue(25, UnitType.Pixels) };
+        var div = new Div { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(50, UnitType.Pixels).ToString(), Anchor = Anchor.Top.ToString() };
+        var child = new Label { Width = new UnitValue(50, UnitType.Pixels).ToString(), Height = new UnitValue(25, UnitType.Pixels).ToString() };
         
         div.AddChild(child, null);
         
@@ -72,8 +72,8 @@ public class LayoutTests
     [Fact]
     public void LayoutEngine_MeasuresWindow()
     {
-        var grid = new Grid { Width = UnitValue.Auto, Height = UnitValue.Auto };
-        var child = new Label { Width = new UnitValue(100, UnitType.Pixels), Height = new UnitValue(50, UnitType.Pixels) };
+        var grid = new Grid { Width = UnitValue.Auto.ToString(), Height = UnitValue.Auto.ToString() };
+        var child = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(50, UnitType.Pixels).ToString() };
 
         grid.AddChild(child, null);
         
@@ -153,7 +153,7 @@ public class LayoutTests
         var div = new Div
         {
             RootFontSize = 16f,
-            Width = new UnitValue(2, UnitType.Rem),
+            Width = new UnitValue(2, UnitType.Rem).ToString(),
         };
         var pixels = div.ToPixels(div.Width);
         Assert.Equal(32, pixels); // 2 * 16
@@ -165,7 +165,7 @@ public class LayoutTests
         var div = new Div
         {
             RootFontSize = 20f,
-            Width = new UnitValue(1.5f, UnitType.Em),
+            Width = new UnitValue(1.5f, UnitType.Em).ToString(),
         };
         var pixels = div.ToPixels(div.Width);
         Assert.Equal(30, pixels); // 1.5 * 20
@@ -198,8 +198,8 @@ public class LayoutTests
         // Create main UI container (like buttonsUI in MainView)
         var mainUI = new Stack 
         { 
-            Width = new UnitValue(400), 
-            Height = new UnitValue(300) 
+            Width = new UnitValue(400).ToString(), 
+            Height = new UnitValue(300).ToString()
         };
         grid.AddChild(mainUI, null);
         
@@ -207,8 +207,8 @@ public class LayoutTests
         var overlay1 = new Overlay();
         var popupContent = new Grid
         {
-            Width = new UnitValue(360),
-            Height = new UnitValue(180)
+            Width = new UnitValue(360).ToString(),
+            Height = new UnitValue(180).ToString()
         };
         overlay1.AddChild(popupContent, null);
         grid.AddChild(overlay1, null);

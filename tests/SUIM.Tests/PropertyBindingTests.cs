@@ -62,7 +62,7 @@ public class PropertyBindingTests
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
     <button><label value=""@buttonText"" /></button>
 </grid>";
-        var (element, model) = MarkupParser.Parse(markup);
+        var (element, _) = MarkupParser.Parse(markup);
 
         var button = element.Children.Single() as Button;
         var label = button?.Children.Single() as Label;

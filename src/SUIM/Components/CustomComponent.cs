@@ -59,7 +59,7 @@ public class CustomComponent(string tagName) : UIElement(tagName)
                         // Binding to parent model property
                         if (parentModel is ObservableObject parentOO)
                         {
-                            var parentPropName = val.Substring(1);
+                            var parentPropName = val[1..];
                             oo.SetProxy(name, () => parentOO.GetValue(parentPropName), (v) => parentOO.SetValue(parentPropName, v));
 
                             // When parent changes, notify the component model so bindings inside the component update.
