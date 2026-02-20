@@ -1,10 +1,12 @@
-<overlay id="screenOverlay" visibility="collapse">
+<ScreenOverlay>
 	<model>
 		{
 			"message": ""
 		}
 	</model>
-    <grid halign="center" valign="center">
-        <label value="@message" />
-    </grid>
-</overlay>
+	<overlay id="screenOverlay" visibility="collapse">
+		<grid halign="center" valign="center">
+			<label value="@message" />
+		</grid>
+	</overlay>
+</ScreenOverlay>

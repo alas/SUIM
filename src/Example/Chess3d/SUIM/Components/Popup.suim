@@ -1,4 +1,4 @@
-<overlay id="popup" visibility="collapse">
+<popup>
 	<model>
 		{
 		    "title": "",
@@ -7,18 +7,21 @@
             "onNo": null
 		}
 	</model>
-    <grid width="360" height="180" halign="center" valign="center">
-        <vstack>
-            <hstack>
-                <label value="@title" />
-            </hstack>
-            <vstack margin="6">
-                <label value="@message" />
+
+	<overlay id="popup" visibility="collapse">
+        <grid width="360" height="180" halign="center" valign="center">
+            <vstack>
+                <hstack>
+                    <label value="@title" />
+                </hstack>
+                <vstack margin="6">
+                    <label value="@message" />
+                </vstack>
+                <hstack>
+                    <button id="yesButton" class="mybutton" onclick="@onYes">YES</button>
+                    <button id="noButton" class="mybutton" onclick="@onNo">NO</button>
+                </hstack>
             </vstack>
-            <hstack>
-                <button id="yesButton" class="mybutton" onclick="@onYes">YES</button>
-                <button id="noButton" class="mybutton" onclick="@onNo">NO</button>
-            </hstack>
-        </vstack>
-    </grid>
-</overlay>
+        </grid>
+    </overlay>
+</popup>
