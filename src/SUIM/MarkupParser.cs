@@ -459,20 +459,24 @@ public static class MarkupParser
         var target = IsLayoutAttribute(name) ? rootElement : innerElement;
 
         // Store raw attribute for CustomComponent expansion or other metadata
-        target.SetAttribute(name, attr.Value);
+        var value = attr.Value;
+        if (!value.StartsWith('@'))
+        {
+            target.SetAttribute(name, value);
+        }
 
         if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
         {
             // Event Binding: onclick="MethodName()"
-            var handlerName = attr.Value;
+            var handlerName = value;
             target.Events[name.Substring(2)] = handlerName;
             return;
         }
 
-        if (attr.Value.StartsWith('@'))
+        if (value.StartsWith('@'))
         {
             // Dynamic Binding: <grid width="@myVar" />
-            var modelPropName = attr.Value.Substring(1);
+            var modelPropName = value.Substring(1);
             target.Bindings.Add(new BindingDefinition(name, modelPropName));
         }
     }

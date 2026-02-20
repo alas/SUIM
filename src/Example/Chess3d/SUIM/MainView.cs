@@ -26,6 +26,7 @@ public class MainView
                 OpenPopup = new Action<string, string>(OpenPopupHandler),
                 YesHandler = new Action(YesHandlerAction),
                 NoHandler = new Action(UnshowPopup),
+                popupVisibility = Visibility.Collapsed,
             };
 
         var mapper = new Parser
@@ -106,14 +107,16 @@ public class MainView
     {
         Model.PopupTitle = title;
         Model.PopupMessage = message;
-        var popup = XPath.Find(RootElement, "popup");
-        popup!.Visibility = Visibility.Visible;
+        //var popup = XPath.Find(RootElement, "popup");
+        //popup!.Visibility = Visibility.Visible;
+        Model.popupVisibility = Visibility.Visible;
     }
 
     private void UnshowPopup()
     {
-        var blocker = XPath.Find(RootElement, "popup");
-        blocker!.Visibility = Visibility.Collapsed;
+        //var blocker = XPath.Find(RootElement, "popup");
+        //blocker!.Visibility = Visibility.Collapsed;
+        Model.popupVisibility = Visibility.Collapsed;
     }
 
     private void ShowBlocker(string message)

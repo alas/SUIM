@@ -4,7 +4,7 @@
 			"message": ""
 		}
 	</model>
-	<overlay id="screenOverlay" visibility="collapse">
+	<overlay id="screenOverlay" visibility="collapsed">
 		<grid halign="center" valign="center">
 			<label value="@message" />
 		</grid>

@@ -23,9 +23,6 @@
     <None Update="Resources\skybox_texture_hdr.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="SUIM\Components\Popup.suim">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="SUIM\Components\ScreenOverlay.suim">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

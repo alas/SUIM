@@ -298,8 +298,12 @@ public class Parser
     {
         stride.Name = suim.Id;
         stride.Opacity = suim.Opacity;
-        stride.Visibility = suim.Visibility == "hidden" ? Visibility.Hidden : (suim.Visibility == "collapse" ? Visibility.Collapsed : Visibility.Visible);
-        
+        stride.Visibility = suim.Visibility == SUIM.Components.Visibility.Hidden
+            ? Visibility.Hidden
+            : (suim.Visibility == SUIM.Components.Visibility.Collapsed
+                ? Visibility.Collapsed
+                : Visibility.Visible);
+
         // Start simple with margins/padding parsing
         stride.Margin = ComponentsThicknessToStride(suim.Margin, suim);
         if (stride is ContentControl cc)

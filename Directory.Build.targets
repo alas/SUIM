@@ -1,0 +1,12 @@
+<Project>
+  <ItemGroup>
+    <Compile Update="**\*.suim.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+      <AutoGen>true</AutoGen>
+      <DesignTime>true</DesignTime>
+    </Compile>
+    <None Update="**\*.suim">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

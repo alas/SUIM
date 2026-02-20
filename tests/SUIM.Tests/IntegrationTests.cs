@@ -145,7 +145,7 @@ public class IntegrationTests
             <grid>
                 <style>
                     .container { HorizontalAlignment: Center; VerticalAlignment: Center; }
-                    .overlay { visibility: collapse; }
+                    .overlay { visibility: collapsed; }
                 </style>
                 <vstack class=""container"" width=""400"" height=""300"">
                     <label value=""Main UI"" />
@@ -210,7 +210,7 @@ public class IntegrationTests
                     </grid>
                 </overlay>
                 
-                <overlay id=""screenOverlay"" visibility=""collapse"">
+                <overlay id=""screenOverlay"" visibility=""collapsed"">
                     <grid>
                         <label value=""Blocker"" />
                     </grid>

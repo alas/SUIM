@@ -2,12 +2,12 @@
     <style src="Styles/Main.style" />
 	
     <vstack class="container">
-        <button class="mybutton" onclick="OpenPopup('Quit', 'Are you sure you want to quit?')">Quit</button>
-        <button class="mybutton" onclick="OpenPopup('Restart', 'Are you sure you want to start over?')">Restart</button>
-        <button class="mybutton" onclick="OpenPopup('Load', 'Load() Not implemented yet!')">Load</button>
-        <button class="mybutton" onclick="OpenPopup('Save', 'Save() Not implemented yet!')">Save</button>
+        <button onclick="OpenPopup('Quit', 'Are you sure you want to quit?')">Quit</button>
+        <button onclick="OpenPopup('Restart', 'Are you sure you want to start over?')">Restart</button>
+        <button onclick="OpenPopup('Load', 'Load() Not implemented yet!')">Load</button>
+        <button onclick="OpenPopup('Save', 'Save() Not implemented yet!')">Save</button>
     </vstack>
 
-	<Popup title="@PopupTitle" message="@PopupMessage" onYes="YesHandler()" onNo="NoHandler()" />
+	<Popup title="@PopupTitle" message="@PopupMessage" onYes="YesHandler()" onNo="NoHandler()" visibility="@popupVisibility" />
     <ScreenOverlay message="@BlockerMessage" />
 </grid>

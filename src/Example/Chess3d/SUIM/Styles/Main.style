@@ -8,7 +8,7 @@ text {
     HorizontalAlignment: Center;
     VerticalAlignment: Center;
 }
-.mybutton {
+button {
     Background: Black;
     Width: 200;
     Height: 50;

@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="SUIM.Suim.targets" Pack="true" PackagePath="buildTransitive" />
+    <None Include="**\*.suim" Pack="true" PackagePath="contentFiles\any\any\" />
+  </ItemGroup>
+
 </Project>

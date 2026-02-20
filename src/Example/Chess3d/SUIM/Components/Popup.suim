@@ -1,27 +1,28 @@
-<popup>
+﻿<popup>
 	<model>
 		{
-		    "title": "",
-		    "message": "",
-			"onYes": null,
-            "onNo": null
+		"title": "",
+		"message": "",
+		"onYes": null,
+		"onNo": null,
+		"visibility": "collapsed"
 		}
 	</model>
 
-	<overlay id="popup" visibility="collapse">
-        <grid width="360" height="180" halign="center" valign="center">
-            <vstack>
-                <hstack>
-                    <label value="@title" />
-                </hstack>
-                <vstack margin="6">
-                    <label value="@message" />
-                </vstack>
-                <hstack>
-                    <button id="yesButton" class="mybutton" onclick="@onYes">YES</button>
-                    <button id="noButton" class="mybutton" onclick="@onNo">NO</button>
-                </hstack>
-            </vstack>
-        </grid>
-    </overlay>
+	<overlay visibility="@visibility">
+		<grid width="360" height="180" halign="center" valign="center">
+			<vstack>
+				<hstack>
+					<label value="@title" />
+				</hstack>
+				<vstack margin="6">
+					<label value="@message" />
+				</vstack>
+				<hstack>
+					<button onclick="@onYes">YES</button>
+					<button onclick="@onNo">NO</button>
+				</hstack>
+			</vstack>
+		</grid>
+	</overlay>
 </popup>

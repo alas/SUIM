@@ -34,7 +34,7 @@ public abstract class UIElement(string tagName)
     public string? BackgroundColor { get; set; }
     public float Opacity { get; set; } = float.NaN;
     public int ZIndex { get; set; }
-    public string? Visibility { get; set; }
+    public Visibility Visibility { get; set; }
     public bool ReadOnly { get; set; }
     public List<BindingDefinition> Bindings { get; } = [];
     public string? Sprite { get; set; }
@@ -105,7 +105,8 @@ public abstract class UIElement(string tagName)
         }
         else if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase))
         {
-            Visibility = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            var s = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            Visibility = Enum.Parse<Visibility>(s, true);
         }
         else if (name.Equals("halign", StringComparison.OrdinalIgnoreCase) || name.Equals("horizontalalignment", StringComparison.OrdinalIgnoreCase))
         {
@@ -312,6 +313,13 @@ public enum VerticalAlignment
     Top,
     Center,
     Bottom
+}
+
+public enum Visibility
+{
+    Visible = 0,
+    Hidden,
+    Collapsed
 }
 
 [Flags]

@@ -461,7 +461,7 @@ public class MarkupParserTests
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal("hidden", div.Visibility);
+        Assert.Equal(Visibility.Hidden, div.Visibility);
     }
 
     [Fact]
@@ -1018,7 +1018,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal("visible", div.Visibility);
+        Assert.Equal(Visibility.Visible, div.Visibility);
     }
 
     [Fact]
@@ -1029,7 +1029,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal("collapsed", div.Visibility);
+        Assert.Equal(Visibility.Collapsed, div.Visibility);
     }
 
     // ============== GRID SPAN EDGE CASES ==============
