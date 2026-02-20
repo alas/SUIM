@@ -2,7 +2,7 @@
 
 using Xunit;
 using SUIM.Components;
-using SUIM.Layout;
+using SUIM.Components.Attributes;
 
 public class MarkupParserTests
 {

@@ -12,6 +12,7 @@ using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
 using SUIM;
+using SUIM.Components.Attributes;
 using StrideGrid = Stride.UI.Panels.Grid;
 
 public class Parser
@@ -298,11 +299,11 @@ public class Parser
     {
         stride.Name = suim.Id;
         stride.Opacity = suim.Opacity;
-        stride.Visibility = suim.Visibility == SUIM.Components.Visibility.Hidden
-            ? Visibility.Hidden
-            : (suim.Visibility == SUIM.Components.Visibility.Collapsed
-                ? Visibility.Collapsed
-                : Visibility.Visible);
+        stride.Visibility = suim.Visibility == SUIM.Components.Attributes.Visibility.Hidden
+            ? Stride.UI.Visibility.Hidden
+            : (suim.Visibility == SUIM.Components.Attributes.Visibility.Collapsed
+                ? Stride.UI.Visibility.Collapsed
+                : Stride.UI.Visibility.Visible);
 
         // Start simple with margins/padding parsing
         stride.Margin = ComponentsThicknessToStride(suim.Margin, suim);
@@ -314,16 +315,16 @@ public class Parser
         // Alignment
         stride.HorizontalAlignment = suim.HorizontalAlignment switch
         {
-            SUIM.Components.HorizontalAlignment.Center => HorizontalAlignment.Center,
-            SUIM.Components.HorizontalAlignment.Right => HorizontalAlignment.Right,
-            _ => HorizontalAlignment.Left
+            SUIM.Components.Attributes.HorizontalAlignment.Center => Stride.UI.HorizontalAlignment.Center,
+            SUIM.Components.Attributes.HorizontalAlignment.Right => Stride.UI.HorizontalAlignment.Right,
+            _ => Stride.UI.HorizontalAlignment.Left
         };
 
         stride.VerticalAlignment = suim.VerticalAlignment switch
         {
-            SUIM.Components.VerticalAlignment.Center => VerticalAlignment.Center,
-            SUIM.Components.VerticalAlignment.Bottom => VerticalAlignment.Bottom,
-            _ => VerticalAlignment.Top
+            SUIM.Components.Attributes.VerticalAlignment.Center => Stride.UI.VerticalAlignment.Center,
+            SUIM.Components.Attributes.VerticalAlignment.Bottom => Stride.UI.VerticalAlignment.Bottom,
+            _ => Stride.UI.VerticalAlignment.Top
         };
 
         // For overlays, always use ActualWidth/ActualHeight from layout
@@ -360,9 +361,9 @@ public class Parser
         }
     }
 
-    private static Thickness ComponentsThicknessToStride(SUIM.Layout.Thickness thickness, SUIM.Components.UIElement suim)
+    private static Stride.UI.Thickness ComponentsThicknessToStride(SUIM.Components.Attributes.Thickness thickness, SUIM.Components.UIElement suim)
     {
-        return new Thickness(
+        return new Stride.UI.Thickness(
             suim.ToPixels(thickness.Left),
             suim.ToPixels(thickness.Top),
             suim.ToPixels(thickness.Right),
@@ -566,7 +567,7 @@ public class Parser
             // Handle other common properties
             else if (string.Equals(targetPropertyName, "visibility", StringComparison.OrdinalIgnoreCase))
             {
-                if (value != null && Enum.TryParse<Visibility>(value.ToString(), out var vis))
+                if (value != null && Enum.TryParse<Stride.UI.Visibility>(value.ToString(), out var vis))
                     strideElement.Visibility = vis;
             }
             else if (string.Equals(targetPropertyName, "opacity", StringComparison.OrdinalIgnoreCase))

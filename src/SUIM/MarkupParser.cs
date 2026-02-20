@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using SUIM.Components;
-using SUIM.Layout;
+using SUIM.Components.Attributes;
 
 public static class MarkupParser
 {

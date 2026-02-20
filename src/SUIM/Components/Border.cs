@@ -1,6 +1,6 @@
 namespace SUIM.Components;
 
-using SUIM.Layout;
+using SUIM.Components.Attributes;
 
 public class Border() : UIElement(nameof(Border))
 {

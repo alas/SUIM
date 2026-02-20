@@ -1,7 +1,7 @@
 namespace SUIM.Components;
 
 using System.Xml.Linq;
-using SUIM.Layout;
+using SUIM.Components.Attributes;
 
 public abstract class UIElement(string tagName)
 {
@@ -232,7 +232,7 @@ public abstract class UIElement(string tagName)
     private static Anchor ParseAnchor(string value)
     {
         var parts = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        Anchor result = Components.Anchor.None;
+        Anchor result = Components.Attributes.Anchor.None;
         
         foreach (var part in parts)
         {
@@ -297,37 +297,4 @@ public class LayoutElement : UIElement
 public interface IPlaceholder
 {
     string? Placeholder { get; set; }
-}
-
-public enum HorizontalAlignment
-{
-    Unspecified = 0,
-    Left,
-    Center,
-    Right
-}
-
-public enum VerticalAlignment
-{
-    Unspecified = 0,
-    Top,
-    Center,
-    Bottom
-}
-
-public enum Visibility
-{
-    Visible = 0,
-    Hidden,
-    Collapsed
-}
-
-[Flags]
-public enum Anchor
-{
-    None = 0,
-    Top = 1,
-    Bottom = 2,
-    Left = 4,
-    Right = 8
 }
