@@ -90,6 +90,7 @@ public class ContentAlignmentTests
         // Center vertical: (500 - 50) / 2 = 225
         Assert.Equal(225, label.ActualY);
     }
+
     [Fact]
     public void Child_WithUnspecifiedAlignment_InheritsParentContentAlignment()
     {
