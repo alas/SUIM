@@ -23,21 +23,15 @@ public class Parser
     private readonly Dictionary<string, SpriteFont> Fonts = [];
     private readonly Dictionary<string, (SUIM.Components.UIElement SuimRoot, UIElement StrideRoot, dynamic? Model)> _parseCache = [];
     private dynamic? _currentModel;
+    private Game? _game;
     public string? RootPath { get; set; }
 
-    public (UIElement, dynamic?) ParseFromFile(string path, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
-    {
-        var markup = File.ReadAllText(path);
-        var viewName = Path.GetFileNameWithoutExtension(path);
-        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, Path.GetDirectoryName(path), viewName);
-    }
-
-    public (UIElement, dynamic?) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    public (UIElement StrideRoot, SUIM.Components.UIElement SuimRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
         return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, null);
     }
 
-    public (UIElement, dynamic?) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    public (UIElement StrideRoot, SUIM.Components.UIElement SuimRoot, dynamic? Model) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
         if (string.IsNullOrEmpty(RootPath)) throw new InvalidOperationException("RootPath must be set before calling GetView.");
         
@@ -51,7 +45,7 @@ public class Parser
         return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath, viewName);
     }
 
-    private (UIElement, dynamic?) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null)
+    private (UIElement StrideRoot, SUIM.Components.UIElement SuimRoot, dynamic? Model) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null)
     {
         ArgumentNullException.ThrowIfNull(markup);
 
@@ -62,14 +56,15 @@ public class Parser
             {
                 if (!createNewInstance)
                 {
-                    return (cached.StrideRoot, cached.Model);
+                    return (cached.StrideRoot, cached.SuimRoot, cached.Model);
                 }
 
                 // createNewInstance==true -> return a fresh Stride tree by remapping the cached SUIM tree
-                return (MapElement(cached.SuimRoot), cached.Model);
+                return (MapElement(cached.SuimRoot), cached.SuimRoot, cached.Model);
             }
         }
 
+        _game = game;
         ContentManager = game.Content;
 
         // Not cached: parse markup, map and store the canonical instance
@@ -84,7 +79,7 @@ public class Parser
             _parseCache[markup] = (suimRoot, strideRoot, model2);
         }
 
-        return createNewInstance ? (MapElement(suimRoot), model2) : (strideRoot, model2);
+        return createNewInstance ? (MapElement(suimRoot), suimRoot, model2) : (strideRoot, suimRoot, model2);
     }
 
     private static void Layout(SUIM.Components.UIElement root, Game game, int defaultFontSize, bool fullscreen)
@@ -226,13 +221,18 @@ public class Parser
         };
     }
 
-    private static ImageElement MapImage(SUIM.Components.Image image)
+    private ImageElement MapImage(SUIM.Components.Image image)
     {
         var img = new ImageElement();
 
         if (!string.IsNullOrEmpty(image.Source))
         {
+            if (image.Source.StartsWith("__diag_") && _game != null)
+            {
+                img.Source = (ISpriteProvider)GetDiagonalSprite(image.Source);
+            }
             //img.Source = image.Source;
+            // else { /* currently commented out in original code */ }
         }
 
         var stretch = SUIM.Components.ImageStretchExtensions.FromString(image.Stretch);
@@ -246,6 +246,31 @@ public class Parser
         };
 
         return img;
+    }
+
+    private readonly Dictionary<string, Sprite> _diagCache = [];
+
+    private Sprite GetDiagonalSprite(string type)
+    {
+        if (_diagCache.TryGetValue(type, out var cached)) return cached;
+
+        const int size = 64;
+        var pixels = new Color[size * size];
+        bool tlbr = type == "__diag_tlbr__";
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                bool isDiag = tlbr ? (x == y) : (x == size - 1 - y);
+                pixels[y * size + x] = isDiag ? Color.Blue : Color.Transparent;
+            }
+        }
+
+        var texture = Texture.New2D(_game!.GraphicsDevice, size, size, PixelFormat.R8G8B8A8_UNorm, pixels);
+        var sprite = new Sprite(texture);
+        _diagCache[type] = sprite;
+        return sprite;
     }
 
     private Border MapBorder(SUIM.Components.Border border)

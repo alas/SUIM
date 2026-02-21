@@ -126,7 +126,7 @@ public class EventHandlerStrideTests
         // Act & Assert - should not throw
         var exception = Record.Exception(() =>
         {
-            var (strideRoot, returnedModel) = suim.Parse(markup, CreateTestGame(), model: model);
+            var (strideRoot, _, returnedModel) = suim.Parse(markup, CreateTestGame(), model: model);
             Assert.NotNull(strideRoot);
         });
 
@@ -145,7 +145,7 @@ public class EventHandlerStrideTests
         var suim = new Parser();
 
         // Act
-        var (strideRoot, returnedModel) = suim.Parse(markup, CreateTestGame(), model: model);
+        var (strideRoot, _, returnedModel) = suim.Parse(markup, CreateTestGame(), model: model);
         var button = strideRoot as StrideButton;
 
         // Assert
@@ -171,7 +171,7 @@ public class EventHandlerStrideTests
         // Act & Assert - should not throw even if handler doesn't exist
         var exception = Record.Exception(() =>
         {
-            var (strideRoot, _) = suim.Parse(markup, CreateTestGame(), model: model);
+            var (strideRoot, _, _) = suim.Parse(markup, CreateTestGame(), model: model);
             Assert.NotNull(strideRoot);
         });
 
@@ -223,7 +223,7 @@ public class EventHandlerStrideTests
         var suim = new Parser();
 
         // Act
-        var (strideRoot, _) = suim.Parse(markup, CreateTestGame(), model: model);
+        var (strideRoot, _, _) = suim.Parse(markup, CreateTestGame(), model: model);
 
         // Assert
         Assert.IsType<StrideButton>(strideRoot);
@@ -246,13 +246,13 @@ public class EventHandlerStrideTests
         var suim = new Parser();
 
         // Act
-        var result1 = suim.Parse(markup, CreateTestGame(), model: model1, createNewInstance: true);
-        var result2 = suim.Parse(markup, CreateTestGame(), model: model2, createNewInstance: true);
+        var (strideRoot1, _, _) = suim.Parse(markup, CreateTestGame(), model: model1, createNewInstance: true);
+        var (strideRoot2, _, _) = suim.Parse(markup, CreateTestGame(), model: model2, createNewInstance: true);
 
         // Assert
-        Assert.NotNull(result1.Item1);
-        Assert.NotNull(result2.Item1);
-        Assert.NotSame(result1.Item1, result2.Item1);
+        Assert.NotNull(strideRoot1);
+        Assert.NotNull(strideRoot2);
+        Assert.NotSame(strideRoot1, strideRoot2);
     }
 
     /// <summary>
@@ -271,7 +271,7 @@ public class EventHandlerStrideTests
         
         // Then convert to Stride via SUIMStride
         var suim = new Parser();
-        var (strideRoot, _) = suim.Parse(markup, CreateTestGame(), model: model);
+        var (strideRoot, _, _) = suim.Parse(markup, CreateTestGame(), model: model);
 
         // Assert
         Assert.NotNull(strideRoot);
@@ -298,7 +298,7 @@ public class EventHandlerStrideTests
         // Act & Assert - should not throw
         var exception = Record.Exception(() =>
         {
-            var (strideRoot, parsedModel) = suim.Parse(markup, CreateTestGame(), model: model);
+            var (strideRoot, _, parsedModel) = suim.Parse(markup, CreateTestGame(), model: model);
             Assert.NotNull(strideRoot);
             Assert.NotNull(parsedModel);
         });

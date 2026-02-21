@@ -52,17 +52,17 @@ public abstract class UIElement(string tagName)
     public float ActualHeight { get; set; } = float.NaN;
 
     // Layout calculation properties (transient, used during measurement/positioning)
-    internal float MeasuredContentWidth { get; set; }
-    internal float MeasuredContentHeight { get; set; }
-    internal float ComputedMarginLeft { get; set; }
-    internal float ComputedMarginTop { get; set; }
-    internal float ComputedMarginRight { get; set; }
-    internal float ComputedMarginBottom { get; set; }
-    internal float ComputedPaddingLeft { get; set; }
-    internal float ComputedPaddingTop { get; set; }
-    internal float ComputedPaddingRight { get; set; }
-    internal float ComputedPaddingBottom { get; set; }
-    internal float CurrentFontSize { get; set; }
+    public float MeasuredContentWidth { get; set; }
+    public float MeasuredContentHeight { get; set; }
+    public float ComputedMarginLeft { get; set; }
+    public float ComputedMarginTop { get; set; }
+    public float ComputedMarginRight { get; set; }
+    public float ComputedMarginBottom { get; set; }
+    public float ComputedPaddingLeft { get; set; }
+    public float ComputedPaddingTop { get; set; }
+    public float ComputedPaddingRight { get; set; }
+    public float ComputedPaddingBottom { get; set; }
+    public float CurrentFontSize { get; set; }
     public bool NeedsVerticalScroll { get; set; }
     public bool NeedsHorizontalScroll { get; set; }
 

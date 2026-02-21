@@ -2,10 +2,11 @@ namespace SUIM.Layout;
 
 using SUIM.Components;
 using SUIM.Components.Attributes;
-using System.Xml.Linq;
 
 public static class LayoutEngine
 {
+    public static bool DebugMode { get; set; }
+
     public static void Layout(UIElement root, float rootFontSize, float availableWidth, float availableHeight)
     {
         ResetPositions(root);
@@ -13,6 +14,91 @@ public static class LayoutEngine
         MeasureElement(root, availableWidth, availableHeight);
         PositionElement(root, 0, 0);
         DetectOverflow(root);
+    }
+
+    public static UIElement? GenerateDebugOverlay(UIElement root)
+    {
+        if (!DebugMode) return null;
+
+        var overlay = new Overlay { Id = "debug_overlay_root" };
+        AddDebugWireframes(root, overlay);
+        return overlay;
+    }
+
+    private static void AddDebugWireframes(UIElement element, Overlay overlay)
+    {
+        // 1. Margin Box (Orange)
+        if (element.ComputedMarginLeft != 0 || element.ComputedMarginTop != 0 || 
+            element.ComputedMarginRight != 0 || element.ComputedMarginBottom != 0)
+        {
+            overlay.AddChild(new Border
+            {
+                X = (element.ActualX).ToString(),
+                Y = (element.ActualY).ToString(),
+                Width = (element.ActualWidth + element.ComputedMarginLeft + element.ComputedMarginRight).ToString(),
+                Height = (element.ActualHeight + element.ComputedMarginTop + element.ComputedMarginBottom).ToString(),
+                Color = "Orange",
+                Thickness = "1"
+            }, null);
+        }
+
+        // 2. Padding Box (Green) - This is the ActualWidth/Height
+        overlay.AddChild(new Border
+        {
+            X = (element.ActualX + element.ComputedMarginLeft).ToString(),
+            Y = (element.ActualY + element.ComputedMarginTop).ToString(),
+            Width = element.ActualWidth.ToString(),
+            Height = element.ActualHeight.ToString(),
+            Color = "Green",
+            Thickness = "1"
+        }, null);
+
+        // 3. Content Box (Blue)
+        var contentX = element.ActualX + element.ComputedMarginLeft + element.ComputedPaddingLeft;
+        var contentY = element.ActualY + element.ComputedMarginTop + element.ComputedPaddingTop;
+        var contentWidth = element.MeasuredContentWidth;
+        var contentHeight = element.MeasuredContentHeight;
+
+        overlay.AddChild(new Border
+        {
+            X = contentX.ToString(),
+            Y = contentY.ToString(),
+            Width = contentWidth.ToString(),
+            Height = contentHeight.ToString(),
+            Color = "Blue",
+            Thickness = "1"
+        }, null);
+
+        // Diagonal lines for the content box
+        if (contentWidth > 0 && contentHeight > 0)
+        {
+            overlay.AddChild(new Image
+            {
+                X = contentX.ToString(),
+                Y = contentY.ToString(),
+                Width = contentWidth.ToString(),
+                Height = contentHeight.ToString(),
+                Source = "__diag_tlbr__", // Procedural source for Top-Left to Bottom-Right
+                Stretch = "Fill",
+                Opacity = "0.3"
+            }, null);
+
+            overlay.AddChild(new Image
+            {
+                X = contentX.ToString(),
+                Y = contentY.ToString(),
+                Width = contentWidth.ToString(),
+                Height = contentHeight.ToString(),
+                Source = "__diag_trbl__", // Procedural source for Top-Right to Bottom-Left
+                Stretch = "Fill",
+                Opacity = "0.3"
+            }, null);
+        }
+
+        foreach (var child in element.Children)
+        {
+            AddDebugWireframes(child, overlay);
+        }
     }
 
     private static void ResetPositions(UIElement element)

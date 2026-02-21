@@ -21,6 +21,7 @@ public class BoardManager : SyncScript
     private Entity? SelectedPiece;
     private PiecePosition SelectedMarker;
     private static BoardManager Instance = null!;
+    private MainView MainView = null!;
 
     public CameraComponent Camera = null!;
 
@@ -33,7 +34,7 @@ public class BoardManager : SyncScript
         InitBoard();
 
         var uiComponent = Entity.GetOrCreate<UIComponent>();
-        _ = new SUIM.MainView((Game)Game, uiComponent);
+        MainView = new MainView((Game)Game, uiComponent);
     }
 
     public override void Update()
@@ -43,6 +44,15 @@ public class BoardManager : SyncScript
         DragPiece();
 
         DropPiece();
+
+        ToggleDebugMode();
+    }
+
+    private void ToggleDebugMode()
+    {
+        if (!Input.IsKeyDown(Keys.LeftAlt) || !Input.IsKeyPressed(Keys.D)) return;
+
+        MainView.ToggleDebugMode();
     }
 
     public static BoardManager GetInstance() => Instance;

@@ -1,16 +1,20 @@
-﻿namespace Chess3d.SUIM;
+﻿namespace Chess3d;
 
 using System;
 using System.Threading.Tasks;
 using Stride.Engine;
 using Stride.UI;
+using global::SUIM.Layout;
 using SUIMStride;
+using SUIMElement = global::SUIM.Components.UIElement;
 
 public class MainView
 {
     private readonly dynamic Model;
     private readonly UIElement RootElement;
     private readonly Game Game;
+    public UIElement? DebugOverlay;
+    private readonly SUIMElement SuimRoot;
 
     public MainView(Game game, UIComponent component)
     {
@@ -34,13 +38,42 @@ public class MainView
         {
             RootPath = "SUIM"
         };
-        var (rootElement, modelResult) = mapper.GetView("MainView", game, model: model);
-        RootElement = rootElement ?? throw new Exception("Failed to load MainView view.");
+        var (strideRoot, suimRoot, modelResult) = mapper.GetView("MainView", game, model: model);
+        RootElement = strideRoot ?? throw new Exception("Failed to load MainView view.");
+        SuimRoot = suimRoot ?? throw new Exception("Failed to load SUIM root.");
         Model = modelResult ?? throw new Exception("Failed to map model.");
         component.Page = new()
         {
             RootElement = RootElement
         };
+    }
+
+    public void ToggleDebugMode()
+    {
+        LayoutEngine.DebugMode = !LayoutEngine.DebugMode;
+
+        if (LayoutEngine.DebugMode)
+        {
+            var suimOverlay = LayoutEngine.GenerateDebugOverlay(SuimRoot);
+            if (suimOverlay != null)
+            {
+                var mapper = new Parser { RootPath = "SUIM" };
+                DebugOverlay = mapper.MapElement(suimOverlay);
+
+                if (RootElement is Stride.UI.Panels.Panel panel)
+                {
+                    panel.Children.Add(DebugOverlay);
+                }
+            }
+        }
+        else if (DebugOverlay != null)
+        {
+            if (RootElement is Stride.UI.Panels.Panel panel)
+            {
+                panel.Children.Remove(DebugOverlay);
+            }
+            DebugOverlay = null;
+        }
     }
 
     private void YesHandlerAction()
@@ -61,7 +94,7 @@ public class MainView
                 break;
         }
     }
-    
+
     private void RestartHandler()
     {
         if (Model.IsWorkInProgress) return;
