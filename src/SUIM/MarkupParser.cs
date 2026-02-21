@@ -18,6 +18,7 @@ public static partial class MarkupParser
         var root = doc.Root!;
 
         Dictionary<string, Dictionary<string, string>> styles = inheritedStyles != null ? new(inheritedStyles) : [];
+        Dictionary<string, Dictionary<string, string>> leakableStyles = inheritedStyles != null ? new(inheritedStyles) : [];
 
         // Extract model from root children (flexible position)
         model2 = ModelLogic.ExtractModel(root, model2);
@@ -38,15 +39,25 @@ public static partial class MarkupParser
                 {
                     if (childX.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))
                     {
+                        var isScoped = childX.Attribute("scoped") != null;
                         // Process styles as usual
                         var sourceAttr = childX.Attribute("source") ?? childX.Attribute("src");
                         if (sourceAttr != null && !string.IsNullOrEmpty(basePath))
                         {
                             var stylePath = Path.Combine(basePath, sourceAttr.Value);
-                            if (File.Exists(stylePath)) ParseStyles(File.ReadAllText(stylePath), styles);
+                            if (File.Exists(stylePath)) 
+                            {
+                                var content = File.ReadAllText(stylePath);
+                                ParseStyles(content, styles);
+                                if (!isScoped) ParseStyles(content, leakableStyles);
+                            }
                         }
-                        var content = childX.Value.Trim();
-                        if (!string.IsNullOrEmpty(content)) ParseStyles(content, styles);
+                        var styleContent = childX.Value.Trim();
+                        if (!string.IsNullOrEmpty(styleContent))
+                        {
+                            ParseStyles(styleContent, styles);
+                            if (!isScoped) ParseStyles(styleContent, leakableStyles);
+                        }
                     }
                     continue;
                 }
@@ -63,14 +74,14 @@ public static partial class MarkupParser
                 }
                 else if (node is XElement childE)
                 {
-                    var childElement = ParseElement(childE, styles, model2, basePath);
+                    var childElement = ParseElement(childE, styles, leakableStyles, model2, basePath);
                     if (childElement != null) element.AddChild(childElement, childE);
                 }
             }
         }
         else
         {
-            element = ParseElement(root, styles, model2, basePath)
+            element = ParseElement(root, styles, leakableStyles, model2, basePath)
                 ?? throw new InvalidOperationException("Root element not found.");
         }
 
@@ -144,7 +155,7 @@ public static partial class MarkupParser
             var classes = elementClass.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             foreach (var className in classes)
             {
-                var classSelector = "." + className;
+                var classSelector = "." + className.ToLowerInvariant();
                 if (styles.TryGetValue(classSelector, out var classProps))
                 {
                     foreach (var kvp in classProps)
@@ -158,7 +169,7 @@ public static partial class MarkupParser
         // ID selector (highest precedence)
         if (!string.IsNullOrEmpty(elementId))
         {
-            var idSelector = "#" + elementId.Trim();
+            var idSelector = "#" + elementId.Trim().ToLowerInvariant();
             if (styles.TryGetValue(idSelector, out var idProps))
             {
                 foreach (var kvp in idProps)
@@ -277,13 +288,14 @@ public static partial class MarkupParser
         return element;
     }
 
-    private static UIElement? ParseElement(XElement element, Dictionary<string, Dictionary<string, string>> styles, dynamic? model, string? basePath = null)
+    private static UIElement? ParseElement(XElement element, Dictionary<string, Dictionary<string, string>> styles, Dictionary<string, Dictionary<string, string>> leakableStyles, dynamic? model, string? basePath = null)
     {
         var innerElement = ParseElementTag(element);
         if (innerElement == null)
         {
             if (element.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))
             {
+                var isScoped = element.Attribute("scoped") != null;
                 var sourceAttr = element.Attribute("source") ?? element.Attribute("src");
                 if (sourceAttr != null && !string.IsNullOrEmpty(basePath))
                 {
@@ -293,13 +305,16 @@ public static partial class MarkupParser
                         throw new FileNotFoundException($"Style file not found: {stylePath}");
                     }
 
-                    ParseStyles(File.ReadAllText(stylePath), styles);
+                    var content = File.ReadAllText(stylePath);
+                    ParseStyles(content, styles);
+                    if (!isScoped) ParseStyles(content, leakableStyles);
                 }
 
-                var content = element.Value.Trim();
-                if (!string.IsNullOrEmpty(content))
+                var styleContent = element.Value.Trim();
+                if (!string.IsNullOrEmpty(styleContent))
                 {
-                    ParseStyles(content, styles);
+                    ParseStyles(styleContent, styles);
+                    if (!isScoped) ParseStyles(styleContent, leakableStyles);
                 }
             }
             return null;
@@ -359,7 +374,7 @@ public static partial class MarkupParser
                     {
                         child.SetAttributeValue("grid.row", rowIndex.ToString());
                         child.SetAttributeValue("grid.column", colIdx.ToString());
-                        var childElement = ParseElement(child, styles, model, basePath);
+                        var childElement = ParseElement(child, styles, leakableStyles, model, basePath);
                         if (childElement == null) continue;
 
                         grid.AddChild(childElement, child);
@@ -381,7 +396,7 @@ public static partial class MarkupParser
                     {
                         child.SetAttributeValue("grid.column", columnIndex.ToString());
                         child.SetAttributeValue("grid.row", rowIdx.ToString());
-                        var childElement = ParseElement(child, styles, model, basePath);
+                        var childElement = ParseElement(child, styles, leakableStyles, model, basePath);
                         if (childElement == null) continue;
 
                         grid.AddChild(childElement, child);
@@ -392,7 +407,7 @@ public static partial class MarkupParser
                 }
                 else
                 {
-                    var childElement = ParseElement(node, styles, model, basePath);
+                    var childElement = ParseElement(node, styles, leakableStyles, model, basePath);
                     if (childElement == null) continue;
 
                     grid.AddChild(childElement, node);
@@ -418,7 +433,7 @@ public static partial class MarkupParser
                 }
                 else if (node is XElement childXElement)
                 {
-                    var childElement = ParseElement(childXElement, styles, model, basePath);
+                    var childElement = ParseElement(childXElement, styles, leakableStyles, model, basePath);
                     if (childElement == null) continue;
 
                     innerElement.AddChild(childElement, childXElement);
@@ -446,7 +461,7 @@ public static partial class MarkupParser
 
         if (rootElement is CustomComponent custom)
         {
-            custom.Expand(model, styles, basePath);
+            custom.Expand(model, leakableStyles, basePath);
         }
 
         return rootElement;
