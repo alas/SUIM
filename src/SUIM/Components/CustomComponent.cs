@@ -65,7 +65,9 @@ public class CustomComponent(string tagName) : UIElement(tagName)
                             oo.SetProxy(name, () =>
                             {
                                 var pv = parentOO.GetValue(parentPropName);
-                                return pv ?? initialValue;
+                                var isInvalid_pv = pv == null || (pv is string s && string.IsNullOrEmpty(s));
+                                var isInvalid_iv = initialValue == null || (initialValue is string s2 && string.IsNullOrEmpty(s2));
+                                return isInvalid_pv && !isInvalid_iv ? initialValue : pv;
                             }, (v) => parentOO.SetValue(parentPropName, v));
 
                             // When parent changes, notify the component model so bindings inside the component update.
@@ -101,6 +103,48 @@ public class CustomComponent(string tagName) : UIElement(tagName)
                 {
                     oo.SetValue(name, attr.Value);
                 }
+            }
+        }
+
+        // Convert any bindings declared on the component tag (e.g. visibility="@PopupVisibility")
+        // into proxies on the component model that map to the parent model property.
+        if (this.Bindings.Count > 0)
+        {
+            foreach (var binding in this.Bindings.ToList())
+            {
+                var compProp = binding.TargetPropertyName;
+                var parentProp = binding.ModelPropertyName;
+
+                if (parentModel is ObservableObject parentOO && componentModel is ObservableObject compOO)
+                {
+                    // Create a proxy on the component model that forwards to the parent property
+                    compOO.SetProxy(compProp, () => parentOO.GetValue(parentProp), (v) => parentOO.SetValue(parentProp, v));
+
+                    // When parent changes, notify the component model so internal bindings update
+                    parentOO.PropertyChanged += (s, e) =>
+                    {
+                        try
+                        {
+                            if (e.PropertyName == parentProp)
+                            {
+                                compOO.NotifyChanged(compProp);
+                            }
+                        }
+                        catch { }
+                    };
+                }
+                else if (parentModel != null && componentModel is ObservableObject compOO2)
+                {
+                    // Parent is a plain object: use reflection-based proxy
+                    compOO2.SetProxy(compProp, () => parentModel.GetType().GetProperty(parentProp)?.GetValue(parentModel), (v) =>
+                    {
+                        var p = parentModel.GetType().GetProperty(parentProp);
+                        if (p != null && p.CanWrite) p.SetValue(parentModel, v);
+                    });
+                }
+
+                // Remove the binding so the mapper doesn't try to bind the component model to the parent property again
+                this.Bindings.Remove(binding);
             }
         }
 

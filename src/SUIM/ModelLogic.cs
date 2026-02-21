@@ -26,7 +26,7 @@ public static class ModelLogic
 
             if (!string.IsNullOrEmpty(content))
             {
-                model = ModelLogic.MergeModels(model, content);
+                model = MergeModels(model, content);
             }
         }
 
