@@ -30,6 +30,7 @@ public abstract class UIElement(string tagName)
     public string? HoverSprite { get; set; }
     public string? PressedSprite { get; set; }
     public string? StopClicks { get; set; }
+    public string? BackgroundImage { get; set; }
 
     // Internal properties calculated during parsing
     public string TagName { get; } = tagName.ToLowerInvariant();
@@ -198,6 +199,10 @@ public abstract class UIElement(string tagName)
         {
             StopClicks = value as string;
         }
+        else if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase))
+        {
+            BackgroundImage = value as string;
+        }
         else if (name.Contains('.'))
         {
             // ignore parent properties
@@ -227,6 +232,7 @@ public abstract class UIElement(string tagName)
         if (name.Equals("width", StringComparison.OrdinalIgnoreCase)) return Width;
         if (name.Equals("height", StringComparison.OrdinalIgnoreCase)) return Height;
         if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase)) return Anchor;
+        if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase)) return BackgroundImage;
         return null;
     }
 

@@ -2038,5 +2038,82 @@ Text after
         Assert.Equal(new Thickness(10), Thickness.Parse(div.Padding));      // from class
         Assert.Equal("white", div.BackgroundColor); // from tag
     }
+
+    [Fact]
+    public void Parse_Img_Alias()
+    {
+        var markup = "<img source=\"test.png\" />";
+        var (element, _) = MarkupParser.Parse(markup);
+
+        Assert.IsType<Image>(element);
+        var img = (Image)element;
+        Assert.Equal("test.png", img.Source);
+    }
+
+    [Fact]
+    public void Parse_Bg_Alias()
+    {
+        var markup = "<bg source=\"test.png\"><div /></bg>";
+        var (element, _) = MarkupParser.Parse(markup);
+
+        Assert.IsType<BackgroundImage>(element);
+        var bg = (BackgroundImage)element;
+        Assert.Equal("test.png", bg.Source);
+        Assert.Single(bg.Children);
+    }
+
+    [Fact]
+    public void Parse_BackgroundImage_AttributeWrapping()
+    {
+        var markup = "<div backgroundimage=\"test.png\" width=\"100\" height=\"100\" />";
+        var (element, _) = MarkupParser.Parse(markup);
+
+        // Should be wrapped in BackgroundImage
+        Assert.IsType<BackgroundImage>(element);
+        var bg = (BackgroundImage)element;
+        Assert.Equal("test.png", bg.Source);
+        
+        // Layout properties should be on the wrapper
+        Assert.Equal(new UnitValue(100), UnitValue.Parse(bg.Width));
+        Assert.Equal(new UnitValue(100), UnitValue.Parse(bg.Height));
+
+        // Inner element should be Div
+        Assert.Single(bg.Children);
+        Assert.IsType<Div>(bg.Children[0]);
+        var div = (Div)bg.Children[0];
+        // Width/Height on inner element should have been set to auto by the wrapper logic
+        Assert.Equal("auto", div.Width);
+        Assert.Equal("auto", div.Height);
+    }
+
+    [Fact]
+    public void Parse_Button_ImageProperties()
+    {
+        var markup = "<button mouseoverimage=\"hover.png\" notpressedimage=\"idle.png\" pressedimage=\"down.png\" />";
+        var (element, _) = MarkupParser.Parse(markup);
+
+        Assert.IsType<Button>(element);
+        var btn = (Button)element;
+        Assert.Equal("hover.png", btn.MouseOverImage);
+        Assert.Equal("idle.png", btn.NotPressedImage);
+        Assert.Equal("down.png", btn.PressedImage);
+    }
+
+    [Fact]
+    public void Parse_Style_BackgroundImage_Wrapping()
+    {
+        var markup = @"<grid>
+    <style>
+        .with-bg { backgroundimage: style.png; width: 200; }
+    </style>
+    <div class=""with-bg"" />
+</grid>";
+        var (element, _) = MarkupParser.Parse(markup);
+
+        var bg = element.Children.Single() as BackgroundImage;
+        Assert.NotNull(bg);
+        Assert.Equal("style.png", bg.Source);
+        Assert.Equal(new UnitValue(200), UnitValue.Parse(bg.Width));
+    }
 }
 

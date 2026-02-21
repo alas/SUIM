@@ -119,6 +119,7 @@ public class Parser
             SUIM.Components.Input i => MapInput(i),
             SUIM.Components.Image img => MapImage(img),
             SUIM.Components.Border br => MapBorder(br),
+            SUIM.Components.BackgroundImage bg => MapBackgroundImage(bg),
             _ => new StrideGrid() // Fallback
         };
 
@@ -154,11 +155,23 @@ public class Parser
         return strideElement;
     }
 
-#pragma warning disable IDE0060 // Remove unused parameter
-    private static Button MapButton(SUIM.Components.Button button)
-#pragma warning restore IDE0060 // Remove unused parameter
+    private Button MapButton(SUIM.Components.Button button)
     {
         var btn = new Button();
+        
+        if (!string.IsNullOrEmpty(button.MouseOverImage))
+        {
+            btn.MouseOverImage = (ISpriteProvider?)ContentManager?.Load<Sprite>(button.MouseOverImage);
+        }
+        if (!string.IsNullOrEmpty(button.NotPressedImage))
+        {
+            btn.NotPressedImage = (ISpriteProvider?)ContentManager?.Load<Sprite>(button.NotPressedImage);
+        }
+        if (!string.IsNullOrEmpty(button.PressedImage))
+        {
+            btn.PressedImage = (ISpriteProvider?)ContentManager?.Load<Sprite>(button.PressedImage);
+        }
+
         // Click handler will be bound in TransferEvents
         return btn;
     }
@@ -225,10 +238,10 @@ public class Parser
     {
         var img = new ImageElement();
 
-        //if (!string.IsNullOrEmpty(image.Source))
-        //{
-        //    img.Source = image.Source;
-        //}
+        if (!string.IsNullOrEmpty(image.Source))
+        {
+            img.Source = (ISpriteProvider?)ContentManager?.Load<Sprite>(image.Source);
+        }
 
         var stretch = SUIM.Components.ImageStretchExtensions.FromString(image.Stretch);
         img.StretchType = stretch switch
@@ -241,6 +254,16 @@ public class Parser
         };
 
         return img;
+    }
+
+    private ContentDecorator MapBackgroundImage(SUIM.Components.BackgroundImage background)
+    {
+        var decorator = new ContentDecorator();
+        if (!string.IsNullOrEmpty(background.Source))
+        {
+            decorator.BackgroundImage = (ISpriteProvider?)ContentManager?.Load<Sprite>(background.Source);
+        }
+        return decorator;
     }
 
     private Border MapBorder(SUIM.Components.Border border)

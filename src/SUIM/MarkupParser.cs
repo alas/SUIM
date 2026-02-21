@@ -196,6 +196,7 @@ public static partial class MarkupParser
         // Pre-check whether this style will create a wrapper so layout attributes can be routed to it.
         bool willWrapWithBorder = properties.Keys.Any(k => k.Equals("border", StringComparison.OrdinalIgnoreCase));
         bool willWrapWithScroll = properties.Keys.Any(k => k.Equals("scroll", StringComparison.OrdinalIgnoreCase));
+        bool willWrapWithBG = properties.Keys.Any(k => k.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase));
 
         foreach (var kvp in properties)
         {
@@ -210,9 +211,13 @@ public static partial class MarkupParser
             {
                 scrollAttr = propValue;
             }
-            else if ((willWrapWithBorder || willWrapWithScroll) && IsLayoutAttribute(propName))
+            else if (propName.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase))
             {
-                // If a style defines layout attributes for an element that will be wrapped (border/scroll),
+                // Background image attribute will be handled by the wrapper creation
+            }
+            else if ((willWrapWithBorder || willWrapWithScroll || willWrapWithBG) && IsLayoutAttribute(propName))
+            {
+                // If a style defines layout attributes for an element that will be wrapped (border/scroll/bg),
                 // apply those layout attributes to the wrapper instead of the inner element.
                 wrapperAttrs[propName] = propValue;
             }
@@ -285,6 +290,25 @@ public static partial class MarkupParser
             element = border;
         }
 
+        // Handle BackgroundImage wrapper (applied last to be the outermost wrapper)
+        if (properties.TryGetValue("backgroundimage", out var bgImgAttr))
+        {
+            var bg = new BackgroundImage();
+            bg.SetAttribute("backgroundimage", bgImgAttr);
+
+            foreach (var kvp in wrapperAttrs)
+            {
+                bg.SetAttribute(kvp.Key, kvp.Value);
+            }
+            if (properties.TryGetValue("width", out var w)) bg.SetAttribute("width", w);
+            if (properties.TryGetValue("height", out var h)) bg.SetAttribute("height", h);
+
+            element.Width ??= "auto";
+            element.Height ??= "auto";
+            bg.AddChild(element, null);
+            element = bg;
+        }
+
         return element;
     }
 
@@ -325,6 +349,7 @@ public static partial class MarkupParser
         var attributes = element.Attributes().ToList();
         var scrollAttr = attributes.FirstOrDefault(a => a.Name.LocalName.Equals("scroll", StringComparison.OrdinalIgnoreCase));
         var borderAttr = attributes.FirstOrDefault(a => a.Name.LocalName.Equals("border", StringComparison.OrdinalIgnoreCase));
+        var bgAttr = attributes.FirstOrDefault(a => a.Name.LocalName.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase));
 
         if (scrollAttr != null)
         {
@@ -351,6 +376,17 @@ public static partial class MarkupParser
 
             border.AddChild(rootElement, element);
             rootElement = border;
+        }
+
+        if (bgAttr != null)
+        {
+            var bg = new BackgroundImage();
+            bg.SetAttribute("backgroundimage", bgAttr.Value);
+            rootElement.Width ??= "auto";
+            rootElement.Height ??= "auto";
+
+            bg.AddChild(rootElement, element);
+            rootElement = bg;
         }
 
         // Handle both text nodes and element children
@@ -534,7 +570,8 @@ public static partial class MarkupParser
         // Content tags
         if (tag.Equals("label", StringComparison.OrdinalIgnoreCase)) return new Label();
         if (tag.Equals("button", StringComparison.OrdinalIgnoreCase)) return new Button();
-        if (tag.Equals("image", StringComparison.OrdinalIgnoreCase)) return new Image();
+        if (tag.Equals("image", StringComparison.OrdinalIgnoreCase) || tag.Equals("img", StringComparison.OrdinalIgnoreCase)) return new Image();
+        if (tag.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || tag.Equals("bg", StringComparison.OrdinalIgnoreCase)) return new BackgroundImage();
         if (tag.Equals("input", StringComparison.OrdinalIgnoreCase)) return new Input();
         if (tag.Equals("select", StringComparison.OrdinalIgnoreCase)) return new Select();
         if (tag.Equals("option", StringComparison.OrdinalIgnoreCase)) return new Option();
