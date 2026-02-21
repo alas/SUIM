@@ -29,7 +29,7 @@ public record struct Thickness(UnitValue Left, UnitValue Top, UnitValue Right, U
     public static Thickness Parse(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return new Thickness(new UnitValue(0, UnitType.Pixels), new UnitValue(0, UnitType.Pixels), new UnitValue(0, UnitType.Pixels), new UnitValue(0, UnitType.Pixels));
+            return None;
 
         var parts = value.Split([' ', ','], StringSplitOptions.RemoveEmptyEntries)
             .Where(p => p.All(x => char.IsNumber(x))

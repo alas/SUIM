@@ -12,15 +12,15 @@ public class ContentAlignmentTests
     {
         var div = new Div
         {
-            Width = new UnitValue(200, UnitType.Pixels).ToString(),
-            Height = new UnitValue(200, UnitType.Pixels).ToString(),
+            Width = "200px",
+            Height = "200px",
             ContentHorizontalAlignment = HorizontalAlignment.Center.ToString(),
             ContentVerticalAlignment = VerticalAlignment.Center.ToString()
         };
 
-        var label1 = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString() };
-        var label2 = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString() };
-        var label3 = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString() };
+        var label1 = new Label { Width = "100px", Height = "20px" };
+        var label2 = new Label { Width = "100px", Height = "20px" };
+        var label3 = new Label { Width = "100px", Height = "20px" };
 
         div.AddChild(label1, null);
         div.AddChild(label2, null);
@@ -45,13 +45,13 @@ public class ContentAlignmentTests
     {
         var div = new Div
         {
-            Width = new UnitValue(200, UnitType.Pixels).ToString(),
-            Height = new UnitValue(200, UnitType.Pixels).ToString(),
+            Width = "200px",
+            Height = "200px",
             ContentHorizontalAlignment = HorizontalAlignment.Center.ToString()
         };
 
-        var label1 = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString(), HorizontalAlignment = HorizontalAlignment.Right.ToString() };
-        var label2 = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString() }; // Should use parent Center
+        var label1 = new Label { Width = "100px", Height = "20px", HorizontalAlignment = HorizontalAlignment.Right.ToString() };
+        var label2 = new Label { Width = "100px", Height = "20px" }; // Should use parent Center
 
         div.AddChild(label1, null);
         div.AddChild(label2, null);
@@ -78,8 +78,8 @@ public class ContentAlignmentTests
     [Fact]
     public void Overlay_AlignsChildren()
     {
-        var overlay = new Overlay { Width = new UnitValue(500, UnitType.Pixels).ToString(), Height = new UnitValue(500, UnitType.Pixels).ToString() };
-        var label = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(50, UnitType.Pixels).ToString(), HorizontalAlignment = HorizontalAlignment.Center.ToString(), VerticalAlignment = VerticalAlignment.Center.ToString() };
+        var overlay = new Overlay { Width = "500px", Height = "500px" };
+        var label = new Label { Width = "100px", Height = "50px", HorizontalAlignment = HorizontalAlignment.Center.ToString(), VerticalAlignment = VerticalAlignment.Center.ToString() };
         
         overlay.AddChild(label, null);
         
@@ -96,13 +96,13 @@ public class ContentAlignmentTests
     {
         var div = new Div
         {
-            Width = new UnitValue(200, UnitType.Pixels).ToString(),
-            Height = new UnitValue(200, UnitType.Pixels).ToString(),
+            Width = "200px",
+            Height = "200px",
             ContentHorizontalAlignment = HorizontalAlignment.Center.ToString(),
             ContentVerticalAlignment = VerticalAlignment.Center.ToString()
         };
 
-        var label = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString() };
+        var label = new Label { Width = "100px", Height = "20px" };
         // HorizontalAlignment and VerticalAlignment are Unspecified by default
         
         div.AddChild(label, null);
@@ -117,10 +117,10 @@ public class ContentAlignmentTests
     [Fact]
     public void Child_WithUnspecifiedAlignment_DefaultsToLeftTopIfParentHasNoContentAlignment()
     {
-        var div = new Div { Width = new UnitValue(200, UnitType.Pixels).ToString(), Height = new UnitValue(200, UnitType.Pixels).ToString() };
+        var div = new Div { Width = "200px", Height = "200px" };
         // div.ContentHorizontalAlignment and ContentVerticalAlignment are Unspecified by default
 
-        var label = new Label { Width = new UnitValue(100, UnitType.Pixels).ToString(), Height = new UnitValue(20, UnitType.Pixels).ToString() };
+        var label = new Label { Width = "100px", Height = "20px" };
         
         div.AddChild(label, null);
         LayoutEngine.Layout(div, 16, 200, 200);

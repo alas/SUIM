@@ -193,11 +193,14 @@ public static class LayoutEngine
         {
             // Container positioning handled by specific methods
         }
-        else if (float.IsNaN(element.ActualX))
+        else
         {
-            // Default positioning for leaf elements if not already positioned by parent container
-            element.ActualX = parentX;
-            element.ActualY = parentY;
+            // Default positioning for leaf elements: only set coordinates that haven't been
+            // positioned by the parent container/parent-specific layout logic.
+            if (float.IsNaN(element.ActualX))
+                element.ActualX = parentX;
+            if (float.IsNaN(element.ActualY))
+                element.ActualY = parentY;
         }
 
         // Position based on element type
@@ -755,7 +758,7 @@ public static class LayoutEngine
             totalHeight += div.Spacing * (div.Children.Count - 1);
 
         float currentY = div.ActualY + div.ComputedPaddingTop + 
-            CalculateVerticalAlignmentOffset(div.MeasuredContentWidth, totalHeight, div.ContentVerticalAlignment);
+            CalculateVerticalAlignmentOffset(div.MeasuredContentHeight, totalHeight, div.ContentVerticalAlignment);
 
         foreach (var child in div.Children)
         {
