@@ -108,7 +108,7 @@ public class MarkupParserTests
 
         Assert.IsType<Dock>(element);
         var dock = (Dock)element;
-        Assert.True(dock.LastChildFill);
+        Assert.True(Convert.ToBoolean(dock.LastChildFill));
         Assert.Equal(4, dock.DockChildren.Count);
         Assert.Equal(DockEdge.Left, dock.DockChildren[0].Edge);
         Assert.Equal(DockEdge.Right, dock.DockChildren[1].Edge);
@@ -327,7 +327,7 @@ public class MarkupParserTests
         Assert.IsType<Image>(element);
         var image = (Image)element;
         Assert.Equal("mysprite", image.Source);
-        Assert.Equal(ImageStretch.Uniform, image.Stretch);
+        Assert.Equal(ImageStretch.Uniform, ImageStretch.FromString(image.Stretch));
     }
 
     [Fact]
@@ -565,7 +565,7 @@ public class MarkupParserTests
         Assert.IsType<Dock>(element);
         var dock = (Dock)element;
         Assert.Equal(5, dock.DockChildren.Count);
-        Assert.True(dock.LastChildFill);
+        Assert.True(Convert.ToBoolean(dock.LastChildFill));
     }
 
     [Fact]
@@ -804,7 +804,7 @@ else
 
         Assert.IsType<Image>(element);
         var image = (Image)element;
-        Assert.Equal(ImageStretch.None, image.Stretch);
+        Assert.Equal(ImageStretch.None, ImageStretch.FromString(image.Stretch));
     }
 
     [Fact]
@@ -815,7 +815,7 @@ else
 
         Assert.IsType<Image>(element);
         var image = (Image)element;
-        Assert.Equal(ImageStretch.Fill, image.Stretch);
+        Assert.Equal(ImageStretch.Fill, ImageStretch.FromString(image.Stretch));
     }
 
     [Fact]
@@ -826,7 +826,7 @@ else
 
         Assert.IsType<Image>(element);
         var image = (Image)element;
-        Assert.Equal(ImageStretch.UniformToFill, image.Stretch);
+        Assert.Equal(ImageStretch.UniformToFill, ImageStretch.FromString(image.Stretch));
     }
 
     // ============== ANCHOR VARIANTS ==============
@@ -913,7 +913,7 @@ else
 
         Assert.IsType<Dock>(element);
         var dock = (Dock)element;
-        Assert.False(dock.LastChildFill);
+        Assert.False(Convert.ToBoolean(dock.LastChildFill));
     }
 
     // ============== MORE COMMON ATTRIBUTES ==============

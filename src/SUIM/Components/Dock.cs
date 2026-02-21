@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 public class Dock() : LayoutElement(nameof(Dock))
 {
-    public bool LastChildFill { get; set; } = true;
+    public string? LastChildFill { get; set; } = "true";
     public List<DockChild> DockChildren { get; } = [];
 
     public override void AddChild(UIElement child, XElement? element)
@@ -36,7 +36,7 @@ public class Dock() : LayoutElement(nameof(Dock))
     {
         if (name.Equals("lastchildfill", StringComparison.OrdinalIgnoreCase))
         {
-            LastChildFill = value is bool b ? b : Convert.ToBoolean(value);
+            LastChildFill = value as string;
         }
         else
         {

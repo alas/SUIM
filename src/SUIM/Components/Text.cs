@@ -9,7 +9,7 @@ public class Text(string? tagName = null) : UIElement(tagName ?? nameof(Text))
     {
         if (name.Equals("value", StringComparison.OrdinalIgnoreCase))
         {
-            Value = value as string ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+            Value = value as string;
         }
         else if (name.Equals("wrap", StringComparison.OrdinalIgnoreCase))
         {

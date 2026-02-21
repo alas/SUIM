@@ -11,9 +11,9 @@ using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
+using StrideGrid = Stride.UI.Panels.Grid;
 using SUIM;
 using SUIM.Components.Attributes;
-using StrideGrid = Stride.UI.Panels.Grid;
 
 public class Parser
 {
@@ -235,7 +235,8 @@ public class Parser
             //img.Source = image.Source;
         }
 
-        img.StretchType = image.Stretch switch
+        var stretch = SUIM.Components.ImageStretchExtensions.FromString(image.Stretch);
+        img.StretchType = stretch switch
         {
             SUIM.Components.ImageStretch.Uniform => StretchType.Uniform,
             SUIM.Components.ImageStretch.UniformToFill => StretchType.UniformToFill,

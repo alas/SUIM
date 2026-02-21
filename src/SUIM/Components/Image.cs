@@ -1,9 +1,11 @@
+using SUIM.Components.Attributes;
+
 namespace SUIM.Components;
 
 public class Image() : UIElement(nameof(Image))
 {
     public string? Source { get; set; }
-    public ImageStretch Stretch { get; set; }
+    public string? Stretch { get; set; }
 
     public override void SetAttribute(string name, object? value)
     {
@@ -13,7 +15,7 @@ public class Image() : UIElement(nameof(Image))
         }
         else if (name.Equals("stretch", StringComparison.OrdinalIgnoreCase))
         {
-            Stretch = Enum.Parse<ImageStretch>((value as string)!, true);
+            Stretch = value as string;
         }
         else
         {
@@ -29,4 +31,17 @@ public enum ImageStretch
     FillOnStretch,
     Uniform,
     UniformToFill
+}
+
+public static class ImageStretchExtensions
+{
+    extension(ImageStretch)
+    {
+        public static ImageStretch FromString(string? value)
+        {
+            if (value == null) return default;
+
+            return Enum.TryParse<ImageStretch>(value, true, out var r) ? r : default;
+        }
+    }
 }
