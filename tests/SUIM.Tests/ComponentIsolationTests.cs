@@ -107,7 +107,7 @@ public class ComponentIsolationTests
             RootPath = AppDomain.CurrentDomain.BaseDirectory
         };
 
-        var parentModel = new { LabelVisibility = "collapsed" };
+        var parentModel = new { LabelVisibility = "collapsed" };//, model: parentModel
         var (strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
 
         // Find first TextBlock in the mapped Stride UI tree and assert its text was set from parent model
