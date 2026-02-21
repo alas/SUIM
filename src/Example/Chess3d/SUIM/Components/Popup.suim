@@ -1,12 +1,12 @@
 ﻿<popup>
 	<model>
-		{
+	{
 		"title": "",
 		"message": "",
 		"onYes": null,
 		"onNo": null,
 		"visibility": "collapsed"
-		}
+	}
 	</model>
 
 	<overlay visibility="@visibility">
