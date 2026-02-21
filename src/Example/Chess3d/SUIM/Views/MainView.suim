@@ -1,4 +1,21 @@
 <grid>
+	<model>
+	{
+		// delegates for buttons
+		"OpenPopup": null,
+		"YesHandler": null,
+		"NoHandler": null,
+
+		// popup data
+		"PopupTitle": null,
+		"PopupMessage": null,
+		"PopupVisibility": "collapsed",
+
+		// overlay data
+		"OverlayMessage": null,
+		"OverlayVisibility": "collapsed"
+	}
+	</model>
     <style src="Styles/Main.style" />
 	
     <vstack class="container">
@@ -8,6 +25,6 @@
         <button onclick="OpenPopup('Save', 'Save() Not implemented yet!')">Save</button>
     </vstack>
 
-	<Popup title="@PopupTitle" message="@PopupMessage" onYes="@YesHandler" onNo="@NoHandler" visibility="@PopupVisibility" />
-    <ScreenOverlay message="@BlockerMessage" visibility="@OverlayVisibility" />
+	<Popup title="@PopupTitle" message="@PopupMessage" visibility="@PopupVisibility" onYes="@YesHandler" onNo="@NoHandler" />
+    <ScreenOverlay message="@OverlayMessage" visibility="@OverlayVisibility" />
 </grid>

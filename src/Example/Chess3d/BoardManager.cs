@@ -11,6 +11,7 @@ using Stride.Input;
 using Stride.Physics;
 using Stride.Rendering;
 using Chess3d.ChessLogic;
+using Chess3d.SUIM;
 
 public class BoardManager : SyncScript
 {
@@ -21,7 +22,6 @@ public class BoardManager : SyncScript
     private Entity? SelectedPiece;
     private PiecePosition SelectedMarker;
     private static BoardManager Instance = null!;
-    private MainView MainView = null!;
 
     public CameraComponent Camera = null!;
 
@@ -34,7 +34,7 @@ public class BoardManager : SyncScript
         InitBoard();
 
         var uiComponent = Entity.GetOrCreate<UIComponent>();
-        MainView = new MainView((Game)Game, uiComponent);
+        _ = new MainView((Game)Game, uiComponent);
     }
 
     public override void Update()
@@ -44,15 +44,6 @@ public class BoardManager : SyncScript
         DragPiece();
 
         DropPiece();
-
-        ToggleDebugMode();
-    }
-
-    private void ToggleDebugMode()
-    {
-        if (!Input.IsKeyDown(Keys.LeftAlt) || !Input.IsKeyPressed(Keys.D)) return;
-
-        MainView.ToggleDebugMode();
     }
 
     public static BoardManager GetInstance() => Instance;

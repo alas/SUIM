@@ -26,12 +26,12 @@ public class Parser
     private Game? _game;
     public string? RootPath { get; set; }
 
-    public (UIElement StrideRoot, SUIM.Components.UIElement SuimRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    public (UIElement StrideRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
         return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, null);
     }
 
-    public (UIElement StrideRoot, SUIM.Components.UIElement SuimRoot, dynamic? Model) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    public (UIElement StrideRoot, dynamic? Model) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
         if (string.IsNullOrEmpty(RootPath)) throw new InvalidOperationException("RootPath must be set before calling GetView.");
         
@@ -45,7 +45,7 @@ public class Parser
         return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath, viewName);
     }
 
-    private (UIElement StrideRoot, SUIM.Components.UIElement SuimRoot, dynamic? Model) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null)
+    private (UIElement StrideRoot, dynamic? Model) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null)
     {
         ArgumentNullException.ThrowIfNull(markup);
 
@@ -56,11 +56,11 @@ public class Parser
             {
                 if (!createNewInstance)
                 {
-                    return (cached.StrideRoot, cached.SuimRoot, cached.Model);
+                    return (cached.StrideRoot, cached.Model);
                 }
 
                 // createNewInstance==true -> return a fresh Stride tree by remapping the cached SUIM tree
-                return (MapElement(cached.SuimRoot), cached.SuimRoot, cached.Model);
+                return (MapElement(cached.SuimRoot), cached.Model);
             }
         }
 
@@ -79,7 +79,7 @@ public class Parser
             _parseCache[markup] = (suimRoot, strideRoot, model2);
         }
 
-        return createNewInstance ? (MapElement(suimRoot), suimRoot, model2) : (strideRoot, suimRoot, model2);
+        return createNewInstance ? (MapElement(suimRoot), model2) : (strideRoot, model2);
     }
 
     private static void Layout(SUIM.Components.UIElement root, Game game, int defaultFontSize, bool fullscreen)
@@ -225,15 +225,10 @@ public class Parser
     {
         var img = new ImageElement();
 
-        if (!string.IsNullOrEmpty(image.Source))
-        {
-            if (image.Source.StartsWith("__diag_") && _game != null)
-            {
-                img.Source = (ISpriteProvider)GetDiagonalSprite(image.Source);
-            }
-            //img.Source = image.Source;
-            // else { /* currently commented out in original code */ }
-        }
+        //if (!string.IsNullOrEmpty(image.Source))
+        //{
+        //    img.Source = image.Source;
+        //}
 
         var stretch = SUIM.Components.ImageStretchExtensions.FromString(image.Stretch);
         img.StretchType = stretch switch
@@ -246,31 +241,6 @@ public class Parser
         };
 
         return img;
-    }
-
-    private readonly Dictionary<string, Sprite> _diagCache = [];
-
-    private Sprite GetDiagonalSprite(string type)
-    {
-        if (_diagCache.TryGetValue(type, out var cached)) return cached;
-
-        const int size = 64;
-        var pixels = new Color[size * size];
-        bool tlbr = type == "__diag_tlbr__";
-
-        for (int y = 0; y < size; y++)
-        {
-            for (int x = 0; x < size; x++)
-            {
-                bool isDiag = tlbr ? (x == y) : (x == size - 1 - y);
-                pixels[y * size + x] = isDiag ? Color.Blue : Color.Transparent;
-            }
-        }
-
-        var texture = Texture.New2D(_game!.GraphicsDevice, size, size, PixelFormat.R8G8B8A8_UNorm, pixels);
-        var sprite = new Sprite(texture);
-        _diagCache[type] = sprite;
-        return sprite;
     }
 
     private Border MapBorder(SUIM.Components.Border border)

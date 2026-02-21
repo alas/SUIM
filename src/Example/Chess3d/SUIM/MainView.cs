@@ -1,20 +1,16 @@
-﻿namespace Chess3d;
+﻿namespace Chess3d.SUIM;
 
 using System;
 using System.Threading.Tasks;
 using Stride.Engine;
 using Stride.UI;
-using global::SUIM.Layout;
 using SUIMStride;
-using SUIMElement = global::SUIM.Components.UIElement;
 
 public class MainView
 {
     private readonly dynamic Model;
     private readonly UIElement RootElement;
     private readonly Game Game;
-    public UIElement? DebugOverlay;
-    private readonly SUIMElement SuimRoot;
 
     public MainView(Game game, UIComponent component)
     {
@@ -24,56 +20,16 @@ public class MainView
             new
             {
                 IsWorkInProgress = false,
-                BlockerMessage = "",
-                PopupTitle = "",
-                PopupMessage = "",
                 OpenPopup = new Action<string, string>(OpenPopupHandler),
                 YesHandler = new Action(YesHandlerAction),
                 NoHandler = new Action(UnshowPopup),
-                PopupVisibility = Visibility.Collapsed,
-                OverlayVisibility = Visibility.Collapsed,
             };
 
-        var mapper = new Parser
-        {
-            RootPath = "SUIM"
-        };
-        var (strideRoot, suimRoot, modelResult) = mapper.GetView("MainView", game, model: model);
+        var mapper = new Parser { RootPath = "SUIM" };
+        var (strideRoot, modelResult) = mapper.GetView("MainView", game, model: model);
         RootElement = strideRoot ?? throw new Exception("Failed to load MainView view.");
-        SuimRoot = suimRoot ?? throw new Exception("Failed to load SUIM root.");
         Model = modelResult ?? throw new Exception("Failed to map model.");
-        component.Page = new()
-        {
-            RootElement = RootElement
-        };
-    }
-
-    public void ToggleDebugMode()
-    {
-        LayoutEngine.DebugMode = !LayoutEngine.DebugMode;
-
-        if (LayoutEngine.DebugMode)
-        {
-            var suimOverlay = LayoutEngine.GenerateDebugOverlay(SuimRoot);
-            if (suimOverlay != null)
-            {
-                var mapper = new Parser { RootPath = "SUIM" };
-                DebugOverlay = mapper.MapElement(suimOverlay);
-
-                if (RootElement is Stride.UI.Panels.Panel panel)
-                {
-                    panel.Children.Add(DebugOverlay);
-                }
-            }
-        }
-        else if (DebugOverlay != null)
-        {
-            if (RootElement is Stride.UI.Panels.Panel panel)
-            {
-                panel.Children.Remove(DebugOverlay);
-            }
-            DebugOverlay = null;
-        }
+        component.Page = new() { RootElement = RootElement };
     }
 
     private void YesHandlerAction()
@@ -151,7 +107,7 @@ public class MainView
 
     private void ShowBlocker(string message)
     {
-        Model.BlockerMessage = message;
+        Model.OverlayMessage = message;
         Model.OverlayVisibility = Visibility.Visible;
     }
 

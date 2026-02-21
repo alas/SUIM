@@ -38,7 +38,8 @@ public static class ModelLogic
         try
         {
             // Parse JSON into a dictionary
-            var jsonObject = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(modelJson);
+            var options = new JsonSerializerOptions { ReadCommentHandling = JsonCommentHandling.Skip };
+            var jsonObject = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(modelJson, options);
             if (jsonObject == null)
             {
                 return existingModel;

@@ -35,11 +35,11 @@ public class ComponentStylingTests
         var (root, _) = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         var div = root as Div;
-        var childComp = div.Children[0] as CustomComponent;
-        var childDiv = childComp.Children[0] as Div;
+        var childComp = div!.Children[0] as CustomComponent;
+        var childDiv = childComp!.Children[0] as Div;
 
         // Styles defined in parent should leak to child
-        Assert.Equal("blue", childDiv.BackgroundColor);
+        Assert.Equal("blue", childDiv!.BackgroundColor);
     }
 
     [Fact]
@@ -62,12 +62,12 @@ public class ComponentStylingTests
 
         var parentDiv = root as Div;
         // Parent should NOT be red
-        Assert.Null(parentDiv.BackgroundColor);
+        Assert.Null(parentDiv!.BackgroundColor);
 
         var childComp = parentDiv.Children[0] as CustomComponent;
-        var childDiv = childComp.Children[0] as Div;
+        var childDiv = childComp!.Children[0] as Div;
         // Child SHOULD be red
-        Assert.Equal("red", childDiv.BackgroundColor);
+        Assert.Equal("red", childDiv!.BackgroundColor);
     }
 
     [Fact]
