@@ -7,15 +7,47 @@ SUIM also incorporates foundational concepts from WinForms, such as explicit anc
 SUIM aims to be familiar to web developers while also being easy to implement on top of existing layout engines.
 The engine utilizes a top-down single-pass architecture to ensure $O(N)$ performance, providing high-speed rendering and zero layout jitter by eliminating expensive reflow cycles.
 
+### SUIM officially supports:
+
+#### Layout
+
+* ✅ Flexbox (subset)
+* ❌ Grid (maybe later)
+* ❌ float / clear
+* ❌ position: fixed
+
+####Styling
+
+* ✅ width / height
+* ✅ margin / padding
+* ✅ gap
+* ✅ colors
+* ✅ fonts
+* ❌ advanced selectors
+* ❌ complex inheritance
+
+#### Behavior
+
+* ✅ click / input events
+* ❌ JS execution
+* ❌ DOM mutation from scripts
+
+This keeps the engine:
+
+* fast
+* predictable
+* debuggable
+* maintainable
+
 ---
 
-## 1. Layout Models & Philosophy
+## 2. Layout Models & Philosophy
 
-### 1.1 The Box Model
+### 2.1 The Box Model
 
 Every element exists within a rectangular box. Spacing is governed by **margin** (external) and **padding** (internal). **Children never expand parents**; parent dimensions are absolute and calculated before children are processed.
 
-### 1.2 Layout Alignment
+### 2.2 Layout Alignment
 
 All layout containers support the following for child positioning:
 
@@ -27,11 +59,11 @@ All tags support the following for positioning inside the parent:
 * **horizontalalignment** (synonym: **halign**): left, center, right.
 * **verticalalignment** (synonym: **valign**): top, center, bottom.
 
-### 1.3 Anchoring
+### 2.3 Anchoring
 
 Inspired by WinForms, **anchor** allows an element to pin itself to one or more edges of its parent container. Anchored elements are removed from standard flow and do not occupy space in stacks or grids. Valid values: `top`, `bottom`, `left`, `right`, or combinations like `top,left` or `left,right,bottom`.
 
-### 1.4 Layout Sizing Logic
+### 2.4 Layout Sizing Logic
 
 Sizing uses **integers** (fixed pixels), **fr units** (fractional/proportional space), **em**, **rem**, or **auto**.
 
@@ -45,15 +77,15 @@ Sizing uses **integers** (fixed pixels), **fr units** (fractional/proportional s
 
 ---
 
-## 2. Structural & Layout Tags
+## 3. Structural & Layout Tags
 
-### 2.1 The <div> Tag
+### 3.1 The <div> Tag
 
 A coordinate-based container where children can overlap and define explicit positions.
 
 * **Usage:** Grouping or absolute layouts.
 
-### 2.2 The <stack> Tag
+### 3.2 The <stack> Tag
 
 Arranges children sequentially along a single axis.
 
@@ -62,7 +94,7 @@ Arranges children sequentially along a single axis.
 * **<vstack>** and **<vbox>**: Equivalent to <stack orientation="vertical">.
 * **<hstack>** and **<hbox>**: Equivalent to <stack orientation="horizontal">.
 
-### 2.3 The <grid> Tag
+### 3.3 The <grid> Tag
 
 Divides space into a matrix.
 
@@ -95,22 +127,22 @@ Divides space into a matrix.
 	</column>
 </grid>
 
-### 2.4 The <dock> Tag
+### 3.4 The <dock> Tag
 
 Pins children to edges. Mirrors WinForms **DockPanel** behavior.
 
 * **Attributes:** lastchildfill (default true).
 * **Child Logic:** dock.edge (left, right, top, bottom).
 
-### 2.5 The <overlay> Tag
+### 3.5 The <overlay> Tag
 
 Forces itself to parent size and intercepts all input. **Overlays always render on the highest global layer**, regardless of the z-index of other elements.
 
 ---
 
-## 3. Content Tags
+## 4. Content Tags
 
-### 3.1 The <button> Tag
+### 4.1 The <button> Tag
 
 Interactive element for triggering actions.
 
@@ -119,7 +151,7 @@ Interactive element for triggering actions.
 * `pressedSprite`: `string` - The sprite for "Pressed" state.
 * `onClick`: `string` - Method name in the model to call.
 
-### 3.2 The <input> Tag
+### 4.2 The <input> Tag
 
 Data entry field.
 
@@ -130,15 +162,15 @@ Data entry field.
 * `min`: `integer` - min for number slider.
 * `max`: `integer` - max for number slider.
 
-### 3.3 The <textarea> Tag
+### 4.3 The <textarea> Tag
 
 Multi-line text input for long content.
 
-### 3.4 The <select> & <option> Tags
+### 4.4 The <select> & <option> Tags
 
 Dropdown menu. Supports **multiple** selection attribute.
 
-### 3.5 The <label> Tag
+### 4.5 The <label> Tag
 
 Text Display.
 
@@ -148,7 +180,7 @@ Text Display.
 * `color`: `Color` - Text color.
 * `wrap`: `bool` - Enable word wrapping.
 
-### 3.5 The <image> Tag
+### 4.5 The <image> Tag
 
 Graphic Display.
 
@@ -156,7 +188,7 @@ Graphic Display.
 * `stretch`: `enum` - `None`, `Fill`, `Uniform`, `UniformToFill`.
 
 
-## 5. The scroll Attribute & Constraints
+## 6. The scroll Attribute & Constraints
 
 The **scroll** attribute triggers a structural transformation. The tag is wrapped in an outer scroll-viewport (the scroll component), which inherits **all of the tag's styling** (including size, background, borders, and padding). The original tag remains as the direct child of the scroll-viewport, containing all nested children. Example:
 
@@ -182,17 +214,17 @@ Original.suim
 * `Dockpanel (width: 10000, height: 800)`
 * `Label` (Text: "Inventory")
 
-### 5.2 Allowed Variations
+### 6.2 Allowed Variations
 
 * **scroll="vertical"**: Outer wrapper is a vertical scroll-viewport.
 * **scroll="horizontal"**: Outer wrapper is a horizontal scroll-viewport.
 * **scroll="both"**: Outer wrapper is a horizontal and vertical scroll-viewport.
 
-### 5.3 The "auto" Rule (Experimental)
+### 6.3 The "auto" Rule (Experimental)
 
 `auto` resolutions are determined by the engine metric table (using the font information to calculate text sizes) rather than content measurement, ensuring efficiency.
 
-## 5. The border Attribute
+## 7. The border Attribute
 
 The **border** attribute triggers a structural transformation. The tag is wrapped in an outer border-element (the border component). The original tag remains as the direct child of the border, containing all nested children. Example:
 
@@ -240,7 +272,7 @@ Original.suim
 
 ---
 
-## 6. Language Grammar & Markup Syntax
+## 8. Language Grammar & Markup Syntax
 
 ### A. Primitive Elements & Attributes
 
