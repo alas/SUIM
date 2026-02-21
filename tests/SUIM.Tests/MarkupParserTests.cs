@@ -33,10 +33,10 @@ public class MarkupParserTests
         Assert.Equal("main", div.Id);
         Assert.Equal(new UnitValue(100), UnitValue.Parse(div.Width));
         Assert.Equal(new UnitValue(200), UnitValue.Parse(div.Height));
-        Assert.Equal(HorizontalAlignment.Center, div.HorizontalAlignment);
-        Assert.Equal(VerticalAlignment.Top, div.VerticalAlignment);
-        Assert.Equal(new Thickness(10), div.Margin);
-        Assert.Equal(new Thickness(5), div.Padding);
+        Assert.Equal(HorizontalAlignment.Center, HorizontalAlignment.Parse(div.HorizontalAlignment));
+        Assert.Equal(VerticalAlignment.Top, VerticalAlignment.Parse(div.VerticalAlignment));
+        Assert.Equal(new Thickness(10), Thickness.Parse(div.Margin));
+        Assert.Equal(new Thickness(5), Thickness.Parse(div.Padding));
         Assert.Equal("blue", div.BackgroundColor);
     }
 
@@ -194,7 +194,7 @@ public class MarkupParserTests
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Anchor.Top, div.Anchor);
+        Assert.Equal(Anchor.Top, Anchor.Parse(div.Anchor));
     }
 
     [Fact]
@@ -205,7 +205,7 @@ public class MarkupParserTests
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Anchor.Left, div.Anchor);
+        Assert.Equal(Anchor.Left, Anchor.Parse(div.Anchor));
     }
 
     [Fact]
@@ -216,8 +216,8 @@ public class MarkupParserTests
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(HorizontalAlignment.Right, div.HorizontalAlignment);
-        Assert.Equal(VerticalAlignment.Bottom, div.VerticalAlignment);
+        Assert.Equal(HorizontalAlignment.Right, HorizontalAlignment.Parse(div.HorizontalAlignment));
+        Assert.Equal(VerticalAlignment.Bottom, VerticalAlignment.Parse(div.VerticalAlignment));
     }
 
     [Fact]
@@ -313,7 +313,7 @@ public class MarkupParserTests
         var label = (Label)element;
         Assert.Equal("Hello", label.Value);
         Assert.Equal("Arial", label.Font);
-        Assert.Equal(16f, label.FontSize);
+        Assert.Equal(16f, Convert.ToSingle(label.FontSize));
         Assert.Equal("#FF0000", label.Color);
         Assert.True(label.Wrap);
     }
@@ -365,8 +365,8 @@ public class MarkupParserTests
         Assert.IsType<TextArea>(element);
         var textarea = (TextArea)element;
         Assert.Equal("notes", textarea.Id);
-        Assert.Equal(new UnitValue(300), textarea.Width);
-        Assert.Equal(new UnitValue(200), textarea.Height);
+        Assert.Equal(new UnitValue(300), UnitValue.Parse(textarea.Width));
+        Assert.Equal(new UnitValue(200), UnitValue.Parse(textarea.Height));
     }
 
     // ============== STACK SYNONYMS TESTS ==============
@@ -461,7 +461,7 @@ public class MarkupParserTests
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Visibility.Hidden, div.Visibility);
+        Assert.Equal(Visibility.Hidden, Visibility.Parse(div.Visibility));
     }
 
     [Fact]
@@ -472,7 +472,7 @@ public class MarkupParserTests
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(0.5, div.Opacity);
+        Assert.Equal(0.5f, Convert.ToSingle(div.Opacity));
     }
 
     [Fact]
@@ -483,7 +483,7 @@ public class MarkupParserTests
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(10, div.ZIndex);
+        Assert.Equal(10, Convert.ToInt32(div.ZIndex));
     }
 
     [Fact]
@@ -494,8 +494,8 @@ public class MarkupParserTests
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(50f, div.X.Value);
-        Assert.Equal(100f, div.Y.Value);
+        Assert.Equal(50f, UnitValue.Parse(div.X).Value);
+        Assert.Equal(100f, UnitValue.Parse(div.Y).Value);
     }
 
     [Fact]
@@ -635,8 +635,8 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(new UnitValue(100), div.Width);
-        Assert.Equal(new UnitValue(200), div.Height);
+        Assert.Equal(new UnitValue(100), UnitValue.Parse(div.Width));
+        Assert.Equal(new UnitValue(200), UnitValue.Parse(div.Height));
     }
 
     [Fact]
@@ -647,8 +647,8 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(new UnitValue(1, UnitType.Fr), div.Width);
-        Assert.Equal(new UnitValue(2, UnitType.Fr), div.Height);
+        Assert.Equal(new UnitValue(1, UnitType.Fr), UnitValue.Parse(div.Width));
+        Assert.Equal(new UnitValue(2, UnitType.Fr), UnitValue.Parse(div.Height));
     }
 
     [Fact]
@@ -659,7 +659,7 @@ else
 
         Assert.IsType<Label>(element);
         var label = (Label)element;
-        Assert.Equal(new UnitValue(0, UnitType.Auto), label.Width);
+        Assert.Equal(new UnitValue(0, UnitType.Auto), UnitValue.Parse(label.Width));
     }
 
     // ============== ADDITIONAL INPUT TYPES TESTS ==============
@@ -839,7 +839,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Anchor.Top, div.Anchor);
+        Assert.Equal(Anchor.Top, Anchor.Parse(div.Anchor));
     }
 
     [Fact]
@@ -850,7 +850,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Anchor.Bottom, div.Anchor);
+        Assert.Equal(Anchor.Bottom, Anchor.Parse(div.Anchor));
     }
 
     [Fact]
@@ -861,7 +861,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Anchor.Right, div.Anchor);
+        Assert.Equal(Anchor.Right, Anchor.Parse(div.Anchor));
     }
 
     [Fact]
@@ -872,7 +872,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Anchor.Left, div.Anchor);
+        Assert.Equal(Anchor.Left, Anchor.Parse(div.Anchor));
     }
 
     [Fact]
@@ -883,7 +883,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Anchor.None, div.Anchor);
+        Assert.Equal(Anchor.None, Anchor.Parse(div.Anchor));
     }
 
     // ============== DOCK EDGE VARIANTS ==============
@@ -926,7 +926,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(1.0f, div.Opacity);
+        Assert.Equal(1.0f, Convert.ToSingle(div.Opacity));
     }
 
     [Fact]
@@ -937,7 +937,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(0.0f, div.Opacity);
+        Assert.Equal(0.0f, Convert.ToSingle(div.Opacity));
     }
 
     [Fact]
@@ -948,7 +948,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(0.75f, div.Opacity);
+        Assert.Equal(0.75f, Convert.ToSingle(div.Opacity));
     }
 
     [Fact]
@@ -959,7 +959,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(-5, div.ZIndex);
+        Assert.Equal(-5, Convert.ToInt32(div.ZIndex));
     }
 
     [Fact]
@@ -970,7 +970,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(1000, div.ZIndex);
+        Assert.Equal(1000, Convert.ToInt32(div.ZIndex));
     }
 
     [Fact]
@@ -1018,7 +1018,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Visibility.Visible, div.Visibility);
+        Assert.Equal(Visibility.Visible, Visibility.Parse(div.Visibility));
     }
 
     [Fact]
@@ -1029,7 +1029,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Visibility.Collapsed, div.Visibility);
+        Assert.Equal(Visibility.Collapsed, Visibility.Parse(div.Visibility));
     }
 
     // ============== GRID SPAN EDGE CASES ==============
@@ -1256,16 +1256,16 @@ Text after
         Assert.IsType<Scroll>(element);
         var scroll = (Scroll)element;
         Assert.Equal(ScrollDirection.Vertical, scroll.Direction);
-        Assert.Equal(new UnitValue(400), scroll.Width);
-        Assert.Equal(new UnitValue(300), scroll.Height);
+        Assert.Equal(new UnitValue(400), UnitValue.Parse(scroll.Width));
+        Assert.Equal(new UnitValue(300), UnitValue.Parse(scroll.Height));
         
         Assert.Single(scroll.Children);
         var stack = (Stack)scroll.Children[0];
         Assert.IsType<Stack>(stack);
         Assert.Equal(Orientation.Vertical, stack.Orientation);
         // Inner element should default to `auto` sizing when wrapped by a scroll-viewport
-        Assert.Equal(UnitValue.Auto, stack.Width);
-        Assert.Equal(UnitValue.Auto, stack.Height);
+        Assert.Equal(UnitValue.Auto, UnitValue.Parse(stack.Width));
+        Assert.Equal(UnitValue.Auto, UnitValue.Parse(stack.Height));
         // Spacing is component specific, goes to stack
         Assert.Equal(5, stack.Spacing);
         Assert.Equal(3, stack.Children.Count);
@@ -1295,7 +1295,7 @@ Text after
 
         Assert.IsType<Border>(element);
         var border = (Border)element;
-        Assert.Equal(new Thickness(5, 10, 5, 10),  border.Thickness);
+        Assert.Equal(new Thickness(5, 10, 5, 10), Thickness.Parse(border.Thickness));
         Assert.Equal("blue", border.Color);
         Assert.Single(border.Children);
     }
@@ -1310,7 +1310,7 @@ Text after
 
         Assert.IsType<Border>(element);
         var border = (Border)element;
-        Assert.Equal(new Thickness(3, 6), border.Thickness);
+        Assert.Equal(new Thickness(3, 6), Thickness.Parse(border.Thickness));
         Assert.Equal("green", border.Color);
     }
 
@@ -1326,8 +1326,8 @@ Text after
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(new UnitValue(300), div.Width);
-        Assert.Equal(new UnitValue(200), div.Height);
+        Assert.Equal(new UnitValue(300), UnitValue.Parse(div.Width));
+        Assert.Equal(new UnitValue(200), UnitValue.Parse(div.Height));
         Assert.Equal("lightgray", div.BackgroundColor);
         Assert.Single(div.Children);
         
@@ -1365,7 +1365,7 @@ Text after
         
         // Border props
         // "2 red" -> Thickness 2, Color red
-        Assert.Equal(2, border.Thickness.Left.Value); 
+        Assert.Equal(2, Thickness.Parse(border.Thickness).Left.Value); 
         Assert.Equal("red", border.Color);
         
         Assert.Single(border.Children);
@@ -1382,14 +1382,14 @@ Text after
         // Logic in Parser: `target = IsLayoutAttribute(name) ? rootElement : innerElement;`
         // Width, Height, Bg ARE LayoutAttributes. So they go to Border.
         
-        Assert.Equal(new UnitValue(300), border.Width);
-        Assert.Equal(new UnitValue(200), border.Height);
+        Assert.Equal(new UnitValue(300), UnitValue.Parse(border.Width));
+        Assert.Equal(new UnitValue(200), UnitValue.Parse(border.Height));
         Assert.Equal("lightgray", border.BackgroundColor);
         
         // Inner Div should NOT have them? Or Parser doesn't set them on inner.
         // Let's check Inner Div.
-        Assert.Equal(UnitValue.Auto, div.Width);
-        Assert.Equal(UnitValue.Auto, div.Height);
+        Assert.Equal(UnitValue.Auto, UnitValue.Parse(div.Width));
+        Assert.Equal(UnitValue.Auto, UnitValue.Parse(div.Height));
         Assert.Null(div.BackgroundColor); // If it was null before.
         
         Assert.Single(div.Children);
@@ -1408,10 +1408,10 @@ Text after
         Assert.IsType<Border>(element);
         var border = (Border)element;
         
-        Assert.Equal(5f, border.Thickness.Left.Value); // Assuming uniform
+        Assert.Equal(5f, Thickness.Parse(border.Thickness).Left.Value); // Assuming uniform
         Assert.Equal("#FF0000", border.Color);
-        Assert.Equal(new UnitValue(500), border.Width);
-        Assert.Equal(new UnitValue(400), border.Height);
+        Assert.Equal(new UnitValue(500), UnitValue.Parse(border.Width));
+        Assert.Equal(new UnitValue(400), UnitValue.Parse(border.Height));
         
         Assert.Single(border.Children);
         Assert.IsType<Div>(border.Children[0]);
@@ -1438,16 +1438,16 @@ Text after
         Assert.NotNull(border);
         Assert.Equal("#FF0000", border.Color);
         // Style sizes should be applied to the wrapper (Border)
-        Assert.Equal(new UnitValue(500), border.Width);
-        Assert.Equal(new UnitValue(400), border.Height);
+        Assert.Equal(new UnitValue(500), UnitValue.Parse(border.Width));
+        Assert.Equal(new UnitValue(400), UnitValue.Parse(border.Height));
         Assert.Single(border.Children);
 
         var div = border.Children[0] as Div;
         Assert.NotNull(div);
         Assert.Equal("myclass", div.Class);
         // Wrapped inner element should default to auto sizing (style moved to wrapper)
-        Assert.Equal(UnitValue.Auto, div.Width);
-        Assert.Equal(UnitValue.Auto, div.Height);
+        Assert.Equal(UnitValue.Auto, UnitValue.Parse(div.Width));
+        Assert.Equal(UnitValue.Auto, UnitValue.Parse(div.Height));
         Assert.Single(div.Children);
         Assert.IsType<Label>(div.Children[0]);
     }
@@ -1456,10 +1456,10 @@ Text after
     public void ParseStyles_ClassWithBorderAndSizes_AssignsProperties()
     {
         var styleContent = ".myclass { width: 500; height: 400; border: 5 #FF0000; }";
-        Dictionary<string, Dictionary<string, string>> styleDictionary = [];
+        var styleDictionary = new Dictionary<string, Dictionary<string, string>>();
         var mi = typeof(MarkupParser).GetMethod("ParseStyles", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
             ?? throw new Exception();
-        _ = mi.Invoke(null, [styleContent, styleDictionary])!;
+        mi.Invoke(null, new object[] { styleContent, styleDictionary });
 
         Assert.True(styleDictionary.ContainsKey(".myclass"));
         var props = styleDictionary[".myclass"];
@@ -1489,7 +1489,7 @@ Text after
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         var div = element?.Children.Single() as Div;
-        Assert.Equal(new UnitValue(200), div?.Width);
+        Assert.Equal(new UnitValue(200), UnitValue.Parse(div?.Width));
     }
 
     [Fact]
@@ -1502,7 +1502,7 @@ Text after
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         var div = element?.Children.Single() as Div;
-        Assert.Equal(new UnitValue(150), div?.Width);
+        Assert.Equal(new UnitValue(150), UnitValue.Parse(div?.Width));
     }
 
     [Fact]
@@ -1800,8 +1800,8 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(10), div.Padding);
-        Assert.Equal(new Thickness(5), div.Margin);
+        Assert.Equal(new Thickness(10), Thickness.FromObject(div.Padding));
+        Assert.Equal(new Thickness(5), Thickness.FromObject(div.Margin));
     }
 
     [Fact]
@@ -1817,8 +1817,8 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new UnitValue(500), div.Width);
-        Assert.Equal(new UnitValue(300), div.Height);
+        Assert.Equal(new UnitValue(500), UnitValue.Parse(div.Width));
+        Assert.Equal(new UnitValue(300), UnitValue.Parse(div.Height));
     }
 
     [Fact]
@@ -1834,7 +1834,7 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(8), div.Padding);
+        Assert.Equal(new Thickness(8), Thickness.FromObject(div.Padding));
         Assert.Equal("blue", div.BackgroundColor);
     }
 
@@ -1851,16 +1851,16 @@ Text after
 
         var stack = element.Children.Single() as Stack;
         Assert.NotNull(stack);
-        Assert.Equal(new Thickness(5), stack.Margin);
-        Assert.Equal(new Thickness(3), stack.Padding);
+        Assert.Equal(new Thickness(5), Thickness.FromObject(stack.Margin));
+        Assert.Equal(new Thickness(3), Thickness.FromObject(stack.Padding));
 
         var div = (Div)stack.Children[0];
-        Assert.Equal(new Thickness(5), div.Margin);
-        Assert.Equal(new Thickness(3), div.Padding);
+        Assert.Equal(new Thickness(5), Thickness.FromObject(div.Margin));
+        Assert.Equal(new Thickness(3), Thickness.FromObject(div.Padding));
 
         var label = (Label)stack.Children[1];
-        Assert.Equal(new Thickness(5), label.Margin);
-        Assert.Equal(new Thickness(3), label.Padding);
+        Assert.Equal(new Thickness(5), Thickness.FromObject(label.Margin));
+        Assert.Equal(new Thickness(3), Thickness.FromObject(label.Padding));
     }
 
     [Fact]
@@ -1878,8 +1878,8 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(5), div.Padding);      // from universal
-        Assert.Equal(new Thickness(10), div.Margin);      // from class
+        Assert.Equal(new Thickness(5), Thickness.FromObject(div.Padding));      // from universal
+        Assert.Equal(new Thickness(10), Thickness.FromObject(div.Margin));      // from class
         Assert.Equal("gray", div.BackgroundColor); // from tag
     }
 
@@ -1899,8 +1899,8 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(20), div.Padding);      // ID selector overrides all
-        Assert.Equal(new Thickness(1), div.Margin);        // from universal
+        Assert.Equal(new Thickness(20), Thickness.Parse(div.Padding));      // ID selector overrides all
+        Assert.Equal(new Thickness(1), Thickness.Parse(div.Margin));        // from universal
         Assert.Equal("blue", div.BackgroundColor);  // from tag selector
     }
 
@@ -1919,7 +1919,7 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(12), div.Padding); // class overrides tag and universal
+        Assert.Equal(new Thickness(12), Thickness.Parse(div.Padding)); // class overrides tag and universal
     }
 
     [Fact]
@@ -1936,10 +1936,10 @@ Text after
         var stack = element.Children.Single() as Stack;
         Assert.NotNull(stack);
         var label = (Label)stack.Children[0];
-        Assert.Equal(new Thickness(6), label.Padding);
+        Assert.Equal(new Thickness(6), Thickness.Parse(label.Padding));
 
         var button = (Button)stack.Children[1];
-        Assert.Equal(new Thickness(new UnitValue(0, UnitType.None)), button.Padding); // button not styled
+        Assert.Equal(new Thickness(new UnitValue(0, UnitType.None)), Thickness.Parse(button.Padding)); // button not styled
     }
 
     [Fact]
@@ -1957,7 +1957,7 @@ Text after
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
         // Class selector should not match "header other" exactly
-        Assert.Equal(new Thickness(new UnitValue(0, UnitType.None)), div.Padding); // div not styled
+        Assert.Equal(new Thickness(new UnitValue(0, UnitType.None)), Thickness.Parse(div.Padding)); // div not styled
     }
 
     [Fact]
@@ -1967,8 +1967,8 @@ Text after
         var (element, _) = MarkupParser.Parse(markup);
 
         var div = (Div)element;
-        Assert.Equal(new Thickness(5), div.Padding);
-        Assert.Equal(new Thickness(10), div.Margin);
+        Assert.Equal(new Thickness(5), Thickness.Parse(div.Padding));
+        Assert.Equal(new Thickness(10), Thickness.Parse(div.Margin));
     }
 
     [Fact]
@@ -1979,7 +1979,7 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(5), div.Padding);
+        Assert.Equal(new Thickness(5), Thickness.Parse(div.Padding));
     }
 
     [Fact]
@@ -1996,7 +1996,7 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(8), div.Padding);
+        Assert.Equal(new Thickness(8), Thickness.Parse(div.Padding));
         Assert.NotNull(model);
         Assert.Equal("test", model!.name);
     }
@@ -2016,7 +2016,7 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(15), div.Padding); // ID takes highest precedence
+        Assert.Equal(new Thickness(15), Thickness.Parse(div.Padding)); // ID takes highest precedence
     }
 
     [Fact]
@@ -2034,8 +2034,8 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(5), div.Margin);        // from universal
-        Assert.Equal(new Thickness(10), div.Padding);      // from class
+        Assert.Equal(new Thickness(5), Thickness.Parse(div.Margin));        // from universal
+        Assert.Equal(new Thickness(10), Thickness.Parse(div.Padding));      // from class
         Assert.Equal("white", div.BackgroundColor); // from tag
     }
 }

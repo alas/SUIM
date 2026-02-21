@@ -1,9 +1,9 @@
 namespace SUIM.Tests;
 
-using SUIM.Components;
-using SUIM.Components.Attributes;
 using System.IO;
 using Xunit;
+using SUIM.Components;
+using SUIM.Components.Attributes;
 
 public class CustomComponentTests
 {
