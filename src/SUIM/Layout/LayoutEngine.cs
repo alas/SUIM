@@ -235,15 +235,16 @@ public static class LayoutEngine
 
     private static void MeasureStack(Stack stack, float availableWidth, float availableHeight)
     {
-        var totalSpacing = Math.Max(0, stack.Spacing * (stack.Children.Count - 1));
-
+        var spacing = Thickness.Parse(stack.Spacing);
+        var totalHorizontalSpacing = Math.Max(0, spacing.Left.Value * (stack.Children.Count - 1));
+        var totalVerticalSpacing = Math.Max(0, spacing.Top.Value * (stack.Children.Count - 1));
         if (stack.Orientation == Orientation.Horizontal)
         {
-            MeasureHorizontalStack(stack, availableWidth, availableHeight, totalSpacing);
+            MeasureHorizontalStack(stack, availableWidth, availableHeight, totalHorizontalSpacing);
         }
         else
         {
-            MeasureVerticalStack(stack, availableWidth, availableHeight, totalSpacing);
+            MeasureVerticalStack(stack, availableWidth, availableHeight, totalVerticalSpacing);
         }
     }
 
@@ -482,8 +483,9 @@ public static class LayoutEngine
         float maxWidth = 0;
         float totalHeight = 0;
         var elements = new List<UIElement>();
-        float spacing = div.Spacing;
-        var totalSpacing = Math.Max(0, spacing * (div.Children.Count - 1));
+        var spacing = Thickness.Parse(div.Spacing);
+        var totalHorizontalSpacing = Math.Max(0, spacing.Left.Value * (div.Children.Count - 1));
+        var totalVerticalSpacing = Math.Max(0, spacing.Top.Value * (div.Children.Count - 1));
 
         // Resolve unspecified width for Div (default to 1fr)
         var width = UnitValue.Parse(div.Width);
@@ -514,7 +516,7 @@ public static class LayoutEngine
         // Resolve FractionalUnit heights
         if (elements.Count > 0)
         {
-            var remainingHeight = availableHeight - totalHeight - totalSpacing;
+            var remainingHeight = availableHeight - totalHeight - totalVerticalSpacing;
             ResolveFractionalUnitHeights(elements, Math.Max(0, remainingHeight), availableWidth);
 
             foreach (var element in elements)
@@ -540,7 +542,7 @@ public static class LayoutEngine
         }
         else
         {
-            div.MeasuredContentHeight = totalHeight + totalSpacing;
+            div.MeasuredContentHeight = totalHeight + totalVerticalSpacing;
         }
     }
 
@@ -588,7 +590,11 @@ public static class LayoutEngine
             totalWidth += child.ActualWidth;
 
         if (stack.Children.Count > 1)
-            totalWidth += stack.Spacing * (stack.Children.Count - 1);
+        {
+            var spacing = Thickness.Parse(stack.Spacing);
+            var totalHorizontalSpacing = spacing.Left.Value * (stack.Children.Count - 1);
+            totalWidth += totalHorizontalSpacing;
+        }
 
         float currentX = stack.ActualX + stack.ComputedPaddingLeft + 
             CalculateHorizontalAlignmentOffset(stack.MeasuredContentWidth, totalWidth, stack.ContentHorizontalAlignment);
@@ -599,7 +605,8 @@ public static class LayoutEngine
             child.ActualX = currentX;
             child.ActualY = baseY;
             ApplyVerticalAlignment(child, baseY, stack.MeasuredContentHeight);
-            currentX += child.ActualWidth + stack.Spacing;
+            var spacing = Thickness.Parse(stack.Spacing);
+            currentX += child.ActualWidth + spacing.Left.Value;
         }
     }
 
@@ -612,7 +619,11 @@ public static class LayoutEngine
             totalHeight += child.ActualHeight;
 
         if (stack.Children.Count > 1)
-            totalHeight += stack.Spacing * (stack.Children.Count - 1);
+        {
+            var spacing = Thickness.Parse(stack.Spacing);
+            var totalVerticalSpacing = spacing.Top.Value * (stack.Children.Count - 1);
+            totalHeight += totalVerticalSpacing;
+        }
 
         float currentY = stack.ActualY + stack.ComputedPaddingTop + 
             CalculateVerticalAlignmentOffset(stack.MeasuredContentHeight, totalHeight, stack.ContentVerticalAlignment);
@@ -622,7 +633,8 @@ public static class LayoutEngine
             child.ActualX = baseX;
             child.ActualY = currentY;
             ApplyHorizontalAlignment(child, baseX, stack.MeasuredContentWidth);
-            currentY += child.ActualHeight + stack.Spacing;
+            var spacing = Thickness.Parse(stack.Spacing);
+            currentY += child.ActualHeight + spacing.Top.Value;
         }
     }
 
@@ -754,7 +766,11 @@ public static class LayoutEngine
             totalHeight += child.ActualHeight;
 
         if (div.Children.Count > 1)
-            totalHeight += div.Spacing * (div.Children.Count - 1);
+        {
+            var spacing = Thickness.Parse(div.Spacing);
+            var totalVerticalSpacing = spacing.Top.Value * (div.Children.Count - 1);
+            totalHeight += totalVerticalSpacing;
+        }
 
         float currentY = div.ActualY + div.ComputedPaddingTop + 
             CalculateVerticalAlignmentOffset(div.MeasuredContentHeight, totalHeight, div.ContentVerticalAlignment);
@@ -764,7 +780,8 @@ public static class LayoutEngine
             child.ActualX = baseX;
             child.ActualY = currentY;
             ApplyHorizontalAlignment(child, baseX, div.MeasuredContentWidth);
-            currentY += child.ActualHeight + div.Spacing;
+            var spacing = Thickness.Parse(div.Spacing);
+            currentY += child.ActualHeight + spacing.Top.Value;
         }
     }
 

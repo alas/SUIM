@@ -49,7 +49,7 @@ public class MarkupParserTests
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
         Assert.Equal(Orientation.Vertical, stack.Orientation);
-        Assert.Equal(10, stack.Spacing);
+        Assert.Equal("10", stack.Spacing);
         Assert.Equal(2, stack.Children.Count);
         Assert.IsType<Div>(stack.Children[0]);
         Assert.IsType<Div>(stack.Children[1]);
@@ -517,7 +517,7 @@ public class MarkupParserTests
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
-        Assert.Equal(10, stack.Spacing);
+        Assert.Equal("10", stack.Spacing);
     }
 
     [Fact]
@@ -1267,7 +1267,7 @@ Text after
         Assert.Equal(UnitValue.Auto, UnitValue.Parse(stack.Width));
         Assert.Equal(UnitValue.Auto, UnitValue.Parse(stack.Height));
         // Spacing is component specific, goes to stack
-        Assert.Equal(5, stack.Spacing);
+        Assert.Equal("5", stack.Spacing);
         Assert.Equal(3, stack.Children.Count);
     }
 

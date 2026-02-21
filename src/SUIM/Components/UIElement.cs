@@ -252,7 +252,7 @@ public abstract class UIElement(string tagName)
 
 public class LayoutElement(string tagName) : UIElement(tagName)
 {
-    public int Spacing { get; set; }
+    public string? Spacing { get; set; }
     public bool Clip { get; set; }
     public Thickness SliceWidth { get; set; } = Thickness.None;
 
@@ -260,7 +260,7 @@ public class LayoutElement(string tagName) : UIElement(tagName)
     {
         if (name.Equals("spacing", StringComparison.OrdinalIgnoreCase))
         {
-            Spacing = value is int i ? i : Convert.ToInt32(value);
+            Spacing = value as string;
         }
         else if (name.Equals("clip", StringComparison.OrdinalIgnoreCase))
         {
