@@ -9,5 +9,5 @@
     </vstack>
 
 	<Popup title="@PopupTitle" message="@PopupMessage" onYes="@YesHandler" onNo="@NoHandler" visibility="@PopupVisibility" />
-    <ScreenOverlay message="@BlockerMessage" />
+    <ScreenOverlay message="@BlockerMessage" visibility="@OverlayVisibility" />
 </grid>

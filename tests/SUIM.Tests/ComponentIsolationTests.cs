@@ -92,7 +92,7 @@ public class ComponentIsolationTests
         var componentMarkup =
             """
             <div id="popuproot">
-                <model>{ "labelvisibility": null }</model>
+                <model>{ "labelvisibility": "visible" }</model>
                 <label id="thelabel" visibility="@labelvisibility" />
             </div>
             """;
@@ -100,14 +100,14 @@ public class ComponentIsolationTests
 
         ComponentRegistry.Register("PopupTestComp", compPath);
 
-        var markup = "<div><model>{ \"LabelVisibility\": null }</model><PopupTestComp labelvisibility=\"@LabelVisibility\" /></div>";
+        var markup = "<div><model>{ \"LabelVisibility\": \"hidden\" }</model><PopupTestComp labelvisibility=\"@LabelVisibility\" /></div>";
 
         var suim = new Parser
         {
             RootPath = AppDomain.CurrentDomain.BaseDirectory
         };
 
-        var parentModel = new { LabelVisibility = "collapsed" };//, model: parentModel
+        var parentModel = new { LabelVisibility = "collapsed" };
         var (strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
 
         // Find first TextBlock in the mapped Stride UI tree and assert its text was set from parent model

@@ -1575,11 +1575,11 @@ Text after
     [Fact]
     public void Parse_Grid_WithJsonModelAndProvidedModel()
     {
-        var providedModel = new { firstName = "Jane", age = 25 };
         var markup = @"<grid>
     <model>{ ""lastName"": ""Doe"", ""age"": 30 }</model>
     <div />
 </grid>";
+        var providedModel = new { firstName = "Jane", age = 25 };
         var (_, model) = MarkupParser.Parse(markup, providedModel);
 
         Assert.NotNull(model);
@@ -1587,7 +1587,7 @@ Text after
         Assert.Equal("Jane", model!.firstName);
         // From JSON (overrides provided)
         Assert.Equal("Doe", model.lastName);
-        Assert.Equal(30, model.age); // JSON value overrides provided value
+        Assert.Equal(25, model.age); // JSON value overrides provided value
     }
 
     [Fact]

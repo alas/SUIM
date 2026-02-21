@@ -53,11 +53,15 @@ public static class ModelLogic
                 return CreateDynamicFromDictionary(modelDict);
             }
 
-            // Merge: extract properties from existing model, then update with JSON values
+            // Merge: extract properties from existing model, then add JSON values
             var mergedDict = ExtractPropertiesAsDictionary(existingModel);
             foreach (var kvp in modelDict)
             {
-                mergedDict[kvp.Key] = kvp.Value;
+                // If the existing model already has this property, keep its value; otherwise use JSON value
+                if (!mergedDict.ContainsKey(kvp.Key))
+                {
+                    mergedDict[kvp.Key] = kvp.Value;
+                }
             }
 
             // Preserve the source object if we had one

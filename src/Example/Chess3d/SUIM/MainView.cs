@@ -27,6 +27,7 @@ public class MainView
                 YesHandler = new Action(YesHandlerAction),
                 NoHandler = new Action(UnshowPopup),
                 PopupVisibility = Visibility.Collapsed,
+                OverlayVisibility = Visibility.Collapsed,
             };
 
         var mapper = new Parser
@@ -118,13 +119,11 @@ public class MainView
     private void ShowBlocker(string message)
     {
         Model.BlockerMessage = message;
-        var blocker = XPath.Find(RootElement, "screenOverlay");
-        blocker!.Visibility = Visibility.Visible;
+        Model.OverlayVisibility = Visibility.Visible;
     }
 
     private void UnshowBlocker()
     {
-        var blocker = XPath.Find(RootElement, "screenOverlay");
-        blocker!.Visibility = Visibility.Collapsed;
+        Model.OverlayVisibility = Visibility.Collapsed;
     }
 }
