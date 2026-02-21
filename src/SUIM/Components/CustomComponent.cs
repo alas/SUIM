@@ -60,7 +60,13 @@ public class CustomComponent(string tagName) : UIElement(tagName)
                         if (parentModel is ObservableObject parentOO)
                         {
                             var parentPropName = val[1..];
-                            oo.SetProxy(name, () => parentOO.GetValue(parentPropName), (v) => parentOO.SetValue(parentPropName, v));
+                            // Preserve the component's initial value as a fallback when the parent doesn't provide a value yet.
+                            var initialValue = oo.GetValue(name);
+                            oo.SetProxy(name, () =>
+                            {
+                                var pv = parentOO.GetValue(parentPropName);
+                                return pv ?? initialValue;
+                            }, (v) => parentOO.SetValue(parentPropName, v));
 
                             // When parent changes, notify the component model so bindings inside the component update.
                             parentOO.PropertyChanged += (s, e) =>

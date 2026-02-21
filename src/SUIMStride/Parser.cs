@@ -578,7 +578,7 @@ public class Parser
             // Handle other common properties
             else if (string.Equals(targetPropertyName, "visibility", StringComparison.OrdinalIgnoreCase))
             {
-                if (value != null && Enum.TryParse<Stride.UI.Visibility>(value.ToString(), out var vis))
+                if (value != null && Enum.TryParse<Stride.UI.Visibility>(value.ToString(), true, out var vis))
                     strideElement.Visibility = vis;
             }
             else if (string.Equals(targetPropertyName, "opacity", StringComparison.OrdinalIgnoreCase))
