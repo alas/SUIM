@@ -1,28 +1,30 @@
 ﻿<popup>
-	<model>
-	{
-		"title": "",
-		"message": "",
-		"onYes": null,
-		"onNo": null,
-		"visibility": "collapsed"
-	}
-	</model>
+    <model>
+    {
+        "title": "",
+        "message": "",
+        "onYes": null,
+        "onNo": null,
+        "visibility": "collapsed"
+    }
+    </model>
 
-	<overlay visibility="@visibility">
-		<grid width="360" height="180" halign="center" valign="center">
-			<vstack>
-				<hstack>
-					<label value="@title" />
-				</hstack>
-				<vstack margin="6">
-					<label value="@message" />
-				</vstack>
-				<hstack>
-					<button onclick="@onYes">YES</button>
-					<button onclick="@onNo">NO</button>
-				</hstack>
-			</vstack>
-		</grid>
-	</overlay>
+    <!-- Classic chess-style popup: wood background, panel shadow, image-based buttons for states -->
+    <overlay visibility="@visibility" background="Assets/Textures/wood_bg.jpg">
+        <grid width="380" height="220" halign="center" valign="center" class="wood-panel" shadow="0 8 16 rgba(0,0,0,0.5)">
+            <vstack spacing="8" padding="12">
+                <hstack>
+                    <label value="@title" class="popup-title" />
+                </hstack>
+                <vstack margin="6">
+                    <label value="@message" class="popup-message" />
+                </vstack>
+                <hstack spacing="10" halign="center">
+                    <!-- Buttons use separate images for states: normal, hover and pressed. Place images under Assets/Buttons/ -->
+                    <button onclick="@onYes" class="chess-btn">YES</button>
+                    <button onclick="@onNo" class="chess-btn">NO</button>
+                </hstack>
+            </vstack>
+        </grid>
+    </overlay>
 </popup>

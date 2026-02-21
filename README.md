@@ -533,3 +533,12 @@ Result in this output:
 * `Stackpanel (Orientation: "Vertical")`
 * `Label` (Text: "Inventory")
 * `Grid` (Binding: Width -> Model.invWidth)
+
+
+Wood Image from:
+Kai photographer
+https://www.vecteezy.com/photo/3498715-seamless-texture-wood-old-oak-or-modern-wood-texture
+
+Button Image from:
+Gamanbit – Survival Dark Style
+https://gamanbit.itch.io/survival-dark-style-free-starter-asset-pack
