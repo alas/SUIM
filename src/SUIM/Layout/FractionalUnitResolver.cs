@@ -5,6 +5,7 @@ public static class FractionalUnitResolver
     public static float[] ResolveFractionalUnits(float[] frValues, float availableSpace)
     {
         if (frValues.Length == 0) return [];
+        availableSpace = Sanitize(availableSpace);
         
         float total = 0f;
         foreach (var value in frValues)
@@ -23,5 +24,22 @@ public static class FractionalUnitResolver
         }
         
         return resolvedValues;
+    }
+
+    public static float Sanitize(float value)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value) || value < 0) return 0;
+        return value;
+    }
+
+    public static float SanitizeWithMax(float value)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value) || value < 0 || value == float.MaxValue) return 0;
+        return value;
+    }
+
+    public static bool IsInvalid(float value)
+    {
+        return float.IsNaN(value) || float.IsInfinity(value) || value < 0;
     }
 }

@@ -14,6 +14,7 @@ using Stride.UI.Panels;
 using StrideGrid = Stride.UI.Panels.Grid;
 using SUIM;
 using SUIM.Components.Attributes;
+using SUIM.Layout;
 
 public class Parser
 {
@@ -342,26 +343,20 @@ public class Parser
         stride.VerticalAlignment = Stride.UI.VerticalAlignment.Top;
 
         // Use calculated dimensions
-        if (!float.IsNaN(suim.ActualWidth) && suim.ActualWidth > 0 && !float.IsInfinity(suim.ActualWidth))
-        {
-            stride.Width = suim.ActualWidth;
-        }
-        if (!float.IsNaN(suim.ActualHeight) && suim.ActualHeight > 0 && !float.IsInfinity(suim.ActualHeight))
-        {
-            stride.Height = suim.ActualHeight;
-        }
+        stride.Width = FractionalUnitResolver.Sanitize(suim.ActualWidth);
+        stride.Height = FractionalUnitResolver.Sanitize(suim.ActualHeight);
 
         // Calculate parent-relative positioning
         float parentContentX = 0;
         float parentContentY = 0;
         if (suim.Parent != null)
         {
-            parentContentX = Sanitize(suim.Parent.ActualX) + Sanitize(suim.Parent.ComputedMarginLeft) + Sanitize(suim.Parent.ComputedPaddingLeft);
-            parentContentY = Sanitize(suim.Parent.ActualY) + Sanitize(suim.Parent.ComputedMarginTop) + Sanitize(suim.Parent.ComputedPaddingTop);
+            parentContentX = FractionalUnitResolver.Sanitize(suim.Parent.ActualX) + FractionalUnitResolver.Sanitize(suim.Parent.ComputedMarginLeft) + FractionalUnitResolver.Sanitize(suim.Parent.ComputedPaddingLeft);
+            parentContentY = FractionalUnitResolver.Sanitize(suim.Parent.ActualY) + FractionalUnitResolver.Sanitize(suim.Parent.ComputedMarginTop) + FractionalUnitResolver.Sanitize(suim.Parent.ComputedPaddingTop);
         }
 
-        float ax = Sanitize(suim.ActualX);
-        float ay = Sanitize(suim.ActualY);
+        float ax = FractionalUnitResolver.Sanitize(suim.ActualX);
+        float ay = FractionalUnitResolver.Sanitize(suim.ActualY);
 
         // The coordinate in Stride is (ax + suim.ComputedMarginLeft) - parentContentX
         // We want AX to be the absolute pos. Stride Margin Left is relative offset.
@@ -369,10 +364,10 @@ public class Parser
         float top = ay - (suim.Parent != null ? parentContentY : 0);
 
         stride.Margin = new Stride.UI.Thickness(
-            Sanitize(left), 
-            Sanitize(top), 
-            Sanitize(suim.ComputedMarginRight), 
-            Sanitize(suim.ComputedMarginBottom));
+            FractionalUnitResolver.Sanitize(left),
+            FractionalUnitResolver.Sanitize(top),
+            FractionalUnitResolver.Sanitize(suim.ComputedMarginRight),
+            FractionalUnitResolver.Sanitize(suim.ComputedMarginBottom));
 
         if (stride is ContentControl cc)
         {
@@ -387,12 +382,6 @@ public class Parser
         {
             stride.CanBeHitByUser = true;
         }
-    }
-
-    private static float Sanitize(float value)
-    {
-        if (float.IsNaN(value) || float.IsInfinity(value)) return 0;
-        return value;
     }
 
     private static Stride.UI.Thickness ComponentsThicknessToStride(string? thicknessString, SUIM.Components.UIElement suim)

@@ -2,7 +2,6 @@ namespace SUIM.Layout;
 
 using SUIM.Components;
 using SUIM.Components.Attributes;
-using System.Collections;
 
 public static class LayoutEngine
 {
@@ -129,15 +128,12 @@ public static class LayoutEngine
         {
             MeasureDiv(div, availableContentWidth, availableContentHeight);
         }
-        else
+        else if (element.Children.Count > 0)
         {
-            // Measure children for generic elements
-            foreach (var child in element.Children)
-            {
-                child.CurrentFontSize = element.CurrentFontSize;
-                MeasureElement(child, availableContentWidth, availableContentHeight);
-            }
+            MeasureGeneric(element, availableContentWidth, availableContentHeight);
         }
+
+        // Handle root element sizing per-axis (only fill available space for axes without any explicit sizes in the tree)
 
         // Handle root element sizing per-axis (only fill available space for axes without any explicit sizes in the tree)
         if (element.Parent == null)
@@ -198,9 +194,9 @@ public static class LayoutEngine
     {
         // Default positioning: only set coordinates that haven't been
         // positioned by the parent container/parent-specific layout logic.
-        if (float.IsNaN(element.ActualX))
+        if (FractionalUnitResolver.IsInvalid(element.ActualX))
             element.ActualX = parentX;
-        if (float.IsNaN(element.ActualY))
+        if (FractionalUnitResolver.IsInvalid(element.ActualY))
             element.ActualY = parentY;
 
         // Position based on element type
@@ -220,6 +216,12 @@ public static class LayoutEngine
                 break;
             case Div div:
                 PositionDiv(div);
+                break;
+            default:
+                if (element.Children.Count > 0)
+                {
+                    PositionGeneric(element);
+                }
                 break;
         }
 
@@ -453,9 +455,9 @@ public static class LayoutEngine
         }
 
         // Guarantee overlays always get valid size for mapping
-        if (float.IsNaN(contentWidth) || contentWidth == 0)
+        if (FractionalUnitResolver.IsInvalid(contentWidth) || contentWidth == 0)
             contentWidth = availableWidth;
-        if (float.IsNaN(contentHeight) || contentHeight == 0)
+        if (FractionalUnitResolver.IsInvalid(contentHeight) || contentHeight == 0)
             contentHeight = availableHeight;
         overlay.MeasuredContentWidth = contentWidth;
         overlay.MeasuredContentHeight = contentHeight;
@@ -601,7 +603,8 @@ public static class LayoutEngine
         }
         else
         {
-            div.MeasuredContentWidth = Math.Max(maxWidth, availableWidth <= 0 || availableWidth == float.MaxValue ? 0 : availableWidth);
+            availableWidth = FractionalUnitResolver.SanitizeWithMax(availableWidth);
+            div.MeasuredContentWidth = Math.Max(maxWidth, availableWidth);
         }
 
         if (height.Type != UnitType.None && height.Type != UnitType.Auto)
@@ -638,8 +641,8 @@ public static class LayoutEngine
 
     private static void PositionStack(Stack stack)
     {
-        stack.ActualX = float.IsNaN(stack.ActualX) ? 0 : stack.ActualX;
-        stack.ActualY = float.IsNaN(stack.ActualY) ? 0 : stack.ActualY;
+        stack.ActualX = FractionalUnitResolver.SanitizeWithMax(stack.ActualX);
+        stack.ActualY = FractionalUnitResolver.SanitizeWithMax(stack.ActualY);
 
         if (stack.Orientation == Orientation.Horizontal)
         {
@@ -653,8 +656,8 @@ public static class LayoutEngine
 
     private static void PositionHorizontalStack(Stack stack)
     {
-        stack.ActualX = float.IsNaN(stack.ActualX) ? 0 : stack.ActualX;
-        stack.ActualY = float.IsNaN(stack.ActualY) ? 0 : stack.ActualY;
+        stack.ActualX = FractionalUnitResolver.SanitizeWithMax(stack.ActualX);
+        stack.ActualY = FractionalUnitResolver.SanitizeWithMax(stack.ActualY);
 
         float totalWidth = 0;
         foreach (var child in stack.Children)
@@ -683,8 +686,8 @@ public static class LayoutEngine
 
     private static void PositionVerticalStack(Stack stack)
     {
-        stack.ActualX = float.IsNaN(stack.ActualX) ? 0 : stack.ActualX;
-        stack.ActualY = float.IsNaN(stack.ActualY) ? 0 : stack.ActualY;
+        stack.ActualX = FractionalUnitResolver.SanitizeWithMax(stack.ActualX);
+        stack.ActualY = FractionalUnitResolver.SanitizeWithMax(stack.ActualY);
 
         float baseX = stack.ActualX + stack.ComputedPaddingLeft;
         
@@ -714,8 +717,8 @@ public static class LayoutEngine
 
     private static void PositionGrid(Grid grid)
     {
-        grid.ActualX = float.IsNaN(grid.ActualX) ? 0 : grid.ActualX;
-        grid.ActualY = float.IsNaN(grid.ActualY) ? 0 : grid.ActualY;
+        grid.ActualX = FractionalUnitResolver.SanitizeWithMax(grid.ActualX);
+        grid.ActualY = FractionalUnitResolver.SanitizeWithMax(grid.ActualY);
 
         var columnWidths = ParseGridUnits(grid.Columns, grid.MeasuredContentWidth, grid);
         var rowHeights = ParseGridUnits(grid.Rows, grid.MeasuredContentHeight, grid);
@@ -747,8 +750,8 @@ public static class LayoutEngine
 
     private static void PositionDock(Dock dock)
     {
-        dock.ActualX = float.IsNaN(dock.ActualX) ? 0 : dock.ActualX;
-        dock.ActualY = float.IsNaN(dock.ActualY) ? 0 : dock.ActualY;
+        dock.ActualX = FractionalUnitResolver.SanitizeWithMax(dock.ActualX);
+        dock.ActualY = FractionalUnitResolver.SanitizeWithMax(dock.ActualY);
 
         float left = dock.ActualX + dock.ComputedPaddingLeft;
         float top = dock.ActualY + dock.ComputedPaddingTop;
@@ -790,8 +793,8 @@ public static class LayoutEngine
 
     private static void PositionDiv(Div div)
     {
-        div.ActualX = float.IsNaN(div.ActualX) ? 0 : div.ActualX;
-        div.ActualY = float.IsNaN(div.ActualY) ? 0 : div.ActualY;
+        div.ActualX = FractionalUnitResolver.SanitizeWithMax(div.ActualX);
+        div.ActualY = FractionalUnitResolver.SanitizeWithMax(div.ActualY);
 
         var anchor = Anchor.Parse(div.Anchor);
         if (anchor != Anchor.None)
@@ -821,8 +824,8 @@ public static class LayoutEngine
 
     private static void PositionFlexDiv(Div div)
     {
-        div.ActualX = float.IsNaN(div.ActualX) ? 0 : div.ActualX;
-        div.ActualY = float.IsNaN(div.ActualY) ? 0 : div.ActualY;
+        div.ActualX = FractionalUnitResolver.SanitizeWithMax(div.ActualX);
+        div.ActualY = FractionalUnitResolver.SanitizeWithMax(div.ActualY);
 
         bool isRow = !string.Equals(div.FlexDirection, "column", StringComparison.OrdinalIgnoreCase);
         var spacing = Thickness.Parse(div.Spacing);
@@ -841,7 +844,7 @@ public static class LayoutEngine
         // Justify Content
         var justify = div.JustifyContent?.ToLowerInvariant();
         float availableSpace = (isRow ? div.MeasuredContentWidth : div.MeasuredContentHeight) - contentSize;
-        if (float.IsNaN(availableSpace) || float.IsInfinity(availableSpace)) availableSpace = 0;
+        availableSpace = FractionalUnitResolver.Sanitize(availableSpace);
 
         switch (justify)
         {
@@ -918,8 +921,8 @@ public static class LayoutEngine
 
     private static void PositionOverlay(Overlay overlay)
     {
-        overlay.ActualX = float.IsNaN(overlay.ActualX) ? 0 : overlay.ActualX;
-        overlay.ActualY = float.IsNaN(overlay.ActualY) ? 0 : overlay.ActualY;
+        overlay.ActualX = FractionalUnitResolver.SanitizeWithMax(overlay.ActualX);
+        overlay.ActualY = FractionalUnitResolver.SanitizeWithMax(overlay.ActualY);
 
         float baseX = overlay.ActualX + overlay.ComputedPaddingLeft;
         float baseY = overlay.ActualY + overlay.ComputedPaddingTop;
@@ -935,8 +938,8 @@ public static class LayoutEngine
 
     private static void PositionVerticalDiv(Div div)
     {
-        div.ActualX = float.IsNaN(div.ActualX) ? 0 : div.ActualX;
-        div.ActualY = float.IsNaN(div.ActualY) ? 0 : div.ActualY;
+        div.ActualX = FractionalUnitResolver.SanitizeWithMax(div.ActualX);
+        div.ActualY = FractionalUnitResolver.SanitizeWithMax(div.ActualY);
 
         float baseX = div.ActualX + div.ComputedPaddingLeft;
         
@@ -1158,6 +1161,37 @@ public static class LayoutEngine
         }
 
         return result;
+    }
+
+    private static void MeasureGeneric(UIElement element, float availableWidth, float availableHeight)
+    {
+        float maxWidth = 0;
+        float maxHeight = 0;
+
+        foreach (var child in element.Children)
+        {
+            child.CurrentFontSize = element.CurrentFontSize;
+            MeasureElement(child, availableWidth, availableHeight);
+            maxWidth = Math.Max(maxWidth, child.ActualWidth);
+            maxHeight = Math.Max(maxHeight, child.ActualHeight);
+        }
+
+        element.MeasuredContentWidth = Math.Max(element.MeasuredContentWidth, maxWidth);
+        element.MeasuredContentHeight = Math.Max(element.MeasuredContentHeight, maxHeight);
+    }
+
+    private static void PositionGeneric(UIElement element)
+    {
+        float baseX = element.ActualX + element.ComputedPaddingLeft;
+        float baseY = element.ActualY + element.ComputedPaddingTop;
+
+        foreach (var child in element.Children)
+        {
+            child.ActualX = baseX;
+            child.ActualY = baseY;
+            ApplyHorizontalAlignment(child, baseX, element.MeasuredContentWidth);
+            ApplyVerticalAlignment(child, baseY, element.MeasuredContentHeight);
+        }
     }
 
     private static float GetGridSpanWidth(float[] columnWidths, int column, int columnSpan)
