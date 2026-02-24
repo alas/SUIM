@@ -65,8 +65,14 @@ public static class LayoutEngine
         }
 
         // Convert explicit sizes to pixels
-        var widthInPixels = (width.Type == UnitType.Auto || width.Type == UnitType.None) ? 0 : element.ToPixels(element.Width);
-        var heightInPixels = (height.Type == UnitType.Auto || height.Type == UnitType.None) ? 0 : element.ToPixels(element.Height);
+        var widthInPixels = (width.Type == UnitType.Auto || width.Type == UnitType.None || width.Type == UnitType.Fr) ? 0 : element.ToPixels(element.Width);
+        var heightInPixels = (height.Type == UnitType.Auto || height.Type == UnitType.None || height.Type == UnitType.Fr) ? 0 : element.ToPixels(element.Height);
+
+        // If we have a fixed available space from parent (e.g. resolved 1fr), use it as fixed size
+        if (width.Type == UnitType.Fr && availableWidth != float.MaxValue && availableWidth > 0)
+            widthInPixels = Math.Max(0, availableWidth - element.ComputedPaddingLeft - element.ComputedPaddingRight);
+        if (height.Type == UnitType.Fr && availableHeight != float.MaxValue && availableHeight > 0)
+            heightInPixels = Math.Max(0, availableHeight - element.ComputedPaddingTop - element.ComputedPaddingBottom);
 
         // Initialize content size
         if (element is Text baseText)
@@ -187,20 +193,12 @@ public static class LayoutEngine
 
     private static void PositionElement(UIElement element, float parentX, float parentY)
     {
-        // Position the element itself
-        if (element is Stack or Grid or Dock or Div or Overlay)
-        {
-            // Container positioning handled by specific methods
-        }
-        else
-        {
-            // Default positioning for leaf elements: only set coordinates that haven't been
-            // positioned by the parent container/parent-specific layout logic.
-            if (float.IsNaN(element.ActualX))
-                element.ActualX = parentX;
-            if (float.IsNaN(element.ActualY))
-                element.ActualY = parentY;
-        }
+        // Default positioning: only set coordinates that haven't been
+        // positioned by the parent container/parent-specific layout logic.
+        if (float.IsNaN(element.ActualX))
+            element.ActualX = parentX;
+        if (float.IsNaN(element.ActualY))
+            element.ActualY = parentY;
 
         // Position based on element type
         switch (element)
@@ -284,8 +282,8 @@ public static class LayoutEngine
             }
         }
 
-        stack.MeasuredContentWidth = totalWidth + totalSpacing;
-        stack.MeasuredContentHeight = maxHeight;
+        stack.MeasuredContentWidth = Math.Max(stack.MeasuredContentWidth, totalWidth + totalSpacing);
+        stack.MeasuredContentHeight = Math.Max(stack.MeasuredContentHeight, maxHeight);
     }
 
     private static void MeasureVerticalStack(Stack stack, float availableWidth, float availableHeight, float totalSpacing)
@@ -324,8 +322,8 @@ public static class LayoutEngine
             }
         }
 
-        stack.MeasuredContentWidth = maxWidth;
-        stack.MeasuredContentHeight = totalHeight + totalSpacing;
+        stack.MeasuredContentWidth = Math.Max(stack.MeasuredContentWidth, maxWidth);
+        stack.MeasuredContentHeight = Math.Max(stack.MeasuredContentHeight, totalHeight + totalSpacing);
     }
 
     private static void ResolveFractionalUnitWidths(List<UIElement> elements, float remainingSpace, float availableHeight)
@@ -335,9 +333,7 @@ public static class LayoutEngine
 
         for (int i = 0; i < elements.Count; i++)
         {
-            elements[i].CurrentFontSize = (elements[i].Parent as Stack)?.CurrentFontSize ?? 16f;
-            var width = UnitValue.Parse(elements[i].Width);
-            if (width.Type == UnitType.None) width = new UnitValue(resolvedValues[i], UnitType.Pixels);
+            elements[i].CurrentFontSize = elements[i].Parent?.CurrentFontSize ?? 16f;
             MeasureElement(elements[i], resolvedValues[i], availableHeight);
         }
     }
@@ -349,9 +345,7 @@ public static class LayoutEngine
 
         for (int i = 0; i < elements.Count; i++)
         {
-            elements[i].CurrentFontSize = (elements[i].Parent as Stack)?.CurrentFontSize ?? 16f;
-            var height = UnitValue.Parse(elements[i].Height);
-            if (height.Type == UnitType.None) height = new UnitValue(resolvedValues[i], UnitType.Pixels);
+            elements[i].CurrentFontSize = elements[i].Parent?.CurrentFontSize ?? 16f;
             MeasureElement(elements[i], availableWidth, resolvedValues[i]);
         }
     }
@@ -466,15 +460,86 @@ public static class LayoutEngine
 
     private static void MeasureDiv(Div div, float availableWidth, float availableHeight)
     {
-        bool hasExplicitlyPositionedChildren = div.Children.Any(c => UnitValue.Parse(c.X).Type != UnitType.None || UnitValue.Parse(c.Y).Type != UnitType.None);
-
-        if (!hasExplicitlyPositionedChildren && div.Children.Count > 0)
+        if (div.Display?.Equals("flex", StringComparison.OrdinalIgnoreCase) == true)
         {
-            MeasureVerticalDiv(div, availableWidth, availableHeight);
+            MeasureFlexDiv(div, availableWidth, availableHeight);
         }
         else
         {
-            MeasureStandardDiv(div, availableWidth, availableHeight);
+            bool hasExplicitlyPositionedChildren = div.Children.Any(c => UnitValue.Parse(c.X).Type != UnitType.None || UnitValue.Parse(c.Y).Type != UnitType.None);
+
+            if (!hasExplicitlyPositionedChildren && div.Children.Count > 0)
+            {
+                MeasureVerticalDiv(div, availableWidth, availableHeight);
+            }
+            else
+            {
+                MeasureStandardDiv(div, availableWidth, availableHeight);
+            }
+        }
+    }
+
+    private static void MeasureFlexDiv(Div div, float availableWidth, float availableHeight)
+    {
+        bool isRow = !string.Equals(div.FlexDirection, "column", StringComparison.OrdinalIgnoreCase);
+        var spacing = Thickness.Parse(div.Spacing);
+        float totalSpacing = Math.Max(0, (isRow ? spacing.Left.Value : spacing.Top.Value) * (div.Children.Count - 1));
+
+        float mainAxisSize = 0;
+        float crossAxisSize = 0;
+        var flexElements = new List<UIElement>();
+
+        foreach (var child in div.Children)
+        {
+            var mainUnit = UnitValue.Parse(isRow ? child.Width : child.Height);
+            if (mainUnit.Type == UnitType.Fr || (mainUnit.Type == UnitType.None && child is LayoutElement))
+            {
+                flexElements.Add(child);
+            }
+            else
+            {
+                child.CurrentFontSize = div.CurrentFontSize;
+                MeasureElement(child, availableWidth, availableHeight);
+                mainAxisSize += isRow ? child.ActualWidth : child.ActualHeight;
+                crossAxisSize = Math.Max(crossAxisSize, isRow ? child.ActualHeight : child.ActualWidth);
+            }
+        }
+
+        if (flexElements.Count > 0)
+        {
+            float remainingSpace = (isRow ? availableWidth : availableHeight) - mainAxisSize - totalSpacing;
+            if (isRow)
+                ResolveFractionalUnitWidths(flexElements, Math.Max(0, remainingSpace), availableHeight);
+            else
+                ResolveFractionalUnitHeights(flexElements, Math.Max(0, remainingSpace), availableWidth);
+
+            foreach (var flexElement in flexElements)
+            {
+                mainAxisSize += isRow ? flexElement.ActualWidth : flexElement.ActualHeight;
+                crossAxisSize = Math.Max(crossAxisSize, isRow ? flexElement.ActualHeight : flexElement.ActualWidth);
+            }
+        }
+
+        div.MeasuredContentWidth = isRow ? Math.Max(div.MeasuredContentWidth, mainAxisSize + totalSpacing) : Math.Max(div.MeasuredContentWidth, crossAxisSize);
+        div.MeasuredContentHeight = isRow ? Math.Max(div.MeasuredContentHeight, crossAxisSize) : Math.Max(div.MeasuredContentHeight, mainAxisSize + totalSpacing);
+
+        // Handle stretch alignment
+        if (string.Equals(div.AlignItems, "stretch", StringComparison.OrdinalIgnoreCase))
+        {
+            float crossStretchSize = isRow ? div.MeasuredContentHeight : div.MeasuredContentWidth;
+            foreach (var child in div.Children)
+            {
+                if (isRow)
+                {
+                    if (UnitValue.Parse(child.Height).Type == UnitType.None || UnitValue.Parse(child.Height).Type == UnitType.Auto)
+                        child.ActualHeight = crossStretchSize;
+                }
+                else
+                {
+                    if (UnitValue.Parse(child.Width).Type == UnitType.None || UnitValue.Parse(child.Width).Type == UnitType.Auto)
+                        child.ActualWidth = crossStretchSize;
+                }
+            }
         }
     }
 
@@ -570,9 +635,6 @@ public static class LayoutEngine
 
     private static void PositionStack(Stack stack)
     {
-        stack.ActualX = 0;
-        stack.ActualY = 0;
-
         if (stack.Orientation == Orientation.Horizontal)
         {
             PositionHorizontalStack(stack);
@@ -640,9 +702,6 @@ public static class LayoutEngine
 
     private static void PositionGrid(Grid grid)
     {
-        grid.ActualX = 0;
-        grid.ActualY = 0;
-
         var columnWidths = ParseGridUnits(grid.Columns, grid.MeasuredContentWidth, grid);
         var rowHeights = ParseGridUnits(grid.Rows, grid.MeasuredContentHeight, grid);
 
@@ -673,9 +732,6 @@ public static class LayoutEngine
 
     private static void PositionDock(Dock dock)
     {
-        dock.ActualX = 0;
-        dock.ActualY = 0;
-
         float left = dock.ActualX + dock.ComputedPaddingLeft;
         float top = dock.ActualY + dock.ComputedPaddingTop;
         float right = left + dock.MeasuredContentWidth;
@@ -726,25 +782,117 @@ public static class LayoutEngine
             div.ActualX = div.ToPixels(div.X);
             div.ActualY = div.ToPixels(div.Y);
         }
+
+        if (div.Display?.Equals("flex", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            PositionFlexDiv(div);
+        }
         else
         {
-            div.ActualX = 0;
-            div.ActualY = 0;
+            bool hasExplicitlyPositionedChildren = div.Children.Any(c => UnitValue.Parse(c.X).Type != UnitType.None || UnitValue.Parse(c.Y).Type != UnitType.None);
+
+            if (!hasExplicitlyPositionedChildren && div.Children.Count > 0)
+            {
+                PositionVerticalDiv(div);
+            }
+        }
+    }
+
+    private static void PositionFlexDiv(Div div)
+    {
+        bool isRow = !string.Equals(div.FlexDirection, "column", StringComparison.OrdinalIgnoreCase);
+        var spacing = Thickness.Parse(div.Spacing);
+        float itemSpacing = isRow ? spacing.Left.Value : spacing.Top.Value;
+
+        float totalChildrenSize = 0;
+        foreach (var child in div.Children)
+            totalChildrenSize += isRow ? child.ActualWidth : child.ActualHeight;
+        
+        float totalSpacing = itemSpacing * (div.Children.Count - 1);
+        float contentSize = totalChildrenSize + totalSpacing;
+
+        float startOffset = 0;
+        float actualGap = itemSpacing;
+
+        // Justify Content
+        var justify = div.JustifyContent?.ToLowerInvariant();
+        float availableSpace = (isRow ? div.MeasuredContentWidth : div.MeasuredContentHeight) - contentSize;
+
+        switch (justify)
+        {
+            case "flex-end":
+            case "end":
+                startOffset = availableSpace;
+                break;
+            case "center":
+                startOffset = availableSpace / 2;
+                break;
+            case "space-between":
+                if (div.Children.Count > 1)
+                {
+                    actualGap = itemSpacing + (availableSpace / (div.Children.Count - 1));
+                    startOffset = 0;
+                }
+                break;
+            case "space-around":
+                if (div.Children.Count > 0)
+                {
+                    float gap = availableSpace / div.Children.Count;
+                    actualGap = itemSpacing + gap;
+                    startOffset = gap / 2;
+                }
+                break;
         }
 
-        bool hasExplicitlyPositionedChildren = div.Children.Any(c => UnitValue.Parse(c.X).Type != UnitType.None || UnitValue.Parse(c.Y).Type != UnitType.None);
+        float currentPos = (isRow ? div.ActualX + div.ComputedPaddingLeft : div.ActualY + div.ComputedPaddingTop) + startOffset;
+        float crossStart = isRow ? div.ActualY + div.ComputedPaddingTop : div.ActualX + div.ComputedPaddingLeft;
+        float crossSize = isRow ? div.MeasuredContentHeight : div.MeasuredContentWidth;
 
-        if (!hasExplicitlyPositionedChildren && div.Children.Count > 0)
+        foreach (var child in div.Children)
         {
-            PositionVerticalDiv(div);
+            if (isRow)
+            {
+                child.ActualX = currentPos;
+                ApplyVerticalAlignment(child, crossStart, crossSize);
+                
+                // Align items override
+                var align = div.AlignItems?.ToLowerInvariant();
+                if (align != null)
+                {
+                    switch (align)
+                    {
+                        case "flex-start": case "start": child.ActualY = crossStart; break;
+                        case "flex-end": case "end": child.ActualY = crossStart + crossSize - child.ActualHeight; break;
+                        case "center": child.ActualY = crossStart + (crossSize - child.ActualHeight) / 2; break;
+                    }
+                }
+                
+                currentPos += child.ActualWidth + actualGap;
+            }
+            else
+            {
+                child.ActualY = currentPos;
+                ApplyHorizontalAlignment(child, crossStart, crossSize);
+
+                // Align items override
+                var align = div.AlignItems?.ToLowerInvariant();
+                if (align != null)
+                {
+                    switch (align)
+                    {
+                        case "flex-start": case "start": child.ActualX = crossStart; break;
+                        case "flex-end": case "end": child.ActualX = crossStart + crossSize - child.ActualWidth; break;
+                        case "center": child.ActualX = crossStart + (crossSize - child.ActualWidth) / 2; break;
+                    }
+                }
+
+                currentPos += child.ActualHeight + actualGap;
+            }
         }
     }
 
     private static void PositionOverlay(Overlay overlay)
     {
-        overlay.ActualX = 0;
-        overlay.ActualY = 0;
-
         float baseX = overlay.ActualX + overlay.ComputedPaddingLeft;
         float baseY = overlay.ActualY + overlay.ComputedPaddingTop;
 

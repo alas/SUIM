@@ -337,50 +337,37 @@ public class Parser
                 ? Stride.UI.Visibility.Collapsed
                 : Stride.UI.Visibility.Visible);
 
-        // Start simple with margins/padding parsing
-        stride.Margin = ComponentsThicknessToStride(suim.Margin, suim);
+        // Alignment - Force to Left/Top to use Margin as coordinate
+        stride.HorizontalAlignment = Stride.UI.HorizontalAlignment.Left;
+        stride.VerticalAlignment = Stride.UI.VerticalAlignment.Top;
+
+        // Use calculated dimensions
+        if (!float.IsNaN(suim.ActualWidth) && suim.ActualWidth > 0)
+        {
+            stride.Width = suim.ActualWidth;
+        }
+        if (!float.IsNaN(suim.ActualHeight) && suim.ActualHeight > 0)
+        {
+            stride.Height = suim.ActualHeight;
+        }
+
+        // Calculate parent-relative positioning
+        float parentContentX = 0;
+        float parentContentY = 0;
+        if (suim.Parent != null)
+        {
+            parentContentX = suim.Parent.ActualX + suim.Parent.ComputedMarginLeft + suim.Parent.ComputedPaddingLeft;
+            parentContentY = suim.Parent.ActualY + suim.Parent.ComputedMarginTop + suim.Parent.ComputedPaddingTop;
+        }
+
+        float offsetX = (float.IsNaN(suim.ActualX) ? 0 : suim.ActualX) + suim.ComputedMarginLeft - parentContentX;
+        float offsetY = (float.IsNaN(suim.ActualY) ? 0 : suim.ActualY) + suim.ComputedMarginTop - parentContentY;
+
+        stride.Margin = new Stride.UI.Thickness(offsetX, offsetY, 0, 0);
+
         if (stride is ContentControl cc)
         {
-            cc.Padding = ComponentsThicknessToStride(suim.Padding, suim); // Only ContentControl has padding in Stride basic? No, wrappers do.
-        }
-
-        // Alignment
-        var ha = SUIM.Components.Attributes.HorizontalAlignment.Parse(suim.HorizontalAlignment);
-        stride.HorizontalAlignment = ha switch
-        {
-            SUIM.Components.Attributes.HorizontalAlignment.Center => Stride.UI.HorizontalAlignment.Center,
-            SUIM.Components.Attributes.HorizontalAlignment.Right => Stride.UI.HorizontalAlignment.Right,
-            _ => Stride.UI.HorizontalAlignment.Left
-        };
-
-        stride.VerticalAlignment = SUIM.Components.Attributes.VerticalAlignment.Parse(suim.VerticalAlignment) switch
-        {
-            SUIM.Components.Attributes.VerticalAlignment.Center => Stride.UI.VerticalAlignment.Center,
-            SUIM.Components.Attributes.VerticalAlignment.Bottom => Stride.UI.VerticalAlignment.Bottom,
-            _ => Stride.UI.VerticalAlignment.Top
-        };
-
-        // For overlays, always use ActualWidth/ActualHeight from layout
-        if (suim is SUIM.Components.Overlay)
-        {
-            if (!float.IsNaN(suim.ActualWidth) && suim.ActualWidth > 0)
-                stride.Width = suim.ActualWidth;
-            if (!float.IsNaN(suim.ActualHeight) && suim.ActualHeight > 0)
-                stride.Height = suim.ActualHeight;
-        }
-        else
-        {
-            var width = suim.ToPixels(suim.Width);
-            if (width != 0f)
-            {
-                stride.Width = width;
-            }
-
-            var height = suim.ToPixels(suim.Height);
-            if (height != 0f)
-            {
-                stride.Height = height;
-            }
+            cc.Padding = ComponentsThicknessToStride(suim.Padding, suim);
         }
 
         if (suim.BackgroundColor != null)
