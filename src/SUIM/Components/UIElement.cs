@@ -26,9 +26,6 @@ public abstract class UIElement(string tagName)
     public string? ZIndex { get; set; }
     public string? Visibility { get; set; }
     public string? ReadOnly { get; set; }
-    public string? Sprite { get; set; }
-    public string? HoverSprite { get; set; }
-    public string? PressedSprite { get; set; }
     public string? StopClicks { get; set; }
     public string? BackgroundImage { get; set; }
 
@@ -213,7 +210,7 @@ public abstract class UIElement(string tagName)
         }
     }
 
-    public virtual object? GetAttribute(string name)
+    public virtual string? GetAttribute(string name)
     {
         if (name.Equals("id", StringComparison.OrdinalIgnoreCase)) return Id;
         if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) return Class;

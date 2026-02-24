@@ -1,9 +1,13 @@
 namespace SUIMStride;
 
-using System.Collections.Concurrent;
+using Stride.Core.Mathematics;
 using Stride.Core.Serialization.Contents;
 using Stride.Engine;
 using Stride.Graphics;
+using Stride.Rendering.Sprites;
+using Stride.UI.Controls;
+using System.Collections.Concurrent;
+using System.IO;
 
 /// <summary>
 /// Helper to load sprite and font assets with a simple memory cache.
@@ -11,49 +15,47 @@ using Stride.Graphics;
 /// </summary>
 public static class ContentLoader
 {
-    private static readonly ConcurrentDictionary<string, Sprite?> SpriteCache = new();
+    private static readonly ConcurrentDictionary<string, ISpriteProvider?> SpriteCache = new();
     private static readonly ConcurrentDictionary<string, SpriteFont?> FontCache = new();
 
     /// <summary>
     /// Load an <see cref="ISpriteProvider"/> (typically a <see cref="Sprite"/>) using the provided <see cref="ContentManager"/>.
     /// Returns null if the path is null/empty or loading fails. Results are cached by path.
     /// </summary>
-    public static Sprite? LoadSprite(ContentManager? contentManager, string? path, Game? game)
+    public static ISpriteProvider? LoadSprite(ContentManager? contentManager, string? path, Game? game)
     {
         if (string.IsNullOrEmpty(path)) return null;
-
         if (SpriteCache.TryGetValue(path, out var cached)) return cached;
 
-        Sprite? result = null;
-        try
-        {
-            if (contentManager != null)
-            {
-                // Primary attempt: use content pipeline
-                result = contentManager.Load<Sprite>(path);
-            }
-        }
-        catch
-        {
-            // Ignore and fall through to caching null; can extend with disk-based loader here
-        }
-
-        if (result == null && game != null)
+        ISpriteProvider? result = null;
+        if (contentManager != null)
         {
             try
             {
-                using var stream = File.Open(path, FileMode.Open);
+                result = contentManager.Load<ISpriteProvider>(path);
+            }
+            catch { }
+        }
+
+        if (result == null && game != null && File.Exists(path))
+        {
+            try
+            {
+                using var stream = File.Open(path, FileMode.Open, FileAccess.Read);
                 var texture = Texture.Load(game.GraphicsDevice, stream);
-                result = new Sprite
+
+                var gfxSprite = new Sprite
                 {
                     Texture = texture,
-                    Region = new Stride.Core.Mathematics.RectangleF(0, 0, texture.Width, texture.Height),
-                    Center = new Stride.Core.Mathematics.Vector2(texture.Width / 2f, texture.Height / 2f)
+                    Region = new RectangleF(0, 0, texture.Width, texture.Height),
+                    Center = new Vector2(texture.Width / 2f, texture.Height / 2f)
                 };
+
+                // Try to create a compatible ISpriteProvider from the Graphics Sprite
+                result = (SpriteFromTexture)gfxSprite;
             }
             catch
             {
-                // Ignore and fall through to caching null; can extend with disk-based loader here
             }
         }
 

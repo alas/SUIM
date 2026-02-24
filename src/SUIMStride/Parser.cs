@@ -162,15 +162,18 @@ public class Parser
         
         if (!string.IsNullOrEmpty(button.MouseOverImage))
         {
-            btn.MouseOverImage = (ISpriteProvider?)ContentLoader.LoadSprite(ContentManager, button.MouseOverImage, game);
+            var loaded = ContentLoader.LoadSprite(ContentManager, button.MouseOverImage, game);
+            if (loaded != null) btn.MouseOverImage = loaded;
         }
         if (!string.IsNullOrEmpty(button.NotPressedImage))
         {
-            btn.NotPressedImage = (ISpriteProvider?)ContentLoader.LoadSprite(ContentManager, button.NotPressedImage, game);
+            var loaded = ContentLoader.LoadSprite(ContentManager, button.NotPressedImage, game);
+            if (loaded != null) btn.NotPressedImage = loaded;
         }
         if (!string.IsNullOrEmpty(button.PressedImage))
         {
-            btn.PressedImage = (ISpriteProvider?)ContentLoader.LoadSprite(ContentManager, button.PressedImage, game);
+            var loaded = ContentLoader.LoadSprite(ContentManager, button.PressedImage, game);
+            if (loaded != null) btn.PressedImage = loaded;
         }
 
         // Click handler will be bound in TransferEvents
@@ -241,7 +244,8 @@ public class Parser
 
         if (!string.IsNullOrEmpty(image.Source))
         {
-            img.Source = (ISpriteProvider?)ContentLoader.LoadSprite(ContentManager, image.Source, game);
+            var loaded = ContentLoader.LoadSprite(ContentManager, image.Source, game);
+            if (loaded != null) img.Source = loaded;
         }
 
         var stretch = SUIM.Components.ImageStretchExtensions.FromString(image.Stretch);
@@ -262,7 +266,8 @@ public class Parser
         var decorator = new ContentDecorator();
         if (!string.IsNullOrEmpty(background.Source))
         {
-            decorator.BackgroundImage = (ISpriteProvider?)ContentLoader.LoadSprite(ContentManager, background.Source, game);
+            var loaded = ContentLoader.LoadSprite(ContentManager, background.Source, game);
+            if (loaded != null) decorator.BackgroundImage = loaded;
         }
         return decorator;
     }

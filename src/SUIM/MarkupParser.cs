@@ -124,8 +124,8 @@ public static partial class MarkupParser
     private static UIElement ApplyStylesToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles)
     {
         var elementTag = element.TagName;
-        var elementId = element.GetAttribute("id") as string;
-        var elementClass = element.GetAttribute("class") as string;
+        var elementId = element.GetAttribute("id");
+        var elementClass = element.GetAttribute("class");
         
         // Merge styles from all matching selectors in order of precedence (low to high)
         var mergedProperties = new Dictionary<string, string>();
