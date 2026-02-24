@@ -143,12 +143,12 @@ public class Parser
             }
             else
             {
-                var stack = new StackPanel { Orientation = Orientation.Vertical };
+                var grid = new StrideGrid();
                 foreach (var child in element.Children)
                 {
-                    stack.Children.Add(MapElement(child, game));
+                    grid.Children.Add(MapElement(child, game));
                 }
-                contentControl.Content = stack;
+                contentControl.Content = grid;
             }
         }
 
@@ -342,11 +342,11 @@ public class Parser
         stride.VerticalAlignment = Stride.UI.VerticalAlignment.Top;
 
         // Use calculated dimensions
-        if (!float.IsNaN(suim.ActualWidth) && suim.ActualWidth > 0)
+        if (!float.IsNaN(suim.ActualWidth) && suim.ActualWidth > 0 && !float.IsInfinity(suim.ActualWidth))
         {
             stride.Width = suim.ActualWidth;
         }
-        if (!float.IsNaN(suim.ActualHeight) && suim.ActualHeight > 0)
+        if (!float.IsNaN(suim.ActualHeight) && suim.ActualHeight > 0 && !float.IsInfinity(suim.ActualHeight))
         {
             stride.Height = suim.ActualHeight;
         }
@@ -356,20 +356,28 @@ public class Parser
         float parentContentY = 0;
         if (suim.Parent != null)
         {
-            parentContentX = suim.Parent.ActualX + suim.Parent.ComputedMarginLeft + suim.Parent.ComputedPaddingLeft;
-            parentContentY = suim.Parent.ActualY + suim.Parent.ComputedMarginTop + suim.Parent.ComputedPaddingTop;
+            parentContentX = Sanitize(suim.Parent.ActualX) + Sanitize(suim.Parent.ComputedMarginLeft) + Sanitize(suim.Parent.ComputedPaddingLeft);
+            parentContentY = Sanitize(suim.Parent.ActualY) + Sanitize(suim.Parent.ComputedMarginTop) + Sanitize(suim.Parent.ComputedPaddingTop);
         }
 
-        float offsetX = (float.IsNaN(suim.ActualX) ? 0 : suim.ActualX) + suim.ComputedMarginLeft - parentContentX;
-        float offsetY = (float.IsNaN(suim.ActualY) ? 0 : suim.ActualY) + suim.ComputedMarginTop - parentContentY;
+        float ax = Sanitize(suim.ActualX);
+        float ay = Sanitize(suim.ActualY);
 
-        stride.Margin = new Stride.UI.Thickness(offsetX, offsetY, 0, 0);
+        // The coordinate in Stride is (ax + suim.ComputedMarginLeft) - parentContentX
+        // We want AX to be the absolute pos. Stride Margin Left is relative offset.
+        float left = ax - (suim.Parent != null ? parentContentX : 0);
+        float top = ay - (suim.Parent != null ? parentContentY : 0);
+
+        stride.Margin = new Stride.UI.Thickness(
+            Sanitize(left), 
+            Sanitize(top), 
+            Sanitize(suim.ComputedMarginRight), 
+            Sanitize(suim.ComputedMarginBottom));
 
         if (stride is ContentControl cc)
         {
             cc.Padding = ComponentsThicknessToStride(suim.Padding, suim);
         }
-
         if (suim.BackgroundColor != null)
         {
             stride.BackgroundColor = ParseColor(suim.BackgroundColor);
@@ -379,6 +387,12 @@ public class Parser
         {
             stride.CanBeHitByUser = true;
         }
+    }
+
+    private static float Sanitize(float value)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value)) return 0;
+        return value;
     }
 
     private static Stride.UI.Thickness ComponentsThicknessToStride(string? thicknessString, SUIM.Components.UIElement suim)

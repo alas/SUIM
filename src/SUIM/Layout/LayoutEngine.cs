@@ -2,12 +2,15 @@ namespace SUIM.Layout;
 
 using SUIM.Components;
 using SUIM.Components.Attributes;
+using System.Collections;
 
 public static class LayoutEngine
 {
     public static void Layout(UIElement root, float rootFontSize, float availableWidth, float availableHeight)
     {
         ResetPositions(root);
+        root.ActualX = 0;
+        root.ActualY = 0;
         root.CurrentFontSize = root.RootFontSize = rootFontSize;
         MeasureElement(root, availableWidth, availableHeight);
         PositionElement(root, 0, 0);
@@ -635,6 +638,9 @@ public static class LayoutEngine
 
     private static void PositionStack(Stack stack)
     {
+        stack.ActualX = float.IsNaN(stack.ActualX) ? 0 : stack.ActualX;
+        stack.ActualY = float.IsNaN(stack.ActualY) ? 0 : stack.ActualY;
+
         if (stack.Orientation == Orientation.Horizontal)
         {
             PositionHorizontalStack(stack);
@@ -647,6 +653,9 @@ public static class LayoutEngine
 
     private static void PositionHorizontalStack(Stack stack)
     {
+        stack.ActualX = float.IsNaN(stack.ActualX) ? 0 : stack.ActualX;
+        stack.ActualY = float.IsNaN(stack.ActualY) ? 0 : stack.ActualY;
+
         float totalWidth = 0;
         foreach (var child in stack.Children)
             totalWidth += child.ActualWidth;
@@ -674,6 +683,9 @@ public static class LayoutEngine
 
     private static void PositionVerticalStack(Stack stack)
     {
+        stack.ActualX = float.IsNaN(stack.ActualX) ? 0 : stack.ActualX;
+        stack.ActualY = float.IsNaN(stack.ActualY) ? 0 : stack.ActualY;
+
         float baseX = stack.ActualX + stack.ComputedPaddingLeft;
         
         float totalHeight = 0;
@@ -702,6 +714,9 @@ public static class LayoutEngine
 
     private static void PositionGrid(Grid grid)
     {
+        grid.ActualX = float.IsNaN(grid.ActualX) ? 0 : grid.ActualX;
+        grid.ActualY = float.IsNaN(grid.ActualY) ? 0 : grid.ActualY;
+
         var columnWidths = ParseGridUnits(grid.Columns, grid.MeasuredContentWidth, grid);
         var rowHeights = ParseGridUnits(grid.Rows, grid.MeasuredContentHeight, grid);
 
@@ -732,6 +747,9 @@ public static class LayoutEngine
 
     private static void PositionDock(Dock dock)
     {
+        dock.ActualX = float.IsNaN(dock.ActualX) ? 0 : dock.ActualX;
+        dock.ActualY = float.IsNaN(dock.ActualY) ? 0 : dock.ActualY;
+
         float left = dock.ActualX + dock.ComputedPaddingLeft;
         float top = dock.ActualY + dock.ComputedPaddingTop;
         float right = left + dock.MeasuredContentWidth;
@@ -772,6 +790,9 @@ public static class LayoutEngine
 
     private static void PositionDiv(Div div)
     {
+        div.ActualX = float.IsNaN(div.ActualX) ? 0 : div.ActualX;
+        div.ActualY = float.IsNaN(div.ActualY) ? 0 : div.ActualY;
+
         var anchor = Anchor.Parse(div.Anchor);
         if (anchor != Anchor.None)
         {
@@ -800,6 +821,9 @@ public static class LayoutEngine
 
     private static void PositionFlexDiv(Div div)
     {
+        div.ActualX = float.IsNaN(div.ActualX) ? 0 : div.ActualX;
+        div.ActualY = float.IsNaN(div.ActualY) ? 0 : div.ActualY;
+
         bool isRow = !string.Equals(div.FlexDirection, "column", StringComparison.OrdinalIgnoreCase);
         var spacing = Thickness.Parse(div.Spacing);
         float itemSpacing = isRow ? spacing.Left.Value : spacing.Top.Value;
@@ -817,6 +841,7 @@ public static class LayoutEngine
         // Justify Content
         var justify = div.JustifyContent?.ToLowerInvariant();
         float availableSpace = (isRow ? div.MeasuredContentWidth : div.MeasuredContentHeight) - contentSize;
+        if (float.IsNaN(availableSpace) || float.IsInfinity(availableSpace)) availableSpace = 0;
 
         switch (justify)
         {
@@ -893,6 +918,9 @@ public static class LayoutEngine
 
     private static void PositionOverlay(Overlay overlay)
     {
+        overlay.ActualX = float.IsNaN(overlay.ActualX) ? 0 : overlay.ActualX;
+        overlay.ActualY = float.IsNaN(overlay.ActualY) ? 0 : overlay.ActualY;
+
         float baseX = overlay.ActualX + overlay.ComputedPaddingLeft;
         float baseY = overlay.ActualY + overlay.ComputedPaddingTop;
 
@@ -907,6 +935,9 @@ public static class LayoutEngine
 
     private static void PositionVerticalDiv(Div div)
     {
+        div.ActualX = float.IsNaN(div.ActualX) ? 0 : div.ActualX;
+        div.ActualY = float.IsNaN(div.ActualY) ? 0 : div.ActualY;
+
         float baseX = div.ActualX + div.ComputedPaddingLeft;
         
         float totalHeight = 0;
