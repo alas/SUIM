@@ -221,11 +221,11 @@ public class ComponentIsolationTests
         // Assert
         // component (CustomComponent) -> Div (from TestComp tag) -> Label
         Assert.Single(component.Children);
-        var div = component.Children[0] as Div;
-        Assert.NotNull(div);
-        Assert.Equal("testcomp", div.TagName);
-        Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
+        var cc = component.Children[0] as CustomComponent;
+        Assert.NotNull(cc);
+        Assert.Equal("testcomp", cc.TagName);
+        Assert.Single(cc.Children);
+        Assert.IsType<Label>(cc.Children[0]);
     }
 
     [Fact]
