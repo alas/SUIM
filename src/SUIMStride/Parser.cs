@@ -1,20 +1,19 @@
 namespace SUIMStride;
 
-using Stride.Core.Mathematics;
-using Stride.Core.Serialization.Contents;
-using Stride.Engine;
-using Stride.Games;
-using Stride.Graphics;
-using Stride.UI;
-using Stride.UI.Controls;
-using Stride.UI.Panels;
-using SUIM;
-using SUIM.Components.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Stride.Core.Mathematics;
+using Stride.Core.Serialization.Contents;
+using Stride.Engine;
+using Stride.Graphics;
+using Stride.UI;
+using Stride.UI.Controls;
+using Stride.UI.Panels;
 using StrideGrid = Stride.UI.Panels.Grid;
+using SUIM;
+using SUIM.Components.Attributes;
 
 public class Parser
 {

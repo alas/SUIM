@@ -61,7 +61,7 @@ public static class BackendHelpers
         if (string.Equals(colorStr, "white", StringComparison.OrdinalIgnoreCase)) return new ParsedColor { R = 255, G = 255, B = 255, A = 255 };
 
         // fallback white
-        return new ParsedColor { R = 255, G = 255, B = 255, A = 255 };
+        throw new NotImplementedException($"named color not supported: {colorStr}");
     }
 
     /// <summary>

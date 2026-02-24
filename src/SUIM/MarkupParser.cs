@@ -26,7 +26,7 @@ public static partial class MarkupParser
         if (componentName != null && string.Equals(root.Name.LocalName, componentName, StringComparison.OrdinalIgnoreCase))
         {
             // Root tag matches component name: bypass redundant wrapper and process children
-            element = new Div(componentName)
+            element = new CustomComponent(componentName)
             {
                 Model = model2,
                 IsComponentRoot = true

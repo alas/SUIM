@@ -1,9 +1,8 @@
 namespace SUIM.Tests;
 
-using Stride.Engine;
+using Xunit;
 using SUIM.Layout;
 using SUIMStride;
-using Xunit;
 
 public class IntegrationTests
 {

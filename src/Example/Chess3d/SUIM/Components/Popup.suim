@@ -9,7 +9,6 @@
     }
     </model>
 
-    <!-- Classic chess-style popup: wood background, panel shadow, image-based buttons for states -->
     <overlay visibility="@visibility">
         <grid width="auto" height="220" halign="center" valign="center" class="wood-panel" shadow="0 8 16 rgba(0,0,0,0.5)" backgroundimage="Assets/seamless-texture-wood-old-oak-small2.jpg">
             <vstack spacing="8" padding="12">
@@ -20,7 +19,6 @@
                     <label value="@message" class="popup-message" />
                 </vstack>
                 <hstack spacing="10" halign="center">
-                    <!-- Buttons use separate images for states: normal, hover and pressed. Place images under Assets/Buttons/ -->
                     <button onclick="@onYes">YES</button>
                     <button onclick="@onNo">NO</button>
                 </hstack>

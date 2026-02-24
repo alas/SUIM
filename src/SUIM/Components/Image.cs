@@ -1,5 +1,3 @@
-using SUIM.Components.Attributes;
-
 namespace SUIM.Components;
 
 public class Image() : UIElement(nameof(Image))

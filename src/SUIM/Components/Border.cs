@@ -1,7 +1,5 @@
 namespace SUIM.Components;
 
-using SUIM.Components.Attributes;
-
 public class Border() : UIElement(nameof(Border))
 {
     public string? Thickness { get; set; }

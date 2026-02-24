@@ -5,7 +5,6 @@ using System.IO;
 using Xunit;
 using SUIM;
 using SUIM.Components;
-using SUIM.Components.Attributes;
 
 public class ComponentStylingTests
 {
