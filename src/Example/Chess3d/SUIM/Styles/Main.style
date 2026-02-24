@@ -1,7 +1,7 @@
 * {
     HorizontalAlignment: Left;
     VerticalAlignment: Top;
-    Color: Green;
+    Color: White;
     FontSize: 16;
 }
 text {
@@ -9,7 +9,6 @@ text {
     VerticalAlignment: Center;
 }
 button {
-    Background: Black;
     Width: 200;
     Height: 50;
     Margin: 5;

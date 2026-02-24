@@ -1,13 +1,11 @@
 namespace SUIMStride;
 
-using Stride.Core.Mathematics;
+using System.Collections.Concurrent;
+using System.IO;
 using Stride.Core.Serialization.Contents;
 using Stride.Engine;
 using Stride.Graphics;
 using Stride.Rendering.Sprites;
-using Stride.UI.Controls;
-using System.Collections.Concurrent;
-using System.IO;
 
 /// <summary>
 /// Helper to load sprite and font assets with a simple memory cache.
@@ -28,13 +26,17 @@ public static class ContentLoader
         if (SpriteCache.TryGetValue(path, out var cached)) return cached;
 
         ISpriteProvider? result = null;
-        if (contentManager != null)
+
+        if (!IsImageExtension(path))
         {
-            try
+            if (contentManager != null)
             {
-                result = contentManager.Load<ISpriteProvider>(path);
+                try
+                {
+                    result = contentManager.Load<ISpriteProvider>(path);
+                }
+                catch { }
             }
-            catch { }
         }
 
         if (result == null && game != null && File.Exists(path))
@@ -42,25 +44,29 @@ public static class ContentLoader
             try
             {
                 using var stream = File.Open(path, FileMode.Open, FileAccess.Read);
-                var texture = Texture.Load(game.GraphicsDevice, stream);
-
-                var gfxSprite = new Sprite
-                {
-                    Texture = texture,
-                    Region = new RectangleF(0, 0, texture.Width, texture.Height),
-                    Center = new Vector2(texture.Width / 2f, texture.Height / 2f)
-                };
-
-                // Try to create a compatible ISpriteProvider from the Graphics Sprite
-                result = (SpriteFromTexture)gfxSprite;
+                var texture = Texture.Load(game.GraphicsDevice, stream, loadAsSRGB: true);
+                result = new SpriteFromTexture { Texture = texture };
             }
-            catch
-            {
-            }
+            catch { }
         }
 
         SpriteCache[path] = result;
         return result;
+    }
+
+    /// <summary>
+    /// Determines if a path refers to a common image file format.
+    /// </summary>
+    private static bool IsImageExtension(string path)
+    {
+        if (string.IsNullOrEmpty(path)) return false;
+
+        var extension = Path.GetExtension(path).ToLowerInvariant();
+        var imageExtensions = new HashSet<string>
+        {
+            ".png", ".jpg", ".jpeg", ".bmp", ".tga", ".gif", ".webp", ".tif", ".tiff"
+        };
+        return imageExtensions.Contains(extension);
     }
 
     /// <summary>

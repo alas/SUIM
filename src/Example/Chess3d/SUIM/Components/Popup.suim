@@ -10,8 +10,8 @@
     </model>
 
     <!-- Classic chess-style popup: wood background, panel shadow, image-based buttons for states -->
-    <overlay visibility="@visibility" background="Assets/seamless-texture-wood-old-oak-small.jpg">
-        <grid width="380" height="220" halign="center" valign="center" class="wood-panel" shadow="0 8 16 rgba(0,0,0,0.5)">
+    <overlay visibility="@visibility">
+        <grid width="auto" height="220" halign="center" valign="center" class="wood-panel" shadow="0 8 16 rgba(0,0,0,0.5)" backgroundimage="Assets/seamless-texture-wood-old-oak-small2.jpg">
             <vstack spacing="8" padding="12">
                 <hstack>
                     <label value="@title" class="popup-title" />
