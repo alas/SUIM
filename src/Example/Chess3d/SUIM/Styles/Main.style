@@ -13,9 +13,9 @@ button {
     Width: 200;
     Height: 50;
     Margin: 5;
-    normal: "../Assets/btn_normal.png";
-    hover: "../Assets/btn_hover.png";
-    pressed: "../Assets/btn_pressed.png";
+    normal: "Assets/btn_normal.png";
+    hover: "Assets/btn_hover.png";
+    pressed: "Assets/btn_pressed.png";
 }
 .container {
     HorizontalAlignment: Left;

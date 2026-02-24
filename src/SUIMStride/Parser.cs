@@ -1,19 +1,20 @@
 namespace SUIMStride;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Stride.Core.Mathematics;
 using Stride.Core.Serialization.Contents;
 using Stride.Engine;
+using Stride.Games;
 using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
-using StrideGrid = Stride.UI.Panels.Grid;
 using SUIM;
 using SUIM.Components.Attributes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using StrideGrid = Stride.UI.Panels.Grid;
 
 public class Parser
 {
@@ -60,7 +61,7 @@ public class Parser
                 }
 
                 // createNewInstance==true -> return a fresh Stride tree by remapping the cached SUIM tree
-                return (MapElement(cached.SuimRoot), cached.Model);
+                return (MapElement(cached.SuimRoot, game), cached.Model);
             }
         }
 
@@ -71,7 +72,7 @@ public class Parser
         var (suimRoot, model2) = MarkupParser.Parse(markup, model, basePath: basePath, componentName: viewName);
         Layout(suimRoot, game, defaultFontSize, fullscreen);
         _currentModel = model2;
-        var strideRoot = MapElement(suimRoot);
+        var strideRoot = MapElement(suimRoot, game);
         _currentModel = null;
 
         lock (_parseCache)
@@ -79,7 +80,7 @@ public class Parser
             _parseCache[markup] = (suimRoot, strideRoot, model2);
         }
 
-        return createNewInstance ? (MapElement(suimRoot), model2) : (strideRoot, model2);
+        return createNewInstance ? (MapElement(suimRoot, game), model2) : (strideRoot, model2);
     }
 
     private static void Layout(SUIM.Components.UIElement root, Game game, int defaultFontSize, bool fullscreen)
@@ -108,18 +109,18 @@ public class Parser
     /// Maps an already-parsed and laid-out SUIM element tree to Stride UI elements.
     /// It is public for testing or when you have a SUIM tree that's already been processed.
     /// </summary>
-    public UIElement MapElement(SUIM.Components.UIElement element)
+    public UIElement MapElement(SUIM.Components.UIElement element, Game? game)
     {
         UIElement strideElement = element switch
         {
-            SUIM.Components.Button b => MapButton(b),
+            SUIM.Components.Button b => MapButton(b, game),
             SUIM.Components.Text t => MapText(t),
             SUIM.Components.Stack s => MapStack(s),
-            SUIM.Components.Grid g => MapGrid(g),
+            SUIM.Components.Grid g => MapGrid(g, game),
             SUIM.Components.Input i => MapInput(i),
-            SUIM.Components.Image img => MapImage(img),
-            SUIM.Components.Border br => MapBorder(br),
-            SUIM.Components.BackgroundImage bg => MapBackgroundImage(bg),
+            SUIM.Components.Image img => MapImage(img, game),
+            SUIM.Components.Border br => MapBorder(br, game),
+            SUIM.Components.BackgroundImage bg => MapBackgroundImage(bg, game),
             _ => new StrideGrid() // Fallback
         };
 
@@ -132,21 +133,21 @@ public class Parser
         {
             foreach (var child in element.Children)
             {
-                panel.Children.Add(MapElement(child));
+                panel.Children.Add(MapElement(child, game));
             }
         }
         else if (strideElement is ContentControl contentControl && element.Children.Count > 0)
         {
             if (element.Children.Count == 1)
             {
-                contentControl.Content = MapElement(element.Children[0]);
+                contentControl.Content = MapElement(element.Children[0], game);
             }
             else
             {
                 var stack = new StackPanel { Orientation = Orientation.Vertical };
                 foreach (var child in element.Children)
                 {
-                    stack.Children.Add(MapElement(child));
+                    stack.Children.Add(MapElement(child, game));
                 }
                 contentControl.Content = stack;
             }
@@ -155,21 +156,21 @@ public class Parser
         return strideElement;
     }
 
-    private Button MapButton(SUIM.Components.Button button)
+    private Button MapButton(SUIM.Components.Button button, Game? game)
     {
         var btn = new Button();
         
         if (!string.IsNullOrEmpty(button.MouseOverImage))
         {
-            btn.MouseOverImage = (ISpriteProvider?)ContentManager?.Load<Sprite>(button.MouseOverImage);
+            btn.MouseOverImage = (ISpriteProvider?)ContentLoader.LoadSprite(ContentManager, button.MouseOverImage, game);
         }
         if (!string.IsNullOrEmpty(button.NotPressedImage))
         {
-            btn.NotPressedImage = (ISpriteProvider?)ContentManager?.Load<Sprite>(button.NotPressedImage);
+            btn.NotPressedImage = (ISpriteProvider?)ContentLoader.LoadSprite(ContentManager, button.NotPressedImage, game);
         }
         if (!string.IsNullOrEmpty(button.PressedImage))
         {
-            btn.PressedImage = (ISpriteProvider?)ContentManager?.Load<Sprite>(button.PressedImage);
+            btn.PressedImage = (ISpriteProvider?)ContentLoader.LoadSprite(ContentManager, button.PressedImage, game);
         }
 
         // Click handler will be bound in TransferEvents
@@ -195,7 +196,7 @@ public class Parser
         SpriteFont? sf = Fonts.TryGetValue(fontName, out SpriteFont? value) ? value : null;
         if (sf == null && !Fonts.ContainsKey(fontName))
         {
-            sf = ContentManager?.Load<SpriteFont>(fontName);
+            sf = ContentLoader.LoadFont(ContentManager, fontName);
             if (sf != null)
             {
                 Fonts[fontName] = sf;
@@ -234,13 +235,13 @@ public class Parser
         };
     }
 
-    private ImageElement MapImage(SUIM.Components.Image image)
+    private ImageElement MapImage(SUIM.Components.Image image, Game? game)
     {
         var img = new ImageElement();
 
         if (!string.IsNullOrEmpty(image.Source))
         {
-            img.Source = (ISpriteProvider?)ContentManager?.Load<Sprite>(image.Source);
+            img.Source = (ISpriteProvider?)ContentLoader.LoadSprite(ContentManager, image.Source, game);
         }
 
         var stretch = SUIM.Components.ImageStretchExtensions.FromString(image.Stretch);
@@ -256,17 +257,17 @@ public class Parser
         return img;
     }
 
-    private ContentDecorator MapBackgroundImage(SUIM.Components.BackgroundImage background)
+    private ContentDecorator MapBackgroundImage(SUIM.Components.BackgroundImage background, Game? game)
     {
         var decorator = new ContentDecorator();
         if (!string.IsNullOrEmpty(background.Source))
         {
-            decorator.BackgroundImage = (ISpriteProvider?)ContentManager?.Load<Sprite>(background.Source);
+            decorator.BackgroundImage = (ISpriteProvider?)ContentLoader.LoadSprite(ContentManager, background.Source, game);
         }
         return decorator;
     }
 
-    private Border MapBorder(SUIM.Components.Border border)
+    private Border MapBorder(SUIM.Components.Border border, Game? game)
     {
         var borderElem = new Border
         {
@@ -283,7 +284,7 @@ public class Parser
         {
             if (border.Children.Count == 1)
             {
-                borderElem.Content = MapElement(border.Children[0]);
+                borderElem.Content = MapElement(border.Children[0], game);
             }
             else
             {
@@ -294,13 +295,13 @@ public class Parser
         return borderElem;
     }
 
-    private StrideGrid MapGrid(SUIM.Components.Grid grid)
+    private StrideGrid MapGrid(SUIM.Components.Grid grid, Game? game)
     {
         var g = new StrideGrid();
 
         foreach (var childContainer in grid.GridChildren)
         {
-            var childStride = MapElement(childContainer.Element);
+            var childStride = MapElement(childContainer.Element, game);
             childStride.SetGridRow(childContainer.Row);
             childStride.SetGridColumn(childContainer.Column);
             childStride.SetGridRowSpan(childContainer.RowSpan);

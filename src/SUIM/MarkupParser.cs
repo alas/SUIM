@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using SUIM.Components;
-using SUIM.Components.Attributes;
 
 public static partial class MarkupParser
 {
@@ -111,7 +110,7 @@ public static partial class MarkupParser
             foreach (System.Text.RegularExpressions.Match propMatch in propMatches)
             {
                 var propName = propMatch.Groups[1].Value.Trim();
-                var propValue = propMatch.Groups[2].Value.Trim();
+                var propValue = propMatch.Groups[2].Value.Trim().Trim('"');
                 properties[propName] = propValue;
             }
 
@@ -479,7 +478,7 @@ public static partial class MarkupParser
 
         foreach (var attr in attributes.Where(x => IsStyleApplicationAttribute(x.Name.LocalName)))
         {
-            SetAttribute(attr, model, rootElement, innerElement);
+            SetAttribute(attr, rootElement, innerElement);
         }
 
         if (styles != null && styles.Count > 0)
@@ -492,7 +491,7 @@ public static partial class MarkupParser
             var name = attr.Name.LocalName;
             if (name.Equals("scroll", StringComparison.OrdinalIgnoreCase) || name.Equals("border", StringComparison.OrdinalIgnoreCase) || name.Equals("class", StringComparison.OrdinalIgnoreCase)) continue;
 
-            SetAttribute(attr, model, rootElement, innerElement);
+            SetAttribute(attr, rootElement, innerElement);
         }
 
         if (rootElement is CustomComponent custom)
@@ -503,7 +502,7 @@ public static partial class MarkupParser
         return rootElement;
     }
 
-    private static void SetAttribute(XAttribute attr, ObservableObject? model, UIElement rootElement, UIElement innerElement)
+    private static void SetAttribute(XAttribute attr, UIElement rootElement, UIElement innerElement)
     {
         var name = attr.Name.LocalName;
         var target = IsLayoutAttribute(name) ? rootElement : innerElement;

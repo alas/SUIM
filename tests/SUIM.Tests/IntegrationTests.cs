@@ -1,8 +1,9 @@
 namespace SUIM.Tests;
 
-using Xunit;
+using Stride.Engine;
 using SUIM.Layout;
 using SUIMStride;
+using Xunit;
 
 public class IntegrationTests
 {
@@ -223,7 +224,7 @@ public class IntegrationTests
         
         // Map to Stride
         var mapper = new Parser();
-        var strideRoot = mapper.MapElement(suimRoot);
+        var strideRoot = mapper.MapElement(suimRoot, null);
         
         // Verify Stride root is a grid
         Assert.NotNull(strideRoot);
