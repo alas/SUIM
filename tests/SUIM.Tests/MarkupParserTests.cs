@@ -489,13 +489,13 @@ public class MarkupParserTests
     [Fact]
     public void Parse_XY_Positioning()
     {
-        var markup = "<div x=\"50\" y=\"100\" width=\"200\" height=\"150\" />";
+        var markup = "<div left=\"50\" top=\"100\" width=\"200\" height=\"150\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(50f, UnitValue.Parse(div.X).Value);
-        Assert.Equal(100f, UnitValue.Parse(div.Y).Value);
+        Assert.Equal(50f, UnitValue.Parse(div.Left).Value);
+        Assert.Equal(100f, UnitValue.Parse(div.Top).Value);
     }
 
     [Fact]
@@ -1457,10 +1457,7 @@ Text after
     {
         var styleContent = ".myclass { width: 500; height: 400; border: 5 #FF0000; }";
         var styleDictionary = new Dictionary<string, Dictionary<string, string>>();
-        var mi = typeof(MarkupParser).GetMethod("ParseStyles", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
-            ?? throw new Exception();
-        mi.Invoke(null, new object[] { styleContent, styleDictionary });
-
+        Style.Parse(styleContent, styleDictionary);
         Assert.True(styleDictionary.ContainsKey(".myclass"));
         var props = styleDictionary[".myclass"];
         Assert.Equal("500", props["width"]);

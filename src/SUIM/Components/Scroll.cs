@@ -3,8 +3,8 @@
 public class Scroll() : LayoutElement(nameof(Scroll))
 {
     public ScrollDirection Direction { get; set; } = ScrollDirection.Vertical;
-    public float ScrollX { get; set; }
-    public float ScrollY { get; set; }
+    public string? ScrollX { get; set; } = "auto";
+    public string? ScrollY { get; set; } = "auto";
 }
 
 public enum ScrollDirection { None, Vertical, Horizontal, Both }

@@ -471,7 +471,7 @@ public static class LayoutEngine
         }
         else
         {
-            bool hasExplicitlyPositionedChildren = div.Children.Any(c => UnitValue.Parse(c.X).Type != UnitType.None || UnitValue.Parse(c.Y).Type != UnitType.None);
+            bool hasExplicitlyPositionedChildren = div.Children.Any(c => UnitValue.Parse(c.Left).Type != UnitType.None || UnitValue.Parse(c.Top).Type != UnitType.None);
 
             if (!hasExplicitlyPositionedChildren && div.Children.Count > 0)
             {
@@ -641,9 +641,6 @@ public static class LayoutEngine
 
     private static void PositionStack(Stack stack)
     {
-        stack.ActualX = FractionalUnitResolver.SanitizeWithMax(stack.ActualX);
-        stack.ActualY = FractionalUnitResolver.SanitizeWithMax(stack.ActualY);
-
         if (stack.Orientation == Orientation.Horizontal)
         {
             PositionHorizontalStack(stack);
@@ -656,9 +653,6 @@ public static class LayoutEngine
 
     private static void PositionHorizontalStack(Stack stack)
     {
-        stack.ActualX = FractionalUnitResolver.SanitizeWithMax(stack.ActualX);
-        stack.ActualY = FractionalUnitResolver.SanitizeWithMax(stack.ActualY);
-
         float totalWidth = 0;
         foreach (var child in stack.Children)
             totalWidth += child.ActualWidth;
@@ -686,9 +680,6 @@ public static class LayoutEngine
 
     private static void PositionVerticalStack(Stack stack)
     {
-        stack.ActualX = FractionalUnitResolver.SanitizeWithMax(stack.ActualX);
-        stack.ActualY = FractionalUnitResolver.SanitizeWithMax(stack.ActualY);
-
         float baseX = stack.ActualX + stack.ComputedPaddingLeft;
         
         float totalHeight = 0;
@@ -717,9 +708,6 @@ public static class LayoutEngine
 
     private static void PositionGrid(Grid grid)
     {
-        grid.ActualX = FractionalUnitResolver.SanitizeWithMax(grid.ActualX);
-        grid.ActualY = FractionalUnitResolver.SanitizeWithMax(grid.ActualY);
-
         var columnWidths = ParseGridUnits(grid.Columns, grid.MeasuredContentWidth, grid);
         var rowHeights = ParseGridUnits(grid.Rows, grid.MeasuredContentHeight, grid);
 
@@ -750,9 +738,6 @@ public static class LayoutEngine
 
     private static void PositionDock(Dock dock)
     {
-        dock.ActualX = FractionalUnitResolver.SanitizeWithMax(dock.ActualX);
-        dock.ActualY = FractionalUnitResolver.SanitizeWithMax(dock.ActualY);
-
         float left = dock.ActualX + dock.ComputedPaddingLeft;
         float top = dock.ActualY + dock.ComputedPaddingTop;
         float right = left + dock.MeasuredContentWidth;
@@ -793,18 +778,15 @@ public static class LayoutEngine
 
     private static void PositionDiv(Div div)
     {
-        div.ActualX = FractionalUnitResolver.SanitizeWithMax(div.ActualX);
-        div.ActualY = FractionalUnitResolver.SanitizeWithMax(div.ActualY);
-
         var anchor = Anchor.Parse(div.Anchor);
         if (anchor != Anchor.None)
         {
             PositionWithAnchor(div);
         }
-        else if (UnitValue.Parse(div.X).Type != UnitType.None || UnitValue.Parse(div.Y).Type != UnitType.None)
+        else if (UnitValue.Parse(div.Left).Type != UnitType.None || UnitValue.Parse(div.Top).Type != UnitType.None)
         {
-            div.ActualX = div.ToPixels(div.X);
-            div.ActualY = div.ToPixels(div.Y);
+            div.ActualX = div.ToPixels(div.Left);
+            div.ActualY = div.ToPixels(div.Top);
         }
 
         if (div.Display?.Equals("flex", StringComparison.OrdinalIgnoreCase) == true)
@@ -813,7 +795,7 @@ public static class LayoutEngine
         }
         else
         {
-            bool hasExplicitlyPositionedChildren = div.Children.Any(c => UnitValue.Parse(c.X).Type != UnitType.None || UnitValue.Parse(c.Y).Type != UnitType.None);
+            bool hasExplicitlyPositionedChildren = div.Children.Any(c => UnitValue.Parse(c.Left).Type != UnitType.None || UnitValue.Parse(c.Top).Type != UnitType.None);
 
             if (!hasExplicitlyPositionedChildren && div.Children.Count > 0)
             {
@@ -824,9 +806,6 @@ public static class LayoutEngine
 
     private static void PositionFlexDiv(Div div)
     {
-        div.ActualX = FractionalUnitResolver.SanitizeWithMax(div.ActualX);
-        div.ActualY = FractionalUnitResolver.SanitizeWithMax(div.ActualY);
-
         bool isRow = !string.Equals(div.FlexDirection, "column", StringComparison.OrdinalIgnoreCase);
         var spacing = Thickness.Parse(div.Spacing);
         float itemSpacing = isRow ? spacing.Left.Value : spacing.Top.Value;
@@ -921,9 +900,6 @@ public static class LayoutEngine
 
     private static void PositionOverlay(Overlay overlay)
     {
-        overlay.ActualX = FractionalUnitResolver.SanitizeWithMax(overlay.ActualX);
-        overlay.ActualY = FractionalUnitResolver.SanitizeWithMax(overlay.ActualY);
-
         float baseX = overlay.ActualX + overlay.ComputedPaddingLeft;
         float baseY = overlay.ActualY + overlay.ComputedPaddingTop;
 
@@ -938,9 +914,6 @@ public static class LayoutEngine
 
     private static void PositionVerticalDiv(Div div)
     {
-        div.ActualX = FractionalUnitResolver.SanitizeWithMax(div.ActualX);
-        div.ActualY = FractionalUnitResolver.SanitizeWithMax(div.ActualY);
-
         float baseX = div.ActualX + div.ComputedPaddingLeft;
         
         float totalHeight = 0;

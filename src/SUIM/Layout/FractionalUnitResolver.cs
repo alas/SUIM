@@ -7,7 +7,7 @@ public static class FractionalUnitResolver
         if (frValues.Length == 0) return [];
         availableSpace = Sanitize(availableSpace);
         
-        float total = 0f;
+        var total = 0f;
         foreach (var value in frValues)
         {
             total += value;
@@ -15,8 +15,8 @@ public static class FractionalUnitResolver
         
         if (total == 0f) return new float[frValues.Length];
         
-        float spacePerFr = availableSpace / total;
-        float[] resolvedValues = new float[frValues.Length];
+        var spacePerFr = availableSpace / total;
+        var resolvedValues = new float[frValues.Length];
         
         for (int i = 0; i < frValues.Length; i++)
         {

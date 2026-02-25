@@ -11,8 +11,8 @@ public abstract class UIElement(string tagName)
     public string? VerticalAlignment { get; set; }
     public string? ContentHorizontalAlignment { get; set; }
     public string? ContentVerticalAlignment { get; set; }
-    public string? X { get; set; }
-    public string? Y { get; set; }
+    public string? Left { get; set; }
+    public string? Top { get; set; }
     public string? Width { get; set; }
     public string? Height { get; set; }
     public string? Margin { get; set; }
@@ -24,18 +24,16 @@ public abstract class UIElement(string tagName)
     public string? BackgroundColor { get; set; }
     public string? Opacity { get; set; }
     public string? ZIndex { get; set; }
-    public string? Visibility { get; set; }
+    public string? Visibility { get; set; } = "visible";
     public string? ReadOnly { get; set; }
     public string? StopClicks { get; set; }
     public string? BackgroundImage { get; set; }
 
-    // Internal properties calculated during parsing
+    // Internal properties to the engine - not directly settable via markup attributes
     public string TagName { get; } = tagName.ToLowerInvariant();
     public UIElement? Parent { get; set; }
     public string? RootFont { get; set; }
-    public float RootFontSize { get; set; }
-
-    // Internal properties to the engine - not directly settable via markup attributes
+    public float RootFontSize { get; set; } = float.NaN;
     public List<BindingDefinition> Bindings { get; } = [];
     public dynamic? Model { get; set; }
     public bool IsComponentRoot { get; set; }
@@ -91,13 +89,13 @@ public abstract class UIElement(string tagName)
         {
             Id = value as string;
         }
-        else if (name.Equals("x", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("left", StringComparison.OrdinalIgnoreCase))
         {
-            X = value as string;
+            Left = value as string;
         }
-        else if (name.Equals("y", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("top", StringComparison.OrdinalIgnoreCase))
         {
-            Y = value as string;
+            Top = value as string;
         }
         else if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase))
         {
@@ -214,8 +212,8 @@ public abstract class UIElement(string tagName)
     {
         if (name.Equals("id", StringComparison.OrdinalIgnoreCase)) return Id;
         if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) return Class;
-        if (name.Equals("x", StringComparison.OrdinalIgnoreCase)) return X;
-        if (name.Equals("y", StringComparison.OrdinalIgnoreCase)) return Y;
+        if (name.Equals("left", StringComparison.OrdinalIgnoreCase)) return Left;
+        if (name.Equals("top", StringComparison.OrdinalIgnoreCase)) return Top;
         if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase)) return Opacity;
         if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase)) return ZIndex;
         if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase)) return Visibility;
@@ -257,7 +255,6 @@ public class LayoutElement(string tagName) : UIElement(tagName)
 {
     public string? Spacing { get; set; }
     public bool Clip { get; set; }
-    public Thickness SliceWidth { get; set; } = Thickness.None;
 
     public override void SetAttribute(string name, object? value)
     {
@@ -268,10 +265,6 @@ public class LayoutElement(string tagName) : UIElement(tagName)
         else if (name.Equals("clip", StringComparison.OrdinalIgnoreCase))
         {
             Clip = value is bool b ? b : Convert.ToBoolean(value);
-        }
-        else if (name.Equals("slicewidth", StringComparison.OrdinalIgnoreCase))
-        {
-            SliceWidth = Thickness.FromObject(value);
         }
         else
         {

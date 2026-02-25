@@ -1,17 +1,13 @@
-* {
-    HorizontalAlignment: Left;
-    VerticalAlignment: Top;
-    Color: White;
-    FontSize: 16;
-}
-text {
+text, label {
     HorizontalAlignment: Center;
     VerticalAlignment: Center;
+    color: White;
+    font-size: 16;
 }
 button {
-    Width: 200;
-    Height: 50;
-    Margin: 5;
+    width: 200px;
+    height: 50px;
+    margin: 5px;
     normal: "Assets/btn_normal.png";
     hover: "Assets/btn_hover.png";
     pressed: "Assets/btn_pressed.png";
@@ -19,5 +15,5 @@ button {
 .container {
     HorizontalAlignment: Left;
     VerticalAlignment: Top;
-    Padding: 10;
+    padding: 10px;
 }

@@ -36,28 +36,7 @@ public static partial class MarkupParser
             {
                 if (node is XElement childX && (childX.Name.LocalName.Equals("model", StringComparison.OrdinalIgnoreCase) || childX.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase)))
                 {
-                    if (childX.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var isScoped = childX.Attribute("scoped") != null;
-                        // Process styles as usual
-                        var sourceAttr = childX.Attribute("source") ?? childX.Attribute("src");
-                        if (sourceAttr != null && !string.IsNullOrEmpty(basePath))
-                        {
-                            var stylePath = Path.Combine(basePath, sourceAttr.Value);
-                            if (File.Exists(stylePath)) 
-                            {
-                                var content = File.ReadAllText(stylePath);
-                                ParseStyles(content, styles);
-                                if (!isScoped) ParseStyles(content, leakableStyles);
-                            }
-                        }
-                        var styleContent = childX.Value.Trim();
-                        if (!string.IsNullOrEmpty(styleContent))
-                        {
-                            ParseStyles(styleContent, styles);
-                            if (!isScoped) ParseStyles(styleContent, leakableStyles);
-                        }
-                    }
+                    ParseStyleInternal(childX, styles, leakableStyles, basePath);
                     continue;
                 }
 
@@ -66,8 +45,8 @@ public static partial class MarkupParser
                     var text = textNode.Value.Trim();
                     if (!string.IsNullOrEmpty(text))
                     {
-                        var textElement = new Text { Value = text };
-                        if (styles.Count > 0) textElement = (Text)ApplyStylesToElement(textElement, styles);
+                        UIElement textElement = new Text { Value = text };
+                        if (styles.Count > 0) textElement = Style.ApplyToElement(textElement, styles);
                         element.AddChild(textElement, root);
                     }
                 }
@@ -90,256 +69,40 @@ public static partial class MarkupParser
         return (element, model2);
     }
 
-    private static void ParseStyles(string styleContent, Dictionary<string, Dictionary<string, string>> styles)
-    {        
-        // CSS-like parser supporting: .classname, #id, tagname, and *
-        // Format: selector { property: value; property: value; }
-        var selectorRegex = MyRegex();
-        var matches = selectorRegex.Matches(styleContent);
-
-        foreach (System.Text.RegularExpressions.Match match in matches)
-        {
-            var selector = match.Groups[1].Value.Trim().ToLowerInvariant();
-            var propertiesContent = match.Groups[2].Value;
-
-            var properties = new Dictionary<string, string>();
-            // Parse properties: "property: value, property: value"
-            var propertyRegex = MyRegex1();
-            var propMatches = propertyRegex.Matches(propertiesContent);
-
-            foreach (System.Text.RegularExpressions.Match propMatch in propMatches)
-            {
-                var propName = propMatch.Groups[1].Value.Trim();
-                var propValue = propMatch.Groups[2].Value.Trim().Trim('"');
-                properties[propName] = propValue;
-            }
-
-            if (properties.Count > 0)
-            {
-                styles[selector] = properties;
-            }
-        }
-    }
-
-    private static UIElement ApplyStylesToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles)
+    private static void ParseStyleInternal(XElement element, Dictionary<string, Dictionary<string, string>> styles, Dictionary<string, Dictionary<string, string>> leakableStyles, string? basePath)
     {
-        var elementTag = element.TagName;
-        var elementId = element.GetAttribute("id");
-        var elementClass = element.GetAttribute("class");
-        
-        // Merge styles from all matching selectors in order of precedence (low to high)
-        var mergedProperties = new Dictionary<string, string>();
-
-        // Universal selector (lowest precedence)
-        if (styles.TryGetValue("*", out var universalProps))
+        if (element.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))
         {
-            foreach (var kvp in universalProps)
+            var isScoped = element.Attribute("scoped") != null;
+            var sourceAttr = element.Attribute("source") ?? element.Attribute("src");
+            if (sourceAttr != null && !string.IsNullOrEmpty(basePath))
             {
-                mergedProperties[kvp.Key] = kvp.Value;
-            }
-        }
-
-        // Tag selector
-        if (styles.TryGetValue(elementTag, out var tagProps))
-        {
-            foreach (var kvp in tagProps)
-            {
-                mergedProperties[kvp.Key] = kvp.Value;
-            }
-        }
-
-        // Class selector(s) - support multiple space-separated classes
-        if (!string.IsNullOrEmpty(elementClass))
-        {
-            var classes = elementClass.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            foreach (var className in classes)
-            {
-                var classSelector = "." + className.ToLowerInvariant();
-                if (styles.TryGetValue(classSelector, out var classProps))
+                var stylePath = Path.Combine(basePath, sourceAttr.Value);
+                if (!File.Exists(stylePath))
                 {
-                    foreach (var kvp in classProps)
-                    {
-                        mergedProperties[kvp.Key] = kvp.Value;
-                    }
+                    throw new FileNotFoundException($"Style file not found: {stylePath}");
                 }
-            }
-        }
 
-        // ID selector (highest precedence)
-        if (!string.IsNullOrEmpty(elementId))
-        {
-            var idSelector = "#" + elementId.Trim().ToLowerInvariant();
-            if (styles.TryGetValue(idSelector, out var idProps))
+                var content = File.ReadAllText(stylePath);
+                Style.Parse(content, styles);
+                if (!isScoped) Style.Parse(content, leakableStyles);
+            }
+
+            var styleContent = element.Value.Trim();
+            if (!string.IsNullOrEmpty(styleContent))
             {
-                foreach (var kvp in idProps)
-                {
-                    mergedProperties[kvp.Key] = kvp.Value;
-                }
+                Style.Parse(styleContent, styles);
+                if (!isScoped) Style.Parse(styleContent, leakableStyles);
             }
         }
-
-        if (mergedProperties.Count > 0)
-        {
-            element = ApplyStylePropertiesToElement(element, mergedProperties);
-        }
-        return element;
     }
 
-    private static UIElement ApplyStylePropertiesToElement(UIElement element, Dictionary<string, string> properties)
-    {
-        // Extract border and scroll attributes for special handling
-        string? borderAttr = null;
-        string? scrollAttr = null;
-        var regularAttrs = new Dictionary<string, string>();
-        var wrapperAttrs = new Dictionary<string, string>();
-        // Pre-check whether this style will create a wrapper so layout attributes can be routed to it.
-        bool willWrapWithBorder = properties.Keys.Any(k => k.Equals("border", StringComparison.OrdinalIgnoreCase));
-        bool willWrapWithScroll = properties.Keys.Any(k => k.Equals("scroll", StringComparison.OrdinalIgnoreCase));
-        bool willWrapWithBG = properties.Keys.Any(k => k.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase));
-
-        foreach (var kvp in properties)
-        {
-            var propName = kvp.Key;
-            var propValue = kvp.Value;
-
-            if (propName.Equals("border", StringComparison.OrdinalIgnoreCase))
-            {
-                borderAttr = propValue;
-            }
-            else if (propName.Equals("scroll", StringComparison.OrdinalIgnoreCase))
-            {
-                scrollAttr = propValue;
-            }
-            else if (propName.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase))
-            {
-                // Background image attribute will be handled by the wrapper creation
-            }
-            else if ((willWrapWithBorder || willWrapWithScroll || willWrapWithBG) && IsLayoutAttribute(propName))
-            {
-                // If a style defines layout attributes for an element that will be wrapped (border/scroll/bg),
-                // apply those layout attributes to the wrapper instead of the inner element.
-                wrapperAttrs[propName] = propValue;
-            }
-            else
-            {
-                regularAttrs[propName] = propValue;
-            }
-        }
-
-        // Apply regular attributes to the element (inner)
-        foreach (var kvp in regularAttrs)
-        {
-            element.SetAttribute(kvp.Key, kvp.Value);
-        }
-
-        // Handle scroll wrapper
-        if (!string.IsNullOrEmpty(scrollAttr))
-        {
-            var scroll = new Scroll();
-            if (Enum.TryParse<ScrollDirection>(scrollAttr, true, out var dir))
-            {
-                scroll.Direction = dir;
-            }
-
-            // Apply any layout attributes from the style to the scroll wrapper (width/height etc.)
-            foreach (var kvp in wrapperAttrs)
-            {
-                scroll.SetAttribute(kvp.Key, kvp.Value);
-            }
-            // Fallback: also apply explicit width/height from properties if present (defensive)
-            if (properties.TryGetValue("width", out var w)) scroll.SetAttribute("width", w);
-            if (properties.TryGetValue("height", out var h)) scroll.SetAttribute("height", h);
-
-            // When a style creates a scroll wrapper, the inner element should default to `auto` if it was unspecified.
-            element.Width ??= "auto";
-            element.Height ??= "auto";
-
-            scroll.AddChild(element, null);
-            element = scroll;
-        }
-
-        // Handle border wrapper (must be applied last to wrap scroll if present)
-        if (!string.IsNullOrEmpty(borderAttr))
-        {
-            var border = new Border();
-            border.SetAttribute("border", borderAttr);
-
-            // Apply any layout attributes from the style to the border wrapper (width/height etc.)
-            foreach (var kvp in wrapperAttrs)
-            {
-                border.SetAttribute(kvp.Key, kvp.Value);
-            }
-            // Fallback: also apply explicit width/height from properties if present (defensive)
-            if (properties.TryGetValue("width", out var w)) border.SetAttribute("width", w);
-            if (properties.TryGetValue("height", out var h)) border.SetAttribute("height", h);
-
-            // Ensure numeric width/height in styles are parsed and applied directly (defensive - avoids any SetAttribute parsing quirks)
-            if (properties.TryGetValue("width", out var pw) && !string.IsNullOrWhiteSpace(pw))
-            {
-                border.Width = pw;
-            }
-            if (properties.TryGetValue("height", out var ph) && !string.IsNullOrWhiteSpace(ph))
-            {
-                border.Height = ph;
-            }
-
-            element.Width ??= "auto";
-            element.Height ??= "auto";
-            border.AddChild(element, null);
-            element = border;
-        }
-
-        // Handle BackgroundImage wrapper (applied last to be the outermost wrapper)
-        if (properties.TryGetValue("backgroundimage", out var bgImgAttr))
-        {
-            var bg = new BackgroundImage();
-            bg.SetAttribute("backgroundimage", bgImgAttr);
-
-            foreach (var kvp in wrapperAttrs)
-            {
-                bg.SetAttribute(kvp.Key, kvp.Value);
-            }
-            if (properties.TryGetValue("width", out var w)) bg.SetAttribute("width", w);
-            if (properties.TryGetValue("height", out var h)) bg.SetAttribute("height", h);
-
-            element.Width ??= "auto";
-            element.Height ??= "auto";
-            bg.AddChild(element, null);
-            element = bg;
-        }
-
-        return element;
-    }
-
-    private static UIElement? ParseElement(XElement element, Dictionary<string, Dictionary<string, string>> styles, Dictionary<string, Dictionary<string, string>> leakableStyles, dynamic? model, string? basePath = null)
+    private static UIElement? ParseElement(XElement element, Dictionary<string, Dictionary<string, string>> styles, Dictionary<string, Dictionary<string, string>> leakableStyles, dynamic? model, string? basePath)
     {
         var innerElement = ParseElementTag(element);
         if (innerElement == null)
         {
-            if (element.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))
-            {
-                var isScoped = element.Attribute("scoped") != null;
-                var sourceAttr = element.Attribute("source") ?? element.Attribute("src");
-                if (sourceAttr != null && !string.IsNullOrEmpty(basePath))
-                {
-                    var stylePath = Path.Combine(basePath, sourceAttr.Value);
-                    if (!File.Exists(stylePath))
-                    {
-                        throw new FileNotFoundException($"Style file not found: {stylePath}");
-                    }
-
-                    var content = File.ReadAllText(stylePath);
-                    ParseStyles(content, styles);
-                    if (!isScoped) ParseStyles(content, leakableStyles);
-                }
-
-                var styleContent = element.Value.Trim();
-                if (!string.IsNullOrEmpty(styleContent))
-                {
-                    ParseStyles(styleContent, styles);
-                    if (!isScoped) ParseStyles(styleContent, leakableStyles);
-                }
-            }
+            ParseStyleInternal(element, styles, leakableStyles, basePath);
             return null;
         }
 
@@ -458,10 +221,10 @@ public static partial class MarkupParser
                     var text = textNode.Value.Trim();
                     if (!string.IsNullOrEmpty(text))
                     {
-                        var textElement = new Text { Value = text };
+                        UIElement textElement = new Text { Value = text };
                         if (styles != null && styles.Count > 0)
                         {
-                            textElement = (Text)ApplyStylesToElement(textElement, styles);
+                            textElement = Style.ApplyToElement(textElement, styles);
                         }
                         innerElement.AddChild(textElement, element);
                     }
@@ -483,7 +246,7 @@ public static partial class MarkupParser
 
         if (styles != null && styles.Count > 0)
         {
-            rootElement = ApplyStylesToElement(rootElement, styles);
+            rootElement = Style.ApplyToElement(rootElement, styles);
         }
 
         foreach (var attr in attributes)
@@ -532,7 +295,7 @@ public static partial class MarkupParser
         "id", "width", "height", "padding", "margin",
         "halign", "horizontalalignment", "valign", "verticalalignment",
         "visibility", "opacity", "background", "bg", "class",
-        "x", "y", "z-index", "anchor"
+        "left", "top", "z-index", "anchor"
     };
 
     private static bool IsLayoutAttribute(string name)
@@ -588,9 +351,4 @@ public static partial class MarkupParser
 
         throw new NotSupportedException($"Unknown tag: {element.Name.LocalName}");
     }
-
-    [System.Text.RegularExpressions.GeneratedRegex(@"([#.]?[a-zA-Z0-9_*-]+)\s*\{([^}]*)\}")]
-    private static partial System.Text.RegularExpressions.Regex MyRegex();
-    [System.Text.RegularExpressions.GeneratedRegex(@"([a-zA-Z0-9\-]+)\s*:\s*([^;}]+)")]
-    private static partial System.Text.RegularExpressions.Regex MyRegex1();
 }

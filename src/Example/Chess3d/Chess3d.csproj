@@ -41,7 +41,7 @@
     <None Update="SUIM\Components\ScreenOverlay.suim">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="SUIM\Styles\Main.style">
+    <None Update="SUIM\Styles\Main.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="SUIM\Views\MainView.suim">

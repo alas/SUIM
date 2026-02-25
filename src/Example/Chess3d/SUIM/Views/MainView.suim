@@ -16,7 +16,7 @@
 		"OverlayVisibility": "collapsed"
 	}
 	</model>
-    <style src="Styles/Main.style" />
+    <style src="Styles/Main.css" />
 	
     <vstack class="container">
         <button onclick="OpenPopup('Quit', 'Are you sure you want to quit?')">Quit</button>
