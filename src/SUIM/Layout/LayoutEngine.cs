@@ -471,7 +471,11 @@ public static class LayoutEngine
         }
         else
         {
-            bool hasExplicitlyPositionedChildren = div.Children.Any(c => UnitValue.Parse(c.Left).Type != UnitType.None || UnitValue.Parse(c.Top).Type != UnitType.None);
+            bool hasExplicitlyPositionedChildren = div.Children
+                .Any(c => UnitValue.Parse(c.Top).Type != UnitType.None
+                || UnitValue.Parse(c.Left).Type != UnitType.None
+                || UnitValue.Parse(c.Bottom).Type != UnitType.None
+                || UnitValue.Parse(c.Right).Type != UnitType.None);
 
             if (!hasExplicitlyPositionedChildren && div.Children.Count > 0)
             {
@@ -783,10 +787,18 @@ public static class LayoutEngine
         {
             PositionWithAnchor(div);
         }
-        else if (UnitValue.Parse(div.Left).Type != UnitType.None || UnitValue.Parse(div.Top).Type != UnitType.None)
+        else if (UnitValue.Parse(div.Top).Type != UnitType.None
+            || UnitValue.Parse(div.Left).Type != UnitType.None
+            || UnitValue.Parse(div.Bottom).Type != UnitType.None
+            || UnitValue.Parse(div.Right).Type != UnitType.None)
         {
             div.ActualX = div.ToPixels(div.Left);
             div.ActualY = div.ToPixels(div.Top);
+            if (div.Parent != null)
+            {
+                div.ActualWidth = div.Parent.ActualWidth - div.ActualX - div.ToPixels(div.Right);
+                div.ActualHeight = div.Parent.ActualHeight - div.ActualY - div.ToPixels(div.Bottom);
+            }
         }
 
         if (div.Display?.Equals("flex", StringComparison.OrdinalIgnoreCase) == true)
@@ -795,7 +807,11 @@ public static class LayoutEngine
         }
         else
         {
-            bool hasExplicitlyPositionedChildren = div.Children.Any(c => UnitValue.Parse(c.Left).Type != UnitType.None || UnitValue.Parse(c.Top).Type != UnitType.None);
+            bool hasExplicitlyPositionedChildren = div.Children
+                .Any(c => UnitValue.Parse(c.Top).Type != UnitType.None
+                || UnitValue.Parse(c.Left).Type != UnitType.None
+                || UnitValue.Parse(c.Bottom).Type != UnitType.None
+                || UnitValue.Parse(c.Right).Type != UnitType.None);
 
             if (!hasExplicitlyPositionedChildren && div.Children.Count > 0)
             {

@@ -11,8 +11,10 @@ public abstract class UIElement(string tagName)
     public string? VerticalAlignment { get; set; }
     public string? ContentHorizontalAlignment { get; set; }
     public string? ContentVerticalAlignment { get; set; }
-    public string? Left { get; set; }
     public string? Top { get; set; }
+    public string? Left { get; set; }
+    public string? Bottom { get; set; }
+    public string? Right { get; set; }
     public string? Width { get; set; }
     public string? Height { get; set; }
     public string? Margin { get; set; }
@@ -89,13 +91,21 @@ public abstract class UIElement(string tagName)
         {
             Id = value as string;
         }
+        else if (name.Equals("top", StringComparison.OrdinalIgnoreCase))
+        {
+            Top = value as string;
+        }
         else if (name.Equals("left", StringComparison.OrdinalIgnoreCase))
         {
             Left = value as string;
         }
-        else if (name.Equals("top", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("bottom", StringComparison.OrdinalIgnoreCase))
         {
-            Top = value as string;
+            Bottom = value as string;
+        }
+        else if (name.Equals("right", StringComparison.OrdinalIgnoreCase))
+        {
+            Right = value as string;
         }
         else if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase))
         {
@@ -212,8 +222,10 @@ public abstract class UIElement(string tagName)
     {
         if (name.Equals("id", StringComparison.OrdinalIgnoreCase)) return Id;
         if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) return Class;
-        if (name.Equals("left", StringComparison.OrdinalIgnoreCase)) return Left;
         if (name.Equals("top", StringComparison.OrdinalIgnoreCase)) return Top;
+        if (name.Equals("left", StringComparison.OrdinalIgnoreCase)) return Left;
+        if (name.Equals("bottom", StringComparison.OrdinalIgnoreCase)) return Bottom;
+        if (name.Equals("right", StringComparison.OrdinalIgnoreCase)) return Right;
         if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase)) return Opacity;
         if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase)) return ZIndex;
         if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase)) return Visibility;
