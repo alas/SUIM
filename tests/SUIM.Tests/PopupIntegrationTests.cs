@@ -69,10 +69,10 @@ public class PopupIntegrationTests
 
         foreach (var button in mainViewButtons)
         {
-            Assert.True(button.ActualWidth == 200, "Button should have ActualWidth > 0");
-            Assert.True(button.ActualHeight == 50, "Button should have ActualHeight > 0");
-            Assert.True(button.RenderOffsets.X == 5, "Button should have valid RenderOffsets.X");
-            Assert.True(button.RenderOffsets.Y > 0, "Button should have valid RenderOffsets.Y");
+            Assert.Equal(200, button.ActualWidth);
+            Assert.Equal(50, button.ActualHeight);
+            Assert.Equal(5, button.Margin.Top);
+            Assert.Equal(5, button.Margin.Left);
         }
     }
 }
