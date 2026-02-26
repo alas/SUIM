@@ -1,11 +1,11 @@
-namespace SUIM.Tests;
+namespace SUIM.Tests.Layout;
 
 using Xunit;
 using Stride.UI.Panels;
 using SUIM.Layout;
 using SUIMStride;
 
-public class IntegrationTests
+public class StrideLayoutTests
 {
     [Fact]
     public void MarkupParser_WithLayoutEngine_CreatesLayout()

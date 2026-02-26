@@ -1,4 +1,4 @@
-namespace SUIM.Tests;
+namespace SUIM.Tests.Binding;
 
 using Xunit;
 using SUIM;

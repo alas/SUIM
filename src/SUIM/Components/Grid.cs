@@ -2,6 +2,8 @@ namespace SUIM.Components;
 
 using System;
 using System.Xml.Linq;
+using SUIM.Components.Attributes;
+using SUIM.Layout;
 
 public class Grid() : LayoutElement(nameof(Grid))
 {
@@ -59,6 +61,56 @@ public class Grid() : LayoutElement(nameof(Grid))
         {
             base.SetAttribute(name, value);
         }
+    }
+
+    public float[] ParseUnits(string? unitsString, float totalSize)
+    {
+        if (string.IsNullOrWhiteSpace(unitsString))
+            return [totalSize];
+
+        var parts = unitsString.Split([','], StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => s.Trim())
+            .ToArray();
+
+        if (parts.Length == 0)
+            return [totalSize];
+
+        var result = new float[parts.Length];
+        var frUnits = new List<UnitValue>();
+        float fixedSize = 0;
+
+        for (int i = 0; i < parts.Length; i++)
+        {
+            var unit = UnitValue.Parse(parts[i]);
+            if (unit.Type == UnitType.Fr)
+            {
+                frUnits.Add(unit);
+            }
+            else
+            {
+                result[i] = ToPixels(unit);
+                fixedSize += result[i];
+            }
+        }
+
+        float remainingSpace = Math.Max(0, totalSize - fixedSize);
+        if (frUnits.Count > 0)
+        {
+            var values = frUnits.Select(u => u.Value).ToArray();
+            var resolvedValues = FractionalUnit.Resolve(values, remainingSpace);
+
+            int index = 0;
+            for (int i = 0; i < parts.Length; i++)
+            {
+                var unit = UnitValue.Parse(parts[i]);
+                if (unit.Type == UnitType.Fr)
+                {
+                    result[i] = resolvedValues[index++];
+                }
+            }
+        }
+
+        return result;
     }
 }
 

@@ -41,46 +41,6 @@ public class PopupIntegrationTests
         return buttons;
     }
 
-    [Fact]
-    public void Button_WithPixelSizeFromCSS_ShouldMeasureCorrectly()
-    {
-        // Create a simple button with CSS-style sizing
-        var markup = @"
-            <grid>
-                <style>
-                    button {
-                        width: 200px;
-                        height: 50px;
-                        margin: 5px;
-                    }
-                </style>
-                <vstack>
-                    <button>Test</button>
-                </vstack>
-            </grid>";
-
-        var (suimElement, _) = MarkupParser.Parse(markup);
-
-        // Check that the button has the right width/height attributes
-        var vstack = suimElement.Children[0];
-        var button = vstack.Children[0];
-
-        System.Diagnostics.Debug.WriteLine($"Before layout: Button.Width={button.Width}, Button.Height={button.Height}, Button.Margin={button.Margin}");
-        Assert.NotNull(button);
-        Assert.Equal("200px", button.Width);
-        Assert.Equal("50px", button.Height);
-        Assert.Equal("5px", button.Margin);
-
-        // Now layout it
-        LayoutEngine.Layout(suimElement, 16, 1280, 720);
-
-        // Check actual dimensions
-        var buttonActual = vstack.Children[0];
-        System.Diagnostics.Debug.WriteLine($"After layout: Button.ActualWidth={buttonActual.ActualWidth}, Button.ActualHeight={buttonActual.ActualHeight}, Button.Width={buttonActual.Width}, Button.MeasuredContentWidth={buttonActual.MeasuredContentWidth}");
-        Assert.Equal(200, buttonActual.ActualWidth);
-        Assert.Equal(50, buttonActual.ActualHeight);
-    }
-
     private static List<Components.Button> FindSuimButtons(Components.UIElement elem)
     {
         var buttons = new List<Components.Button>();
@@ -160,8 +120,10 @@ public class PopupIntegrationTests
         {
             Assert.Equal(200, button.Width);
             Assert.Equal(50, button.Height);
-            Assert.Equal(5, button.Margin.Top);
             Assert.Equal(5, button.Margin.Left);
+            Assert.Equal(5, button.Margin.Top);
+            Assert.Equal(5, button.Margin.Right);
+            Assert.Equal(5, button.Margin.Bottom);
         }
     }
 }

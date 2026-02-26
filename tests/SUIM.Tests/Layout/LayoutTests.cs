@@ -1,4 +1,4 @@
-namespace SUIM.Tests;
+namespace SUIM.Tests.Layout;
 
 using Xunit;
 using SUIM.Components;
@@ -175,7 +175,7 @@ public class LayoutTests
     public void FrUnitResolver_ResolveSimpleFractionalUnits()
     {
         var values = new float[] { 1, 2 };
-        var result = FractionalUnitResolver.ResolveFractionalUnits(values, 300);
+        var result = FractionalUnit.Resolve(values, 300);
         Assert.Equal(100, result[0]); // 1 * (300 / 3)
         Assert.Equal(200, result[1]); // 2 * (300 / 3)
     }
@@ -184,7 +184,7 @@ public class LayoutTests
     public void FrUnitResolver_ResolveSingleFractionalUnit()
     {
         var values = new float[] { 1 };
-        var result = FractionalUnitResolver.ResolveFractionalUnits(values, 200);
+        var result = FractionalUnit.Resolve(values, 200);
         Assert.Equal(200, result[0]); // 1 * (200 / 1)
     }
 

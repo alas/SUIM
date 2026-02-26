@@ -1,8 +1,8 @@
 namespace SUIM.Layout;
 
-public static class FractionalUnitResolver
+public static class FractionalUnit
 {
-    public static float[] ResolveFractionalUnits(float[] frValues, float availableSpace)
+    public static float[] Resolve(float[] frValues, float availableSpace)
     {
         if (frValues.Length == 0) return [];
         availableSpace = Sanitize(availableSpace);

@@ -1,4 +1,4 @@
-namespace SUIM.Tests;
+namespace SUIM.Tests.Layout;
 
 using Xunit;
 using SUIM.Components;

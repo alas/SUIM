@@ -158,79 +158,33 @@ public static class LayoutEngine
         // Calculate total size including padding
         element.ActualWidth = element.MeasuredContentWidth + element.ComputedPaddingLeft + element.ComputedPaddingRight;
         element.ActualHeight = element.MeasuredContentHeight + element.ComputedPaddingTop + element.ComputedPaddingBottom;
-    }
 
-    private static bool TreeHasAnyExplicitWidth(UIElement element)
-    {
-        var width = UnitValue.Parse(element.Width);
-        bool widthExplicit = width.Type != UnitType.None
-                             && width.Type != UnitType.Rem
-                             && width.Type != UnitType.Em 
-                             && width.Type != UnitType.Fr;
-        if (widthExplicit) return true;
-        foreach (var child in element.Children)
+        static bool TreeHasAnyExplicitWidth(UIElement element)
         {
-            if (TreeHasAnyExplicitWidth(child)) return true;
-        }
-        return false;
-    }
-
-    private static bool TreeHasAnyExplicitHeight(UIElement element)
-    {
-        var height = UnitValue.Parse(element.Height);
-        // Treat any non-None/non-Fr height (including rem/em/auto) as explicit for height axis
-        bool heightExplicit = height.Type != UnitType.None && height.Type != UnitType.Fr;
-        if (heightExplicit) return true;
-        foreach (var child in element.Children)
-        {
-            if (TreeHasAnyExplicitHeight(child)) return true;
-        }
-        return false;
-    }
-
-    private static void PositionElement(UIElement element, float parentX, float parentY)
-    {
-        // Default positioning: only set coordinates that haven't been
-        // positioned by the parent container/parent-specific layout logic.
-        if (FractionalUnitResolver.IsInvalid(element.ActualX))
-            element.ActualX = parentX;
-        if (FractionalUnitResolver.IsInvalid(element.ActualY))
-            element.ActualY = parentY;
-
-        // Position based on element type
-        switch (element)
-        {
-            case Stack stack:
-                PositionStack(stack);
-                break;
-            case Grid grid:
-                PositionGrid(grid);
-                break;
-            case Dock dock:
-                PositionDock(dock);
-                break;
-            case Overlay overlay:
-                PositionOverlay(overlay);
-                break;
-            case Div div:
-                PositionDiv(div);
-                break;
-            default:
-                if (element.Children.Count > 0)
-                {
-                    PositionGeneric(element);
-                }
-                break;
+            var width = UnitValue.Parse(element.Width);
+            bool widthExplicit = width.Type != UnitType.None
+                                 && width.Type != UnitType.Rem
+                                 && width.Type != UnitType.Em
+                                 && width.Type != UnitType.Fr;
+            if (widthExplicit) return true;
+            foreach (var child in element.Children)
+            {
+                if (TreeHasAnyExplicitWidth(child)) return true;
+            }
+            return false;
         }
 
-        // Position children
-        var contentX = element.ActualX + element.ComputedMarginLeft + element.ComputedPaddingLeft;
-        var contentY = element.ActualY + element.ComputedMarginTop + element.ComputedPaddingTop;
-        
-        foreach (var child in element.Children)
+        static bool TreeHasAnyExplicitHeight(UIElement element)
         {
-            child.CurrentFontSize = element.CurrentFontSize;
-            PositionElement(child, contentX, contentY);
+            var height = UnitValue.Parse(element.Height);
+            // Treat any non-None/non-Fr height (including rem/em/auto) as explicit for height axis
+            bool heightExplicit = height.Type != UnitType.None && height.Type != UnitType.Fr;
+            if (heightExplicit) return true;
+            foreach (var child in element.Children)
+            {
+                if (TreeHasAnyExplicitHeight(child)) return true;
+            }
+            return false;
         }
     }
 
@@ -329,30 +283,6 @@ public static class LayoutEngine
         stack.MeasuredContentHeight = Math.Max(stack.MeasuredContentHeight, totalHeight + totalSpacing);
     }
 
-    private static void ResolveFractionalUnitWidths(List<UIElement> elements, float remainingSpace, float availableHeight)
-    {
-        var values = elements.Select(e => UnitValue.Parse(e.Width)).Select(w => w.Type == UnitType.Fr ? w.Value : 1f).ToArray();
-        var resolvedValues = FractionalUnitResolver.ResolveFractionalUnits(values, remainingSpace);
-
-        for (int i = 0; i < elements.Count; i++)
-        {
-            elements[i].CurrentFontSize = elements[i].Parent?.CurrentFontSize ?? 16f;
-            MeasureElement(elements[i], resolvedValues[i], availableHeight);
-        }
-    }
-
-    private static void ResolveFractionalUnitHeights(List<UIElement> elements, float remainingSpace, float availableWidth)
-    {
-        var values = elements.Select(e => UnitValue.Parse(e.Height)).Select(h => h.Type == UnitType.Fr ? h.Value : 1f).ToArray();
-        var resolvedValues = FractionalUnitResolver.ResolveFractionalUnits(values, remainingSpace);
-
-        for (int i = 0; i < elements.Count; i++)
-        {
-            elements[i].CurrentFontSize = elements[i].Parent?.CurrentFontSize ?? 16f;
-            MeasureElement(elements[i], availableWidth, resolvedValues[i]);
-        }
-    }
-
     private static void MeasureGrid(Grid grid, float availableWidth, float availableHeight)
     {
         // When grid has no explicit columns/rows and is auto-sized, 
@@ -377,8 +307,8 @@ public static class LayoutEngine
         }
         else
         {
-            var columnWidths = ParseGridUnits(grid.Columns, availableWidth, grid);
-            var rowHeights = ParseGridUnits(grid.Rows, availableHeight, grid);
+            var columnWidths = grid.ParseUnits(grid.Columns, availableWidth);
+            var rowHeights = grid.ParseUnits(grid.Rows, availableHeight);
 
             foreach (var gridChild in grid.GridChildren)
             {
@@ -453,9 +383,9 @@ public static class LayoutEngine
         }
 
         // Guarantee overlays always get valid size for mapping
-        if (FractionalUnitResolver.IsInvalid(contentWidth) || contentWidth == 0)
+        if (FractionalUnit.IsInvalid(contentWidth) || contentWidth == 0)
             contentWidth = availableWidth;
-        if (FractionalUnitResolver.IsInvalid(contentHeight) || contentHeight == 0)
+        if (FractionalUnit.IsInvalid(contentHeight) || contentHeight == 0)
             contentHeight = availableHeight;
         overlay.MeasuredContentWidth = contentWidth;
         overlay.MeasuredContentHeight = contentHeight;
@@ -605,7 +535,7 @@ public static class LayoutEngine
         }
         else
         {
-            availableWidth = FractionalUnitResolver.SanitizeWithMax(availableWidth);
+            availableWidth = FractionalUnit.SanitizeWithMax(availableWidth);
             div.MeasuredContentWidth = Math.Max(maxWidth, availableWidth);
         }
 
@@ -638,6 +568,112 @@ public static class LayoutEngine
         {
             div.MeasuredContentWidth = maxWidth > 0 ? maxWidth : availableWidth;
             div.MeasuredContentHeight = maxHeight > 0 ? maxHeight : availableHeight;
+        }
+    }
+
+    private static void MeasureGeneric(UIElement element, float availableWidth, float availableHeight)
+    {
+        float maxWidth = 0;
+        float maxHeight = 0;
+
+        // If element has explicit sizing, constrain children to that size
+        var width = UnitValue.Parse(element.Width);
+        var height = UnitValue.Parse(element.Height);
+
+        var childAvailableWidth = availableWidth;
+        var childAvailableHeight = availableHeight;
+
+        // If element has explicit pixel width, constrain children to that width
+        if (width.Type != UnitType.Auto && width.Type != UnitType.None && width.Type != UnitType.Fr)
+        {
+            childAvailableWidth = element.ToPixels(element.Width ?? "0");
+        }
+
+        // If element has explicit pixel height, constrain children to that height
+        if (height.Type != UnitType.Auto && height.Type != UnitType.None && height.Type != UnitType.Fr)
+        {
+            childAvailableHeight = element.ToPixels(element.Height ?? "0");
+        }
+
+        foreach (var child in element.Children)
+        {
+            child.CurrentFontSize = element.CurrentFontSize;
+            MeasureElement(child, childAvailableWidth, childAvailableHeight);
+            maxWidth = Math.Max(maxWidth, child.ActualWidth);
+            maxHeight = Math.Max(maxHeight, child.ActualHeight);
+        }
+
+        element.MeasuredContentWidth = Math.Max(element.MeasuredContentWidth, maxWidth);
+        element.MeasuredContentHeight = Math.Max(element.MeasuredContentHeight, maxHeight);
+    }
+
+    private static void ResolveFractionalUnitWidths(List<UIElement> elements, float remainingSpace, float availableHeight)
+    {
+        var values = elements.Select(e => UnitValue.Parse(e.Width)).Select(w => w.Type == UnitType.Fr ? w.Value : 1f).ToArray();
+        var resolvedValues = FractionalUnit.Resolve(values, remainingSpace);
+
+        for (int i = 0; i < elements.Count; i++)
+        {
+            elements[i].CurrentFontSize = elements[i].Parent?.CurrentFontSize ?? 16f;
+            MeasureElement(elements[i], resolvedValues[i], availableHeight);
+        }
+    }
+
+    private static void ResolveFractionalUnitHeights(List<UIElement> elements, float remainingSpace, float availableWidth)
+    {
+        var values = elements.Select(e => UnitValue.Parse(e.Height)).Select(h => h.Type == UnitType.Fr ? h.Value : 1f).ToArray();
+        var resolvedValues = FractionalUnit.Resolve(values, remainingSpace);
+
+        for (int i = 0; i < elements.Count; i++)
+        {
+            elements[i].CurrentFontSize = elements[i].Parent?.CurrentFontSize ?? 16f;
+            MeasureElement(elements[i], availableWidth, resolvedValues[i]);
+        }
+    }
+
+    private static void PositionElement(UIElement element, float parentX, float parentY)
+    {
+        // Default positioning: only set coordinates that haven't been
+        // positioned by the parent container/parent-specific layout logic.
+        if (FractionalUnit.IsInvalid(element.ActualX))
+            element.ActualX = parentX;
+        if (FractionalUnit.IsInvalid(element.ActualY))
+            element.ActualY = parentY;
+
+        // Position based on element type
+        switch (element)
+        {
+            case Stack stack:
+                PositionStack(stack);
+                break;
+            case Grid grid:
+                PositionGrid(grid);
+                break;
+            case Dock dock:
+                PositionDock(dock);
+                break;
+            case Overlay overlay:
+                PositionOverlay(overlay);
+                break;
+            case Div div:
+                PositionDiv(div);
+                break;
+            default:
+                if (element.Children.Count > 0)
+                {
+                    PositionGeneric(element);
+                }
+                break;
+        }
+
+        // Position children
+        var contentX = element.ActualX + element.ComputedMarginLeft + element.ComputedPaddingLeft;
+        var contentY = element.ActualY + element.ComputedMarginTop + element.ComputedPaddingTop;
+        
+        foreach (var child in element.Children)
+        {
+            child.CurrentFontSize = element.CurrentFontSize;
+            PositionElement(child, contentX, contentY);
         }
     }
 
@@ -710,8 +746,8 @@ public static class LayoutEngine
 
     private static void PositionGrid(Grid grid)
     {
-        var columnWidths = ParseGridUnits(grid.Columns, grid.MeasuredContentWidth, grid);
-        var rowHeights = ParseGridUnits(grid.Rows, grid.MeasuredContentHeight, grid);
+        var columnWidths = grid.ParseUnits(grid.Columns, grid.MeasuredContentWidth);
+        var rowHeights = grid.ParseUnits(grid.Rows, grid.MeasuredContentHeight);
 
         float baseX = grid.ActualX + grid.ComputedPaddingLeft;
         float baseY = grid.ActualY + grid.ComputedPaddingTop;
@@ -837,7 +873,7 @@ public static class LayoutEngine
         // Justify Content
         var justify = div.JustifyContent?.ToLowerInvariant();
         float availableSpace = (isRow ? div.MeasuredContentWidth : div.MeasuredContentHeight) - contentSize;
-        availableSpace = FractionalUnitResolver.Sanitize(availableSpace);
+        availableSpace = FractionalUnit.Sanitize(availableSpace);
 
         switch (justify)
         {
@@ -1015,6 +1051,20 @@ public static class LayoutEngine
         }
     }
 
+    private static void PositionGeneric(UIElement element)
+    {
+        float baseX = element.ActualX + element.ComputedPaddingLeft;
+        float baseY = element.ActualY + element.ComputedPaddingTop;
+
+        foreach (var child in element.Children)
+        {
+            child.ActualX = baseX;
+            child.ActualY = baseY;
+            ApplyHorizontalAlignment(child, baseX, element.MeasuredContentWidth);
+            ApplyVerticalAlignment(child, baseY, element.MeasuredContentHeight);
+        }
+    }
+
     private static void ApplyHorizontalAlignment(UIElement element, float baseX, float containerWidth)
     {
         var alignment = HorizontalAlignment.Parse(element.HorizontalAlignment);
@@ -1097,106 +1147,6 @@ public static class LayoutEngine
         foreach (var child in element.Children)
         {
             DetectOverflow(child);
-        }
-    }
-
-    private static float[] ParseGridUnits(string? unitsString, float totalSize, Grid elem)
-    {
-        if (string.IsNullOrWhiteSpace(unitsString))
-            return [totalSize];
-
-        var parts = unitsString.Split([','], StringSplitOptions.RemoveEmptyEntries)
-            .Select(s => s.Trim())
-            .ToArray();
-
-        if (parts.Length == 0)
-            return [totalSize];
-
-        var result = new float[parts.Length];
-        var frUnits = new List<UnitValue>();
-        float fixedSize = 0;
-
-        for (int i = 0; i < parts.Length; i++)
-        {
-            var unit = UnitValue.Parse(parts[i]);
-            if (unit.Type == UnitType.Fr)
-            {
-                frUnits.Add(unit);
-            }
-            else
-            {
-                result[i] = elem.ToPixels(unit);
-                fixedSize += result[i];
-            }
-        }
-
-        float remainingSpace = Math.Max(0, totalSize - fixedSize);
-        if (frUnits.Count > 0)
-        {
-            var values = frUnits.Select(u => u.Value).ToArray();
-            var resolvedValues = FractionalUnitResolver.ResolveFractionalUnits(values, remainingSpace);
-
-            int index = 0;
-            for (int i = 0; i < parts.Length; i++)
-            {
-                var unit = UnitValue.Parse(parts[i]);
-                if (unit.Type == UnitType.Fr)
-                {
-                    result[i] = resolvedValues[index++];
-                }
-            }
-        }
-
-        return result;
-    }
-
-    private static void MeasureGeneric(UIElement element, float availableWidth, float availableHeight)
-    {
-        float maxWidth = 0;
-        float maxHeight = 0;
-
-        // If element has explicit sizing, constrain children to that size
-        var width = UnitValue.Parse(element.Width);
-        var height = UnitValue.Parse(element.Height);
-
-        var childAvailableWidth = availableWidth;
-        var childAvailableHeight = availableHeight;
-
-        // If element has explicit pixel width, constrain children to that width
-        if (width.Type != UnitType.Auto && width.Type != UnitType.None && width.Type != UnitType.Fr)
-        {
-            childAvailableWidth = element.ToPixels(element.Width ?? "0");
-        }
-
-        // If element has explicit pixel height, constrain children to that height
-        if (height.Type != UnitType.Auto && height.Type != UnitType.None && height.Type != UnitType.Fr)
-        {
-            childAvailableHeight = element.ToPixels(element.Height ?? "0");
-        }
-
-        foreach (var child in element.Children)
-        {
-            child.CurrentFontSize = element.CurrentFontSize;
-            MeasureElement(child, childAvailableWidth, childAvailableHeight);
-            maxWidth = Math.Max(maxWidth, child.ActualWidth);
-            maxHeight = Math.Max(maxHeight, child.ActualHeight);
-        }
-
-        element.MeasuredContentWidth = Math.Max(element.MeasuredContentWidth, maxWidth);
-        element.MeasuredContentHeight = Math.Max(element.MeasuredContentHeight, maxHeight);
-    }
-
-    private static void PositionGeneric(UIElement element)
-    {
-        float baseX = element.ActualX + element.ComputedPaddingLeft;
-        float baseY = element.ActualY + element.ComputedPaddingTop;
-
-        foreach (var child in element.Children)
-        {
-            child.ActualX = baseX;
-            child.ActualY = baseY;
-            ApplyHorizontalAlignment(child, baseX, element.MeasuredContentWidth);
-            ApplyVerticalAlignment(child, baseY, element.MeasuredContentHeight);
         }
     }
 

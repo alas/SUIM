@@ -79,7 +79,7 @@ public class Parser
             _parseCache[markup] = (suimRoot, strideRoot, model2);
         }
 
-        return createNewInstance ? (MapElement(suimRoot, game), model2) : (strideRoot, model2);
+        return (strideRoot, model2);
     }
 
     private static void Layout(SUIM.Components.UIElement root, Game game, int defaultFontSize, bool fullscreen)
@@ -324,31 +324,17 @@ public class Parser
         stride.VerticalAlignment = Stride.UI.VerticalAlignment.Top;
 
         // Use calculated dimensions
-        stride.Width = FractionalUnitResolver.Sanitize(suim.ActualWidth);
-        stride.Height = FractionalUnitResolver.Sanitize(suim.ActualHeight);
+        stride.Width = FractionalUnit.Sanitize(suim.ActualWidth);
+        stride.Height = FractionalUnit.Sanitize(suim.ActualHeight);
 
         // Calculate parent-relative positioning
-        float parentContentX = 0;
-        float parentContentY = 0;
-        if (suim.Parent != null)
-        {
-            parentContentX = FractionalUnitResolver.Sanitize(suim.Parent.ActualX) + FractionalUnitResolver.Sanitize(suim.Parent.ComputedMarginLeft) + FractionalUnitResolver.Sanitize(suim.Parent.ComputedPaddingLeft);
-            parentContentY = FractionalUnitResolver.Sanitize(suim.Parent.ActualY) + FractionalUnitResolver.Sanitize(suim.Parent.ComputedMarginTop) + FractionalUnitResolver.Sanitize(suim.Parent.ComputedPaddingTop);
-        }
 
-        float ax = FractionalUnitResolver.Sanitize(suim.ActualX);
-        float ay = FractionalUnitResolver.Sanitize(suim.ActualY);
-
-        // The coordinate in Stride is (ax + suim.ComputedMarginLeft) - parentContentX
-        // We want AX to be the absolute pos. Stride Margin Left is relative offset.
-        float left = ax - (suim.Parent != null ? parentContentX : 0);
-        float top = ay - (suim.Parent != null ? parentContentY : 0);
-
+        // Use the computed margins from SUIM, which represent the actual margin values applied to the element
         stride.Margin = new Stride.UI.Thickness(
-            FractionalUnitResolver.Sanitize(left),
-            FractionalUnitResolver.Sanitize(top),
-            FractionalUnitResolver.Sanitize(suim.ComputedMarginRight),
-            FractionalUnitResolver.Sanitize(suim.ComputedMarginBottom));
+            FractionalUnit.Sanitize(suim.ComputedMarginLeft),
+            FractionalUnit.Sanitize(suim.ComputedMarginTop),
+            FractionalUnit.Sanitize(suim.ComputedMarginRight),
+            FractionalUnit.Sanitize(suim.ComputedMarginBottom));
 
         if (stride is ContentControl cc)
         {

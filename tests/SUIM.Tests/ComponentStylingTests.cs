@@ -5,6 +5,7 @@ using System.IO;
 using Xunit;
 using SUIM;
 using SUIM.Components;
+using SUIM.Layout;
 
 public class ComponentStylingTests
 {
@@ -175,5 +176,43 @@ public class ComponentStylingTests
 
         // Grandparent style should leak all the way to grandchild
         Assert.Equal("cyan", gcDiv.BackgroundColor);
+    }
+
+    [Fact]
+    public void Button_WithPixelSizeFromCSS_ShouldMeasureCorrectly()
+    {
+        // Create a simple button with CSS-style sizing
+        var markup = @"
+            <grid>
+                <style>
+                    button {
+                        width: 200px;
+                        height: 50px;
+                        margin: 5px;
+                    }
+                </style>
+                <vstack>
+                    <button>Test</button>
+                </vstack>
+            </grid>";
+
+        var (suimElement, _) = MarkupParser.Parse(markup);
+
+        // Check that the button has the right width/height attributes
+        var vstack = suimElement.Children[0];
+        var button = vstack.Children[0];
+
+        Assert.NotNull(button);
+        Assert.Equal("200px", button.Width);
+        Assert.Equal("50px", button.Height);
+        Assert.Equal("5px", button.Margin);
+
+        // Now layout it
+        LayoutEngine.Layout(suimElement, 16, 1280, 720);
+
+        // Check actual dimensions
+        var buttonActual = vstack.Children[0];
+        Assert.Equal(200, buttonActual.ActualWidth);
+        Assert.Equal(50, buttonActual.ActualHeight);
     }
 }

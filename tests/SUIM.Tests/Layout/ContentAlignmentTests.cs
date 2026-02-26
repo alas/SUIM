@@ -1,4 +1,4 @@
-namespace SUIM.Tests;
+namespace SUIM.Tests.Layout;
 
 using Xunit;
 using SUIM.Components;
@@ -50,7 +50,7 @@ public class ContentAlignmentTests
             ContentHorizontalAlignment = HorizontalAlignment.Center.ToString()
         };
 
-        var label1 = new Label { Width = "100px", Height = "20px", HorizontalAlignment = HorizontalAlignment.Right.ToString() };
+        var label1 = new Label { Width = "100px", Height = "20px", HorizontalAlignment = "right" };
         var label2 = new Label { Width = "100px", Height = "20px" }; // Should use parent Center
 
         div.AddChild(label1, null);
@@ -79,7 +79,7 @@ public class ContentAlignmentTests
     public void Overlay_AlignsChildren()
     {
         var overlay = new Overlay { Width = "500px", Height = "500px" };
-        var label = new Label { Width = "100px", Height = "50px", HorizontalAlignment = HorizontalAlignment.Center.ToString(), VerticalAlignment = VerticalAlignment.Center.ToString() };
+        var label = new Label { Width = "100px", Height = "50px", HorizontalAlignment = "center", VerticalAlignment = "center" };
         
         overlay.AddChild(label, null);
         
@@ -98,8 +98,8 @@ public class ContentAlignmentTests
         {
             Width = "200px",
             Height = "200px",
-            ContentHorizontalAlignment = HorizontalAlignment.Center.ToString(),
-            ContentVerticalAlignment = VerticalAlignment.Center.ToString()
+            ContentHorizontalAlignment = "center",
+            ContentVerticalAlignment = "center"
         };
 
         var label = new Label { Width = "100px", Height = "20px" };

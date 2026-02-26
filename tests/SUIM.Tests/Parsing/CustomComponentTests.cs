@@ -1,4 +1,4 @@
-namespace SUIM.Tests;
+namespace SUIM.Tests.Parsing;
 
 using System.IO;
 using Xunit;
