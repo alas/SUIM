@@ -330,8 +330,6 @@ public class Parser
         stride.Width = FractionalUnit.Sanitize(suim.ActualWidth);
         stride.Height = FractionalUnit.Sanitize(suim.ActualHeight);
 
-        // Calculate parent-relative positioning
-
         // Use the computed margins from SUIM, which represent the actual margin values applied to the element
         stride.Margin = new Stride.UI.Thickness(
             FractionalUnit.Sanitize(suim.ComputedMarginLeft),
