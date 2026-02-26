@@ -81,10 +81,10 @@ public class PopupIntegrationTests
         Assert.Equal(50, buttonActual.ActualHeight);
     }
 
-    private static List<SUIM.Components.Button> FindSuimButtons(SUIM.Components.UIElement elem)
+    private static List<Components.Button> FindSuimButtons(Components.UIElement elem)
     {
-        var buttons = new List<SUIM.Components.Button>();
-        if (elem is SUIM.Components.Button btn)
+        var buttons = new List<Components.Button>();
+        if (elem is Components.Button btn)
             buttons.Add(btn);
         foreach (var child in elem.Children)
             buttons.AddRange(FindSuimButtons(child));
