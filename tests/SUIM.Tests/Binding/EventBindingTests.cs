@@ -81,7 +81,7 @@ public class EventBindingTests
     public void GetHandler_WithOverloadedMethods_SelectsParameterlessFirst()
     {
         var model = new TestModelWithOverloading();
-        var observableModel = new ObservableObject();
+        var observableModel = new Model.ObservableObject();
         observableModel.Initialize(model);
 
         // Get the parameterless handler

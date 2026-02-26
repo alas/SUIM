@@ -487,7 +487,7 @@ else
 
     private static dynamic Create(object model)
     {
-        var observable = new ObservableObject();
+        var observable = new Model.ObservableObject();
         observable.Initialize(model);
         return observable;
     }
