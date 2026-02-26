@@ -1,8 +1,9 @@
 ﻿namespace SUIM.Tests.Parsing;
 
 using Xunit;
-using SUIM.Components;
-using SUIM.Components.Attributes;
+using SUIM.Parse;
+using SUIM.Parse.Components;
+using SUIM.Parse.Components.Attributes;
 
 public class MarkupParserTests
 {

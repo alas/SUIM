@@ -5,9 +5,10 @@ using System.IO;
 using Xunit;
 using Stride.Engine;
 using Stride.UI.Events;
-using SUIM;
-using SUIM.Components;
 using SUIMStride;
+using SUIM.Parse;
+using SUIM.Model;
+using SUIM.Parse.Components;
 
 public class ComponentIsolationTests
 {

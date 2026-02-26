@@ -3,9 +3,9 @@ namespace SUIM.Tests;
 using System;
 using System.IO;
 using Xunit;
-using SUIM;
-using SUIM.Components;
 using SUIM.Layout;
+using SUIM.Parse;
+using SUIM.Parse.Components;
 
 public class ComponentStylingTests
 {

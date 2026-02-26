@@ -4,7 +4,8 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using SUIM.Components;
+using SUIM.Model;
+using SUIM.Parse.Components;
 
 /// <summary>
 /// Backend-agnostic helpers used by engine-specific integrations (Stride, Unity, Godot, etc.).

@@ -1,9 +1,9 @@
 namespace SUIM.Tests.Layout;
 
 using Xunit;
-using SUIM.Components;
 using SUIM.Layout;
-using SUIM.Components.Attributes;
+using SUIM.Parse.Components;
+using SUIM.Parse.Components.Attributes;
 
 public class ContentAlignmentTests
 {

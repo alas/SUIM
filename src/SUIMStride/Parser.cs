@@ -10,28 +10,34 @@ using Stride.Engine;
 using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
+using StrideUIElement = Stride.UI.UIElement;
+using StrideButton = Stride.UI.Controls.Button;
 using Stride.UI.Panels;
 using SUIM;
-using SUIM.Components.Attributes;
 using SUIM.Layout;
+using SUIM.Model;
+using SUIM.Parse;
+using SUIM.Parse.Components;
+using SUIMElement = SUIM.Parse.Components.UIElement;
+using SUIM.Parse.Components.Attributes;
 
 public class Parser
 {
     // Test hook: keep track of click handlers bound to Stride Buttons so tests can simulate clicks.
-    private readonly Dictionary<Button, Delegate> _clickHandlers = [];
+    private readonly Dictionary<StrideButton, Delegate> _clickHandlers = [];
     private ContentManager? ContentManager = null;
     private readonly Dictionary<string, SpriteFont> Fonts = [];
-    private readonly Dictionary<string, (SUIM.Components.UIElement SuimRoot, UIElement StrideRoot, dynamic? Model)> _parseCache = [];
+    private readonly Dictionary<string, (SUIMElement SuimRoot, StrideUIElement StrideRoot, dynamic? Model)> _parseCache = [];
     private dynamic? _currentModel;
     private Game? _game;
     public string? RootPath { get; set; }
 
-    public (UIElement StrideRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    public (StrideUIElement StrideRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
         return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, null);
     }
 
-    public (UIElement StrideRoot, dynamic? Model) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    public (StrideUIElement StrideRoot, dynamic? Model) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
         if (string.IsNullOrEmpty(RootPath)) throw new InvalidOperationException("RootPath must be set before calling GetView.");
         
@@ -45,7 +51,7 @@ public class Parser
         return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath, viewName);
     }
 
-    private (UIElement StrideRoot, dynamic? Model) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null)
+    private (StrideUIElement StrideRoot, dynamic? Model) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null)
     {
         ArgumentNullException.ThrowIfNull(markup);
 
@@ -82,7 +88,7 @@ public class Parser
         return (strideRoot, model2);
     }
 
-    private static void Layout(SUIM.Components.UIElement root, Game game, int defaultFontSize, bool fullscreen)
+    private static void Layout(SUIMElement root, Game game, int defaultFontSize, bool fullscreen)
     {
         int preferredWidth;
         int preferredHeight;
@@ -108,17 +114,17 @@ public class Parser
     /// Maps an already-parsed and laid-out SUIM element tree to Stride UI elements.
     /// It is public for testing or when you have a SUIM tree that's already been processed.
     /// </summary>
-    public UIElement MapElement(SUIM.Components.UIElement element, Game? game)
+    public StrideUIElement MapElement(SUIMElement element, Game? game)
     {
-        UIElement strideElement = element switch
+        StrideUIElement strideElement = element switch
         {
-            SUIM.Components.Button b => MapButton(b, game),
-            SUIM.Components.Text t => MapText(t),
-            SUIM.Components.Stack s => MapStack(s),
-            SUIM.Components.Input i => MapInput(i),
-            SUIM.Components.Image img => MapImage(img, game),
-            SUIM.Components.Border br => MapBorder(br, game),
-            SUIM.Components.BackgroundImage bg => MapBackgroundImage(bg, game),
+            SUIM.Parse.Components.Button b => MapButton(b, game),
+            Text t => MapText(t),
+            Stack s => MapStack(s),
+            Input i => MapInput(i),
+            SUIM.Parse.Components.Image img => MapImage(img, game),
+            SUIM.Parse.Components.Border br => MapBorder(br, game),
+            BackgroundImage bg => MapBackgroundImage(bg, game),
             _ => new Canvas() // Fallback
         };
 
@@ -154,9 +160,9 @@ public class Parser
         return strideElement;
     }
 
-    private Button MapButton(SUIM.Components.Button button, Game? game)
+    private StrideButton MapButton(SUIM.Parse.Components.Button button, Game? game)
     {
-        var btn = new Button();
+        var btn = new StrideButton();
         
         if (!string.IsNullOrEmpty(button.MouseOverImage))
         {
@@ -178,7 +184,7 @@ public class Parser
         return btn;
     }
 
-    private TextBlock MapText(SUIM.Components.Text text)
+    private TextBlock MapText(Text text)
     {
         var fontSize = text.FontSize != null ? Convert.ToSingle(text.FontSize) : 0f;
         if (fontSize <= 0f)
@@ -222,12 +228,12 @@ public class Parser
         return tb;
     }
 
-    private static UIElement MapInput(SUIM.Components.Input input)
+    private static StrideUIElement MapInput(Input input)
     {
         // Map based on the input type
         return input.Type switch
         {
-            SUIM.Components.InputType.Checkbox => new ToggleButton(),
+            InputType.Checkbox => new ToggleButton(),
             // SUIM.Components.InputType.Radio => new ToggleButton(), // Stride doesn't have a direct RadioButton in all versions; use ToggleButton for now
             _ => new EditText
             {
@@ -236,7 +242,7 @@ public class Parser
         };
     }
 
-    private ImageElement MapImage(SUIM.Components.Image image, Game? game)
+    private ImageElement MapImage(SUIM.Parse.Components.Image image, Game? game)
     {
         var img = new ImageElement();
 
@@ -246,20 +252,20 @@ public class Parser
             if (loaded != null) img.Source = loaded;
         }
 
-        var stretch = SUIM.Components.ImageStretchExtensions.FromString(image.Stretch);
+        var stretch = ImageStretchExtensions.FromString(image.Stretch);
         img.StretchType = stretch switch
         {
-            SUIM.Components.ImageStretch.Uniform => StretchType.Uniform,
-            SUIM.Components.ImageStretch.UniformToFill => StretchType.UniformToFill,
-            SUIM.Components.ImageStretch.Fill => StretchType.Fill,
-            SUIM.Components.ImageStretch.FillOnStretch => StretchType.FillOnStretch,
+            ImageStretch.Uniform => StretchType.Uniform,
+            ImageStretch.UniformToFill => StretchType.UniformToFill,
+            ImageStretch.Fill => StretchType.Fill,
+            ImageStretch.FillOnStretch => StretchType.FillOnStretch,
             _ => StretchType.None
         };
 
         return img;
     }
 
-    private ContentDecorator MapBackgroundImage(SUIM.Components.BackgroundImage background, Game? game)
+    private ContentDecorator MapBackgroundImage(BackgroundImage background, Game? game)
     {
         var decorator = new ContentDecorator();
         if (!string.IsNullOrEmpty(background.Source))
@@ -270,11 +276,11 @@ public class Parser
         return decorator;
     }
 
-    private Border MapBorder(SUIM.Components.Border border, Game? game)
+    private Stride.UI.Controls.Border MapBorder(SUIM.Parse.Components.Border border, Game? game)
     {
-        var borderElem = new Border
+        var borderElem = new Stride.UI.Controls.Border
         {
-            BorderThickness = ComponentsThicknessToStride(border.Thickness, border)
+            BorderThickness = ThicknessToStride(border.Thickness, border)
         };
 
         if (!string.IsNullOrEmpty(border.Color))
@@ -298,30 +304,27 @@ public class Parser
         return borderElem;
     }
 
-    private static StackPanel MapStack(SUIM.Components.Stack stack)
+    private static StackPanel MapStack(Stack stack)
     {
         return new StackPanel
         {
-            Orientation = stack.Orientation == SUIM.Components.Orientation.Horizontal 
-                ? Orientation.Horizontal 
-                : Orientation.Vertical
+            Orientation = stack.Orientation == SUIM.Parse.Components.Orientation.Horizontal 
+                ? Stride.UI.Orientation.Horizontal 
+                : Stride.UI.Orientation.Vertical
         };
     }
 
-    private static void ApplyCommonProperties(SUIM.Components.UIElement suim, UIElement stride)
+    private static void ApplyCommonProperties(SUIMElement suim, StrideUIElement stride)
     {
         stride.Name = suim.Id;
         stride.Opacity = suim.Opacity == null ? 1 : Convert.ToSingle(suim.Opacity);
-        var vis = SUIM.Components.Attributes.Visibility.Parse(suim.Visibility);
-        stride.Visibility = vis == SUIM.Components.Attributes.Visibility.Hidden
-            ? Stride.UI.Visibility.Hidden
-            : (vis == SUIM.Components.Attributes.Visibility.Collapsed
-                ? Stride.UI.Visibility.Collapsed
-                : Stride.UI.Visibility.Visible);
-
-        // Alignment - Force to Left/Top to use Margin as coordinate
-        stride.HorizontalAlignment = Stride.UI.HorizontalAlignment.Left;
-        stride.VerticalAlignment = Stride.UI.VerticalAlignment.Top;
+        var vis = SUIM.Parse.Components.Attributes.Visibility.Parse(suim.Visibility);
+        stride.Visibility = vis switch
+        {
+            SUIM.Parse.Components.Attributes.Visibility.Hidden => Stride.UI.Visibility.Hidden,
+            SUIM.Parse.Components.Attributes.Visibility.Collapsed => Stride.UI.Visibility.Collapsed,
+            _ => Stride.UI.Visibility.Visible,
+        };
 
         // Use calculated dimensions
         stride.Width = FractionalUnit.Sanitize(suim.ActualWidth);
@@ -338,7 +341,7 @@ public class Parser
 
         if (stride is ContentControl cc)
         {
-            cc.Padding = ComponentsThicknessToStride(suim.Padding, suim);
+            cc.Padding = ThicknessToStride(suim.Padding, suim);
         }
         if (suim.BackgroundColor != null)
         {
@@ -351,9 +354,9 @@ public class Parser
         }
     }
 
-    private static Stride.UI.Thickness ComponentsThicknessToStride(string? thicknessString, SUIM.Components.UIElement suim)
+    private static Stride.UI.Thickness ThicknessToStride(string? thicknessString, SUIMElement suim)
     {
-        var thickness = SUIM.Components.Attributes.Thickness.Parse(thicknessString);
+        var thickness = SUIM.Parse.Components.Attributes.Thickness.Parse(thicknessString);
         return new Stride.UI.Thickness(
             suim.ToPixels(thickness.Left),
             suim.ToPixels(thickness.Top),
@@ -367,7 +370,7 @@ public class Parser
         return new Color(pc.R, pc.G, pc.B, pc.A);
     }
     
-    private void TransferBindings(SUIM.Components.UIElement suimElement, UIElement strideElement)
+    private void TransferBindings(SUIMElement suimElement, StrideUIElement strideElement)
     {
         var model = suimElement.GetEffectiveModel();
         
@@ -385,7 +388,7 @@ public class Parser
         TransferEvents(suimElement, strideElement);
     }
 
-    private void TransferEvents(SUIM.Components.UIElement suimElement, UIElement strideElement)
+    private void TransferEvents(SUIMElement suimElement, StrideUIElement strideElement)
     {
         if (suimElement.Events.Count == 0) return;
         var model = suimElement.GetEffectiveModel();
@@ -436,7 +439,7 @@ public class Parser
             if (handler != null)
             {
                 // Map to Stride event
-                if (string.Equals(eventName, "click", StringComparison.OrdinalIgnoreCase) && strideElement is Button btn)
+                if (string.Equals(eventName, "click", StringComparison.OrdinalIgnoreCase) && strideElement is StrideButton btn)
                 {
                     BindClickHandler(btn, handler, suimElement);
                 }
@@ -445,7 +448,7 @@ public class Parser
         }
     }
 
-    private void BindClickHandler(Button btn, Delegate handler, SUIM.Components.UIElement suimElement)
+    private void BindClickHandler(StrideButton btn, Delegate handler, SUIMElement suimElement)
     {
         // Support multiple handler types for click events
         if (handler is EventHandler<Stride.UI.Events.RoutedEventArgs> routedHandler)
@@ -459,7 +462,7 @@ public class Parser
             btn.Click += wrappedHandler;
             _clickHandlers[btn] = wrappedHandler;
         }
-        else if (handler is Action<SUIM.Components.UIElement> actionWithElement)
+        else if (handler is Action<SUIMElement> actionWithElement)
         {
             EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => actionWithElement(suimElement);
             btn.Click += wrappedHandler;
@@ -474,7 +477,7 @@ public class Parser
     }
 
     // Test helper to retrieve a bound click handler (returns null if none)
-    public Delegate? GetBoundClickHandler(Button btn)
+    public Delegate? GetBoundClickHandler(StrideButton btn)
     {
         return _clickHandlers.TryGetValue(btn, out var d) ? d : null;
     }
@@ -512,7 +515,7 @@ public class Parser
         return null;
     }
     
-    private static void SetupBinding(dynamic? model, string modelPropertyName, string targetPropertyName, UIElement strideElement)
+    private static void SetupBinding(dynamic? model, string modelPropertyName, string targetPropertyName, StrideUIElement strideElement)
     {
         if (model == null) return;
         
@@ -541,7 +544,7 @@ public class Parser
         BackendHelpers.SetupPropertyBinding((object?)model, modelPropertyName, newValue => ApplyBindingValue(strideElement, targetPropertyName, newValue));
     }
     
-    private static void ApplyBindingValue(UIElement strideElement, string targetPropertyName, object? value)
+    private static void ApplyBindingValue(StrideUIElement strideElement, string targetPropertyName, object? value)
     {
         try
         {
@@ -552,7 +555,7 @@ public class Parser
                     tb.Text = value?.ToString() ?? "";
                 else if (strideElement is EditText et)
                     et.Text = value?.ToString() ?? "";
-                else if (strideElement is Button btn && btn.Content is TextBlock btnText)
+                else if (strideElement is StrideButton btn && btn.Content is TextBlock btnText)
                     btnText.Text = value?.ToString() ?? "";
             }
             // Handle other common properties

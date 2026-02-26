@@ -1,4 +1,4 @@
-﻿namespace SUIM;
+﻿namespace SUIM.Model;
 
 using System.Text.Json;
 using System.Xml.Linq;

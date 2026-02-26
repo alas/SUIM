@@ -1,7 +1,7 @@
-namespace SUIM.Components;
+namespace SUIM.Parse.Components;
 
 using System.Xml.Linq;
-using SUIM.Components.Attributes;
+using SUIM.Parse.Components.Attributes;
 
 public abstract class UIElement(string tagName)
 {
@@ -262,6 +262,8 @@ public abstract class UIElement(string tagName)
         return Parent?.GetEffectiveModel();
     }
 }
+
+public record BindingDefinition(string TargetPropertyName, string ModelPropertyName);
 
 public class LayoutElement(string tagName) : UIElement(tagName)
 {

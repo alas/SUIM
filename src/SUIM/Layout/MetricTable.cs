@@ -1,7 +1,7 @@
 namespace SUIM.Layout;
 
 using System.Collections.Concurrent;
-using SUIM.Components;
+using SUIM.Parse.Components;
 
 public interface IFontMetricsProvider
 {

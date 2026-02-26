@@ -4,7 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SUIM.Components;
+using SUIM.Parse;
+using SUIM.Parse.Components;
 
 public partial class SUIMProject(string rootPath)
 {

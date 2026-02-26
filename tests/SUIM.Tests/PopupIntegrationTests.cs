@@ -3,13 +3,14 @@ namespace SUIM.Tests;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
-using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
 using Stride.Engine;
-using SUIM;
+using StrideUIElement = Stride.UI.UIElement;
+using StrideButton = Stride.UI.Controls.Button;
 using SUIM.Layout;
 using SUIMStride;
+using SUIMElement = Parse.Components.UIElement;
 
 public class PopupIntegrationTests
 {
@@ -21,11 +22,11 @@ public class PopupIntegrationTests
         return game;
     }
 
-    private static List<Button> CollectButtons(UIElement element)
+    private static List<StrideButton> CollectButtons(StrideUIElement element)
     {
-        var buttons = new List<Button>();
+        var buttons = new List<StrideButton>();
 
-        if (element is Button button)
+        if (element is StrideButton button)
         {
             buttons.Add(button);
         }
@@ -41,10 +42,10 @@ public class PopupIntegrationTests
         return buttons;
     }
 
-    private static List<Components.Button> FindSuimButtons(Components.UIElement elem)
+    private static List<Parse.Components.Button> FindSuimButtons(SUIMElement elem)
     {
-        var buttons = new List<Components.Button>();
-        if (elem is Components.Button btn)
+        var buttons = new List<Parse.Components.Button>();
+        if (elem is Parse.Components.Button btn)
             buttons.Add(btn);
         foreach (var child in elem.Children)
             buttons.AddRange(FindSuimButtons(child));
@@ -65,7 +66,7 @@ public class PopupIntegrationTests
         var markup = File.ReadAllText(project_views_path);
         project.ResolveDependencies(markup);
 
-        var (suimRoot, _) = MarkupParser.Parse(markup, model: null, basePath: rootPath);
+        var (suimRoot, _) = Parse.MarkupParser.Parse(markup, model: null, basePath: rootPath);
 
         var buttons = FindSuimButtons(suimRoot);
         Assert.NotEmpty(buttons);

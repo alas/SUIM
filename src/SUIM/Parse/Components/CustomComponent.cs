@@ -1,5 +1,7 @@
-namespace SUIM.Components;
+namespace SUIM.Parse.Components;
 
+using SUIM.Model;
+using SUIM.Parse;
 using System;
 using System.IO;
 

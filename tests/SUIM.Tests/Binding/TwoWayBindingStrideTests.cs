@@ -4,8 +4,8 @@ using Xunit;
 using Stride.UI.Controls;
 using Stride.UI;
 using Stride.Engine;
-using SUIM;
 using SUIMStride;
+using SUIM.Model;
 
 public class TwoWayBindingStrideTests
 {

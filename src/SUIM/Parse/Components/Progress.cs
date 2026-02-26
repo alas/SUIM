@@ -1,4 +1,4 @@
-﻿namespace SUIM.Components;
+﻿namespace SUIM.Parse.Components;
 
 public class Progress() : UIElement(nameof(Progress))
 {

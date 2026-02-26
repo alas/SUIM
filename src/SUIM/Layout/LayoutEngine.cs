@@ -1,7 +1,7 @@
 namespace SUIM.Layout;
 
-using SUIM.Components;
-using SUIM.Components.Attributes;
+using SUIM.Parse.Components;
+using SUIM.Parse.Components.Attributes;
 
 public static class LayoutEngine
 {

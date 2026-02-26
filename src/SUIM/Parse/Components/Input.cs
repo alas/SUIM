@@ -1,4 +1,4 @@
-﻿namespace SUIM.Components;
+﻿namespace SUIM.Parse.Components;
 
 public class Input() : UIElement(nameof(Input)), IPlaceholder
 {

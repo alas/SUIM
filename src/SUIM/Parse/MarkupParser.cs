@@ -1,9 +1,10 @@
-namespace SUIM;
+namespace SUIM.Parse;
 
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using SUIM.Components;
+using SUIM.Model;
+using SUIM.Parse.Components;
 
 public static partial class MarkupParser
 {

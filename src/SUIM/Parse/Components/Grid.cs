@@ -1,9 +1,9 @@
-namespace SUIM.Components;
+namespace SUIM.Parse.Components;
 
 using System;
 using System.Xml.Linq;
-using SUIM.Components.Attributes;
 using SUIM.Layout;
+using SUIM.Parse.Components.Attributes;
 
 public class Grid() : LayoutElement(nameof(Grid))
 {

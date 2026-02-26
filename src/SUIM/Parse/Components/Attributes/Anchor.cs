@@ -1,4 +1,4 @@
-﻿namespace SUIM.Components.Attributes;
+﻿namespace SUIM.Parse.Components.Attributes;
 
 [Flags]
 public enum Anchor

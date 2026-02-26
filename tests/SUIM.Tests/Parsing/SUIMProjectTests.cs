@@ -2,7 +2,8 @@ namespace SUIM.Tests.Parsing;
 
 using System.IO;
 using Xunit;
-using SUIM.Components;
+using SUIM.Parse;
+using SUIM.Parse.Components;
 
 public class SUIMProjectTests
 {

@@ -1,4 +1,4 @@
-namespace SUIM.Components;
+namespace SUIM.Parse.Components;
 
 public class Button() : UIElement(nameof(Button))
 {

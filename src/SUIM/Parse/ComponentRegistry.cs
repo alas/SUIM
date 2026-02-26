@@ -1,8 +1,8 @@
-namespace SUIM;
+namespace SUIM.Parse;
 
 using System;
 using System.Collections.Generic;
-using SUIM.Components;
+using SUIM.Parse.Components;
 
 public static class ComponentRegistry
 {

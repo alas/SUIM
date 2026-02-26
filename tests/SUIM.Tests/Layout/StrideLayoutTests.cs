@@ -4,6 +4,8 @@ using Xunit;
 using Stride.UI.Panels;
 using SUIM.Layout;
 using SUIMStride;
+using SUIM.Parse;
+using SUIM.Parse.Components;
 
 public class StrideLayoutTests
 {
@@ -55,11 +57,11 @@ public class StrideLayoutTests
         Assert.Equal(200, element.ActualWidth);
         Assert.Equal(48, element.ActualHeight); // 16 + 32
 
-        var label1 = (Components.Label)element.Children[0];
+        var label1 = (Label)element.Children[0];
         Assert.Equal(32, label1.ActualWidth);
         Assert.Equal(16, label1.ActualHeight);
 
-        var label2 = (Components.Label)element.Children[1];
+        var label2 = (Label)element.Children[1];
         Assert.Equal(16, label2.ActualWidth);
         Assert.Equal(32, label2.ActualHeight);
     }
@@ -80,11 +82,11 @@ public class StrideLayoutTests
         Assert.Equal(32, element.ActualWidth);
         Assert.Equal(48, element.ActualHeight); // 16 + 32
 
-        var label1 = (Components.Label)element.Children[0];
+        var label1 = (Label)element.Children[0];
         Assert.Equal(32, label1.ActualWidth);
         Assert.Equal(16, label1.ActualHeight);
 
-        var label2 = (Components.Label)element.Children[1];
+        var label2 = (Label)element.Children[1];
         Assert.Equal(16, label2.ActualWidth);
         Assert.Equal(32, label2.ActualHeight);
     }
@@ -119,8 +121,8 @@ public class StrideLayoutTests
         // so each label in the first vertical stack should be 315 pixels wide, and each label in the second vertical stack should be 315 pixels wide.
 
         // Verify child label sizes using Actual* values populated by LayoutEngine
-        var firstStack = (Components.Stack)element.Children[0];
-        var secondStack = (Components.Stack)element.Children[1];
+        var firstStack = (Stack)element.Children[0];
+        var secondStack = (Stack)element.Children[1];
 
         int expectedStackWidth = (640 - 10) / 2; // 315
         int expectedLabelHeight = 25; // root font size
@@ -173,7 +175,7 @@ public class StrideLayoutTests
         Assert.Equal(720, root.ActualHeight);
         
         // Find the overlays in the grid's children
-        var overlays = root.Children.OfType<Components.Overlay>().ToList();
+        var overlays = root.Children.OfType<Overlay>().ToList();
         Assert.Equal(2, overlays.Count);
         
         var popup = overlays.FirstOrDefault(o => o.Id == "popup");

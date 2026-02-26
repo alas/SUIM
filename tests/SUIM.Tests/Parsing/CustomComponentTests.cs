@@ -2,8 +2,9 @@ namespace SUIM.Tests.Parsing;
 
 using System.IO;
 using Xunit;
-using SUIM.Components;
-using SUIM.Components.Attributes;
+using SUIM.Parse;
+using SUIM.Parse.Components;
+using SUIM.Parse.Components.Attributes;
 
 public class CustomComponentTests
 {

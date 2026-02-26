@@ -1,4 +1,4 @@
-﻿namespace SUIM.Components.Attributes;
+﻿namespace SUIM.Parse.Components.Attributes;
 
 public record struct Thickness(UnitValue Left, UnitValue Top, UnitValue Right, UnitValue Bottom)
 {

@@ -1,4 +1,4 @@
-namespace SUIM.Components;
+namespace SUIM.Parse.Components;
 
 public class Text(string? tagName = null) : UIElement(tagName ?? nameof(Text))
 {

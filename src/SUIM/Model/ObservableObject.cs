@@ -1,5 +1,6 @@
-namespace SUIM;
+namespace SUIM.Model;
 
+using SUIM.Parse.Components;
 using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
@@ -108,10 +109,10 @@ public class ObservableObject : DynamicObject, INotifyPropertyChanged
         // 2. Method taking single UIElement (Action<UIElement>)
         var uiElementMethod = matchingMethods.FirstOrDefault(m =>
             m.GetParameters().Length == 1 &&
-            typeof(Components.UIElement).IsAssignableFrom(m.GetParameters()[0].ParameterType));
+            typeof(UIElement).IsAssignableFrom(m.GetParameters()[0].ParameterType));
         if (uiElementMethod != null)
         {
-            return uiElementMethod.CreateDelegate<Action<Components.UIElement>>(_source);
+            return uiElementMethod.CreateDelegate<Action<UIElement>>(_source);
         }
 
         // 3. EventHandler pattern (object sender, EventArgs e)
@@ -137,8 +138,8 @@ public class ObservableObject : DynamicObject, INotifyPropertyChanged
             {
                 if (parameters.Length == 0)
                     return fallbackMethod.CreateDelegate<Action>(_source);
-                else if (parameters.Length == 1 && typeof(Components.UIElement).IsAssignableFrom(parameters[0].ParameterType))
-                    return fallbackMethod.CreateDelegate<Action<Components.UIElement>>(_source);
+                else if (parameters.Length == 1 && typeof(UIElement).IsAssignableFrom(parameters[0].ParameterType))
+                    return fallbackMethod.CreateDelegate<Action<UIElement>>(_source);
                 else if (parameters.Length == 2)
                     return fallbackMethod.CreateDelegate<EventHandler>(_source);
             }

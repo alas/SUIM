@@ -1,8 +1,8 @@
 namespace SUIM.Tests.Layout;
 
 using Xunit;
-using SUIM.Components;
 using SUIM.Layout;
+using SUIM.Parse.Components;
 
 public class FlexLayoutTests
 {

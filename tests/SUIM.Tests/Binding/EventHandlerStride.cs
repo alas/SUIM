@@ -3,9 +3,10 @@ namespace SUIM.Tests.Binding;
 using Xunit;
 using Stride.Engine;
 using StrideButton = Stride.UI.Controls.Button;
-using SUIM;
 using SUIMStride;
-using SUIM.Components;
+using SUIM.Parse;
+using SUIM.Model;
+using SUIM.Parse.Components;
 
 /// <summary>
 /// Tests for verifying that event handlers on the model are correctly mapped when 

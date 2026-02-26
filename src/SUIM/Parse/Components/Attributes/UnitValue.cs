@@ -1,4 +1,4 @@
-namespace SUIM.Components.Attributes;
+namespace SUIM.Parse.Components.Attributes;
 
 public record struct UnitValue(float Value, UnitType Type = UnitType.Pixels)
 {

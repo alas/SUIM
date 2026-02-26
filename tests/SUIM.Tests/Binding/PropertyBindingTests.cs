@@ -1,7 +1,8 @@
 namespace SUIM.Tests.Binding;
 
 using Xunit;
-using SUIM.Components;
+using SUIM.Parse;
+using SUIM.Parse.Components;
 
 public class PropertyBindingTests
 {

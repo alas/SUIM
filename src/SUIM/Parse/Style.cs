@@ -3,7 +3,7 @@ namespace SUIM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SUIM.Components;
+using SUIM.Parse.Components;
 
 /// <summary>
 /// Handles CSS-like style parsing and application to UI elements.
