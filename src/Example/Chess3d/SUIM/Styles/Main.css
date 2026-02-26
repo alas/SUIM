@@ -2,7 +2,7 @@ text, label {
     HorizontalAlignment: Center;
     VerticalAlignment: Center;
     color: White;
-    font-size: 16;
+    font-size: 16px;
 }
 button {
     width: 200px;

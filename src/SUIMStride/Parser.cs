@@ -186,10 +186,10 @@ public class Parser
 
     private TextBlock MapText(Text text)
     {
-        var fontSize = text.FontSize != null ? Convert.ToSingle(text.FontSize) : 0f;
+        var fontSize = text.FontSize != null ? text.ToPixels(UnitValue.Parse(text.FontSize)) : 0f;
         if (fontSize <= 0f)
         {
-            fontSize = 14f; // Default font size if not specified or invalid
+            fontSize = 16f; // Default font size if not specified or invalid
         }
         var tb = new TextBlock
         {

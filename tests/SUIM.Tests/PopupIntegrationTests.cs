@@ -125,6 +125,15 @@ public class PopupIntegrationTests
             Assert.Equal(5, button.Margin.Top);
             Assert.Equal(5, button.Margin.Right);
             Assert.Equal(5, button.Margin.Bottom);
+            var text = button.Content as TextBlock;
+            Assert.NotNull(text);
+            Assert.True(200 > text.Width);
+            Assert.Equal(16, text.Height);
+            Assert.Equal(0, text.Margin.Left);
+            Assert.Equal(0, text.Margin.Top);
+            Assert.Equal(0, text.Margin.Right);
+            Assert.Equal(0, text.Margin.Bottom);
+            System.Diagnostics.Debug.WriteLine($"MainView Button: '{text.Text}', Width={text.Width}, Height={text.Height}, Margin={text.Margin}");
         }
     }
 }
