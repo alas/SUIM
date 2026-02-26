@@ -1,6 +1,7 @@
 namespace SUIM.Tests;
 
 using Xunit;
+using Stride.UI.Panels;
 using SUIM.Layout;
 using SUIMStride;
 
@@ -225,19 +226,19 @@ public class IntegrationTests
         var mapper = new Parser();
         var strideRoot = mapper.MapElement(suimRoot, null);
         
-        // Verify Stride root is a grid
+        // Verify Stride root is a canvas
         Assert.NotNull(strideRoot);
-        Assert.IsType<Stride.UI.Panels.Grid>(strideRoot);
+        Assert.IsType<Canvas>(strideRoot);
         
-        var strideGrid = (Stride.UI.Panels.Grid)strideRoot;
+        var strideCanvas = (Canvas)strideRoot;
         
-        // Check that the Stride grid has children (overlays and main UI mapped)
-        Assert.NotEmpty(strideGrid.Children);
-        
-        // The grid should have mapped children including overlays
+        // Check that the Stride canvas has children (overlays and main UI mapped)
+        Assert.NotEmpty(strideCanvas.Children);
+
+        // The canvas should have mapped children including overlays
         // Stride overlays should preserve the SUIM dimensions
         // This verifies the mapping doesn't lose dimension data
-        var strideChildren = strideGrid.Children.ToList();
+        var strideChildren = strideCanvas.Children.ToList();
         Assert.True(strideChildren.Count >= 2, $"Expected at least 2 children, got {strideChildren.Count}");
 
         var popup = strideChildren.FirstOrDefault(c => c.Name == "popup");

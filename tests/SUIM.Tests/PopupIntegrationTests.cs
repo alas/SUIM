@@ -158,8 +158,8 @@ public class PopupIntegrationTests
 
         foreach (var button in mainViewButtons)
         {
-            Assert.Equal(200, button.ActualWidth);
-            Assert.Equal(50, button.ActualHeight);
+            Assert.Equal(200, button.Width);
+            Assert.Equal(50, button.Height);
             Assert.Equal(5, button.Margin.Top);
             Assert.Equal(5, button.Margin.Left);
         }

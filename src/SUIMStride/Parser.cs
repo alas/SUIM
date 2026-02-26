@@ -11,7 +11,6 @@ using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
-using StrideGrid = Stride.UI.Panels.Grid;
 using SUIM;
 using SUIM.Components.Attributes;
 using SUIM.Layout;
@@ -102,7 +101,7 @@ public class Parser
             preferredWidth = game.GraphicsDeviceManager.PreferredBackBufferWidth;
             preferredHeight = game.GraphicsDeviceManager.PreferredBackBufferHeight;
         }
-        SUIM.Layout.LayoutEngine.Layout(root, defaultFontSize, preferredWidth, preferredHeight);
+        LayoutEngine.Layout(root, defaultFontSize, preferredWidth, preferredHeight);
     }
 
     /// <summary>
@@ -116,12 +115,11 @@ public class Parser
             SUIM.Components.Button b => MapButton(b, game),
             SUIM.Components.Text t => MapText(t),
             SUIM.Components.Stack s => MapStack(s),
-            SUIM.Components.Grid g => MapGrid(g, game),
             SUIM.Components.Input i => MapInput(i),
             SUIM.Components.Image img => MapImage(img, game),
             SUIM.Components.Border br => MapBorder(br, game),
             SUIM.Components.BackgroundImage bg => MapBackgroundImage(bg, game),
-            _ => new StrideGrid() // Fallback
+            _ => new Canvas() // Fallback
         };
 
         ApplyCommonProperties(element, strideElement);
@@ -129,7 +127,7 @@ public class Parser
         TransferBindings(element, strideElement);
 
         // Handle Children for generic containers if not already handled
-        if (strideElement is Panel panel && element.Children.Count > 0 && element is not SUIM.Components.Grid)
+        if (strideElement is Panel panel && element.Children.Count > 0)
         {
             foreach (var child in element.Children)
             {
@@ -144,12 +142,12 @@ public class Parser
             }
             else
             {
-                var grid = new StrideGrid();
+                var canvas = new Canvas();
                 foreach (var child in element.Children)
                 {
-                    grid.Children.Add(MapElement(child, game));
+                    canvas.Children.Add(MapElement(child, game));
                 }
-                contentControl.Content = grid;
+                contentControl.Content = canvas;
             }
         }
 
@@ -298,23 +296,6 @@ public class Parser
         }
 
         return borderElem;
-    }
-
-    private StrideGrid MapGrid(SUIM.Components.Grid grid, Game? game)
-    {
-        var g = new StrideGrid();
-
-        foreach (var childContainer in grid.GridChildren)
-        {
-            var childStride = MapElement(childContainer.Element, game);
-            childStride.SetGridRow(childContainer.Row);
-            childStride.SetGridColumn(childContainer.Column);
-            childStride.SetGridRowSpan(childContainer.RowSpan);
-            childStride.SetGridColumnSpan(childContainer.ColumnSpan);
-            g.Children.Add(childStride);
-        }
-
-        return g;
     }
 
     private static StackPanel MapStack(SUIM.Components.Stack stack)
