@@ -133,7 +133,7 @@ public class PopupIntegrationTests
             Assert.Equal(0, text.Margin.Top);
             Assert.Equal(0, text.Margin.Right);
             Assert.Equal(0, text.Margin.Bottom);
-            System.Diagnostics.Debug.WriteLine($"MainView Button: '{text.Text}', Width={text.Width}, Height={text.Height}, Margin={text.Margin}");
+            Console.WriteLine($"MainView Button: '{text.Text}', Width={text.Width}, Height={text.Height}, Margin={text.Margin}");
         }
     }
 }

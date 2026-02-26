@@ -60,10 +60,10 @@ public static class LayoutEngine
             if (width.Type == UnitType.None) element.Width = (width = UnitValue.OneFR).ToString();
             if (height.Type == UnitType.None) element.Height = (height = UnitValue.OneFR).ToString();
         }
-        else if (element is Stack or Grid or Dock or Overlay or Text)
+        else
         {
-            if (width.Type == UnitType.None) element.Width = UnitValue.Auto.ToString();
-            if (height.Type == UnitType.None) element.Height = UnitValue.Auto.ToString();
+            if (width.Type == UnitType.None) element.Width = (width = UnitValue.Auto).ToString();
+            if (height.Type == UnitType.None) element.Height = (height = UnitValue.Auto).ToString();
         }
 
         // Convert explicit sizes to pixels
