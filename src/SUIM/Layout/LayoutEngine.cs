@@ -1157,10 +1157,29 @@ public static class LayoutEngine
         float maxWidth = 0;
         float maxHeight = 0;
 
+        // If element has explicit sizing, constrain children to that size
+        var width = UnitValue.Parse(element.Width);
+        var height = UnitValue.Parse(element.Height);
+
+        var childAvailableWidth = availableWidth;
+        var childAvailableHeight = availableHeight;
+
+        // If element has explicit pixel width, constrain children to that width
+        if (width.Type != UnitType.Auto && width.Type != UnitType.None && width.Type != UnitType.Fr)
+        {
+            childAvailableWidth = element.ToPixels(element.Width ?? "0");
+        }
+
+        // If element has explicit pixel height, constrain children to that height
+        if (height.Type != UnitType.Auto && height.Type != UnitType.None && height.Type != UnitType.Fr)
+        {
+            childAvailableHeight = element.ToPixels(element.Height ?? "0");
+        }
+
         foreach (var child in element.Children)
         {
             child.CurrentFontSize = element.CurrentFontSize;
-            MeasureElement(child, availableWidth, availableHeight);
+            MeasureElement(child, childAvailableWidth, childAvailableHeight);
             maxWidth = Math.Max(maxWidth, child.ActualWidth);
             maxHeight = Math.Max(maxHeight, child.ActualHeight);
         }

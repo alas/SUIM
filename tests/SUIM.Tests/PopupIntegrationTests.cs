@@ -7,6 +7,8 @@ using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
 using Stride.Engine;
+using SUIM;
+using SUIM.Layout;
 using SUIMStride;
 
 public class PopupIntegrationTests
@@ -22,7 +24,7 @@ public class PopupIntegrationTests
     private static List<Button> CollectButtons(UIElement element)
     {
         var buttons = new List<Button>();
-        
+
         if (element is Button button)
         {
             buttons.Add(button);
@@ -40,10 +42,96 @@ public class PopupIntegrationTests
     }
 
     [Fact]
+    public void Button_WithPixelSizeFromCSS_ShouldMeasureCorrectly()
+    {
+        // Create a simple button with CSS-style sizing
+        var markup = @"
+            <grid>
+                <style>
+                    button {
+                        width: 200px;
+                        height: 50px;
+                        margin: 5px;
+                    }
+                </style>
+                <vstack>
+                    <button>Test</button>
+                </vstack>
+            </grid>";
+
+        var (suimElement, _) = MarkupParser.Parse(markup);
+
+        // Check that the button has the right width/height attributes
+        var vstack = suimElement.Children[0];
+        var button = vstack.Children[0];
+
+        System.Diagnostics.Debug.WriteLine($"Before layout: Button.Width={button.Width}, Button.Height={button.Height}, Button.Margin={button.Margin}");
+        Assert.NotNull(button);
+        Assert.Equal("200px", button.Width);
+        Assert.Equal("50px", button.Height);
+        Assert.Equal("5px", button.Margin);
+
+        // Now layout it
+        LayoutEngine.Layout(suimElement, 16, 1280, 720);
+
+        // Check actual dimensions
+        var buttonActual = vstack.Children[0];
+        System.Diagnostics.Debug.WriteLine($"After layout: Button.ActualWidth={buttonActual.ActualWidth}, Button.ActualHeight={buttonActual.ActualHeight}, Button.Width={buttonActual.Width}, Button.MeasuredContentWidth={buttonActual.MeasuredContentWidth}");
+        Assert.Equal(200, buttonActual.ActualWidth);
+        Assert.Equal(50, buttonActual.ActualHeight);
+    }
+
+    private static List<SUIM.Components.Button> FindSuimButtons(SUIM.Components.UIElement elem)
+    {
+        var buttons = new List<SUIM.Components.Button>();
+        if (elem is SUIM.Components.Button btn)
+            buttons.Add(btn);
+        foreach (var child in elem.Children)
+            buttons.AddRange(FindSuimButtons(child));
+        return buttons;
+    }
+
+    [Fact]
+    public void MainView_ButtonsHaveWidthFromCSS()
+    {
+        var rootPath = "..\\..\\..\\..\\..\\src\\Example\\Chess3d\\SUIM";
+        var project = new SUIMProject(rootPath);
+        var project_views_path = Path.Combine(rootPath, "views", "MainView.suim");
+        if (!File.Exists(project_views_path))
+            project_views_path = Path.Combine(rootPath, "Views", "MainView.suim");
+
+        Assert.True(File.Exists(project_views_path), $"MainView.suim not found at {project_views_path}");
+
+        var markup = File.ReadAllText(project_views_path);
+        project.ResolveDependencies(markup);
+
+        var (suimRoot, _) = MarkupParser.Parse(markup, model: null, basePath: rootPath);
+
+        var buttons = FindSuimButtons(suimRoot);
+        Assert.NotEmpty(buttons);
+
+        foreach (var btn in buttons)
+        {
+            System.Diagnostics.Debug.WriteLine($"Before layout: Button.Width={btn.Width ?? "null"}, Button.Height={btn.Height ?? "null"}");
+            // CSS should have been applied during parsing
+            Assert.NotNull(btn.Width);
+            Assert.NotNull(btn.Height);
+        }
+
+        // Now layout
+        LayoutEngine.Layout(suimRoot, 16, 1920, 1080);
+
+        foreach (var btn in buttons)
+        {
+            System.Diagnostics.Debug.WriteLine($"After layout: Button.ActualWidth={btn.ActualWidth}, Button.ActualHeight={btn.ActualHeight}");
+        }
+    }
+
+    [Fact]
     public void MainViewWithPopup_ChecksButtonActualProperties()
     {
         var game = CreateTestGame();
-        
+
         var model = new
         {
             OpenPopup = (Action<string, string>)((title, message) => { }),
@@ -54,7 +142,8 @@ public class PopupIntegrationTests
             PopupVisibility = "visible",
         };
 
-        var parser = new Parser { RootPath = "..\\..\\..\\..\\..\\src\\Example\\Chess3d\\SUIM" };
+        var rootPath = "..\\..\\..\\..\\..\\src\\Example\\Chess3d\\SUIM";
+        var parser = new Parser { RootPath = rootPath };
         var (strideRoot, _) = parser.GetView("MainView", game, model: model);
 
         Assert.NotNull(strideRoot);
