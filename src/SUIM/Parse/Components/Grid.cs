@@ -112,6 +112,16 @@ public class Grid() : LayoutElement(nameof(Grid))
 
         return result;
     }
+
+    public static float GetSpanSize(float[] sizes, int start, int length)
+    {
+        float result = 0;
+        for (int i = start; i < start + length && i < sizes.Length; i++)
+        {
+            result += sizes[i];
+        }
+        return result;
+    }
 }
 
 public class GridChild

@@ -312,8 +312,8 @@ public static class LayoutEngine
 
             foreach (var gridChild in grid.GridChildren)
             {
-                var childWidth = GetGridSpanWidth(columnWidths, gridChild.Column, gridChild.ColumnSpan);
-                var childHeight = GetGridSpanHeight(rowHeights, gridChild.Row, gridChild.RowSpan);
+                var childWidth = Grid.GetSpanSize(columnWidths, gridChild.Column, gridChild.ColumnSpan);
+                var childHeight = Grid.GetSpanSize(rowHeights, gridChild.Row, gridChild.RowSpan);
 
                 gridChild.Element.CurrentFontSize = grid.CurrentFontSize;
                 MeasureElement(gridChild.Element, childWidth, childHeight);
@@ -763,8 +763,8 @@ public static class LayoutEngine
             for (int i = 0; i < gridChild.Row; i++)
                 y += rowHeights[i];
 
-            var cellWidth = GetGridSpanWidth(columnWidths, gridChild.Column, gridChild.ColumnSpan);
-            var cellHeight = GetGridSpanHeight(rowHeights, gridChild.Row, gridChild.RowSpan);
+            var cellWidth = Grid.GetSpanSize(columnWidths, gridChild.Column, gridChild.ColumnSpan);
+            var cellHeight = Grid.GetSpanSize(rowHeights, gridChild.Row, gridChild.RowSpan);
 
             gridChild.Element.ActualX = x;
             gridChild.Element.ActualY = y;
@@ -1148,25 +1148,5 @@ public static class LayoutEngine
         {
             DetectOverflow(child);
         }
-    }
-
-    private static float GetGridSpanWidth(float[] columnWidths, int column, int columnSpan)
-    {
-        float width = 0;
-        for (int i = column; i < column + columnSpan && i < columnWidths.Length; i++)
-        {
-            width += columnWidths[i];
-        }
-        return width;
-    }
-
-    private static float GetGridSpanHeight(float[] rowHeights, int row, int rowSpan)
-    {
-        float height = 0;
-        for (int i = row; i < row + rowSpan && i < rowHeights.Length; i++)
-        {
-            height += rowHeights[i];
-        }
-        return height;
     }
 }
