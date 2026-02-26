@@ -134,8 +134,6 @@ public static class LayoutEngine
         }
 
         // Handle root element sizing per-axis (only fill available space for axes without any explicit sizes in the tree)
-
-        // Handle root element sizing per-axis (only fill available space for axes without any explicit sizes in the tree)
         if (element.Parent == null)
         {
             if (!TreeHasAnyExplicitWidth(element) || width.Type == UnitType.Fr)
@@ -165,10 +163,10 @@ public static class LayoutEngine
     private static bool TreeHasAnyExplicitWidth(UIElement element)
     {
         var width = UnitValue.Parse(element.Width);
-        bool widthExplicit = width.Type != UnitType.None && 
-                            width.Type != UnitType.Rem && 
-                            width.Type != UnitType.Em && 
-                            width.Type != UnitType.Fr;
+        bool widthExplicit = width.Type != UnitType.None
+                             && width.Type != UnitType.Rem
+                             && width.Type != UnitType.Em 
+                             && width.Type != UnitType.Fr;
         if (widthExplicit) return true;
         foreach (var child in element.Children)
         {
