@@ -23,10 +23,10 @@
         <grid class="wood-panel">
             <vstack spacing="8" padding="12">
                 <hstack>
-                    <label value="@title" class="popup-title" />
+                    <label value="@title" />
                 </hstack>
                 <vstack margin="6">
-                    <label value="@message" class="popup-message" />
+                    <label value="@message" />
                 </vstack>
                 <hstack spacing="10" halign="center">
                     <button onclick="@onYes">YES</button>

@@ -13,7 +13,6 @@ public static class LayoutEngine
         root.CurrentFontSize = root.RootFontSize = rootFontSize;
         MeasureElement(root, availableWidth, availableHeight);
         PositionElement(root, 0, 0);
-        ApplyDefaultAlignments(root);
         DetectOverflow(root);
     }
 
@@ -1075,7 +1074,12 @@ public static class LayoutEngine
         }
         
         if (alignment == HorizontalAlignment.Unspecified)
-            alignment = HorizontalAlignment.Left;
+        {
+            if (element is Text && element.Parent is Button)
+                alignment = HorizontalAlignment.Center;
+            else
+                alignment = HorizontalAlignment.Left;
+        }
 
         switch (alignment)
         {
@@ -1100,7 +1104,12 @@ public static class LayoutEngine
         }
 
         if (alignment == VerticalAlignment.Unspecified)
-            alignment = VerticalAlignment.Top;
+        {
+            if (element is Text && element.Parent is Button)
+                alignment = VerticalAlignment.Center;
+            else
+                alignment = VerticalAlignment.Top;
+        }
 
         switch (alignment)
         {
@@ -1130,24 +1139,6 @@ public static class LayoutEngine
         if (alignment == VerticalAlignment.Center) return Math.Max(0, (containerSize - contentSize) / 2);
         if (alignment == VerticalAlignment.Bottom) return Math.Max(0, containerSize - contentSize);
         return 0; // Default or Top or Unspecified
-    }
-
-    private static void ApplyDefaultAlignments(UIElement element)
-    {
-        // Text elements should default to center alignment
-        if (element is Text && element.Parent is Button)
-        {
-            if (string.IsNullOrEmpty(element.HorizontalAlignment))
-                element.HorizontalAlignment = "center";
-            if (string.IsNullOrEmpty(element.VerticalAlignment))
-                element.VerticalAlignment = "center";
-        }
-
-        // Recursively apply to children
-        foreach (var child in element.Children)
-        {
-            ApplyDefaultAlignments(child);
-        }
     }
 
     private static void DetectOverflow(UIElement element)
