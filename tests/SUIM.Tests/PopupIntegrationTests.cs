@@ -124,24 +124,6 @@ public class PopupIntegrationTests
         }
     }
 
-    private static void PrintSUIMTree(SUIMElement element, int depth = 0)
-    {
-        var indent = new string(' ', depth * 2);
-        var elementType = element.GetType().Name;
-        var id = !string.IsNullOrEmpty(element.Id) ? $" Id='{element.Id}'" : "";
-        var className = !string.IsNullOrEmpty(element.Class) ? $" Class='{element.Class}'" : "";
-
-        Console.WriteLine($"{indent}{elementType}{id}{className} | " +
-            $"Width={element.Width}, Height={element.Height}, " +
-            $"ActualWidth={element.ActualWidth:F2}, ActualHeight={element.ActualHeight:F2}, " +
-            $"ActualX={element.ActualX:F2}, ActualY={element.ActualY:F2}");
-
-        foreach (var child in element.Children)
-        {
-            PrintSUIMTree(child, depth + 1);
-        }
-    }
-
     [Fact]
     public void MainView_ButtonsHaveWidthFromCSS()
     {
@@ -214,14 +196,9 @@ public class PopupIntegrationTests
 
         var rootPath = "..\\..\\..\\..\\..\\src\\Example\\Chess3d\\SUIM";
         var parser = new Parser { RootPath = rootPath };
-        var (suimRoot, strideRoot, _) = parser.GetView("MainView", game, model: model);
+        var (strideRoot, _) = parser.GetView("MainView", game, model: model);
 
         Assert.NotNull(strideRoot);
-        Assert.NotNull(suimRoot);
-
-        // Print the SUIM tree before widget checks
-        Console.WriteLine("=== SUIM UI Tree (Before Stride Conversion) ===");
-        PrintSUIMTree(suimRoot);
 
         // Collect all buttons from the view
         var buttons = CollectButtons(strideRoot);
