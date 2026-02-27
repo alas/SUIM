@@ -2,15 +2,14 @@
 
 ## 1. Overview
 
-SUIM is a performance-first markup language architected for absolute layout predictability. It aims to reuse existing tags and concepts found in HTML and CSS that do not break determinism or degrade performance.
-SUIM also incorporates foundational concepts from WinForms, such as explicit anchoring and docking logic, for desktop-grade application development.
-SUIM aims to be familiar to web developers while also being easy to implement on top of existing layout engines.
-The engine utilizes a top-down single-pass architecture to ensure $O(N)$ performance, providing high-speed rendering and zero layout jitter by eliminating expensive reflow cycles.
+SUIM aims to reuse existing tags and concepts found in HTML and CSS while also incorporating foundational concepts from WinForms, such as explicit anchoring and docking logic, for desktop-grade application development.
+SUIM aims to be familiar to web developers and winforms developers while also being easy to implement on top of existing layout engines.
 
 ### SUIM officially supports:
 
 #### Layout
 
+* ✅ Custom Layout Tags Based on WinForms Box Model(Dock, Stack, Grid, Overlay)
 * ✅ Flexbox (subset)
 * ❌ Grid (maybe later)
 * ❌ float / clear
@@ -29,15 +28,7 @@ The engine utilizes a top-down single-pass architecture to ensure $O(N)$ perform
 #### Behavior
 
 * ✅ click / input events
-* ❌ JS execution
-* ❌ DOM mutation from scripts
-
-This keeps the engine:
-
-* fast
-* predictable
-* debuggable
-* maintainable
+* ❌ Javascript
 
 ---
 
@@ -49,15 +40,12 @@ Every element exists within a rectangular box. Spacing is governed by **margin**
 
 ### 2.2 Layout Alignment
 
-All layout containers support the following for child positioning:
+All layout containers support the following for positioning and alignment:
 
-* **contenthorizontalalignment** (synonym: **chalign**): left, center, right.
-* **contentverticalalignment** (synonym: **cvalign**): top, center, bottom.
-
-All tags support the following for positioning inside the parent:
-
-* **horizontalalignment** (synonym: **halign**): left, center, right.
-* **verticalalignment** (synonym: **valign**): top, center, bottom.
+* **JustifySelf**
+* **JustifyItems**
+* **AlignSelf**
+* **AlignItems**
 
 ### 2.3 Anchoring
 
@@ -81,9 +69,7 @@ Sizing uses **integers** (fixed pixels), **fr units** (fractional/proportional s
 
 ### 3.1 The <div> Tag
 
-A coordinate-based container where children can overlap and define explicit positions.
-
-* **Usage:** Grouping or absolute layouts.
+A coordinate-based container where children can overlap and define explicit positions. It also support flexbox layout.
 
 ### 3.2 The <stack> Tag
 
@@ -146,9 +132,9 @@ Forces itself to parent size and intercepts all input. **Overlays always render 
 
 Interactive element for triggering actions.
 
-* `sprite`: `string` - The 9-slice sprite for the "Idle" state.
-* `hoverSprite`: `string` - The sprite for "Hover" state.
-* `pressedSprite`: `string` - The sprite for "Pressed" state.
+* `normal`: `string` - The sprite for the "Idle" state.
+* `hover`: `string` - The sprite for "Hover" state.
+* `pressed`: `string` - The sprite for "Pressed" state.
 * `onClick`: `string` - Method name in the model to call.
 
 ### 4.2 The <input> Tag
@@ -194,6 +180,7 @@ The **scroll** attribute triggers a structural transformation. The tag is wrappe
 
 Original.suim
 ```xml
+<dock class="myclass" scroll="vertical">
 <style>
 .myclass {
 	width: 500;
@@ -202,7 +189,6 @@ Original.suim
 	scroll.height: 800;
 }
 </style>
-<dock class="myclass" scroll="vertical">
 	<label value="Inventory" />
 </dock>
 
@@ -230,6 +216,7 @@ The **border** attribute triggers a structural transformation. The tag is wrappe
 
 Original.suim
 ```xml
+<dock class="myclass">
 <style>
 .myclass {
 	width: 500;
@@ -237,7 +224,6 @@ Original.suim
 	border: 10 White;
 }
 </style>
-<dock class="myclass">
 	<label value="Inventory" />
 </dock>
 
@@ -251,6 +237,7 @@ Original.suim
 
 Original.suim
 ```xml
+<dock class="myclass">
 <style>
 .myclass {
 	width: 500;
@@ -258,7 +245,6 @@ Original.suim
 	border: 10 5 0 2 White;
 }
 </style>
-<dock class="myclass">
 	<label value="Inventory" />
 </dock>
 
@@ -287,9 +273,11 @@ Every element in SUIM inherits a set of **Common Attributes** for layout and sty
 | `height` | `integer/string` | Fixed pixels or `@variable`. |
 | `padding` | `integer/string` | Shorthand for all sides (e.g., `10`). |
 | `margin` | `integer/string` | External spacing (e.g., `5`). |
-| `horizontalalignment` | `enum` | `Left`, `Center`, `Right`. |
-| `verticalalignment` | `enum` | `Top`, `Center`, `Bottom`. |
-| `visibility` | `enum/bool` | `Visible`, `Collapsed`, `Hidden`. |
+| `justify-self` | `enum` | `start`, `center`, `end`. |
+| `justify-items` | `enum` | `start`, `center`, `end`. |
+| `align-self` | `enum` | `start`, `center`, `end`. |
+| `align-items` | `enum` | `start`, `center`, `end`. |
+| `visibility` | `enum/bool` | `visible`, `collapsed`, `hidden`. |
 | `opacity` | `integer` | Transparency `0.0` to `1.0`. |
 | `background` | `string/Color` | Hex code, color name. Alias: bg |
 | `class` | `string` | Space-separated styles. |
@@ -324,7 +312,7 @@ Every element in SUIM inherits a set of **Common Attributes** for layout and sty
    * Tag selector in CSS (e.g., `div { width: 120; }`)
    * Universal selector in CSS (e.g., `* { width: 100; }`) - **Lowest priority**
 
-4. **The `@` Prefix:****
+4. **The `@` Prefix:**
 * If any attribute starts with `@`, the **Hydrator** must create a `PropertyBinding` instead of a static assignment.
 
 
