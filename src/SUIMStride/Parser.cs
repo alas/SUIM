@@ -120,7 +120,6 @@ public class Parser
         {
             SUIM.Parse.Components.Button b => MapButton(b, game),
             Text t => MapText(t),
-            Stack s => MapStack(s),
             Input i => MapInput(i),
             SUIM.Parse.Components.Image img => MapImage(img, game),
             SUIM.Parse.Components.Border br => MapBorder(br, game),
@@ -302,16 +301,6 @@ public class Parser
         }
 
         return borderElem;
-    }
-
-    private static StackPanel MapStack(Stack stack)
-    {
-        return new StackPanel
-        {
-            Orientation = stack.Orientation == SUIM.Parse.Components.Orientation.Horizontal 
-                ? Stride.UI.Orientation.Horizontal 
-                : Stride.UI.Orientation.Vertical
-        };
     }
 
     private static void ApplyCommonProperties(SUIMElement suim, StrideUIElement stride)

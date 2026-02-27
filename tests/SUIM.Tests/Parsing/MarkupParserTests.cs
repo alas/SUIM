@@ -26,7 +26,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_DivWithAttributes()
     {
-        var markup = "<div id=\"main\" width=\"100\" height=\"200\" halign=\"center\" valign=\"top\" margin=\"10\" padding=\"5\" bg=\"blue\" />";
+        var markup = "<div id=\"main\" width=\"100\" height=\"200\" justify-self=\"center\" align-self=\"start\" margin=\"10\" padding=\"5\" bg=\"blue\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
@@ -34,8 +34,8 @@ public class MarkupParserTests
         Assert.Equal("main", div.Id);
         Assert.Equal(new UnitValue(100), UnitValue.Parse(div.Width));
         Assert.Equal(new UnitValue(200), UnitValue.Parse(div.Height));
-        Assert.Equal(HorizontalAlignment.Center, HorizontalAlignment.Parse(div.HorizontalAlignment));
-        Assert.Equal(VerticalAlignment.Top, VerticalAlignment.Parse(div.VerticalAlignment));
+        Assert.Equal(HorizontalAlignment.Center, HorizontalAlignment.Parse(div.JustifySelf));
+        Assert.Equal(VerticalAlignment.Top, VerticalAlignment.Parse(div.AlignSelf));
         Assert.Equal(new Thickness(10), Thickness.Parse(div.Margin));
         Assert.Equal(new Thickness(5), Thickness.Parse(div.Padding));
         Assert.Equal("blue", div.BackgroundColor);
@@ -212,13 +212,13 @@ public class MarkupParserTests
     [Fact]
     public void Parse_SynonymAttributes()
     {
-        var markup = "<div halign=\"right\" valign=\"bottom\" />";
+        var markup = "<div justify-self=\"end\" align-self=\"end\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(HorizontalAlignment.Right, HorizontalAlignment.Parse(div.HorizontalAlignment));
-        Assert.Equal(VerticalAlignment.Bottom, VerticalAlignment.Parse(div.VerticalAlignment));
+        Assert.Equal(HorizontalAlignment.Right, HorizontalAlignment.Parse(div.JustifySelf));
+        Assert.Equal(VerticalAlignment.Bottom, VerticalAlignment.Parse(div.AlignSelf));
     }
 
     [Fact]

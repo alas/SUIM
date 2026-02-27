@@ -255,7 +255,7 @@ public static class Style
     private static readonly HashSet<string> LayoutAttributeNames = new(StringComparer.OrdinalIgnoreCase)
     {
         "id", "width", "height", "padding", "margin",
-        "halign", "horizontalalignment", "valign", "verticalalignment",
+        "justify-self", "align-self",
         "visibility", "opacity", "background", "bg", "class",
         "left", "top", "z-index", "anchor"
     };

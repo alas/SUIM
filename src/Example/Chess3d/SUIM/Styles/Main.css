@@ -1,6 +1,6 @@
 text, label {
-    HorizontalAlignment: Left;
-    VerticalAlignment: Top;
+    justify-self: start;
+    align-self: start;
     color: White;
     font-size: 16px;
 }

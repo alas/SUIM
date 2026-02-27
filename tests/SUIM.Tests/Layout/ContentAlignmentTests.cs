@@ -1,9 +1,10 @@
 namespace SUIM.Tests.Layout;
 
-using Xunit;
 using SUIM.Layout;
 using SUIM.Parse.Components;
 using SUIM.Parse.Components.Attributes;
+using Xunit;
+using Xunit.Abstractions;
 
 public class ContentAlignmentTests
 {
@@ -14,8 +15,8 @@ public class ContentAlignmentTests
         {
             Width = "200px",
             Height = "200px",
-            ContentHorizontalAlignment = HorizontalAlignment.Center.ToString(),
-            ContentVerticalAlignment = VerticalAlignment.Center.ToString()
+            JustifyContent = "center",
+            AlignItems = "center"
         };
 
         var label1 = new Label { Width = "100px", Height = "20px" };
@@ -47,10 +48,10 @@ public class ContentAlignmentTests
         {
             Width = "200px",
             Height = "200px",
-            ContentHorizontalAlignment = HorizontalAlignment.Center.ToString()
+            JustifyContent = "center"
         };
 
-        var label1 = new Label { Width = "100px", Height = "20px", HorizontalAlignment = "right" };
+        var label1 = new Label { Width = "100px", Height = "20px", JustifySelf = "right" };
         var label2 = new Label { Width = "100px", Height = "20px" }; // Should use parent Center
 
         div.AddChild(label1, null);
@@ -68,18 +69,18 @@ public class ContentAlignmentTests
     public void Div_SupportsCHAlignAndCVAlignAttributes()
     {
         var div = new Div();
-        div.SetAttribute("chalign", "center");
-        div.SetAttribute("cvalign", "bottom");
+        div.SetAttribute("justify-content", "center");
+        div.SetAttribute("align-items", "end");
 
-        Assert.Equal(HorizontalAlignment.Center, HorizontalAlignment.Parse(div.ContentHorizontalAlignment));
-        Assert.Equal(VerticalAlignment.Bottom, VerticalAlignment.Parse(div.ContentVerticalAlignment));
+        Assert.Equal(HorizontalAlignment.Center, HorizontalAlignment.Parse(div.JustifyContent));
+        Assert.Equal(VerticalAlignment.Bottom, VerticalAlignment.Parse(div.AlignItems));
     }
     
     [Fact]
     public void Overlay_AlignsChildren()
     {
         var overlay = new Overlay { Width = "500px", Height = "500px" };
-        var label = new Label { Width = "100px", Height = "50px", HorizontalAlignment = "center", VerticalAlignment = "center" };
+        var label = new Label { Width = "100px", Height = "50px", JustifySelf = "center", AlignSelf = "center" };
         
         overlay.AddChild(label, null);
         
@@ -98,8 +99,8 @@ public class ContentAlignmentTests
         {
             Width = "200px",
             Height = "200px",
-            ContentHorizontalAlignment = "center",
-            ContentVerticalAlignment = "center"
+            JustifyContent = "center",
+            AlignItems = "center"
         };
 
         var label = new Label { Width = "100px", Height = "20px" };
@@ -118,7 +119,7 @@ public class ContentAlignmentTests
     public void Child_WithUnspecifiedAlignment_DefaultsToLeftTopIfParentHasNoContentAlignment()
     {
         var div = new Div { Width = "200px", Height = "200px" };
-        // div.ContentHorizontalAlignment and ContentVerticalAlignment are Unspecified by default
+        // div.justify-items and align-items are Unspecified by default
 
         var label = new Label { Width = "100px", Height = "20px" };
         

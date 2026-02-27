@@ -12,10 +12,14 @@
 	.wood-panel {
 		width: auto;
 		height: 220px;
-		halign: center;
-		valign: center;
+		justify-self: center;
+		align-items: center;
 		backgroundimage: "Assets/seamless-texture-wood-old-oak-small2.jpg";
 		shadow: 0 8 16 rgba(0,0,0,0.5);
+	}
+	.hstack2 {
+		spacing: 10;
+		justify-self: center;
 	}
 	</style>
 
@@ -28,7 +32,7 @@
                 <vstack margin="6">
                     <label value="@message" />
                 </vstack>
-                <hstack spacing="10" halign="center">
+                <hstack class="hstack2">
                     <button onclick="@onYes">YES</button>
                     <button onclick="@onNo">NO</button>
                 </hstack>

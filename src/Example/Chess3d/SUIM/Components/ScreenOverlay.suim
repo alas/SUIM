@@ -5,8 +5,14 @@
 		"visibility": "collapsed"
 	}
 	</model>
+	<style>
+	.mygrid {
+		justify-self: center;
+		align-self: center;
+	}
+	</style>
 	<overlay visibility="@visibility">
-		<grid halign="center" valign="center">
+		<grid class="mygrid">
 			<label value="@message" />
 		</grid>
 	</overlay>

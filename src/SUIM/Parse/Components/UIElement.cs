@@ -1,16 +1,16 @@
 namespace SUIM.Parse.Components;
 
-using System.Xml.Linq;
 using SUIM.Parse.Components.Attributes;
+using System.Xml.Linq;
 
 public abstract class UIElement(string tagName)
 {
     public string? Id { get; set; }
     public string? Class { get; set; }
-    public string? HorizontalAlignment { get; set; }
-    public string? VerticalAlignment { get; set; }
-    public string? ContentHorizontalAlignment { get; set; }
-    public string? ContentVerticalAlignment { get; set; }
+    public string? JustifySelf { get; set; }
+    public string? JustifyContent { get; set; }
+    public string? AlignSelf { get; set; }
+    public string? AlignContent { get; set; }
     public string? Top { get; set; }
     public string? Left { get; set; }
     public string? Bottom { get; set; }
@@ -111,7 +111,7 @@ public abstract class UIElement(string tagName)
         {
             Opacity = value as string;
         }
-        else if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase) || name.Equals("zindex", StringComparison.OrdinalIgnoreCase))
         {
             ZIndex = value as string;
         }
@@ -119,21 +119,21 @@ public abstract class UIElement(string tagName)
         {
             Visibility = value as string;
         }
-        else if (name.Equals("halign", StringComparison.OrdinalIgnoreCase) || name.Equals("horizontalalignment", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("justify-self", StringComparison.OrdinalIgnoreCase) || name.Equals("justifyself", StringComparison.OrdinalIgnoreCase))
         {
-            HorizontalAlignment = value as string;
+            JustifySelf = value as string;
         }
-        else if (name.Equals("valign", StringComparison.OrdinalIgnoreCase) || name.Equals("verticalalignment", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("justify-content", StringComparison.OrdinalIgnoreCase) || name.Equals("justifycontent", StringComparison.OrdinalIgnoreCase))
         {
-            VerticalAlignment = value as string;
+            JustifyContent = value as string;
         }
-        else if (name.Equals("chalign", StringComparison.OrdinalIgnoreCase) || name.Equals("contenthorizontalalignment", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("align-self", StringComparison.OrdinalIgnoreCase) || name.Equals("alignself", StringComparison.OrdinalIgnoreCase))
         {
-            ContentHorizontalAlignment = value as string;
+            AlignSelf = value as string;
         }
-        else if (name.Equals("cvalign", StringComparison.OrdinalIgnoreCase) || name.Equals("contentverticalalignment", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("align-content", StringComparison.OrdinalIgnoreCase) || name.Equals("aligncontent", StringComparison.OrdinalIgnoreCase))
         {
-            ContentVerticalAlignment = value as string;
+            AlignContent = value as string;
         }
         else if (name.Equals("margin", StringComparison.OrdinalIgnoreCase))
         {
@@ -184,7 +184,7 @@ public abstract class UIElement(string tagName)
         {
             Font = value as string;
         }
-        else if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase) || name.Equals("font-size", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("font-size", StringComparison.OrdinalIgnoreCase) || name.Equals("fontsize", StringComparison.OrdinalIgnoreCase))
         {
             FontSize = value as string;
         }
@@ -196,6 +196,10 @@ public abstract class UIElement(string tagName)
         {
             BackgroundColor = value as string ?? value?.ToString();
         }
+        else if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase))
+        {
+            BackgroundImage = value as string;
+        }
         else if (name.Equals("readonly", StringComparison.OrdinalIgnoreCase))
         {
             ReadOnly = value as string;
@@ -203,10 +207,6 @@ public abstract class UIElement(string tagName)
         else if (name.Equals("stopclicks", StringComparison.OrdinalIgnoreCase))
         {
             StopClicks = value as string;
-        }
-        else if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase))
-        {
-            BackgroundImage = value as string;
         }
         else if (name.Contains('.'))
         {
@@ -227,19 +227,19 @@ public abstract class UIElement(string tagName)
         if (name.Equals("bottom", StringComparison.OrdinalIgnoreCase)) return Bottom;
         if (name.Equals("right", StringComparison.OrdinalIgnoreCase)) return Right;
         if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase)) return Opacity;
-        if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase)) return ZIndex;
+        if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase) || name.Equals("zindex", StringComparison.OrdinalIgnoreCase)) return ZIndex;
         if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase)) return Visibility;
-        if (name.Equals("halign", StringComparison.OrdinalIgnoreCase) || name.Equals("horizontalalignment", StringComparison.OrdinalIgnoreCase)) return HorizontalAlignment;
-        if (name.Equals("valign", StringComparison.OrdinalIgnoreCase) || name.Equals("verticalalignment", StringComparison.OrdinalIgnoreCase)) return VerticalAlignment;
-        if (name.Equals("chalign", StringComparison.OrdinalIgnoreCase) || name.Equals("contenthorizontalalignment", StringComparison.OrdinalIgnoreCase)) return ContentHorizontalAlignment;
-        if (name.Equals("cvalign", StringComparison.OrdinalIgnoreCase) || name.Equals("contentverticalalignment", StringComparison.OrdinalIgnoreCase)) return ContentVerticalAlignment;
+        if (name.Equals("justify-self", StringComparison.OrdinalIgnoreCase) || name.Equals("justifyself", StringComparison.OrdinalIgnoreCase)) return JustifySelf;
+        if (name.Equals("justify-content", StringComparison.OrdinalIgnoreCase) || name.Equals("justifycontent", StringComparison.OrdinalIgnoreCase)) return JustifyContent;
+        if (name.Equals("align-self", StringComparison.OrdinalIgnoreCase) || name.Equals("alignself", StringComparison.OrdinalIgnoreCase)) return AlignSelf;
+        if (name.Equals("align-content", StringComparison.OrdinalIgnoreCase) || name.Equals("aligncontent", StringComparison.OrdinalIgnoreCase)) return AlignContent;
         if (name.Equals("margin", StringComparison.OrdinalIgnoreCase)) return Margin;
         if (name.Equals("padding", StringComparison.OrdinalIgnoreCase)) return Padding;
         if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase)) return BackgroundColor;
+        if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase)) return BackgroundImage;
         if (name.Equals("width", StringComparison.OrdinalIgnoreCase)) return Width;
         if (name.Equals("height", StringComparison.OrdinalIgnoreCase)) return Height;
         if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase)) return Anchor;
-        if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase)) return BackgroundImage;
         return null;
     }
 

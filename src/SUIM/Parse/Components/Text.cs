@@ -51,7 +51,7 @@ public class Label() : Text(nameof(Label))
 
     public override void SetAttribute(string name, object? value)
     {
-        if (name.Equals("rows", StringComparison.OrdinalIgnoreCase))
+        if (name.Equals("for", StringComparison.OrdinalIgnoreCase))
         {
             For = value is string s ? s : value?.ToString();
         }

@@ -147,7 +147,7 @@ public class StrideLayoutTests
         var markup = @"
             <grid>
                 <style>
-                    .container { HorizontalAlignment: Center; VerticalAlignment: Center; }
+                    .container { justify-self: center; align-self: center; }
                     .overlay { visibility: collapsed; }
                 </style>
                 <vstack class=""container"" width=""400"" height=""300"">
@@ -155,13 +155,13 @@ public class StrideLayoutTests
                 </vstack>
                 
                 <overlay class=""overlay"" id=""popup"">
-                    <grid width=""360"" height=""180"" halign=""center"" valign=""center"">
+                    <grid width=""360"" height=""180"" justify-self=""center"" align-self=""center"">
                         <label value=""Popup"" />
                     </grid>
                 </overlay>
                 
                 <overlay class=""overlay"" id=""screenOverlay"">
-                    <grid halign=""center"" valign=""center"">
+                    <grid justify-self=""center"" align-self=""center"">
                         <label value=""Blocker"" />
                     </grid>
                 </overlay>

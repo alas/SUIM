@@ -682,7 +682,7 @@ public static class LayoutEngine
         }
 
         float currentX = stack.ActualX + stack.ComputedPaddingLeft + 
-            CalculateHorizontalAlignmentOffset(stack.MeasuredContentWidth, totalWidth, stack.ContentHorizontalAlignment);
+            CalculateHorizontalAlignmentOffset(stack.MeasuredContentWidth, totalWidth, stack.JustifyContent);
         float baseY = stack.ActualY + stack.ComputedPaddingTop;
 
         foreach (var child in stack.Children)
@@ -711,7 +711,7 @@ public static class LayoutEngine
         }
 
         float currentY = stack.ActualY + stack.ComputedPaddingTop + 
-            CalculateVerticalAlignmentOffset(stack.MeasuredContentHeight, totalHeight, stack.ContentVerticalAlignment);
+            CalculateVerticalAlignmentOffset(stack.MeasuredContentHeight, totalHeight, stack.AlignContent);
 
         foreach (var child in stack.Children)
         {
@@ -957,7 +957,7 @@ public static class LayoutEngine
         }
 
         float currentY = div.ActualY + div.ComputedPaddingTop + 
-            CalculateVerticalAlignmentOffset(div.MeasuredContentHeight, totalHeight, div.ContentVerticalAlignment);
+            CalculateVerticalAlignmentOffset(div.MeasuredContentHeight, totalHeight, div.AlignItems);
 
         foreach (var child in div.Children)
         {
@@ -1046,10 +1046,10 @@ public static class LayoutEngine
 
     private static void ApplyHorizontalAlignment(UIElement element, float baseX, float containerWidth)
     {
-        var alignment = HorizontalAlignment.Parse(element.HorizontalAlignment);
+        var alignment = HorizontalAlignment.Parse(element.JustifySelf);
         if (alignment == HorizontalAlignment.Unspecified && element.Parent != null)
         {
-            alignment = HorizontalAlignment.Parse(element.Parent.ContentHorizontalAlignment);
+            alignment = HorizontalAlignment.Parse(element.Parent.JustifyContent);
         }
         
         if (alignment == HorizontalAlignment.Unspecified)
@@ -1076,10 +1076,10 @@ public static class LayoutEngine
 
     private static void ApplyVerticalAlignment(UIElement element, float baseY, float containerHeight)
     {
-        var alignment = VerticalAlignment.Parse(element.VerticalAlignment);
+        var alignment = VerticalAlignment.Parse(element.AlignSelf);
         if (alignment == VerticalAlignment.Unspecified && element.Parent != null)
         {
-            alignment = VerticalAlignment.Parse(element.Parent.ContentVerticalAlignment);
+            alignment = VerticalAlignment.Parse(element.Parent.AlignContent);
         }
 
         if (alignment == VerticalAlignment.Unspecified)

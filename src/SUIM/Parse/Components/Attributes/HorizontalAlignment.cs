@@ -16,6 +16,10 @@ public static class HorizontalAlignmentExtensions
         {
             if (value == null) return default;
 
+            if (value.Equals("flex-start", StringComparison.OrdinalIgnoreCase) || value.Equals("start", StringComparison.OrdinalIgnoreCase)) return HorizontalAlignment.Left;
+
+            if (value.Equals("flex-end", StringComparison.OrdinalIgnoreCase) || value.Equals("end", StringComparison.OrdinalIgnoreCase)) return HorizontalAlignment.Right;
+
             return Enum.TryParse<HorizontalAlignment>(value, true, out var r) ? r : default;
         }
     }

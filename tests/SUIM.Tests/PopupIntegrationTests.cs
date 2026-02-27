@@ -52,7 +52,7 @@ public class PopupIntegrationTests
         return buttons;
     }
 
-    private static SUIMElement FindElementByClass(SUIMElement elem, string className)
+    private static SUIMElement? FindElementByClass(SUIMElement elem, string className)
     {
         if (!string.IsNullOrEmpty(elem.Class) && elem.Class.Contains(className))
             return elem;
