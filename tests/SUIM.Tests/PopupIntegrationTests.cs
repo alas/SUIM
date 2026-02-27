@@ -97,6 +97,51 @@ public class PopupIntegrationTests
         return null;
     }
 
+    private static void PrintStrideWidgetTree(StrideUIElement element, int depth = 0)
+    {
+        var indent = new string(' ', depth * 2);
+        var elementType = element.GetType().Name;
+        var name = !string.IsNullOrEmpty(element.Name) ? $" Name='{element.Name}'" : "";
+
+        Console.WriteLine($"{indent}{elementType}{name} | " +
+            $"Width={element.Width}, Height={element.Height}, " +
+            $"ActualWidth={element.ActualWidth:F2}, ActualHeight={element.ActualHeight:F2}, " +
+            $"Margin=({element.Margin.Left:F2},{element.Margin.Top:F2},{element.Margin.Right:F2},{element.Margin.Bottom:F2})");
+
+        depth++;
+
+        if (element is Panel panel)
+        {
+            foreach (var child in panel.Children)
+            {
+                PrintStrideWidgetTree(child, depth);
+            }
+        }
+
+        if (element is ContentControl cc)
+        {
+            PrintStrideWidgetTree(cc.Content, depth);
+        }
+    }
+
+    private static void PrintSUIMTree(SUIMElement element, int depth = 0)
+    {
+        var indent = new string(' ', depth * 2);
+        var elementType = element.GetType().Name;
+        var id = !string.IsNullOrEmpty(element.Id) ? $" Id='{element.Id}'" : "";
+        var className = !string.IsNullOrEmpty(element.Class) ? $" Class='{element.Class}'" : "";
+
+        Console.WriteLine($"{indent}{elementType}{id}{className} | " +
+            $"Width={element.Width}, Height={element.Height}, " +
+            $"ActualWidth={element.ActualWidth:F2}, ActualHeight={element.ActualHeight:F2}, " +
+            $"ActualX={element.ActualX:F2}, ActualY={element.ActualY:F2}");
+
+        foreach (var child in element.Children)
+        {
+            PrintSUIMTree(child, depth + 1);
+        }
+    }
+
     [Fact]
     public void MainView_ButtonsHaveWidthFromCSS()
     {
@@ -169,9 +214,14 @@ public class PopupIntegrationTests
 
         var rootPath = "..\\..\\..\\..\\..\\src\\Example\\Chess3d\\SUIM";
         var parser = new Parser { RootPath = rootPath };
-        var (strideRoot, _) = parser.GetView("MainView", game, model: model);
+        var (suimRoot, strideRoot, _) = parser.GetView("MainView", game, model: model);
 
         Assert.NotNull(strideRoot);
+        Assert.NotNull(suimRoot);
+
+        // Print the SUIM tree before widget checks
+        Console.WriteLine("=== SUIM UI Tree (Before Stride Conversion) ===");
+        PrintSUIMTree(suimRoot);
 
         // Collect all buttons from the view
         var buttons = CollectButtons(strideRoot);
@@ -197,7 +247,6 @@ public class PopupIntegrationTests
             Assert.Equal(0, text.Margin.Top);
             Assert.Equal(0, text.Margin.Right);
             Assert.Equal(0, text.Margin.Bottom);
-            Console.WriteLine($"MainView Button: '{text.Text}', Width={text.Width}, Height={text.Height}, Margin={text.Margin}");
         }
 
         // Check vstack container (converted to Stride StackPanel)
@@ -214,8 +263,6 @@ public class PopupIntegrationTests
                 "Container should have width set or actual width > 0");
             Assert.True(containerStackPanel.Height > 0 || containerStackPanel.ActualHeight > 0,
                 "Container should have height set or actual height > 0");
-            Console.WriteLine($"Container: Width={containerStackPanel.Width}, Height={containerStackPanel.Height}, " +
-                $"ActualWidth={containerStackPanel.ActualWidth}, ActualHeight={containerStackPanel.ActualHeight}");
         }
 
         // Check root grid
@@ -225,5 +272,10 @@ public class PopupIntegrationTests
             "Root grid should have height set or actual height > 0");
         Console.WriteLine($"Root Grid: Width={strideRoot.Width}, Height={strideRoot.Height}, " +
             $"ActualWidth={strideRoot.ActualWidth}, ActualHeight={strideRoot.ActualHeight}");
+
+        // Print the entire Stride widget tree with dimensions
+        Console.WriteLine("\n=== Stride Widget Tree (After Conversion) ===");
+        Console.WriteLine("NOTE: Check if ActualX and ActualY from SUIM are being mapped to Stride widgets");
+        PrintStrideWidgetTree(strideRoot);
     }
 }

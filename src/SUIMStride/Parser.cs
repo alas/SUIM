@@ -32,12 +32,12 @@ public class Parser
     private Game? _game;
     public string? RootPath { get; set; }
 
-    public (StrideUIElement StrideRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    public (SUIMElement SuimRoot, StrideUIElement StrideRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
         return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, null);
     }
 
-    public (StrideUIElement StrideRoot, dynamic? Model) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    public (SUIMElement SuimRoot, StrideUIElement StrideRoot, dynamic? Model) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
         if (string.IsNullOrEmpty(RootPath)) throw new InvalidOperationException("RootPath must be set before calling GetView.");
         
@@ -51,7 +51,7 @@ public class Parser
         return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath, viewName);
     }
 
-    private (StrideUIElement StrideRoot, dynamic? Model) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null)
+    private (SUIMElement SuimRoot, StrideUIElement StrideRoot, dynamic? Model) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null)
     {
         ArgumentNullException.ThrowIfNull(markup);
 
@@ -62,11 +62,11 @@ public class Parser
             {
                 if (!createNewInstance)
                 {
-                    return (cached.StrideRoot, cached.Model);
+                    return (cached.SuimRoot, cached.StrideRoot, cached.Model);
                 }
 
                 // createNewInstance==true -> return a fresh Stride tree by remapping the cached SUIM tree
-                return (MapElement(cached.SuimRoot, game), cached.Model);
+                return (cached.SuimRoot, MapElement(cached.SuimRoot, game), cached.Model);
             }
         }
 
@@ -85,7 +85,7 @@ public class Parser
             _parseCache[markup] = (suimRoot, strideRoot, model2);
         }
 
-        return (strideRoot, model2);
+        return (suimRoot, strideRoot, model2);
     }
 
     private static void Layout(SUIMElement root, Game game, int defaultFontSize, bool fullscreen)

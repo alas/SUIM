@@ -18,7 +18,7 @@ public class TwoWayBindingStrideTests
         model.SetValue("myText", "initial");
         
         var suim = new Parser();
-        var (strideRoot, _) = suim.Parse(markup, new Game(), model: model);
+        var (_, strideRoot, _) = suim.Parse(markup, new Game(), model: model);
         var et = strideRoot as EditText;
         Assert.NotNull(et);
 
@@ -46,7 +46,7 @@ public class TwoWayBindingStrideTests
         model.SetValue("myBool", false);
         
         var suim = new Parser();
-        var (strideRoot, _) = suim.Parse(markup, new Game(), model: model);
+        var (_, strideRoot, _) = suim.Parse(markup, new Game(), model: model);
         var tb = strideRoot as ToggleButton;
         Assert.NotNull(tb);
 

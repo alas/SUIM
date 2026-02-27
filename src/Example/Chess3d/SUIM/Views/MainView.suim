@@ -1,4 +1,4 @@
-<grid>
+<grid class="container">
 	<model>
 	{
 		// delegates for buttons

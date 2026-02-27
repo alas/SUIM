@@ -42,7 +42,7 @@ public class ComponentIsolationTests
         };
 
         var parentModel = new { PopupTitle = "HelloWorld" };
-        var (strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
+        var (_, strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
 
         // Find first TextBlock in the mapped Stride UI tree and assert its text was set from parent model
         var found = XPath.Find(strideRoot, "thelabel") as Stride.UI.Controls.TextBlock;
@@ -75,7 +75,7 @@ public class ComponentIsolationTests
         };
 
         var parentModel = new { LabelVisibility = "collapsed" };
-        var (strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
+        var (_, strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
 
         // Find first TextBlock in the mapped Stride UI tree and assert its text was set from parent model
         var found = XPath.Find(strideRoot, "thelabel") as Stride.UI.Controls.TextBlock;
@@ -109,7 +109,7 @@ public class ComponentIsolationTests
         };
 
         var parentModel = new { LabelVisibility = "collapsed" };
-        var (strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
+        var (_, strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
 
         // Find first TextBlock in the mapped Stride UI tree and assert its text was set from parent model
         var found = XPath.Find(strideRoot, "thelabel") as Stride.UI.Controls.TextBlock;
@@ -148,7 +148,7 @@ public class ComponentIsolationTests
                 called = true;
             }) };
         var game = new Game();
-        var (strideRoot, _) = suim.Parse(markup, game, model: parentModel);
+        var (_, strideRoot, _) = suim.Parse(markup, game, model: parentModel);
 
         var found = XPath.Find(strideRoot, "thebutton") as Stride.UI.Controls.Button;
         Assert.NotNull(found);
@@ -250,7 +250,7 @@ public class ComponentIsolationTests
 
         // Act & Assert
         var ex = Assert.Throws<InvalidOperationException>(() => {
-            var (root, _) = suim.Parse(markup, new Game());
+            var (_, root, _) = suim.Parse(markup, new Game());
         });
         Assert.Contains("no model context is available", ex.Message);
     }

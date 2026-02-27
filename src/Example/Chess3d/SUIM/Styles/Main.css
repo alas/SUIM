@@ -1,4 +1,6 @@
 text, label {
+    HorizontalAlignment: Left;
+    VerticalAlignment: Top;
     color: White;
     font-size: 16px;
 }
@@ -11,7 +13,5 @@ button {
     pressed: "Assets/btn_pressed.png";
 }
 .container {
-    HorizontalAlignment: Left;
-    VerticalAlignment: Top;
-    padding: 10px;
+    padding: 5px;
 }
