@@ -8,8 +8,10 @@ public abstract class UIElement(string tagName)
     public string? Id { get; set; }
     public string? Class { get; set; }
     public string? JustifySelf { get; set; }
+    public string? JustifyItems { get; set; }
     public string? JustifyContent { get; set; }
     public string? AlignSelf { get; set; }
+    public string? AlignItems { get; set; }
     public string? AlignContent { get; set; }
     public string? Top { get; set; }
     public string? Left { get; set; }
@@ -123,6 +125,10 @@ public abstract class UIElement(string tagName)
         {
             JustifySelf = value as string;
         }
+        else if (name.Equals("justify-items", StringComparison.OrdinalIgnoreCase) || name.Equals("justifyitems", StringComparison.OrdinalIgnoreCase))
+        {
+            JustifyItems = value as string;
+        }
         else if (name.Equals("justify-content", StringComparison.OrdinalIgnoreCase) || name.Equals("justifycontent", StringComparison.OrdinalIgnoreCase))
         {
             JustifyContent = value as string;
@@ -130,6 +136,10 @@ public abstract class UIElement(string tagName)
         else if (name.Equals("align-self", StringComparison.OrdinalIgnoreCase) || name.Equals("alignself", StringComparison.OrdinalIgnoreCase))
         {
             AlignSelf = value as string;
+        }
+        else if (name.Equals("align-items", StringComparison.OrdinalIgnoreCase) || name.Equals("alignitems", StringComparison.OrdinalIgnoreCase))
+        {
+            AlignItems = value as string;
         }
         else if (name.Equals("align-content", StringComparison.OrdinalIgnoreCase) || name.Equals("aligncontent", StringComparison.OrdinalIgnoreCase))
         {
@@ -230,8 +240,10 @@ public abstract class UIElement(string tagName)
         if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase) || name.Equals("zindex", StringComparison.OrdinalIgnoreCase)) return ZIndex;
         if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase)) return Visibility;
         if (name.Equals("justify-self", StringComparison.OrdinalIgnoreCase) || name.Equals("justifyself", StringComparison.OrdinalIgnoreCase)) return JustifySelf;
+        if (name.Equals("justify-items", StringComparison.OrdinalIgnoreCase) || name.Equals("justifyitems", StringComparison.OrdinalIgnoreCase)) return JustifyItems;
         if (name.Equals("justify-content", StringComparison.OrdinalIgnoreCase) || name.Equals("justifycontent", StringComparison.OrdinalIgnoreCase)) return JustifyContent;
         if (name.Equals("align-self", StringComparison.OrdinalIgnoreCase) || name.Equals("alignself", StringComparison.OrdinalIgnoreCase)) return AlignSelf;
+        if (name.Equals("align-items", StringComparison.OrdinalIgnoreCase) || name.Equals("alignitems", StringComparison.OrdinalIgnoreCase)) return AlignItems;
         if (name.Equals("align-content", StringComparison.OrdinalIgnoreCase) || name.Equals("aligncontent", StringComparison.OrdinalIgnoreCase)) return AlignContent;
         if (name.Equals("margin", StringComparison.OrdinalIgnoreCase)) return Margin;
         if (name.Equals("padding", StringComparison.OrdinalIgnoreCase)) return Padding;
@@ -267,14 +279,24 @@ public record BindingDefinition(string TargetPropertyName, string ModelPropertyN
 
 public class LayoutElement(string tagName) : UIElement(tagName)
 {
-    public string? Spacing { get; set; }
+    public string? Gap { get; set; }
+    public string? RowGap { get; set; }
+    public string? ColumnGap { get; set; }
     public bool Clip { get; set; }
 
     public override void SetAttribute(string name, object? value)
     {
-        if (name.Equals("spacing", StringComparison.OrdinalIgnoreCase))
+        if (name.Equals("gap", StringComparison.OrdinalIgnoreCase))
         {
-            Spacing = value as string;
+            Gap = value as string;
+        }
+        else if (name.Equals("row-gap", StringComparison.OrdinalIgnoreCase) || name.Equals("rowgap", StringComparison.OrdinalIgnoreCase))
+        {
+            RowGap = value as string;
+        }
+        else if (name.Equals("column-gap", StringComparison.OrdinalIgnoreCase) || name.Equals("columngap", StringComparison.OrdinalIgnoreCase))
+        {
+            ColumnGap = value as string;
         }
         else if (name.Equals("clip", StringComparison.OrdinalIgnoreCase))
         {
@@ -284,6 +306,16 @@ public class LayoutElement(string tagName) : UIElement(tagName)
         {
             base.SetAttribute(name, value);
         }
+    }
+
+    public override string? GetAttribute(string name)
+    {
+        if (name.Equals("gap", StringComparison.OrdinalIgnoreCase)) return Gap;
+        if (name.Equals("row-gap", StringComparison.OrdinalIgnoreCase) || name.Equals("rowgap", StringComparison.OrdinalIgnoreCase)) return RowGap;
+        if (name.Equals("column-gap", StringComparison.OrdinalIgnoreCase) || name.Equals("columngap", StringComparison.OrdinalIgnoreCase)) return ColumnGap;
+        if (name.Equals("clip", StringComparison.OrdinalIgnoreCase)) return Clip.ToString();
+
+        return base.GetAttribute(name);
     }
 }
 

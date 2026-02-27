@@ -44,13 +44,13 @@ public class MarkupParserTests
     [Fact]
     public void Parse_StackVertical()
     {
-        var markup = "<stack orientation=\"vertical\" spacing=\"10\"><div /><div /></stack>";
+        var markup = "<stack orientation=\"vertical\" gap=\"10\"><div /><div /></stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
         Assert.Equal(Orientation.Vertical, stack.Orientation);
-        Assert.Equal("10", stack.Spacing);
+        Assert.Equal("10", stack.Gap);
         Assert.Equal(2, stack.Children.Count);
         Assert.IsType<Div>(stack.Children[0]);
         Assert.IsType<Div>(stack.Children[1]);
@@ -513,12 +513,12 @@ public class MarkupParserTests
     [Fact]
     public void Parse_Spacing_SingleValue()
     {
-        var markup = "<stack spacing=\"10\"><div /><div /></stack>";
+        var markup = "<stack gap=\"10\"><div /><div /></stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
-        Assert.Equal("10", stack.Spacing);
+        Assert.Equal("10", stack.Gap);
     }
 
     [Fact]
@@ -538,7 +538,7 @@ public class MarkupParserTests
     public void Parse_Nested_GridAndStack_Complex()
     {
         var markup = @"<grid columns=""*,*"" rows=""auto,*"">
-<stack grid.row=""0"" grid.column=""0"" orientation=""horizontal"" spacing=""10"">
+<stack grid.row=""0"" grid.column=""0"" orientation=""horizontal"" gap=""10"">
     <label value=""Top Left"" />
     <label value=""Top"" />
 </stack>
@@ -1247,7 +1247,7 @@ Text after
     [Fact]
     public void Parse_Stack_WithScroll_WithAllAttributes()
     {
-        var markup = @"<stack orientation=""vertical"" scroll=""vertical"" width=""400"" height=""300"" spacing=""5"">
+        var markup = @"<stack orientation=""vertical"" scroll=""vertical"" width=""400"" height=""300"" gap=""5"">
 <label value=""Scrollable Item 1"" />
 <label value=""Scrollable Item 2"" />
 <label value=""Scrollable Item 3"" />
@@ -1267,8 +1267,8 @@ Text after
         // Inner element should default to `auto` sizing when wrapped by a scroll-viewport
         Assert.Equal(UnitValue.Auto, UnitValue.Parse(stack.Width));
         Assert.Equal(UnitValue.Auto, UnitValue.Parse(stack.Height));
-        // Spacing is component specific, goes to stack
-        Assert.Equal("5", stack.Spacing);
+        // gap is component specific, goes to stack
+        Assert.Equal("5", stack.Gap);
         Assert.Equal(3, stack.Children.Count);
     }
 

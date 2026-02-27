@@ -40,12 +40,14 @@ Every element exists within a rectangular box. Spacing is governed by **margin**
 
 ### 2.2 Layout Alignment
 
-All layout containers support the following for positioning and alignment:
+All layout containers support the following flexbox-style properties for positioning and alignment:
 
-* **JustifySelf**
-* **JustifyItems**
-* **AlignSelf**
-* **AlignItems**
+* **justify-content**
+* **align-content**
+* **justify-items**
+* **align-items**
+* **justify-self**
+* **align-self**
 
 ### 2.3 Anchoring
 
@@ -287,7 +289,9 @@ Every element in SUIM inherits a set of **Common Attributes** for layout and sty
 
 #### 1.2 Common Container Attributes (Supported by ALL Container and Layout tags)
 
-* `spacing`: `integer|integer integer` - Spacing between children, one value for both orientations, 2 values for each separately.
+* `gap`: `integer` - Spacing between children on both axis.
+* `row-gap`: `integer` - Spacing between children vertically.
+* `column-gap`: `integer` - Spacing between children horizontally.
 * `clip`: `bool` - If true, children outside bounds are not drawn.
 * `slicewidth`: `integer|integer integer integer integer` - Thickness of the 9-slice border or borders.
 * `scroll`: `both|vertical|horizontal` - Wraps the tag in an outer scroll-container.

@@ -18,14 +18,14 @@
 		shadow: 0 8 16 rgba(0,0,0,0.5);
 	}
 	.hstack2 {
-		spacing: 10;
+		gap: 10;
 		justify-self: center;
 	}
 	</style>
 
     <overlay visibility="@visibility">
         <grid class="wood-panel">
-            <vstack spacing="8" padding="12">
+            <vstack gap="8" padding="12">
                 <hstack>
                     <label value="@title" />
                 </hstack>

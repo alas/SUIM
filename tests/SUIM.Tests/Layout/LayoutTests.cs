@@ -10,7 +10,7 @@ public class LayoutTests
     [Fact]
     public void LayoutEngine_MeasuresStackWithPixels()
     {
-        var stack = new Stack { Orientation = Orientation.Vertical, Spacing = "10", Width = "auto", Height = "auto" };
+        var stack = new Stack { Orientation = Orientation.Vertical, Gap = "10", Width = "auto", Height = "auto" };
         var child1 = new Label { Width = "100px", Height = "50px" };
         var child2 = new Label { Width = "100px", Height = "30px" };
         
@@ -20,13 +20,13 @@ public class LayoutTests
         LayoutEngine.Layout(stack, 16, 200, 200);
         
         Assert.Equal(100, stack.ActualWidth);
-        Assert.Equal(90, stack.ActualHeight); // 50 + 30 + 10 spacing
+        Assert.Equal(90, stack.ActualHeight); // 50 + 30 + 10 gap
     }
     
     [Fact]
     public void LayoutEngine_MeasuresStackWithFractionalUnits()
     {
-        var stack = new Stack { Orientation = Orientation.Horizontal, Spacing = "0", Width = "1fr", Height = "auto" };
+        var stack = new Stack { Orientation = Orientation.Horizontal, Gap = "0", Width = "1fr", Height = "auto" };
         var child1 = new Label { Width = "1fr", Height = "50px" };
         var child2 = new Label { Width = "2fr", Height = "50px" };
         
