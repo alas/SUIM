@@ -215,4 +215,77 @@ public class ComponentStylingTests
         Assert.Equal(200, buttonActual.ActualWidth);
         Assert.Equal(50, buttonActual.ActualHeight);
     }
+
+    [Fact]
+    public void MultipleSelectorRules_MergePropertiesWithCascading()
+    {
+        // Test that multiple rules with the same selector merge properties,
+        // with later rules overriding earlier ones
+        var markup = @"
+            <grid>
+                <style>
+                    button {
+                        width: 100px;
+                        height: 40px;
+                        margin: 2px;
+                        color: red;
+                    }
+                </style>
+                <style>
+                    button {
+                        width: 200px;
+                        height: 50px;
+                        margin: 5px;
+                    }
+                </style>
+                <button>Test</button>
+            </grid>";
+
+        var (suimElement, _) = MarkupParser.Parse(markup);
+        var button = suimElement.Children[0];
+
+        // The second button rule should merge with and override the first
+        // Expected: width=200px, height=50px, margin=5px, color=red (from first rule, not overridden)
+        Assert.Equal("200px", button.Width);
+        Assert.Equal("50px", button.Height);
+        Assert.Equal("5px", button.Margin);
+        Assert.Equal("red", button.Color);
+    }
+
+    [Fact]
+    public void StyleFileAndInlineStyles_MergeWithCascading()
+    {
+        // Test that styles from external files merge with inline styles
+        var cssPath = GetTestPath("MergeTest.css");
+        var cssContent = @"button {
+    width: 100px;
+    height: 40px;
+    color: blue;
+}";
+        File.WriteAllText(cssPath, cssContent);
+
+        var markup = $@"
+            <grid>
+                <style src=""{Path.GetFileName(cssPath)}"" />
+                <style>
+                    button {{
+                        width: 200px;
+                        height: 50px;
+                        margin: 5px;
+                    }}
+                </style>
+                <button>Test</button>
+            </grid>";
+
+        var (suimElement, _) = MarkupParser.Parse(markup, basePath: GetTestPath(""));
+        var button = suimElement.Children[0];
+
+        // External CSS should be merged with inline style
+        // Inline style (later) should override CSS file values for width/height
+        // Color should come from CSS (not overridden by inline)
+        Assert.Equal("200px", button.Width);
+        Assert.Equal("50px", button.Height);
+        Assert.Equal("5px", button.Margin);
+        Assert.Equal("blue", button.Color);
+    }
 }

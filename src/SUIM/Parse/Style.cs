@@ -47,10 +47,19 @@ public static class Style
 
             if (properties.Count > 0)
             {
-                // Apply the same properties to all selectors
+                // Apply the same properties to all selectors, merging with existing properties
                 foreach (var selector in selectors)
                 {
-                    styles[selector] = properties;
+                    if (!styles.ContainsKey(selector))
+                    {
+                        styles[selector] = new Dictionary<string, string>();
+                    }
+
+                    // Merge properties: new properties override existing ones with the same name
+                    foreach (var kvp in properties)
+                    {
+                        styles[selector][kvp.Key] = kvp.Value;
+                    }
                 }
             }
         }
