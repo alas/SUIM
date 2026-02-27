@@ -133,16 +133,23 @@ public static class LayoutEngine
             MeasureGeneric(element, availableContentWidth, availableContentHeight);
         }
 
-        // Handle root element sizing per-axis (only fill available space for axes without any explicit sizes in the tree)
+        // Handle root element sizing per-axis:
+        // - Fr or None (unset/defaulted to layout-fill): fill available space
+        // - Auto (explicit shrink-wrap): keep measured content size, capped to available
+        // - Pixels/Rem/Em: already resolved via widthInPixels, just cap to available
         if (element.Parent == null)
         {
-            if (!TreeHasAnyExplicitWidth(element) || width.Type == UnitType.Fr)
+            if (width.Type == UnitType.Fr || width.Type == UnitType.None)
                 element.MeasuredContentWidth = availableContentWidth;
+            else if (width.Type == UnitType.Auto)
+                element.MeasuredContentWidth = Math.Min(element.MeasuredContentWidth, availableContentWidth);
             else if (widthInPixels == 0)
                 element.MeasuredContentWidth = Math.Min(element.MeasuredContentWidth, availableContentWidth);
 
-            if (!TreeHasAnyExplicitHeight(element) || height.Type == UnitType.Fr)
+            if (height.Type == UnitType.Fr || height.Type == UnitType.None)
                 element.MeasuredContentHeight = availableContentHeight;
+            else if (height.Type == UnitType.Auto)
+                element.MeasuredContentHeight = Math.Min(element.MeasuredContentHeight, availableContentHeight);
             else if (heightInPixels == 0)
                 element.MeasuredContentHeight = Math.Min(element.MeasuredContentHeight, availableContentHeight);
         }
@@ -158,34 +165,6 @@ public static class LayoutEngine
         // Calculate total size including padding
         element.ActualWidth = element.MeasuredContentWidth + element.ComputedPaddingLeft + element.ComputedPaddingRight;
         element.ActualHeight = element.MeasuredContentHeight + element.ComputedPaddingTop + element.ComputedPaddingBottom;
-
-        static bool TreeHasAnyExplicitWidth(UIElement element)
-        {
-            var width = UnitValue.Parse(element.Width);
-            bool widthExplicit = width.Type != UnitType.None
-                                 && width.Type != UnitType.Rem
-                                 && width.Type != UnitType.Em
-                                 && width.Type != UnitType.Fr;
-            if (widthExplicit) return true;
-            foreach (var child in element.Children)
-            {
-                if (TreeHasAnyExplicitWidth(child)) return true;
-            }
-            return false;
-        }
-
-        static bool TreeHasAnyExplicitHeight(UIElement element)
-        {
-            var height = UnitValue.Parse(element.Height);
-            // Treat any non-None/non-Fr height (including rem/em/auto) as explicit for height axis
-            bool heightExplicit = height.Type != UnitType.None && height.Type != UnitType.Fr;
-            if (heightExplicit) return true;
-            foreach (var child in element.Children)
-            {
-                if (TreeHasAnyExplicitHeight(child)) return true;
-            }
-            return false;
-        }
     }
 
     private static void MeasureStack(Stack stack, float availableWidth, float availableHeight)

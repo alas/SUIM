@@ -52,6 +52,51 @@ public class PopupIntegrationTests
         return buttons;
     }
 
+    private static SUIMElement FindElementByClass(SUIMElement elem, string className)
+    {
+        if (!string.IsNullOrEmpty(elem.Class) && elem.Class.Contains(className))
+            return elem;
+        foreach (var child in elem.Children)
+        {
+            var result = FindElementByClass(child, className);
+            if (result != null)
+                return result;
+        }
+        return null;
+    }
+
+    private static SUIMElement? FindElementByType<T>(SUIMElement elem) where T : SUIMElement
+    {
+        if (elem is T)
+            return elem;
+
+        foreach (var child in elem.Children)
+        {
+            var result = FindElementByType<T>(child);
+            if (result != null)
+                return result;
+        }
+        return null;
+    }
+
+    private static StrideUIElement? FindElementInStrideTree(StrideUIElement root, Func<StrideUIElement, bool> predicate)
+    {
+        if (predicate(root))
+            return root;
+
+        if (root is Panel panel)
+        {
+            foreach (var child in panel.Children)
+            {
+                var result = FindElementInStrideTree(child, predicate);
+                if (result != null)
+                    return result;
+            }
+        }
+
+        return null;
+    }
+
     [Fact]
     public void MainView_ButtonsHaveWidthFromCSS()
     {
@@ -71,6 +116,15 @@ public class PopupIntegrationTests
         var buttons = FindSuimButtons(suimRoot);
         Assert.NotEmpty(buttons);
 
+        // Check vstack container
+        var containerVStack = FindElementByClass(suimRoot, "container");
+        Assert.NotNull(containerVStack);
+        System.Diagnostics.Debug.WriteLine($"Before layout: Container.Width={containerVStack.Width ?? "null"}, Container.Height={containerVStack.Height ?? "null"}");
+
+        // Check root grid
+        Assert.NotNull(suimRoot);
+        System.Diagnostics.Debug.WriteLine($"Before layout: Root.Width={suimRoot.Width ?? "null"}, Root.Height={suimRoot.Height ?? "null"}");
+
         foreach (var btn in buttons)
         {
             System.Diagnostics.Debug.WriteLine($"Before layout: Button.Width={btn.Width ?? "null"}, Button.Height={btn.Height ?? "null"}");
@@ -80,12 +134,22 @@ public class PopupIntegrationTests
         }
 
         // Now layout
-        LayoutEngine.Layout(suimRoot, 16, 1920, 1080);
+        LayoutEngine.Layout(suimRoot, 16, 1280, 720);
 
         foreach (var btn in buttons)
         {
             System.Diagnostics.Debug.WriteLine($"After layout: Button.ActualWidth={btn.ActualWidth}, Button.ActualHeight={btn.ActualHeight}");
         }
+
+        // Check container dimensions after layout
+        System.Diagnostics.Debug.WriteLine($"After layout: Container.ActualWidth={containerVStack.ActualWidth}, Container.ActualHeight={containerVStack.ActualHeight}");
+        Assert.True(containerVStack.ActualWidth > 0, "Container should have positive actual width after layout");
+        Assert.True(containerVStack.ActualHeight > 0, "Container should have positive actual height after layout");
+
+        // Check root grid dimensions after layout
+        System.Diagnostics.Debug.WriteLine($"After layout: Root.ActualWidth={suimRoot.ActualWidth}, Root.ActualHeight={suimRoot.ActualHeight}");
+        Assert.True(suimRoot.ActualWidth > 0, "Root grid should have positive actual width after layout");
+        Assert.True(suimRoot.ActualHeight > 0, "Root grid should have positive actual height after layout");
     }
 
     [Fact]
@@ -135,5 +199,31 @@ public class PopupIntegrationTests
             Assert.Equal(0, text.Margin.Bottom);
             Console.WriteLine($"MainView Button: '{text.Text}', Width={text.Width}, Height={text.Height}, Margin={text.Margin}");
         }
+
+        // Check vstack container (converted to Stride StackPanel)
+        var containerPanel = FindElementInStrideTree(strideRoot, element =>
+        {
+            if (element is StackPanel panel && panel.Name == "container")
+                return true;
+            return false;
+        });
+
+        if (containerPanel is StackPanel containerStackPanel)
+        {
+            Assert.True(containerStackPanel.Width > 0 || containerStackPanel.ActualWidth > 0,
+                "Container should have width set or actual width > 0");
+            Assert.True(containerStackPanel.Height > 0 || containerStackPanel.ActualHeight > 0,
+                "Container should have height set or actual height > 0");
+            Console.WriteLine($"Container: Width={containerStackPanel.Width}, Height={containerStackPanel.Height}, " +
+                $"ActualWidth={containerStackPanel.ActualWidth}, ActualHeight={containerStackPanel.ActualHeight}");
+        }
+
+        // Check root grid
+        Assert.True(strideRoot.Width > 0 || strideRoot.ActualWidth > 0,
+            "Root grid should have width set or actual width > 0");
+        Assert.True(strideRoot.Height > 0 || strideRoot.ActualHeight > 0,
+            "Root grid should have height set or actual height > 0");
+        Console.WriteLine($"Root Grid: Width={strideRoot.Width}, Height={strideRoot.Height}, " +
+            $"ActualWidth={strideRoot.ActualWidth}, ActualHeight={strideRoot.ActualHeight}");
     }
 }
