@@ -952,7 +952,7 @@ public static class LayoutEngine
     private static void PositionVerticalDiv(Div div)
     {
         float baseX = div.ActualX + div.ComputedPaddingLeft;
-        
+
         float totalHeight = 0;
         foreach (var child in div.Children)
             totalHeight += child.ActualHeight + child.ComputedMarginTop + child.ComputedMarginBottom;
@@ -972,7 +972,7 @@ public static class LayoutEngine
         {
             child.ActualX = baseX + child.ComputedMarginLeft;
             child.ActualY = currentY + child.ComputedMarginTop;
-            ApplyHorizontalAlignment(child, baseX, div.MeasuredContentWidth);
+            ApplyHorizontalAlignment(child, baseX, div.MeasuredContentWidth, div.JustifyContent);
             currentY += child.ActualHeight + child.ComputedMarginTop + child.ComputedMarginBottom + gapPixels;
         }
     }
@@ -1052,75 +1052,61 @@ public static class LayoutEngine
         }
     }
 
-    private static void ApplyHorizontalAlignment(UIElement element, float baseX, float containerWidth)
+    private static void ApplyHorizontalAlignment(UIElement element, float baseX, float containerWidth, string? parentJustifyContent = null)
     {
-        var align = element.JustifySelf ?? element.Parent?.JustifyItems;
+        var align = element.JustifySelf ?? element.Parent?.JustifyItems ?? parentJustifyContent;
         if (string.IsNullOrEmpty(align)) return;
 
-        if (element.Width != null && UnitValue.Parse(element.Width).Type == UnitType.Auto)
+        switch (align.ToLowerInvariant())
         {
-            switch (align.ToLowerInvariant())
-            {
-                case "center":
-                    element.ActualX = baseX + (containerWidth - element.ActualWidth) / 2;
-                    break;
-                case "end":
-                case "flex-end":
-                case "right":
-                    element.ActualX = baseX + containerWidth - element.ActualWidth;
-                    break;
-                case "stretch":
-                    element.ActualX = baseX;
+            case "center":
+                element.ActualX = baseX + (containerWidth - element.ActualWidth) / 2;
+                break;
+            case "end":
+            case "flex-end":
+            case "right":
+                element.ActualX = baseX + containerWidth - element.ActualWidth;
+                break;
+            case "stretch":
+                element.ActualX = baseX;
+                if (UnitValue.Parse(element.Width).Type == UnitType.Auto)
                     element.ActualWidth = containerWidth;
-                    break;
-                case "start":
-                case "flex-start":
-                case "left":
-                    element.ActualX = baseX;
-                    break;
-            }
-        }
-        else if (align.Equals("stretch", StringComparison.OrdinalIgnoreCase))
-        {
-            element.ActualX = baseX;
-            element.ActualWidth = containerWidth;
+                break;
+            case "start":
+            case "flex-start":
+            case "left":
+                element.ActualX = baseX;
+                break;
         }
     }
 
-    private static void ApplyVerticalAlignment(UIElement element, float baseY, float containerHeight)
+    private static void ApplyVerticalAlignment(UIElement element, float baseY, float containerHeight, string? parentAlignItems = null)
     {
-        var align = element.AlignSelf ?? element.Parent?.AlignItems;
+        var align = element.AlignSelf ?? element.Parent?.AlignItems ?? parentAlignItems;
         if (string.IsNullOrEmpty(align)) return;
 
-        if (element.Height != null && UnitValue.Parse(element.Height).Type == UnitType.Auto)
+        switch (align.ToLowerInvariant())
         {
-            switch (align.ToLowerInvariant())
-            {
-                case "center":
-                    element.ActualY = baseY + (containerHeight - element.ActualHeight) / 2;
-                    break;
-                case "end":
-                case "flex-end":
-                case "bottom":
-                    element.ActualY = baseY + containerHeight - element.ActualHeight;
-                    break;
-                case "stretch":
-                    element.ActualY = baseY;
+            case "center":
+                element.ActualY = baseY + (containerHeight - element.ActualHeight) / 2;
+                break;
+            case "end":
+            case "flex-end":
+            case "bottom":
+                element.ActualY = baseY + containerHeight - element.ActualHeight;
+                break;
+            case "stretch":
+                element.ActualY = baseY;
+                if (UnitValue.Parse(element.Height).Type == UnitType.Auto)
                     element.ActualHeight = containerHeight;
-                    break;
-                case "start":
-                case "flex-start":
-                case "top":
-                    element.ActualY = baseY;
-                    break;
-            }
+                break;
+            case "start":
+            case "flex-start":
+            case "top":
+                element.ActualY = baseY;
+                break;
         }
-        else if (align.Equals("stretch", StringComparison.OrdinalIgnoreCase))
-        {
-            element.ActualY = baseY;
-            element.ActualHeight = containerHeight;
-        }
-    }    
+    }
     private static float CalculateHorizontalAlignmentOffset(float containerWidth, float contentWidth, string? justify)
     {
         if (string.IsNullOrEmpty(justify)) return 0;

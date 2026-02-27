@@ -8,6 +8,7 @@ button {
     width: 200px;
     height: 50px;
     margin: 5px;
+    padding: 5px;
     normal: "Assets/btn_normal.png";
     hover: "Assets/btn_hover.png";
     pressed: "Assets/btn_pressed.png";
