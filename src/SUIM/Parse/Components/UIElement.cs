@@ -257,15 +257,19 @@ public abstract class UIElement(string tagName)
 
     public float ToPixels(string? value) => ToPixels(UnitValue.Parse(value));
 
-    public float ToPixels(UnitValue unitValue) => unitValue.Type switch
+    public float ToPixels(UnitValue unitValue)
     {
-        UnitType.Pixels => unitValue.Value,
-        UnitType.Rem => unitValue.Value * RootFontSize,
-        UnitType.Em => unitValue.Value * (Parent?.FontSize is string s ? Convert.ToSingle(s) : RootFontSize),
-        UnitType.Auto => 0f, // Will be calculated during layout
-        UnitType.Fr => 0f, // Will be calculated during fr distribution
-        _ => 0f
-    };
+        float val = unitValue.Type switch
+        {
+            UnitType.Pixels => unitValue.Value,
+            UnitType.Rem => unitValue.Value * RootFontSize,
+            UnitType.Em => unitValue.Value * (Parent?.FontSize is string s ? Convert.ToSingle(s) : RootFontSize),
+            UnitType.Auto => 0f, // Will be calculated during layout
+            UnitType.Fr => 0f, // Will be calculated during fr distribution
+            _ => 0f
+        };
+        return float.IsNaN(val) || float.IsInfinity(val) ? 0f : val;
+    }
 
     public dynamic? GetEffectiveModel()
     {

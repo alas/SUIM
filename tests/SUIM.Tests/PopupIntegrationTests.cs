@@ -255,4 +255,60 @@ public class PopupIntegrationTests
         Console.WriteLine("NOTE: Check if ActualX and ActualY from SUIM are being mapped to Stride widgets");
         PrintStrideWidgetTree(strideRoot);
     }
+
+    [Fact]
+    public void Popup_VisibilityToggle_DoesNotProduceNaN()
+    {
+        var rootPath = "..\\..\\..\\..\\..\\src\\Example\\Chess3d\\SUIM";
+        var project = new SUIMProject(rootPath);
+        var project_views_path = Path.Combine(rootPath, "Views", "MainView.suim");
+
+        Assert.True(File.Exists(project_views_path), $"MainView.suim not found at {project_views_path}");
+
+        var markup = File.ReadAllText(project_views_path);
+        project.ResolveDependencies(markup);
+
+        var (suimRoot, _) = Parse.MarkupParser.Parse(markup, model: null, basePath: rootPath);
+
+        // First layout with generic values
+        LayoutEngine.Layout(suimRoot, 16, 1280, 720);
+
+        // Find the Popup (it's a component, probably resolved to something else, or we find it by searching child elements)
+        // In the parsed tree, it should have the class or id that matches the popup, let's just find the first thing with visibility="collapsed"
+        var popup = suimRoot.Children.FirstOrDefault(c => string.Equals(c.Visibility, "collapsed", StringComparison.OrdinalIgnoreCase)) 
+                    ?? suimRoot.Children.LastOrDefault(); // Assuming it's at the end if not collapsed by default in parsed tree
+        
+        Assert.NotNull(popup);
+        
+        // Change visibility to Visible
+        popup.Visibility = "visible";
+        
+        // Set some dummy values
+        if (popup is SUIMElement popupElement)
+        {
+            // Try to set title and message if those IDs exist, or just layout again
+        }
+
+        LayoutEngine.Layout(suimRoot, 16, 1280, 720);
+
+        // Verify no NaNs in the tree
+        VerifyNoNaNs(suimRoot);
+    }
+
+    private void VerifyNoNaNs(SUIMElement element)
+    {
+        Assert.False(float.IsNaN(element.ActualWidth), $"{element.GetType().Name} ActualWidth is NaN");
+        Assert.False(float.IsNaN(element.ActualHeight), $"{element.GetType().Name} ActualHeight is NaN");
+        Assert.False(float.IsNaN(element.ActualX), $"{element.GetType().Name} ActualX is NaN");
+        Assert.False(float.IsNaN(element.ActualY), $"{element.GetType().Name} ActualY is NaN");
+        Assert.False(float.IsNaN(element.ComputedMarginTop), $"{element.GetType().Name} ComputedMarginTop is NaN");
+        Assert.False(float.IsNaN(element.ComputedMarginBottom), $"{element.GetType().Name} ComputedMarginBottom is NaN");
+        Assert.False(float.IsNaN(element.ComputedMarginLeft), $"{element.GetType().Name} ComputedMarginLeft is NaN");
+        Assert.False(float.IsNaN(element.ComputedMarginRight), $"{element.GetType().Name} ComputedMarginRight is NaN");
+
+        foreach (var child in element.Children)
+        {
+            VerifyNoNaNs(child);
+        }
+    }
 }
