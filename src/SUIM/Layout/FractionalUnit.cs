@@ -28,7 +28,7 @@ public static class FractionalUnit
 
     public static float Sanitize(float value)
     {
-        if (float.IsNaN(value) || float.IsInfinity(value) || value < 0) return 0;
+        if (float.IsNaN(value) || float.IsInfinity(value) || value < 0 || value == float.MaxValue) return 0;
         return value;
     }
 
