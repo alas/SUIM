@@ -3,14 +3,14 @@ namespace SUIM.Tests;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using Stride.Engine;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
-using Stride.Engine;
 using StrideUIElement = Stride.UI.UIElement;
 using StrideButton = Stride.UI.Controls.Button;
 using SUIM.Layout;
-using SUIMStride;
 using SUIMElement = Parse.Components.UIElement;
+using SUIMStride;
 
 public class PopupIntegrationTests
 {
@@ -279,7 +279,7 @@ public class PopupIntegrationTests
                     ?? suimRoot.Children.LastOrDefault(); // Assuming it's at the end if not collapsed by default in parsed tree
         
         Assert.NotNull(popup);
-        
+
         // Change visibility to Visible
         popup.Visibility = "visible";
         

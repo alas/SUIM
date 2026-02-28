@@ -57,13 +57,31 @@ public static class LayoutEngine
         var height = UnitValue.Parse(element.Height);
         if (element is LayoutElement)
         {
-            if (width.Type == UnitType.None) element.Width = (width = UnitValue.OneFR).ToString();
-            if (height.Type == UnitType.None) element.Height = (height = UnitValue.OneFR).ToString();
+            if (width.Type == UnitType.None) 
+            {
+                element.Width = "fr";
+                width = UnitValue.OneFR;
+            }
+
+            if (height.Type == UnitType.None)
+            {
+                element.Height = "fr";
+                height = UnitValue.OneFR;
+            }
         }
         else
         {
-            if (width.Type == UnitType.None) element.Width = (width = UnitValue.Auto).ToString();
-            if (height.Type == UnitType.None) element.Height = (height = UnitValue.Auto).ToString();
+            if (width.Type == UnitType.None)
+            {
+                element.Width = "auto";
+                width = UnitValue.Auto;
+            }
+
+            if (height.Type == UnitType.None)
+            {
+                element.Height = "auto";
+                height = UnitValue.Auto;
+            }
         }
 
         // Convert explicit sizes to pixels
@@ -478,7 +496,10 @@ public static class LayoutEngine
         // Resolve unspecified width for Div (default to 1fr)
         var width = UnitValue.Parse(div.Width);
         if (width.Type == UnitType.None)
-            div.Width = (width = UnitValue.OneFR).ToString();
+        {
+            div.Width = "fr";
+            width = UnitValue.OneFR;
+        }
         // Resolve unspecified height for Div (default to Auto)
         var height = UnitValue.Parse(div.Height);
         if (height.Type == UnitType.None)

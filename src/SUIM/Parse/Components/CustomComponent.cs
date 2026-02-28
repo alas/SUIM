@@ -1,11 +1,11 @@
 namespace SUIM.Parse.Components;
 
-using SUIM.Model;
-using SUIM.Parse;
 using System;
 using System.IO;
+using SUIM.Model;
+using SUIM.Parse;
 
-public class CustomComponent(string tagName) : UIElement(tagName)
+public class CustomComponent(string tagName) : LayoutElement(tagName)
 {
     public string? Source { get; set; }
 

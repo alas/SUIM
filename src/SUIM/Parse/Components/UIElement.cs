@@ -1,7 +1,7 @@
 namespace SUIM.Parse.Components;
 
-using SUIM.Parse.Components.Attributes;
 using System.Xml.Linq;
+using SUIM.Parse.Components.Attributes;
 
 public abstract class UIElement(string tagName)
 {
