@@ -283,10 +283,13 @@ public static class LayoutEngine
 
     private static void MeasureGrid(Grid grid, float availableWidth, float availableHeight)
     {
-        // When grid has no explicit columns/rows and is auto-sized, 
+        // When grid has no explicit columns/rows and at least one dimension is auto-sized, 
         // measure children with auto space and let content drive sizing
+        bool isWidthAuto = UnitValue.Parse(grid.Width).Type == UnitType.Auto;
+        bool isHeightAuto = UnitValue.Parse(grid.Height).Type == UnitType.Auto;
+
         if (string.IsNullOrWhiteSpace(grid.Columns) && string.IsNullOrWhiteSpace(grid.Rows) 
-            && UnitValue.Parse(grid.Width).Type == UnitType.Auto && UnitValue.Parse(grid.Height).Type == UnitType.Auto)
+            && (isWidthAuto || isHeightAuto))
         {
             float maxWidth = 0;
             float maxHeight = 0;
@@ -294,19 +297,25 @@ public static class LayoutEngine
             foreach (var gridChild in grid.GridChildren)
             {
                 gridChild.Element.CurrentFontSize = grid.CurrentFontSize;
-                // Measure with effectively unlimited space to get content-driven size
-                MeasureElement(gridChild.Element, float.MaxValue, float.MaxValue);
+                // Measure with effectively unlimited space only for the auto dimension
+                float childAvailW = isWidthAuto ? float.MaxValue : availableWidth;
+                float childAvailH = isHeightAuto ? float.MaxValue : availableHeight;
+                
+                MeasureElement(gridChild.Element, childAvailW, childAvailH);
                 maxWidth = Math.Max(maxWidth, gridChild.Element.ActualWidth + gridChild.Element.ComputedMarginLeft + gridChild.Element.ComputedMarginRight);
                 maxHeight = Math.Max(maxHeight, gridChild.Element.ActualHeight + gridChild.Element.ComputedMarginTop + gridChild.Element.ComputedMarginBottom);
             }
 
-            grid.MeasuredContentWidth = maxWidth;
-            grid.MeasuredContentHeight = maxHeight;
+            if (isWidthAuto) grid.MeasuredContentWidth = maxWidth;
+            if (isHeightAuto) grid.MeasuredContentHeight = maxHeight;
         }
         else
         {
-            var columnWidths = grid.ParseUnits(grid.Columns, availableWidth);
-            var rowHeights = grid.ParseUnits(grid.Rows, availableHeight);
+            float gridContentAvailW = availableWidth == float.MaxValue ? 0 : availableWidth;
+            float gridContentAvailH = availableHeight == float.MaxValue ? 0 : availableHeight;
+
+            var columnWidths = grid.ParseUnits(grid.Columns, availableWidth == float.MaxValue ? 0 : availableWidth);
+            var rowHeights = grid.ParseUnits(grid.Rows, availableHeight == float.MaxValue ? 0 : availableHeight);
 
             foreach (var gridChild in grid.GridChildren)
             {
@@ -324,14 +333,28 @@ public static class LayoutEngine
 
     private static void MeasureDock(Dock dock, float availableWidth, float availableHeight)
     {
+        float maxWidth = 0;
+        float maxHeight = 0;
         foreach (var dockChild in dock.DockChildren)
         {
             dockChild.Element.CurrentFontSize = dock.CurrentFontSize;
             MeasureElement(dockChild.Element, availableWidth, availableHeight);
+            maxWidth = Math.Max(maxWidth, dockChild.Element.ActualWidth + dockChild.Element.ComputedMarginLeft + dockChild.Element.ComputedMarginRight);
+            maxHeight = Math.Max(maxHeight, dockChild.Element.ActualHeight + dockChild.Element.ComputedMarginTop + dockChild.Element.ComputedMarginBottom);
         }
 
-        dock.MeasuredContentWidth = availableWidth;
-        dock.MeasuredContentHeight = availableHeight;
+        var width = UnitValue.Parse(dock.Width);
+        var height = UnitValue.Parse(dock.Height);
+
+        if (width.Type == UnitType.Auto)
+            dock.MeasuredContentWidth = maxWidth;
+        else
+            dock.MeasuredContentWidth = availableWidth == float.MaxValue ? maxWidth : availableWidth;
+
+        if (height.Type == UnitType.Auto)
+            dock.MeasuredContentHeight = maxHeight;
+        else
+            dock.MeasuredContentHeight = availableHeight == float.MaxValue ? maxHeight : availableHeight;
     }
 
     private static void MeasureOverlay(Overlay overlay, float availableWidth, float availableHeight)
@@ -344,7 +367,7 @@ public static class LayoutEngine
         float contentHeight;
 
         // measure to content size
-        if (availableWidth == float.MaxValue)
+        if (availableWidth == float.MaxValue && availableHeight == float.MaxValue)
         {
             float maxWidth = 0;
             float maxHeight = 0;
@@ -376,15 +399,18 @@ public static class LayoutEngine
             foreach (var child in overlay.Children)
             {
                 child.CurrentFontSize = overlay.CurrentFontSize;
+                // If dimensions are unconstrained (MaxValue), measure children with that MaxValue
                 MeasureElement(child, contentWidth, contentHeight);
             }
         }
 
         // Guarantee overlays always get valid size for mapping
-        if (FractionalUnit.IsInvalid(contentWidth) || contentWidth == 0)
+        // If unconstrained, we might need to fallback to a reasonable default or keep it MaxValue
+        if (contentWidth == 0 && availableWidth != float.MaxValue)
             contentWidth = availableWidth;
-        if (FractionalUnit.IsInvalid(contentHeight) || contentHeight == 0)
+        if (contentHeight == 0 && availableHeight != float.MaxValue)
             contentHeight = availableHeight;
+            
         overlay.MeasuredContentWidth = contentWidth;
         overlay.MeasuredContentHeight = contentHeight;
     }
@@ -542,7 +568,7 @@ public static class LayoutEngine
         }
         else
         {
-            availableWidth = FractionalUnit.SanitizeWithMax(availableWidth);
+            availableWidth = FractionalUnit.Sanitize(availableWidth);
             div.MeasuredContentWidth = Math.Max(maxWidth, availableWidth);
         }
 
@@ -571,11 +597,16 @@ public static class LayoutEngine
 
         var width = UnitValue.Parse(div.Width);
         var height = UnitValue.Parse(div.Height);
-        if (width.Type == UnitType.Auto && height.Type == UnitType.Auto)
-        {
-            div.MeasuredContentWidth = maxWidth > 0 ? maxWidth : availableWidth;
-            div.MeasuredContentHeight = maxHeight > 0 ? maxHeight : availableHeight;
-        }
+        
+        if (width.Type == UnitType.Auto)
+            div.MeasuredContentWidth = maxWidth;
+        else if (width.Type == UnitType.Fr && availableWidth != float.MaxValue)
+            div.MeasuredContentWidth = availableWidth;
+
+        if (height.Type == UnitType.Auto)
+            div.MeasuredContentHeight = maxHeight;
+        else if (height.Type == UnitType.Fr && availableHeight != float.MaxValue)
+            div.MeasuredContentHeight = availableHeight;
     }
 
     private static void MeasureGeneric(UIElement element, float availableWidth, float availableHeight)

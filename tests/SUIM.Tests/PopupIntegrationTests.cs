@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using Stride.Engine;
+using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
 using StrideUIElement = Stride.UI.UIElement;
@@ -97,16 +98,41 @@ public class PopupIntegrationTests
         return null;
     }
 
+    private static void VerifyNoNaNs(SUIMElement element)
+    {
+        Assert.False(float.IsNaN(element.ActualWidth), $"{element.GetType().Name} ActualWidth is NaN");
+        Assert.False(float.IsNaN(element.ActualHeight), $"{element.GetType().Name} ActualHeight is NaN");
+        Assert.False(float.IsNaN(element.ActualX), $"{element.GetType().Name} ActualX is NaN");
+        Assert.False(float.IsNaN(element.ActualY), $"{element.GetType().Name} ActualY is NaN");
+        Assert.False(float.IsNaN(element.ComputedMarginTop), $"{element.GetType().Name} ComputedMarginTop is NaN");
+        Assert.False(float.IsNaN(element.ComputedMarginBottom), $"{element.GetType().Name} ComputedMarginBottom is NaN");
+        Assert.False(float.IsNaN(element.ComputedMarginLeft), $"{element.GetType().Name} ComputedMarginLeft is NaN");
+        Assert.False(float.IsNaN(element.ComputedMarginRight), $"{element.GetType().Name} ComputedMarginRight is NaN");
+
+        foreach (var child in element.Children)
+        {
+            VerifyNoNaNs(child);
+        }
+    }
+
     private static void PrintStrideWidgetTree(StrideUIElement element, int depth = 0)
     {
         var indent = new string(' ', depth * 2);
         var elementType = element.GetType().Name;
         var name = !string.IsNullOrEmpty(element.Name) ? $" Name='{element.Name}'" : "";
+        var width = element.Width != 0 ? $"Width={element.Width:F2}, " : "";
+        var height = element.Height != 0 ? $"Height={element.Height:F2}, " : "";
+        var actualWidth = element.ActualWidth != 0 ? $"ActualWidth={element.ActualWidth:F2}, " : "";
+        var actualHeight = element.ActualHeight != 0 ? $"ActualHeight={element.ActualHeight:F2}, " : "";
+        var margin = element.Margin != new Thickness() ? $"Margin=({element.Margin.Left:F2},{element.Margin.Top:F2},{element.Margin.Right:F2},{element.Margin.Bottom:F2}), " : "";
+        var abs = element.GetCanvasAbsolutePosition();
+        var left = abs.X != 0 ? $"Left:{abs.X:F2}, " : "";
+        var top = abs.Y != 0 ? $"Top:{abs.Y:F2}, " : "";
+        var rel = element.GetCanvasRelativePosition();
+        var left2 = rel.X != 0 ? $"Left2:{rel.X:F2}, " : "";
+        var top2 = rel.Y != 0 ? $"Top2:{rel.Y:F2}, " : "";
 
-        Console.WriteLine($"{indent}{elementType}{name} | " +
-            $"Width={element.Width}, Height={element.Height}, " +
-            $"ActualWidth={element.ActualWidth:F2}, ActualHeight={element.ActualHeight:F2}, " +
-            $"Margin=({element.Margin.Left:F2},{element.Margin.Top:F2},{element.Margin.Right:F2},{element.Margin.Bottom:F2})");
+        Console.WriteLine($"{indent}{elementType}{name} | " + width + height + actualWidth + actualHeight + margin + left + top + left2 + top2);
 
         depth++;
 
@@ -295,20 +321,24 @@ public class PopupIntegrationTests
         VerifyNoNaNs(suimRoot);
     }
 
-    private void VerifyNoNaNs(SUIMElement element)
+    [Fact]
+    public void Grid_MixedAutoFixed_MeasuresChildren()
     {
-        Assert.False(float.IsNaN(element.ActualWidth), $"{element.GetType().Name} ActualWidth is NaN");
-        Assert.False(float.IsNaN(element.ActualHeight), $"{element.GetType().Name} ActualHeight is NaN");
-        Assert.False(float.IsNaN(element.ActualX), $"{element.GetType().Name} ActualX is NaN");
-        Assert.False(float.IsNaN(element.ActualY), $"{element.GetType().Name} ActualY is NaN");
-        Assert.False(float.IsNaN(element.ComputedMarginTop), $"{element.GetType().Name} ComputedMarginTop is NaN");
-        Assert.False(float.IsNaN(element.ComputedMarginBottom), $"{element.GetType().Name} ComputedMarginBottom is NaN");
-        Assert.False(float.IsNaN(element.ComputedMarginLeft), $"{element.GetType().Name} ComputedMarginLeft is NaN");
-        Assert.False(float.IsNaN(element.ComputedMarginRight), $"{element.GetType().Name} ComputedMarginRight is NaN");
-
-        foreach (var child in element.Children)
-        {
-            VerifyNoNaNs(child);
-        }
+        // Simple View with Grid: Width="auto", Height="200"
+        var markup = @"
+<Div Width='400' Height='400'>
+    <Grid Width='auto' Height='200'>
+        <Label Value='Hello World' Width='100' Height='50' />
+    </Grid>
+</Div>";
+        var game = CreateTestGame();
+        var (strideRoot, _) = new Parser().Parse(markup, game);
+        
+        // Find the grid in the Stride tree
+        var canvas = (Canvas)strideRoot;
+        var grid = (Canvas)canvas.Children[0];         
+        // Grid should have Width=100 (from child) and Height=200 (fixed)
+        Assert.Equal(100f, grid.Width);
+        Assert.Equal(200f, grid.Height);
     }
 }

@@ -319,8 +319,8 @@ public class Parser
         stride.SetCanvasAbsolutePosition(new Vector3(
             FractionalUnit.Sanitize(suim.ActualX),
             FractionalUnit.Sanitize(suim.ActualY), 0));
-        stride.Width = FractionalUnit.Sanitize(suim.ActualWidth);
-        stride.Height = FractionalUnit.Sanitize(suim.ActualHeight);
+        stride.Width = SanitizeSizeForStride(suim.ActualWidth);
+        stride.Height = SanitizeSizeForStride(suim.ActualHeight);
 
         // Use the computed margins from SUIM, which represent the actual margin values applied to the element
         stride.Margin = new Stride.UI.Thickness(
@@ -561,5 +561,13 @@ public class Parser
             }
         }
         catch { }
+    }
+
+    private static float SanitizeSizeForStride(float value)
+    {
+        // Dimensions of MaxValue break Stride UI matrices (infinity)
+        // Dimensions should be resolved to pixels by LayoutEngine, if it's still MaxValue here, it's effectively 0 for rendering
+        if (value == float.MaxValue) return 0;
+        return FractionalUnit.Sanitize(value);
     }
 }

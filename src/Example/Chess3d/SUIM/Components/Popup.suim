@@ -10,12 +10,14 @@
 	</model>
 	<style>
 	.wood-panel {
-		width: auto;
+		width: 500px;
 		height: 220px;
+		gap: 8px;
+		padding: 12px;
 		justify-self: center;
 		align-items: center;
 		backgroundimage: "Assets/seamless-texture-wood-old-oak-small2.jpg";
-		/*shadow: 0 8 16 rgba(0,0,0,0.5);*/
+		shadow: 0 8 16 rgba(0,0,0,0.5);
 	}
 	.hstack2 {
 		gap: 10;
@@ -24,19 +26,17 @@
 	</style>
 
     <overlay visibility="@visibility">
-        <grid class="wood-panel">
-            <vstack gap="8" padding="12">
-                <hstack>
-                    <label value="@title" />
-                </hstack>
-                <vstack margin="6">
-                    <label value="@message" />
-                </vstack>
-                <hstack class="hstack2">
-                    <button onclick="@onYes">YES</button>
-                    <button onclick="@onNo">NO</button>
-                </hstack>
-            </vstack>
-        </grid>
+			<vstack class="wood-panel">
+				<hstack>
+					<label value="@title" />
+				</hstack>
+				<vstack margin="6" scroll="auto">
+					<label value="@message" />
+				</vstack>
+				<hstack class="hstack2">
+					<button onclick="@onYes">YES</button>
+					<button onclick="@onNo">NO</button>
+				</hstack>
+		</vstack>
     </overlay>
 </popup>
