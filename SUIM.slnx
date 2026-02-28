@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/Flexbox/Flexbox.csproj" Id="48fb409f-74d2-4085-af0d-6c1cec76b9c5" />
     <Project Path="src/SUIM/SUIM.csproj" />
     <Project Path="src/SUIMStride/SUIMStride.csproj" />
   </Folder>
