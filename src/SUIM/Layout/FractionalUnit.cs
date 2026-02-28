@@ -40,6 +40,8 @@ public static class FractionalUnit
 
     public static bool IsInvalid(float value)
     {
+        //if (value == float.MaxValue)
+        //    return true;
         return float.IsNaN(value) || float.IsInfinity(value) || value < 0;
     }
 }
