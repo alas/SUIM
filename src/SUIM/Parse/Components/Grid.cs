@@ -1,15 +1,21 @@
 namespace SUIM.Parse.Components;
 
-using System;
-using System.Xml.Linq;
+using SUIM.Flexbox;
 using SUIM.Layout;
 using SUIM.Parse.Components.Attributes;
+using System;
+using System.Xml.Linq;
 
 public class Grid() : LayoutElement(nameof(Grid))
 {
     public string? Columns { get; set; }
     public string? Rows { get; set; }
     public List<GridChild> GridChildren { get; } = [];
+
+    public override void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection)
+    {
+        throw new NotImplementedException();
+    }
 
     public override void AddChild(UIElement child, XElement? element)
     {

@@ -1,3 +1,5 @@
+using SUIM.Flexbox;
+
 namespace SUIM.Parse.Components;
 
 public class Button() : UIElement(nameof(Button))
@@ -5,6 +7,11 @@ public class Button() : UIElement(nameof(Button))
     public string? MouseOverImage { get; set; }
     public string? NotPressedImage { get; set; }
     public string? PressedImage { get; set; }
+
+    public override void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection)
+    {
+        throw new NotImplementedException();
+    }
 
     public override void SetAttribute(string name, object? value)
     {

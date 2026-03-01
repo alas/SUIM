@@ -1,4 +1,4 @@
-namespace Flexbox;
+namespace SUIM.Flexbox;
 
 public partial class Node
 {
@@ -6,21 +6,21 @@ public partial class Node
     {
         if (dimension == Dimension.Width)
         {
-            if (value.unit == Unit.Auto)
+            if (value.Unit == Unit.Auto)
                 StyleSetWidthAuto();
-            else if (value.unit == Unit.Percent)
-                StyleSetWidthPercent(value.value);
-            else if (value.unit == Unit.Point)
-                StyleSetWidth(value.value);
+            else if (value.Unit == Unit.Percent)
+                StyleSetWidthPercent(value.ValueUnit);
+            else if (value.Unit == Unit.Point)
+                StyleSetWidth(value.ValueUnit);
         }
         else
         {
-            if (value.unit == Unit.Auto)
+            if (value.Unit == Unit.Auto)
                 StyleSetHeightAuto();
-            else if (value.unit == Unit.Percent)
-                StyleSetHeightPercent(value.value);
-            else if (value.unit == Unit.Point)
-                StyleSetHeight(value.value);
+            else if (value.Unit == Unit.Percent)
+                StyleSetHeightPercent(value.ValueUnit);
+            else if (value.Unit == Unit.Point)
+                StyleSetHeight(value.ValueUnit);
         }
     }
 
@@ -28,18 +28,18 @@ public partial class Node
     {
         if (dimension == Dimension.Width)
         {
-            if (value.unit == Unit.Percent)
-                StyleSetMinWidthPercent(value.value);
-            else if (value.unit == Unit.Point)
-                StyleSetMinWidth(value.value);
+            if (value.Unit == Unit.Percent)
+                StyleSetMinWidthPercent(value.ValueUnit);
+            else if (value.Unit == Unit.Point)
+                StyleSetMinWidth(value.ValueUnit);
             else StyleSetMinWidth(float.NaN);
         }
         else
         {
-            if (value.unit == Unit.Percent)
-                StyleSetMinHeightPercent(value.value);
-            else if (value.unit == Unit.Point)
-                StyleSetMinHeight(value.value);
+            if (value.Unit == Unit.Percent)
+                StyleSetMinHeightPercent(value.ValueUnit);
+            else if (value.Unit == Unit.Point)
+                StyleSetMinHeight(value.ValueUnit);
             else StyleSetMinHeight(float.NaN);
         }
     }
@@ -48,18 +48,18 @@ public partial class Node
     {
         if (dimension == Dimension.Width)
         {
-            if (value.unit == Unit.Percent)
-                StyleSetMaxWidthPercent(value.value);
-            else if (value.unit == Unit.Point)
-                StyleSetMaxWidth(value.value);
+            if (value.Unit == Unit.Percent)
+                StyleSetMaxWidthPercent(value.ValueUnit);
+            else if (value.Unit == Unit.Point)
+                StyleSetMaxWidth(value.ValueUnit);
             else StyleSetMaxWidth(float.NaN);
         }
         else
         {
-            if (value.unit == Unit.Percent)
-                StyleSetMaxHeightPercent(value.value);
-            else if (value.unit == Unit.Point)
-                StyleSetMaxHeight(value.value);
+            if (value.Unit == Unit.Percent)
+                StyleSetMaxHeightPercent(value.ValueUnit);
+            else if (value.Unit == Unit.Point)
+                StyleSetMaxHeight(value.ValueUnit);
             else StyleSetMaxHeight(float.NaN);
         }
     }
@@ -68,27 +68,27 @@ public partial class Node
     {
         if (tag == "margin")
         {
-            if (value.unit == Unit.Auto)
+            if (value.Unit == Unit.Auto)
                 StyleSetMarginAuto(edge);
-            else if (value.unit == Unit.Percent)
-                StyleSetMarginPercent(edge, value.value);
-            else if (value.unit == Unit.Point)
-                StyleSetMargin(edge, value.value);
+            else if (value.Unit == Unit.Percent)
+                StyleSetMarginPercent(edge, value.ValueUnit);
+            else if (value.Unit == Unit.Point)
+                StyleSetMargin(edge, value.ValueUnit);
             else // if (value.unit == Unit.Undefined)
                 StyleSetMargin(edge, float.NaN);
         }
         else if (tag == "padding")
         {
-            if (value.unit == Unit.Percent)
-                StyleSetPaddingPercent(edge, value.value);
-            else if (value.unit == Unit.Point)
-                StyleSetPadding(edge, value.value);
+            if (value.Unit == Unit.Percent)
+                StyleSetPaddingPercent(edge, value.ValueUnit);
+            else if (value.Unit == Unit.Point)
+                StyleSetPadding(edge, value.ValueUnit);
             else StyleSetPadding(edge, float.NaN);
         }
         else if (tag == "border")
         {
-            if (value.unit == Unit.Point)
-                StyleSetBorder(edge, value.value);
+            if (value.Unit == Unit.Point)
+                StyleSetBorder(edge, value.ValueUnit);
             else StyleSetBorder(edge, float.NaN);
         }
     }
@@ -96,15 +96,15 @@ public partial class Node
     public void StyleSetWidth(float width)
     {
         var dim = this.nodeStyle.Dimensions[(int)Dimension.Width];
-        if (dim.value != width || dim.unit != Unit.Point)
+        if (dim.ValueUnit != width || dim.Unit != Unit.Point)
         {
-            dim.value = width;
-            dim.unit = Unit.Point;
+            var unit = Unit.Point;
             if (Flex.FloatIsUndefined(width))
             {
-                dim.unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Dimensions[(int)Dimension.Width] = new(width, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -112,15 +112,15 @@ public partial class Node
     public void StyleSetWidthPercent(float width)
     {
         var dim = this.nodeStyle.Dimensions[(int)Dimension.Width];
-        if (dim.value != width || dim.unit != Unit.Percent)
+        if (dim.ValueUnit != width || dim.Unit != Unit.Percent)
         {
-            dim.value = width;
-            dim.unit = Unit.Percent;
+            var unit = Unit.Percent;
             if (Flex.FloatIsUndefined(width))
             {
-                dim.unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Dimensions[(int)Dimension.Width] = new(width, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -128,30 +128,29 @@ public partial class Node
     public void StyleSetWidthAuto()
     {
         var dim = this.nodeStyle.Dimensions[(int)Dimension.Width];
-        if (dim.unit != Unit.Auto)
+        if (dim.Unit != Unit.Auto)
         {
-            dim.value = float.NaN;
-            dim.unit = Unit.Auto;
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Dimensions[(int)Dimension.Width] = new(float.NaN, Unit.Auto);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
     // StyleGetWidth gets width
-    public Value StyleGetWidth() => this.nodeStyle.Dimensions[(int)Dimension.Width];
+    public Value StyleGetWidth() => nodeStyle.Dimensions[(int)Dimension.Width];
 
     // StyleSetHeight sets height
     public void StyleSetHeight(float height)
     {
         var dim = this.nodeStyle.Dimensions[(int)Dimension.Height];
-        if (dim.value != height || dim.unit != Unit.Point)
+        if (dim.ValueUnit != height || dim.Unit != Unit.Point)
         {
-            dim.value = height;
-            dim.unit = Unit.Point;
+            var unit = Unit.Point;
             if (Flex.FloatIsUndefined(height))
             {
-                dim.unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Dimensions[(int)Dimension.Height] = new(height, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -159,15 +158,15 @@ public partial class Node
     public void StyleSetHeightPercent(float height)
     {
         var dim = this.nodeStyle.Dimensions[(int)Dimension.Height];
-        if (dim.value != height || dim.unit != Unit.Percent)
+        if (dim.ValueUnit != height || dim.Unit != Unit.Percent)
         {
-            dim.value = height;
-            dim.unit = Unit.Percent;
+            var unit = Unit.Percent;
             if (Flex.FloatIsUndefined(height))
             {
-                dim.unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Dimensions[(int)Dimension.Height] = new(height, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -175,11 +174,10 @@ public partial class Node
     public void StyleSetHeightAuto()
     {
         var dim = this.nodeStyle.Dimensions[(int)Dimension.Height];
-        if (dim.unit != Unit.Auto)
+        if (dim.Unit != Unit.Auto)
         {
-            dim.value = float.NaN;
-            dim.unit = Unit.Auto;
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Dimensions[(int)Dimension.Height] = new(float.NaN, Unit.Auto);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -192,7 +190,7 @@ public partial class Node
         if (this.nodeStyle.PositionType != positionType)
         {
             this.nodeStyle.PositionType = positionType;
-            Flex.nodeMarkDirtyInternal(this);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -202,15 +200,15 @@ public partial class Node
     public void StyleSetPosition(Edge edge, float position)
     {
         var pos = this.nodeStyle.Position[(int)edge];
-        if (pos.value != position || pos.unit != Unit.Point)
+        if (pos.ValueUnit != position || pos.Unit != Unit.Point)
         {
-            pos.value = position;
-            pos.unit = Unit.Point;
+            var unit = Unit.Point;
             if (Flex.FloatIsUndefined(position))
             {
-                pos.unit = Unit.Undefined;
+                unit = Unit.Undefined;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Position[(int)edge] = new(position, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -218,15 +216,15 @@ public partial class Node
     public void StyleSetPositionPercent(Edge edge, float position)
     {
         var pos = this.nodeStyle.Position[(int)edge];
-        if (pos.value != position || pos.unit != Unit.Percent)
+        if (pos.ValueUnit != position || pos.Unit != Unit.Percent)
         {
-            pos.value = position;
-            pos.unit = Unit.Percent;
+            var unit = Unit.Percent;
             if (Flex.FloatIsUndefined(position))
             {
-                pos.unit = Unit.Undefined;
+                unit = Unit.Undefined;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Position[(int)edge] = new(position, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -239,7 +237,7 @@ public partial class Node
         if (this.nodeStyle.Direction != direction)
         {
             this.nodeStyle.Direction = direction;
-            Flex.nodeMarkDirtyInternal(this);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -251,7 +249,7 @@ public partial class Node
         if (this.nodeStyle.FlexDirection != flexDirection)
         {
             this.nodeStyle.FlexDirection = flexDirection;
-            Flex.nodeMarkDirtyInternal(this);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -263,7 +261,7 @@ public partial class Node
         if (this.nodeStyle.JustifyContent != justifyContent)
         {
             this.nodeStyle.JustifyContent = justifyContent;
-            Flex.nodeMarkDirtyInternal(this);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -275,7 +273,7 @@ public partial class Node
         if (this.nodeStyle.AlignContent != alignContent)
         {
             this.nodeStyle.AlignContent = alignContent;
-            Flex.nodeMarkDirtyInternal(this);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -287,7 +285,7 @@ public partial class Node
         if (this.nodeStyle.AlignItems != alignItems)
         {
             this.nodeStyle.AlignItems = alignItems;
-            Flex.nodeMarkDirtyInternal(this);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -299,7 +297,7 @@ public partial class Node
         if (this.nodeStyle.AlignSelf != alignSelf)
         {
             this.nodeStyle.AlignSelf = alignSelf;
-            Flex.nodeMarkDirtyInternal(this);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -311,7 +309,7 @@ public partial class Node
         if (this.nodeStyle.FlexWrap != flexWrap)
         {
             this.nodeStyle.FlexWrap = flexWrap;
-            Flex.nodeMarkDirtyInternal(this);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -323,7 +321,7 @@ public partial class Node
         if (this.nodeStyle.Overflow != overflow)
         {
             this.nodeStyle.Overflow = overflow;
-            Flex.nodeMarkDirtyInternal(this);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -335,7 +333,7 @@ public partial class Node
         if (this.nodeStyle.Display != display)
         {
             this.nodeStyle.Display = display;
-            Flex.nodeMarkDirtyInternal(this);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -348,7 +346,7 @@ public partial class Node
         if (this.nodeStyle.FlexGrow != flexGrow)
         {
             this.nodeStyle.FlexGrow = flexGrow;
-            Flex.nodeMarkDirtyInternal(this);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -382,50 +380,49 @@ public partial class Node
         if (this.nodeStyle.FlexShrink != flexShrink)
         {
             this.nodeStyle.FlexShrink = flexShrink;
-            Flex.nodeMarkDirtyInternal(this);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
     // StyleSetFlexBasis sets flex basis
     public void StyleSetFlexBasis(float flexBasis)
     {
-        if (this.nodeStyle.FlexBasis.value != flexBasis ||
-            this.nodeStyle.FlexBasis.unit != Unit.Point)
+        if (this.nodeStyle.FlexBasis.ValueUnit != flexBasis ||
+            this.nodeStyle.FlexBasis.Unit != Unit.Point)
         {
-            this.nodeStyle.FlexBasis.value = flexBasis;
-            this.nodeStyle.FlexBasis.unit = Unit.Point;
+            var unit = Unit.Point;
             if (Flex.FloatIsUndefined(flexBasis))
             {
-                this.nodeStyle.FlexBasis.unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.FlexBasis = new(flexBasis, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
     // StyleSetFlexBasisPercent sets flex basis percent
     public void StyleSetFlexBasisPercent(float flexBasis)
     {
-        if (this.nodeStyle.FlexBasis.value != flexBasis ||
-            this.nodeStyle.FlexBasis.unit != Unit.Percent)
+        if (this.nodeStyle.FlexBasis.ValueUnit != flexBasis ||
+            this.nodeStyle.FlexBasis.Unit != Unit.Percent)
         {
-            this.nodeStyle.FlexBasis.value = flexBasis;
-            this.nodeStyle.FlexBasis.unit = Unit.Percent;
+            var unit = Unit.Percent;
             if (Flex.FloatIsUndefined(flexBasis))
             {
-                this.nodeStyle.FlexBasis.unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.FlexBasis = new(flexBasis, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
     // NodeStyleSetFlexBasisAuto sets flex basis auto
     public void NodeStyleSetFlexBasisAuto()
     {
-        if (this.nodeStyle.FlexBasis.unit != Unit.Auto)
+        if (this.nodeStyle.FlexBasis.Unit != Unit.Auto)
         {
-            this.nodeStyle.FlexBasis.value = float.NaN;
-            this.nodeStyle.FlexBasis.unit = Unit.Auto;
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.FlexBasis = new(float.NaN, Unit.Auto);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -434,32 +431,32 @@ public partial class Node
     // StyleSetMargin sets margin
     public void StyleSetMargin(Edge edge, float margin)
     {
-        if (this.nodeStyle.Margin[(int)edge].value != margin ||
-            this.nodeStyle.Margin[(int)edge].unit != Unit.Point)
+        if (this.nodeStyle.Margin[(int)edge].ValueUnit != margin ||
+            this.nodeStyle.Margin[(int)edge].Unit != Unit.Point)
         {
-            this.nodeStyle.Margin[(int)edge].value = margin;
-            this.nodeStyle.Margin[(int)edge].unit = Unit.Point;
+            var unit = Unit.Point;
             if (Flex.FloatIsUndefined(margin))
             {
-                this.nodeStyle.Margin[(int)edge].unit = Unit.Undefined;
+                unit = Unit.Undefined;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Margin[(int)edge] = new(margin, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
     // StyleSetMarginPercent sets margin percent
     public void StyleSetMarginPercent(Edge edge, float margin)
     {
-        if (this.nodeStyle.Margin[(int)edge].value != margin ||
-            this.nodeStyle.Margin[(int)edge].unit != Unit.Percent)
+        if (this.nodeStyle.Margin[(int)edge].ValueUnit != margin ||
+            this.nodeStyle.Margin[(int)edge].Unit != Unit.Percent)
         {
-            this.nodeStyle.Margin[(int)edge].value = margin;
-            this.nodeStyle.Margin[(int)edge].unit = Unit.Percent;
+            var unit = Unit.Percent;
             if (Flex.FloatIsUndefined(margin))
             {
-                this.nodeStyle.Margin[(int)edge].unit = Unit.Undefined;
+                unit = Unit.Undefined;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Margin[(int)edge] = new(margin, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -469,43 +466,42 @@ public partial class Node
     // StyleSetMarginAuto sets margin auto
     public void StyleSetMarginAuto(Edge edge)
     {
-        if (this.nodeStyle.Margin[(int)edge].unit != Unit.Auto)
+        if (this.nodeStyle.Margin[(int)edge].Unit != Unit.Auto)
         {
-            this.nodeStyle.Margin[(int)edge].value = float.NaN;
-            this.nodeStyle.Margin[(int)edge].unit = Unit.Auto;
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Margin[(int)edge] = new(float.NaN, Unit.Auto);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
     // StyleSetPadding sets padding
     public void StyleSetPadding(Edge edge, float padding)
     {
-        if (this.nodeStyle.Padding[(int)edge].value != padding ||
-            this.nodeStyle.Padding[(int)edge].unit != Unit.Point)
+        if (this.nodeStyle.Padding[(int)edge].ValueUnit != padding ||
+            this.nodeStyle.Padding[(int)edge].Unit != Unit.Point)
         {
-            this.nodeStyle.Padding[(int)edge].value = padding;
-            this.nodeStyle.Padding[(int)edge].unit = Unit.Point;
+            var unit = Unit.Point;
             if (Flex.FloatIsUndefined(padding))
             {
-                this.nodeStyle.Padding[(int)edge].unit = Unit.Undefined;
+                unit = Unit.Undefined;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Padding[(int)edge] = new(padding, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
     // StyleSetPaddingPercent sets padding percent
     public void StyleSetPaddingPercent(Edge edge, float padding)
     {
-        if (this.nodeStyle.Padding[(int)edge].value != padding ||
-            this.nodeStyle.Padding[(int)edge].unit != Unit.Percent)
+        if (this.nodeStyle.Padding[(int)edge].ValueUnit != padding ||
+            this.nodeStyle.Padding[(int)edge].Unit != Unit.Percent)
         {
-            this.nodeStyle.Padding[(int)edge].value = padding;
-            this.nodeStyle.Padding[(int)edge].unit = Unit.Percent;
+            var unit = Unit.Percent;
             if (Flex.FloatIsUndefined(padding))
             {
-                this.nodeStyle.Padding[(int)edge].unit = Unit.Undefined;
+                unit = Unit.Undefined;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Padding[(int)edge] = new(padding, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -515,51 +511,51 @@ public partial class Node
     // StyleSetBorder sets border
     public void StyleSetBorder(Edge edge, float border)
     {
-        if (this.nodeStyle.Border[(int)edge].value != border ||
-            this.nodeStyle.Border[(int)edge].unit != Unit.Point)
+        if (this.nodeStyle.Border[(int)edge].ValueUnit != border ||
+            this.nodeStyle.Border[(int)edge].Unit != Unit.Point)
         {
-            this.nodeStyle.Border[(int)edge].value = border;
-            this.nodeStyle.Border[(int)edge].unit = Unit.Point;
+            var unit = Unit.Point;
             if (Flex.FloatIsUndefined(border))
             {
-                this.nodeStyle.Border[(int)edge].unit = Unit.Undefined;
+                unit = Unit.Undefined;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.Border[(int)edge] = new(border, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
     // StyleGetBorder gets border
-    public float StyleGetBorder(Edge edge) => this.nodeStyle.Border[(int)edge].value;
+    public float StyleGetBorder(Edge edge) => this.nodeStyle.Border[(int)edge].ValueUnit;
 
     // StyleSetMinWidth sets min width
     public void StyleSetMinWidth(float minWidth)
     {
-        if (this.nodeStyle.MinDimensions[(int)Dimension.Width].value != minWidth ||
-            this.nodeStyle.MinDimensions[(int)Dimension.Width].unit != Unit.Point)
+        if (this.nodeStyle.MinDimensions[(int)Dimension.Width].ValueUnit != minWidth ||
+            this.nodeStyle.MinDimensions[(int)Dimension.Width].Unit != Unit.Point)
         {
-            this.nodeStyle.MinDimensions[(int)Dimension.Width].value = minWidth;
-            this.nodeStyle.MinDimensions[(int)Dimension.Width].unit = Unit.Point;
+            var unit = Unit.Point;
             if (Flex.FloatIsUndefined(minWidth))
             {
-                this.nodeStyle.MinDimensions[(int)Dimension.Width].unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.MinDimensions[(int)Dimension.Width] = new(minWidth, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
     // StyleSetMinWidthPercent sets width percent
     public void StyleSetMinWidthPercent(float minWidth)
     {
-        if (this.nodeStyle.MinDimensions[(int)Dimension.Width].value != minWidth ||
-            this.nodeStyle.MinDimensions[(int)Dimension.Width].unit != Unit.Percent)
+        if (this.nodeStyle.MinDimensions[(int)Dimension.Width].ValueUnit != minWidth ||
+            this.nodeStyle.MinDimensions[(int)Dimension.Width].Unit != Unit.Percent)
         {
-            this.nodeStyle.MinDimensions[(int)Dimension.Width].value = minWidth;
-            this.nodeStyle.MinDimensions[(int)Dimension.Width].unit = Unit.Percent;
+            var unit = Unit.Percent;
             if (Flex.FloatIsUndefined(minWidth))
             {
-                this.nodeStyle.MinDimensions[(int)Dimension.Width].unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.MinDimensions[(int)Dimension.Width] = new(minWidth, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -569,32 +565,32 @@ public partial class Node
     // StyleSetMinHeight sets min width
     public void StyleSetMinHeight(float minHeight)
     {
-        if (this.nodeStyle.MinDimensions[(int)Dimension.Height].value != minHeight ||
-            this.nodeStyle.MinDimensions[(int)Dimension.Height].unit != Unit.Point)
+        if (this.nodeStyle.MinDimensions[(int)Dimension.Height].ValueUnit != minHeight ||
+            this.nodeStyle.MinDimensions[(int)Dimension.Height].Unit != Unit.Point)
         {
-            this.nodeStyle.MinDimensions[(int)Dimension.Height].value = minHeight;
-            this.nodeStyle.MinDimensions[(int)Dimension.Height].unit = Unit.Point;
+            var unit = Unit.Point;
             if (Flex.FloatIsUndefined(minHeight))
             {
-                this.nodeStyle.MinDimensions[(int)Dimension.Height].unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.MinDimensions[(int)Dimension.Height] = new(minHeight, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
     // StyleSetMinHeightPercent sets min height percent
     public void StyleSetMinHeightPercent(float minHeight)
     {
-        if (this.nodeStyle.MinDimensions[(int)Dimension.Height].value != minHeight ||
-            this.nodeStyle.MinDimensions[(int)Dimension.Height].unit != Unit.Percent)
+        if (this.nodeStyle.MinDimensions[(int)Dimension.Height].ValueUnit != minHeight ||
+            this.nodeStyle.MinDimensions[(int)Dimension.Height].Unit != Unit.Percent)
         {
-            this.nodeStyle.MinDimensions[(int)Dimension.Height].value = minHeight;
-            this.nodeStyle.MinDimensions[(int)Dimension.Height].unit = Unit.Percent;
+            var unit = Unit.Percent;
             if (Flex.FloatIsUndefined(minHeight))
             {
-                this.nodeStyle.MinDimensions[(int)Dimension.Height].unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.MinDimensions[(int)Dimension.Height] = new(minHeight, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -604,32 +600,32 @@ public partial class Node
     // StyleSetMaxWidth sets max width
     public void StyleSetMaxWidth(float maxWidth)
     {
-        if (this.nodeStyle.MaxDimensions[(int)Dimension.Width].value != maxWidth ||
-            this.nodeStyle.MaxDimensions[(int)Dimension.Width].unit != Unit.Point)
+        if (this.nodeStyle.MaxDimensions[(int)Dimension.Width].ValueUnit != maxWidth ||
+            this.nodeStyle.MaxDimensions[(int)Dimension.Width].Unit != Unit.Point)
         {
-            this.nodeStyle.MaxDimensions[(int)Dimension.Width].value = maxWidth;
-            this.nodeStyle.MaxDimensions[(int)Dimension.Width].unit = Unit.Point;
+            var unit = Unit.Point;
             if (Flex.FloatIsUndefined(maxWidth))
             {
-                this.nodeStyle.MaxDimensions[(int)Dimension.Width].unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.MaxDimensions[(int)Dimension.Width] = new(maxWidth, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
     // StyleSetMaxWidthPercent sets max width percent
     public void StyleSetMaxWidthPercent(float maxWidth)
     {
-        if (this.nodeStyle.MaxDimensions[(int)Dimension.Width].value != maxWidth ||
-            this.nodeStyle.MaxDimensions[(int)Dimension.Width].unit != Unit.Percent)
+        if (this.nodeStyle.MaxDimensions[(int)Dimension.Width].ValueUnit != maxWidth ||
+            this.nodeStyle.MaxDimensions[(int)Dimension.Width].Unit != Unit.Percent)
         {
-            this.nodeStyle.MaxDimensions[(int)Dimension.Width].value = maxWidth;
-            this.nodeStyle.MaxDimensions[(int)Dimension.Width].unit = Unit.Percent;
+            var unit = Unit.Percent;
             if (Flex.FloatIsUndefined(maxWidth))
             {
-                this.nodeStyle.MaxDimensions[(int)Dimension.Width].unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.MaxDimensions[(int)Dimension.Width] = new(maxWidth, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -639,32 +635,32 @@ public partial class Node
     // StyleSetMaxHeight sets max width
     public void StyleSetMaxHeight(float maxHeight)
     {
-        if (this.nodeStyle.MaxDimensions[(int)Dimension.Height].value != maxHeight ||
-            this.nodeStyle.MaxDimensions[(int)Dimension.Height].unit != Unit.Point)
+        if (this.nodeStyle.MaxDimensions[(int)Dimension.Height].ValueUnit != maxHeight ||
+            this.nodeStyle.MaxDimensions[(int)Dimension.Height].Unit != Unit.Point)
         {
-            this.nodeStyle.MaxDimensions[(int)Dimension.Height].value = maxHeight;
-            this.nodeStyle.MaxDimensions[(int)Dimension.Height].unit = Unit.Point;
+            var unit = Unit.Point;
             if (Flex.FloatIsUndefined(maxHeight))
             {
-                this.nodeStyle.MaxDimensions[(int)Dimension.Height].unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.MaxDimensions[(int)Dimension.Height] = new(maxHeight, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
     // StyleSetMaxHeightPercent sets max height percent
     public void StyleSetMaxHeightPercent(float maxHeight)
     {
-        if (this.nodeStyle.MaxDimensions[(int)Dimension.Height].value != maxHeight ||
-            this.nodeStyle.MaxDimensions[(int)Dimension.Height].unit != Unit.Percent)
+        if (this.nodeStyle.MaxDimensions[(int)Dimension.Height].ValueUnit != maxHeight ||
+            this.nodeStyle.MaxDimensions[(int)Dimension.Height].Unit != Unit.Percent)
         {
-            this.nodeStyle.MaxDimensions[(int)Dimension.Height].value = maxHeight;
-            this.nodeStyle.MaxDimensions[(int)Dimension.Height].unit = Unit.Percent;
+            var unit = Unit.Percent;
             if (Flex.FloatIsUndefined(maxHeight))
             {
-                this.nodeStyle.MaxDimensions[(int)Dimension.Height].unit = Unit.Auto;
+                unit = Unit.Auto;
             }
-            Flex.nodeMarkDirtyInternal(this);
+            this.nodeStyle.MaxDimensions[(int)Dimension.Height] = new(maxHeight, unit);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 
@@ -677,7 +673,7 @@ public partial class Node
         if (this.nodeStyle.AspectRatio != aspectRatio)
         {
             this.nodeStyle.AspectRatio = aspectRatio;
-            Flex.nodeMarkDirtyInternal(this);
+            Flex.NodeMarkDirtyInternal(this);
         }
     }
 }

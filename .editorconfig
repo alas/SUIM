@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# IDE0022: Use block body for method
+dotnet_diagnostic.IDE0022.severity = warning

@@ -1,4 +1,4 @@
-namespace Flexbox;
+namespace SUIM.Flexbox;
 
 public partial class Flex
 {
@@ -413,14 +413,14 @@ public partial class Flex
             uu = Unit.Point;
         }
 
-        if (float.TryParse(dig, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out res.value))
+        if (float.TryParse(dig, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var value))
         {
-            res.unit = uu;
+            res = new Value(value, uu);
         }
         else
         {
             parsed = false;
-            res.unit = Unit.Undefined;
+            //res.Unit = Unit.Undefined;
         }
         valueDictionaryCache.Add(text, res);
         result = res;

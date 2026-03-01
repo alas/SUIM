@@ -1,4 +1,4 @@
-namespace Flexbox;
+namespace SUIM.Flexbox;
 
 public class Config
 {
@@ -54,7 +54,7 @@ public class Config
     // SetPointScaleFactor sets scale factor
     public void SetPointScaleFactor(float pixelsInPoint)
     {
-        assertWithConfig(this, pixelsInPoint >= 0, "Scale factor should not be less than zero");
+        AssertWithConfig(this, pixelsInPoint >= 0, "Scale factor should not be less than zero");
 
         // We store points for Pixel as we will use it for rounding
         if (pixelsInPoint == 0)
@@ -68,7 +68,7 @@ public class Config
         }
     }
 
-    internal static void assertWithConfig(Config config, bool condition, string message)
+    internal static void AssertWithConfig(Config config, bool condition, string message)
     {
         if (!condition)
         {

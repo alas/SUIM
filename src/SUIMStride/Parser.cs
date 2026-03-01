@@ -107,7 +107,7 @@ public class Parser
             preferredWidth = game.GraphicsDeviceManager.PreferredBackBufferWidth;
             preferredHeight = game.GraphicsDeviceManager.PreferredBackBufferHeight;
         }
-        LayoutEngine.Layout(root, defaultFontSize, preferredWidth, preferredHeight);
+        //LayoutEngine.Layout(root, defaultFontSize, preferredWidth, preferredHeight);
     }
 
     /// <summary>
@@ -185,7 +185,7 @@ public class Parser
 
     private TextBlock MapText(Text text)
     {
-        var fontSize = text.FontSize != null ? text.ToPixels(UnitValue.Parse(text.FontSize)) : 0f;
+        var fontSize = text.FontSize != null ? SUIMElement.ToPixels(UnitValue.Parse(text.FontSize)) : 0f;
         if (fontSize <= 0f)
         {
             fontSize = 16f; // Default font size if not specified or invalid
@@ -348,10 +348,10 @@ public class Parser
     {
         var thickness = SUIM.Parse.Components.Attributes.Thickness.Parse(thicknessString);
         return new Stride.UI.Thickness(
-            suim.ToPixels(thickness.Left),
-            suim.ToPixels(thickness.Top),
-            suim.ToPixels(thickness.Right),
-            suim.ToPixels(thickness.Bottom));
+            SUIMElement.ToPixels(thickness.Left),
+            SUIMElement.ToPixels(thickness.Top),
+            SUIMElement.ToPixels(thickness.Right),
+            SUIMElement.ToPixels(thickness.Bottom));
     }
 
     private static Color ParseColor(string colorStr)

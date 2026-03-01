@@ -1,4 +1,4 @@
-namespace Flexbox;
+namespace SUIM.Flexbox;
 
 public partial class Flex
 {

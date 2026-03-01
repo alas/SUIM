@@ -39,20 +39,6 @@ public record struct UnitValue(float Value, UnitType Type = UnitType.Pixels)
         // Handle auto
         if (value.Equals("auto", StringComparison.OrdinalIgnoreCase))
             return new UnitValue(0, UnitType.Auto);
-            
-        // Handle rem
-        if (value.EndsWith("rem", StringComparison.OrdinalIgnoreCase))
-        {
-            if (float.TryParse(value[..^3], out float remValue))
-                return new UnitValue(remValue, UnitType.Rem);
-        }
-        
-        // Handle em
-        if (value.EndsWith("em", StringComparison.OrdinalIgnoreCase))
-        {
-            if (float.TryParse(value[..^2], out float emValue))
-                return new UnitValue(emValue, UnitType.Em);
-        }
         
         // Handle px suffix (web-friendly)
         if (value.EndsWith("px", StringComparison.OrdinalIgnoreCase))
@@ -76,7 +62,6 @@ public enum UnitType
     None,
     Pixels,
     Rem,      // Root em - relative to root font size
-    Em,       // Relative to parent font size  
     Fr,       // Fractional units - proportional space (CSS Grid's fr unit)
     Auto      // Content-based sizing
 }

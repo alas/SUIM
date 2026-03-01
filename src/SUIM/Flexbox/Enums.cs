@@ -1,4 +1,4 @@
-namespace Flexbox;
+namespace SUIM.Flexbox;
 
 public enum Align
 {
@@ -20,7 +20,6 @@ public enum Dimension
 
 public enum Direction
 {
-
     Inherit = 0,
     LTR,
     RTL,
@@ -45,7 +44,6 @@ public enum Edge : int
     Vertical,
     All,
 }
-
 
 public enum ExperimentalFeature
 {

@@ -1,4 +1,4 @@
-﻿namespace Flexbox;
+﻿namespace SUIM.Flexbox;
 
 public class Style
 {
@@ -75,7 +75,7 @@ public class Style
     };
 
     // Reports that styles have changed values that affect to layout    
-    public bool layoutDirty
+    public bool LayoutDirty
     {
         get
         {
@@ -101,7 +101,7 @@ public class Style
     // use to store attrs values which changed by animation(see ApplyAnimation())
     protected readonly Dictionary<string, string> layoutAttributeAnimated = [];
 
-    private static Dictionary<string, int> edgeNameToId = new()
+    private static readonly Dictionary<string, int> edgeNameToId = new()
         {
             {"left", (int) Edge.Left},
             {"top", (int) Edge.Top},
@@ -135,7 +135,7 @@ public class Style
                 var name = attr == "border-width" ? "border" : attr;
                 if (Flex.ParseFourValueFromString(value, out var vals))
                     foreach (var kv in edgeNameToId)
-                        this[name + "-" + kv.Key + tail] = $"{vals![kv.Value].value.ToString("F", System.Globalization.CultureInfo.InvariantCulture)}{(vals[kv.Value].unit == Unit.Percent ? "%" : "")}";
+                        this[name + "-" + kv.Key + tail] = $"{vals![kv.Value].ValueUnit.ToString("F", System.Globalization.CultureInfo.InvariantCulture)}{(vals[kv.Value].Unit == Unit.Percent ? "%" : "")}";
                 else
                     throw new Exception("Failed to parse attribute [" + attr + ":" + value + "]");
 
@@ -301,7 +301,7 @@ public class Style
         dest.Display = src.Display;
         dest.FlexGrow = src.FlexGrow;
         dest.FlexShrink = src.FlexShrink;
-        dest.FlexBasis = src.FlexBasis.Clone();
+        dest.FlexBasis = src.FlexBasis;
 
         Value.CopyValue(dest.Margin, src.Margin);
         Value.CopyValue(dest.Position, src.Position);

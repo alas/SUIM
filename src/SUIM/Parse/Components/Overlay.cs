@@ -1,3 +1,5 @@
+using SUIM.Flexbox;
+
 namespace SUIM.Parse.Components;
 
 public class Overlay : LayoutElement
@@ -6,5 +8,10 @@ public class Overlay : LayoutElement
     {
         StopClicks = "true";
         BackgroundColor = "#80000000";
+    }
+
+    public override void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection)
+    {
+        throw new NotImplementedException();
     }
 }

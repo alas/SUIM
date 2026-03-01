@@ -1,4 +1,4 @@
-namespace Flexbox;
+namespace SUIM.Flexbox;
 
 public partial class Node
 {
@@ -7,7 +7,7 @@ public partial class Node
     internal int lineIndex;
 
     private Layout? _layout = null;
-    public Layout layout
+    public Layout Layout
     {
         get
         {
@@ -22,8 +22,8 @@ public partial class Node
 
     public int ChildrenCount { get { return Children.Count; } }
 
-    public Node? firstChild { get { return Children.Count > 0 ? Children.First() : null; } }
-    public Node? lastChild { get { return Children.Count > 0 ? Children.Last() : null; } }
+    public Node? FirstChild { get { return Children.Count > 0 ? Children.First() : null; } }
+    public Node? LastChild { get { return Children.Count > 0 ? Children.Last() : null; } }
 
     internal Node? NextChild;
 
@@ -59,7 +59,7 @@ public partial class Node
         _layout = null;
         Flex.CalculateLayout(this, parentWidth, parentHeight, parentDirection);
     }
-    public void MarkAsDirty() => Flex.nodeMarkDirtyInternal(this);
+    public void MarkAsDirty() => Flex.NodeMarkDirtyInternal(this);
 
 
     #region Layout
@@ -195,6 +195,4 @@ public partial class Node
     public void InsertChild(Node child, int idx) => Flex.InsertChild(this, child, idx);
     public void RemoveChild(Node child) => Flex.RemoveChild(this, child);
     #endregion
-
-
 }

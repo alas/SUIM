@@ -92,22 +92,6 @@ public class LayoutTests
     }
     
     [Fact]
-    public void UnitValue_ParseRem()
-    {
-        var unit = UnitValue.Parse("2rem");
-        Assert.Equal(2, unit.Value);
-        Assert.Equal(UnitType.Rem, unit.Type);
-    }
-    
-    [Fact]
-    public void UnitValue_ParseEm()
-    {
-        var unit = UnitValue.Parse("1.5em");
-        Assert.Equal(1.5f, unit.Value);
-        Assert.Equal(UnitType.Em, unit.Type);
-    }
-    
-    [Fact]
     public void UnitValue_ParseFractionalUnits()
     {
         var unit = UnitValue.Parse("2fr");
@@ -155,7 +139,7 @@ public class LayoutTests
             RootFontSize = 16f,
             Width = "2rem",
         };
-        var pixels = div.ToPixels(div.Width);
+        var pixels = UIElement.ToPixels(div.Width);
         Assert.Equal(32, pixels); // 2 * 16
     }
     
@@ -167,7 +151,7 @@ public class LayoutTests
             RootFontSize = 20f,
             Width = "1.5em",
         };
-        var pixels = div.ToPixels(div.Width);
+        var pixels = UIElement.ToPixels(div.Width);
         Assert.Equal(30, pixels); // 1.5 * 20
     }
     

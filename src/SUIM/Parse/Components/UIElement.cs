@@ -1,7 +1,8 @@
 namespace SUIM.Parse.Components;
 
-using System.Xml.Linq;
+using SUIM.Flexbox;
 using SUIM.Parse.Components.Attributes;
+using System.Xml.Linq;
 
 public abstract class UIElement(string tagName)
 {
@@ -255,15 +256,13 @@ public abstract class UIElement(string tagName)
         return null;
     }
 
-    public float ToPixels(string? value) => ToPixels(UnitValue.Parse(value));
+    public static float ToPixels(string? value) => ToPixels(UnitValue.Parse(value));
 
-    public float ToPixels(UnitValue unitValue)
+    public static float ToPixels(UnitValue unitValue)
     {
         float val = unitValue.Type switch
         {
             UnitType.Pixels => unitValue.Value,
-            UnitType.Rem => unitValue.Value * RootFontSize,
-            UnitType.Em => unitValue.Value * (Parent?.FontSize is string s ? Convert.ToSingle(s) : RootFontSize),
             UnitType.Auto => 0f, // Will be calculated during layout
             UnitType.Fr => 0f, // Will be calculated during fr distribution
             _ => 0f
@@ -277,11 +276,13 @@ public abstract class UIElement(string tagName)
         if (IsComponentRoot) return null;
         return Parent?.GetEffectiveModel();
     }
+
+    public abstract void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection);
 }
 
 public record BindingDefinition(string TargetPropertyName, string ModelPropertyName);
 
-public class LayoutElement(string tagName) : UIElement(tagName)
+public abstract class LayoutElement(string tagName) : UIElement(tagName)
 {
     public string? Gap { get; set; }
     public string? RowGap { get; set; }

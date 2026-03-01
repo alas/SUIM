@@ -1,5 +1,4 @@
-namespace Flexbox;
-
+namespace SUIM.Flexbox;
 
 // MeasureFunc describes function for measuring
 public delegate Size MeasureFunc(Node node, float width, MeasureMode widthMode, float height, MeasureMode heightMode);

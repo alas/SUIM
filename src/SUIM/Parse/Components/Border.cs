@@ -1,8 +1,15 @@
+using SUIM.Flexbox;
+
 namespace SUIM.Parse.Components;
 
 public class Border() : UIElement(nameof(Border))
 {
     public string? Thickness { get; set; }
+
+    public override void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection)
+    {
+        throw new NotImplementedException();
+    }
 
     public override void SetAttribute(string name, object? value)
     {
