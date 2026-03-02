@@ -50,15 +50,16 @@ public static class Style
                 // Apply the same properties to all selectors, merging with existing properties
                 foreach (var selector in selectors)
                 {
-                    if (!styles.ContainsKey(selector))
+                    if (!styles.TryGetValue(selector, out Dictionary<string, string>? value))
                     {
-                        styles[selector] = new Dictionary<string, string>();
+                        value = new Dictionary<string, string>();
+                        styles[selector] = value;
                     }
 
                     // Merge properties: new properties override existing ones with the same name
                     foreach (var kvp in properties)
                     {
-                        styles[selector][kvp.Key] = kvp.Value;
+                        value[kvp.Key] = kvp.Value;
                     }
                 }
             }
@@ -269,7 +270,10 @@ public static class Style
         "left", "top", "z-index", "anchor"
     };
 
-    private static bool IsLayoutAttribute(string name) => LayoutAttributeNames.Contains(name);
+    private static bool IsLayoutAttribute(string name)
+    {
+        return LayoutAttributeNames.Contains(name);
+    }
 }
 
 internal static partial class StyleParserRegexes

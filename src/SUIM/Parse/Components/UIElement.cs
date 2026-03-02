@@ -4,6 +4,8 @@ using SUIM.Flexbox;
 using SUIM.Parse.Components.Attributes;
 using System.Xml.Linq;
 
+public class LayoutEngine { public static void Layout(UIElement? x, float a, float b, float c) { } }
+
 public abstract class UIElement(string tagName)
 {
     public string? Id { get; set; }
@@ -164,7 +166,6 @@ public abstract class UIElement(string tagName)
         }
         else if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase))
         {
-            var s = value as string;
             Anchor = value as string;
         }
         else if (name.Equals("class", StringComparison.OrdinalIgnoreCase))
@@ -256,7 +257,10 @@ public abstract class UIElement(string tagName)
         return null;
     }
 
-    public static float ToPixels(string? value) => ToPixels(UnitValue.Parse(value));
+    public static float ToPixels(string? value)
+    {
+        return ToPixels(UnitValue.Parse(value));
+    }
 
     public static float ToPixels(UnitValue unitValue)
     {

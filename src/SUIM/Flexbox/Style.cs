@@ -208,7 +208,10 @@ public class Style
 
     //returns dictionatry of changed attributes with previous value after Set() or Apply() was called
     //used for transition animation
-    public virtual Dictionary<string, string> GetChangedAttributes() => new(layoutAttributeChanged);
+    public virtual Dictionary<string, string> GetChangedAttributes()
+    {
+        return new(layoutAttributeChanged);
+    }
 
     // Reset to default state and apply styles
     public virtual void Set(string style)
@@ -314,9 +317,14 @@ public class Style
 
         dest.AspectRatio = src.AspectRatio;
     }
-    internal static Value CreateAutoValue() => new(float.NaN, Unit.Auto);
+    internal static Value CreateAutoValue()
+    {
+        return new(float.NaN, Unit.Auto);
+    }
 
-    internal static Value[] CreateDefaultEdgeValuesUnit() => [
+    internal static Value[] CreateDefaultEdgeValuesUnit()
+    {
+        return [
             Value.UndefinedValue,
             Value.UndefinedValue,
             Value.UndefinedValue,
@@ -327,6 +335,7 @@ public class Style
             Value.UndefinedValue,
             Value.UndefinedValue,
         ];
+    }
 
     public virtual Style Clone()
     {

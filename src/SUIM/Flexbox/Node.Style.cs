@@ -136,7 +136,10 @@ public partial class Node
     }
 
     // StyleGetWidth gets width
-    public Value StyleGetWidth() => nodeStyle.Dimensions[(int)Dimension.Width];
+    public Value StyleGetWidth()
+    {
+        return nodeStyle.Dimensions[(int)Dimension.Width];
+    }
 
     // StyleSetHeight sets height
     public void StyleSetHeight(float height)
@@ -182,7 +185,10 @@ public partial class Node
     }
 
     // StyleGetHeight gets height
-    public Value StyleGetHeight() => this.nodeStyle.Dimensions[(int)Dimension.Height];
+    public Value StyleGetHeight()
+    {
+        return this.nodeStyle.Dimensions[(int)Dimension.Height];
+    }
 
     // StyleSetPositionType sets position type
     public void StyleSetPositionType(PositionType positionType)
@@ -194,7 +200,10 @@ public partial class Node
         }
     }
 
-    public PositionType StyleGetPositionType() => this.nodeStyle.PositionType;
+    public PositionType StyleGetPositionType()
+    {
+        return this.nodeStyle.PositionType;
+    }
 
     // StyleSetPosition sets position
     public void StyleSetPosition(Edge edge, float position)
@@ -229,7 +238,10 @@ public partial class Node
     }
 
     // StyleGetPosition gets position
-    public Value StyleGetPosition(Edge edge) => this.nodeStyle.Position[(int)edge];
+    public Value StyleGetPosition(Edge edge)
+    {
+        return this.nodeStyle.Position[(int)edge];
+    }
 
     // StyleSetDirection sets direction
     public void StyleSetDirection(Direction direction)
@@ -241,7 +253,10 @@ public partial class Node
         }
     }
 
-    public Direction StyleGetDirection() => this.nodeStyle.Direction;
+    public Direction StyleGetDirection()
+    {
+        return this.nodeStyle.Direction;
+    }
 
     // StyleSetFlexDirection sets flex directions
     public void StyleSetFlexDirection(FlexDirection flexDirection)
@@ -253,7 +268,10 @@ public partial class Node
         }
     }
 
-    public FlexDirection StyleGetFlexDirection() => this.nodeStyle.FlexDirection;
+    public FlexDirection StyleGetFlexDirection()
+    {
+        return this.nodeStyle.FlexDirection;
+    }
 
     // StyleSetJustifyContent sets justify content
     public void StyleSetJustifyContent(Justify justifyContent)
@@ -265,7 +283,10 @@ public partial class Node
         }
     }
 
-    public Justify StyleGetJustifyContent() => this.nodeStyle.JustifyContent;
+    public Justify StyleGetJustifyContent()
+    {
+        return this.nodeStyle.JustifyContent;
+    }
 
     // StyleSetAlignContent sets align content
     public void StyleSetAlignContent(Align alignContent)
@@ -277,7 +298,10 @@ public partial class Node
         }
     }
 
-    public Align StyleGetAlignContent() => this.nodeStyle.AlignContent;
+    public Align StyleGetAlignContent()
+    {
+        return this.nodeStyle.AlignContent;
+    }
 
     // StyleSetAlignItems sets align content
     public void StyleSetAlignItems(Align alignItems)
@@ -289,7 +313,10 @@ public partial class Node
         }
     }
 
-    public Align StyleGetAlignItems() => this.nodeStyle.AlignItems;
+    public Align StyleGetAlignItems()
+    {
+        return this.nodeStyle.AlignItems;
+    }
 
     // StyleSetAlignSelf sets align self
     public void StyleSetAlignSelf(Align alignSelf)
@@ -301,7 +328,10 @@ public partial class Node
         }
     }
 
-    public Align StyleGetAlignSelf() => this.nodeStyle.AlignSelf;
+    public Align StyleGetAlignSelf()
+    {
+        return this.nodeStyle.AlignSelf;
+    }
 
     // StyleSetFlexWrap sets flex wrap
     public void StyleSetFlexWrap(Wrap flexWrap)
@@ -313,7 +343,10 @@ public partial class Node
         }
     }
 
-    public Wrap StyleGetFlexWrap() => this.nodeStyle.FlexWrap;
+    public Wrap StyleGetFlexWrap()
+    {
+        return this.nodeStyle.FlexWrap;
+    }
 
     // StyleSetOverflow sets overflow
     public void StyleSetOverflow(Overflow overflow)
@@ -325,7 +358,10 @@ public partial class Node
         }
     }
 
-    public Overflow StyleGetOverflow() => this.nodeStyle.Overflow;
+    public Overflow StyleGetOverflow()
+    {
+        return this.nodeStyle.Overflow;
+    }
 
     // StyleSetDisplay sets display
     public void StyleSetDisplay(Display display)
@@ -337,7 +373,10 @@ public partial class Node
         }
     }
 
-    public Display StyleGetDisplay() => this.nodeStyle.Display;
+    public Display StyleGetDisplay()
+    {
+        return this.nodeStyle.Display;
+    }
 
 
     // StyleSetFlexGrow sets flex grow
@@ -426,7 +465,10 @@ public partial class Node
         }
     }
 
-    public Value NodeStyleGetFlexBasis() => this.nodeStyle.FlexBasis;
+    public Value NodeStyleGetFlexBasis()
+    {
+        return this.nodeStyle.FlexBasis;
+    }
 
     // StyleSetMargin sets margin
     public void StyleSetMargin(Edge edge, float margin)
@@ -461,7 +503,10 @@ public partial class Node
     }
 
     // StyleGetMargin gets margin
-    public Value StyleGetMargin(Edge edge) => this.nodeStyle.Margin[(int)edge];
+    public Value StyleGetMargin(Edge edge)
+    {
+        return this.nodeStyle.Margin[(int)edge];
+    }
 
     // StyleSetMarginAuto sets margin auto
     public void StyleSetMarginAuto(Edge edge)
@@ -506,7 +551,10 @@ public partial class Node
     }
 
     // StyleGetPadding gets padding
-    public Value StyleGetPadding(Edge edge) => this.nodeStyle.Padding[(int)edge];
+    public Value StyleGetPadding(Edge edge)
+    {
+        return this.nodeStyle.Padding[(int)edge];
+    }
 
     // StyleSetBorder sets border
     public void StyleSetBorder(Edge edge, float border)
@@ -525,7 +573,10 @@ public partial class Node
     }
 
     // StyleGetBorder gets border
-    public float StyleGetBorder(Edge edge) => this.nodeStyle.Border[(int)edge].ValueUnit;
+    public float StyleGetBorder(Edge edge)
+    {
+        return this.nodeStyle.Border[(int)edge].ValueUnit;
+    }
 
     // StyleSetMinWidth sets min width
     public void StyleSetMinWidth(float minWidth)
@@ -560,7 +611,10 @@ public partial class Node
     }
 
     // StyleGetMinWidth gets min width
-    public Value StyleGetMinWidth() => this.nodeStyle.MinDimensions[(int)Dimension.Width];
+    public Value StyleGetMinWidth()
+    {
+        return this.nodeStyle.MinDimensions[(int)Dimension.Width];
+    }
 
     // StyleSetMinHeight sets min width
     public void StyleSetMinHeight(float minHeight)
@@ -595,7 +649,10 @@ public partial class Node
     }
 
     // StyleGetMinHeight gets min height
-    public Value StyleGetMinHeight() => this.nodeStyle.MinDimensions[(int)Dimension.Height];
+    public Value StyleGetMinHeight()
+    {
+        return this.nodeStyle.MinDimensions[(int)Dimension.Height];
+    }
 
     // StyleSetMaxWidth sets max width
     public void StyleSetMaxWidth(float maxWidth)
@@ -630,7 +687,10 @@ public partial class Node
     }
 
     // StyleGetMaxWidth gets max width
-    public Value StyleGetMaxWidth() => this.nodeStyle.MaxDimensions[(int)Dimension.Width];
+    public Value StyleGetMaxWidth()
+    {
+        return this.nodeStyle.MaxDimensions[(int)Dimension.Width];
+    }
 
     // StyleSetMaxHeight sets max width
     public void StyleSetMaxHeight(float maxHeight)
@@ -665,7 +725,10 @@ public partial class Node
     }
 
     // StyleGetMaxHeight gets max height
-    public Value StyleGetMaxHeight() => this.nodeStyle.MaxDimensions[(int)Dimension.Height];
+    public Value StyleGetMaxHeight()
+    {
+        return this.nodeStyle.MaxDimensions[(int)Dimension.Height];
+    }
 
     // StyleSetAspectRatio sets axpect ratio
     public void StyleSetAspectRatio(float aspectRatio)

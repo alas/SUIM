@@ -5,6 +5,8 @@ using System.Xml.Linq;
 
 public static class ModelLogic
 {
+    private static readonly JsonSerializerOptions Options = new () { ReadCommentHandling = JsonCommentHandling.Skip };
+
     public static dynamic Create(object model)
     {
         if (model is ObservableObject oo) return oo;
@@ -38,8 +40,7 @@ public static class ModelLogic
         try
         {
             // Parse JSON into a dictionary
-            var options = new JsonSerializerOptions { ReadCommentHandling = JsonCommentHandling.Skip };
-            var jsonObject = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(modelJson, options);
+            var jsonObject = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(modelJson, Options);
             if (jsonObject == null)
             {
                 return existingModel;

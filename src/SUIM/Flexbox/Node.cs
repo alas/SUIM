@@ -59,7 +59,10 @@ public partial class Node
         _layout = null;
         Flex.CalculateLayout(this, parentWidth, parentHeight, parentDirection);
     }
-    public void MarkAsDirty() => Flex.NodeMarkDirtyInternal(this);
+    public void MarkAsDirty()
+    {
+        Flex.NodeMarkDirtyInternal(this);
+    }
 
 
     #region Layout
@@ -80,22 +83,40 @@ public partial class Node
         return y;
     }
     // LayoutGetLeft gets left
-    internal float LayoutGetLeft() => this.nodeLayout.Position[(int)Edge.Left];
+    internal float LayoutGetLeft()
+    {
+        return this.nodeLayout.Position[(int)Edge.Left];
+    }
 
     // LayoutGetTop gets top
-    internal float LayoutGetTop() => this.nodeLayout.Position[(int)Edge.Top];
+    internal float LayoutGetTop()
+    {
+        return this.nodeLayout.Position[(int)Edge.Top];
+    }
 
     // LayoutGetRight gets right
-    internal float LayoutGetRight() => this.nodeLayout.Position[(int)Edge.Right];
+    internal float LayoutGetRight()
+    {
+        return this.nodeLayout.Position[(int)Edge.Right];
+    }
 
     // LayoutGetBottom gets bottom
-    internal float LayoutGetBottom() => this.nodeLayout.Position[(int)Edge.Bottom];
+    internal float LayoutGetBottom()
+    {
+        return this.nodeLayout.Position[(int)Edge.Bottom];
+    }
 
     // LayoutGetWidth gets width
-    internal float LayoutGetWidth() => this.nodeLayout.Dimensions[(int)Dimension.Width];
+    internal float LayoutGetWidth()
+    {
+        return this.nodeLayout.Dimensions[(int)Dimension.Width];
+    }
 
     // LayoutGetHeight gets height
-    internal float LayoutGetHeight() => this.nodeLayout.Dimensions[(int)Dimension.Height];
+    internal float LayoutGetHeight()
+    {
+        return this.nodeLayout.Dimensions[(int)Dimension.Height];
+    }
 
     // LayoutGetMargin gets margin
     internal float LayoutGetMargin(Edge edge)
@@ -168,31 +189,70 @@ public partial class Node
         return this.nodeLayout.Padding[(int)edge];
     }
 
-    internal Direction LayoutGetDirection() => this.nodeLayout.Direction;
+    internal Direction LayoutGetDirection()
+    {
+        return this.nodeLayout.Direction;
+    }
 
-    internal bool LayoutGetHadOverflow() => this.nodeLayout.HadOverflow;
+    internal bool LayoutGetHadOverflow()
+    {
+        return this.nodeLayout.HadOverflow;
+    }
 
     #endregion
 
     #region other props
 
-    public void SetMeasureFunc(MeasureFunc measureFunc) => Flex.SetMeasureFunc(this, measureFunc);
+    public void SetMeasureFunc(MeasureFunc measureFunc)
+    {
+        Flex.SetMeasureFunc(this, measureFunc);
+    }
 
-    public MeasureFunc? GetMeasureFunc() => this.measureFunc;
+    public MeasureFunc? GetMeasureFunc()
+    {
+        return this.measureFunc;
+    }
 
-    public void SetBaselineFunc(BaselineFunc baselineFunc) => this.baselineFunc = baselineFunc;
+    public void SetBaselineFunc(BaselineFunc baselineFunc)
+    {
+        this.baselineFunc = baselineFunc;
+    }
 
-    public BaselineFunc? GetBaselineFunc() => this.baselineFunc;
+    public BaselineFunc? GetBaselineFunc()
+    {
+        return this.baselineFunc;
+    }
 
-    public void SetPrintFunc(PrintFunc printFunc) => this.printFunc = printFunc;
+    public void SetPrintFunc(PrintFunc printFunc)
+    {
+        this.printFunc = printFunc;
+    }
 
-    public PrintFunc? GetPrintFunc() => this.printFunc;
+    public PrintFunc? GetPrintFunc()
+    {
+        return this.printFunc;
+    }
     #endregion
 
     #region tree
-    public Node? GetChild(int idx) => Flex.GetChild(this, idx);
-    public void AddChild(Node child) => Flex.InsertChild(this, child, ChildrenCount);
-    public void InsertChild(Node child, int idx) => Flex.InsertChild(this, child, idx);
-    public void RemoveChild(Node child) => Flex.RemoveChild(this, child);
+    public Node? GetChild(int idx)
+    {
+        return Flex.GetChild(this, idx);
+    }
+
+    public void AddChild(Node child)
+    {
+        Flex.InsertChild(this, child, ChildrenCount);
+    }
+
+    public void InsertChild(Node child, int idx)
+    {
+        Flex.InsertChild(this, child, idx);
+    }
+
+    public void RemoveChild(Node child)
+    {
+        Flex.RemoveChild(this, child);
+    }
     #endregion
 }

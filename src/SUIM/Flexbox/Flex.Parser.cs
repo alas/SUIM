@@ -5,160 +5,208 @@ public partial class Flex
     #region XXXX_ToSring
 
     // AlignToString returns string version of Align enum
-    public static string AlignToString(Align value) => value switch
+    public static string AlignToString(Align value)
     {
-        Align.Auto => "auto",
-        Align.FlexStart => "flex-start",
-        Align.Center => "center",
-        Align.FlexEnd => "flex-end",
-        Align.Stretch => "stretch",
-        Align.Baseline => "baseline",
-        Align.SpaceBetween => "space-between",
-        Align.SpaceAround => "space-around",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            Align.Auto => "auto",
+            Align.FlexStart => "flex-start",
+            Align.Center => "center",
+            Align.FlexEnd => "flex-end",
+            Align.Stretch => "stretch",
+            Align.Baseline => "baseline",
+            Align.SpaceBetween => "space-between",
+            Align.SpaceAround => "space-around",
+            _ => "unknown",
+        };
+    }
 
     // DimensionToString returns string version of Dimension enum
-    public static string DimensionToString(Dimension value) => value switch
+    public static string DimensionToString(Dimension value)
     {
-        Dimension.Width => "width",
-        Dimension.Height => "height",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            Dimension.Width => "width",
+            Dimension.Height => "height",
+            _ => "unknown",
+        };
+    }
 
     // DirectionToString returns string version of Direction enum
-    public static string DirectionToString(Direction value) => value switch
+    public static string DirectionToString(Direction value)
     {
-        Direction.Inherit => "inherit",
-        Direction.LTR => "ltr",
-        Direction.RTL => "rtl",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            Direction.Inherit => "inherit",
+            Direction.LTR => "ltr",
+            Direction.RTL => "rtl",
+            _ => "unknown",
+        };
+    }
 
     // DisplayToString returns string version of Display enum
-    public static string DisplayToString(Display value) => value switch
+    public static string DisplayToString(Display value)
     {
-        Display.Flex => "flex",
-        Display.None => "none",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            Display.Flex => "flex",
+            Display.None => "none",
+            _ => "unknown",
+        };
+    }
 
     // EdgeToString returns string version of Edge enum
-    public static string EdgeToString(Edge value) => value switch
+    public static string EdgeToString(Edge value)
     {
-        Edge.Left => "left",
-        Edge.Top => "top",
-        Edge.Right => "right",
-        Edge.Bottom => "bottom",
-        Edge.Start => "start",
-        Edge.End => "end",
-        Edge.Horizontal => "horizontal",
-        Edge.Vertical => "vertical",
-        Edge.All => "all",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            Edge.Left => "left",
+            Edge.Top => "top",
+            Edge.Right => "right",
+            Edge.Bottom => "bottom",
+            Edge.Start => "start",
+            Edge.End => "end",
+            Edge.Horizontal => "horizontal",
+            Edge.Vertical => "vertical",
+            Edge.All => "all",
+            _ => "unknown",
+        };
+    }
 
     // ExperimentalFeatureToString returns string version of ExperimentalFeature enum
-    public static string ExperimentalFeatureToString(ExperimentalFeature value) => value switch
+    public static string ExperimentalFeatureToString(ExperimentalFeature value)
     {
-        ExperimentalFeature.WebFlexBasis => "web-flex-basis",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            ExperimentalFeature.WebFlexBasis => "web-flex-basis",
+            _ => "unknown",
+        };
+    }
 
     // FlexDirectionToString returns string version of FlexDirection enum
-    public static string FlexDirectionToString(FlexDirection value) => value switch
+    public static string FlexDirectionToString(FlexDirection value)
     {
-        FlexDirection.Column => "column",
-        FlexDirection.ColumnReverse => "column-reverse",
-        FlexDirection.Row => "row",
-        FlexDirection.RowReverse => "row-reverse",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            FlexDirection.Column => "column",
+            FlexDirection.ColumnReverse => "column-reverse",
+            FlexDirection.Row => "row",
+            FlexDirection.RowReverse => "row-reverse",
+            _ => "unknown",
+        };
+    }
 
     // JustifyToString returns string version of Justify enum
-    public static string JustifyToString(Justify value) => value switch
+    public static string JustifyToString(Justify value)
     {
-        Justify.FlexStart => "flex-start",
-        Justify.Center => "center",
-        Justify.FlexEnd => "flex-end",
-        Justify.SpaceBetween => "space-between",
-        Justify.SpaceAround => "space-around",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            Justify.FlexStart => "flex-start",
+            Justify.Center => "center",
+            Justify.FlexEnd => "flex-end",
+            Justify.SpaceBetween => "space-between",
+            Justify.SpaceAround => "space-around",
+            _ => "unknown",
+        };
+    }
 
     // LogLevelToString returns string version of LogLevel enum
-    public static string LogLevelToString(LogLevel value) => value switch
+    public static string LogLevelToString(LogLevel value)
     {
-        LogLevel.Error => "error",
-        LogLevel.Warn => "warn",
-        LogLevel.Info => "info",
-        LogLevel.Debug => "debug",
-        LogLevel.Verbose => "verbose",
-        LogLevel.Fatal => "fatal",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            LogLevel.Error => "error",
+            LogLevel.Warn => "warn",
+            LogLevel.Info => "info",
+            LogLevel.Debug => "debug",
+            LogLevel.Verbose => "verbose",
+            LogLevel.Fatal => "fatal",
+            _ => "unknown",
+        };
+    }
 
     // MeasureModeToString returns string version of MeasureMode enum
-    public static string MeasureModeToString(MeasureMode value) => value switch
+    public static string MeasureModeToString(MeasureMode value)
     {
-        MeasureMode.Undefined => "undefined",
-        MeasureMode.Exactly => "exactly",
-        MeasureMode.AtMost => "at-most",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            MeasureMode.Undefined => "undefined",
+            MeasureMode.Exactly => "exactly",
+            MeasureMode.AtMost => "at-most",
+            _ => "unknown",
+        };
+    }
 
     // NodeTypeToString returns string version of NodeType enum
-    public static string NodeTypeToString(NodeType value) => value switch
+    public static string NodeTypeToString(NodeType value)
     {
-        NodeType.Default => "default",
-        NodeType.Text => "text",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            NodeType.Default => "default",
+            NodeType.Text => "text",
+            _ => "unknown",
+        };
+    }
 
     // OverflowToString returns string version of Overflow enum
-    public static string OverflowToString(Overflow value) => value switch
+    public static string OverflowToString(Overflow value)
     {
-        Overflow.Visible => "visible",
-        Overflow.Hidden => "hidden",
-        Overflow.Scroll => "scroll",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            Overflow.Visible => "visible",
+            Overflow.Hidden => "hidden",
+            Overflow.Scroll => "scroll",
+            _ => "unknown",
+        };
+    }
 
     // PositionType returns string version of PositionType enum
-    public static string PositionTypeToString(PositionType value) => value switch
+    public static string PositionTypeToString(PositionType value)
     {
-        PositionType.Relative => "relative",
-        PositionType.Absolute => "absolute",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            PositionType.Relative => "relative",
+            PositionType.Absolute => "absolute",
+            _ => "unknown",
+        };
+    }
 
     // PrintOptionsToString returns string version of PrintOptions enum
-    public static string PrintOptionsToString(PrintOptions value) => value switch
+    public static string PrintOptionsToString(PrintOptions value)
     {
-        PrintOptions.Layout => "layout",
-        PrintOptions.Style => "style",
-        PrintOptions.Children => "children",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            PrintOptions.Layout => "layout",
+            PrintOptions.Style => "style",
+            PrintOptions.Children => "children",
+            _ => "unknown",
+        };
+    }
 
     // UnitToString returns string version of Unit enum
-    public static string UnitToString(Unit value) => value switch
+    public static string UnitToString(Unit value)
     {
-        Unit.Undefined => "undefined",
-        Unit.Point => "point",
-        Unit.Percent => "percent",
-        Unit.Auto => "auto",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            Unit.Undefined => "undefined",
+            Unit.Point => "point",
+            Unit.Percent => "percent",
+            Unit.Auto => "auto",
+            _ => "unknown",
+        };
+    }
 
     // WrapToString returns string version of Wrap enum
-    public static string WrapToString(Wrap value) => value switch
+    public static string WrapToString(Wrap value)
     {
-        Wrap.NoWrap => "no-wrap",
-        Wrap.Wrap => "wrap",
-        Wrap.WrapReverse => "wrap-reverse",
-        _ => "unknown",
-    };
+        return value switch
+        {
+            Wrap.NoWrap => "no-wrap",
+            Wrap.Wrap => "wrap",
+            Wrap.WrapReverse => "wrap-reverse",
+            _ => "unknown",
+        };
+    }
 
     #endregion
 
@@ -402,7 +450,7 @@ public partial class Flex
         string dig = text;
         Unit uu = Unit.Point;
 
-        if (text.EndsWith("%"))
+        if (text.EndsWith('%'))
         {
             dig = text[..^1];
             uu = Unit.Percent;

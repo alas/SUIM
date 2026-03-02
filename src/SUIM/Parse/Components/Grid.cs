@@ -69,7 +69,7 @@ public class Grid() : LayoutElement(nameof(Grid))
         }
     }
 
-    public float[] ParseUnits(string? unitsString, float totalSize)
+    public static float[] ParseUnits(string? unitsString, float totalSize)
     {
         if (string.IsNullOrWhiteSpace(unitsString))
             return [totalSize];

@@ -76,9 +76,15 @@ public partial class Flex
         node.config = config;
     }
 
-    public static Node CreateDefaultNode() => new();
+    public static Node CreateDefaultNode()
+    {
+        return new();
+    }
 
-    public static Node CreateDefaultNode(Style style) => new(style);
+    public static Node CreateDefaultNode(Style style)
+    {
+        return new(style);
+    }
 
     public static Node CreateDefaultNode(Config config)
     {
@@ -92,7 +98,10 @@ public partial class Flex
         return node;
     }
 
-    public static Config CreateDefaultConfig() => new();
+    public static Config CreateDefaultConfig()
+    {
+        return new();
+    }
 
     // CalculateLayout calculates layout
     public static void CalculateLayout(Node node, float parentWidth, float parentHeight, Direction parentDirection)
@@ -176,13 +185,16 @@ public partial class Flex
         return defaultValue;
     }
 
-    internal static float ResolveValue(Value value, float parentSize) => value.Unit switch
+    internal static float ResolveValue(Value value, float parentSize)
     {
-        Unit.Undefined or Unit.Auto => float.NaN,
-        Unit.Point => value.ValueUnit,
-        Unit.Percent => value.ValueUnit * parentSize / 100f,
-        _ => float.NaN,
-    };
+        return value.Unit switch
+        {
+            Unit.Undefined or Unit.Auto => float.NaN,
+            Unit.Point => value.ValueUnit,
+            Unit.Percent => value.ValueUnit * parentSize / 100f,
+            _ => float.NaN,
+        };
+    }
 
     internal static float resolveValueMargin(Value value, float parentSize)
     {
@@ -209,7 +221,10 @@ public partial class Flex
     }
 
     // // NewNode creates a new node
-    internal static Node NewNode() => NewNodeWithConfig(CreateDefaultConfig());
+    internal static Node NewNode()
+    {
+        return NewNodeWithConfig(CreateDefaultConfig());
+    }
 
     // internal static int Len(Node[] array)
     // {
@@ -218,13 +233,22 @@ public partial class Flex
 
 
     // ConfigGetDefault returns default config, only for C#
-    internal static Config ConfigGetDefault() => CreateDefaultConfig();
+    internal static Config ConfigGetDefault()
+    {
+        return CreateDefaultConfig();
+    }
 
     // NewConfig creates new config
-    internal static Config NewConfig() => CreateDefaultConfig();
+    internal static Config NewConfig()
+    {
+        return CreateDefaultConfig();
+    }
 
     // ConfigCopy copies a config
-    internal static void ConfigCopy(Config dest, Config src) => Config.Copy(dest, src);
+    internal static void ConfigCopy(Config dest, Config src)
+    {
+        Config.Copy(dest, src);
+    }
 
     internal static void NodeMarkDirtyInternal(Node node)
     {
@@ -283,7 +307,10 @@ public partial class Flex
     }
 
     // GetChild returns a child at a given index
-    internal static Node? GetChild(Node node, int idx) => idx < node.Children.Count ? node.Children[idx] : null;
+    internal static Node? GetChild(Node node, int idx)
+    {
+        return idx < node.Children.Count ? node.Children[idx] : null;
+    }
 
     // MarkDirty marks node as dirty
     internal static void MarkDirty(Node node)
@@ -383,7 +410,10 @@ public partial class Flex
     internal static int currentGenerationCount = 0;
 
     // FloatIsUndefined returns true if value is undefined
-    internal static bool FloatIsUndefined(float value) => float.IsNaN(value);
+    internal static bool FloatIsUndefined(float value)
+    {
+        return float.IsNaN(value);
+    }
 
     // ValueEqual returns true if values are equal
     internal static bool ValueEqual(Value a, Value b)
@@ -426,9 +456,15 @@ public partial class Flex
     readonly internal static Edge[] pos = [Edge.Top, Edge.Bottom, Edge.Left, Edge.Right];
     readonly internal static Dimension[] dim = [Dimension.Height, Dimension.Height, Dimension.Width, Dimension.Width];
 
-    internal static bool FlexDirectionIsRow(FlexDirection flexDirection) => flexDirection == FlexDirection.Row || flexDirection == FlexDirection.RowReverse;
+    internal static bool FlexDirectionIsRow(FlexDirection flexDirection)
+    {
+        return flexDirection == FlexDirection.Row || flexDirection == FlexDirection.RowReverse;
+    }
 
-    internal static bool FlexDirectionIsColumn(FlexDirection flexDirection) => flexDirection == FlexDirection.Column || flexDirection == FlexDirection.ColumnReverse;
+    internal static bool FlexDirectionIsColumn(FlexDirection flexDirection)
+    {
+        return flexDirection == FlexDirection.Column || flexDirection == FlexDirection.ColumnReverse;
+    }
 
     internal static float NodeLeadingMargin(Node node, FlexDirection axis, float widthSize)
     {
@@ -496,9 +532,15 @@ public partial class Flex
         return fmaxf(ComputedEdgeValue(node.nodeStyle.Border, trailing[(int)axis], ValueZero).ValueUnit, 0);
     }
 
-    internal static float NodeLeadingPaddingAndBorder(Node node, FlexDirection axis, float widthSize) => NodeLeadingPadding(node, axis, widthSize) + NodeLeadingBorder(node, axis);
+    internal static float NodeLeadingPaddingAndBorder(Node node, FlexDirection axis, float widthSize)
+    {
+        return NodeLeadingPadding(node, axis, widthSize) + NodeLeadingBorder(node, axis);
+    }
 
-    internal static float NodeTrailingPaddingAndBorder(Node node, FlexDirection axis, float widthSize) => NodeTrailingPadding(node, axis, widthSize) + NodeTrailingBorder(node, axis);
+    internal static float NodeTrailingPaddingAndBorder(Node node, FlexDirection axis, float widthSize)
+    {
+        return NodeTrailingPadding(node, axis, widthSize) + NodeTrailingBorder(node, axis);
+    }
 
     internal static float NodeMarginForAxis(Node node, FlexDirection axis, float widthSize)
     {
@@ -507,8 +549,11 @@ public partial class Flex
         return leading + trailing;
     }
 
-    internal static float NodePaddingAndBorderForAxis(Node node, FlexDirection axis, float widthSize) => NodeLeadingPaddingAndBorder(node, axis, widthSize) +
+    internal static float NodePaddingAndBorderForAxis(Node node, FlexDirection axis, float widthSize)
+    {
+        return NodeLeadingPaddingAndBorder(node, axis, widthSize) +
             NodeTrailingPaddingAndBorder(node, axis, widthSize);
+    }
 
     internal static Align NodeAlignItem(Node node, Node child)
     {
@@ -603,8 +648,11 @@ public partial class Flex
         return FlexDirection.Column;
     }
 
-    internal static bool NodeIsFlex(Node node) => (node.nodeStyle.PositionType == PositionType.Relative &&
+    internal static bool NodeIsFlex(Node node)
+    {
+        return (node.nodeStyle.PositionType == PositionType.Relative &&
             (ResolveFlexGrow(node) != 0 || NodeResolveFlexShrink(node) != 0));
+    }
 
     internal static bool IsBaselineLayout(Node node)
     {
@@ -628,8 +676,11 @@ public partial class Flex
         return false;
     }
 
-    internal static float nodeDimWithMargin(Node node, FlexDirection axis, float widthSize) => node.nodeLayout.measuredDimensions[(int)dim[(int)axis]] + NodeLeadingMargin(node, axis, widthSize) +
+    internal static float nodeDimWithMargin(Node node, FlexDirection axis, float widthSize)
+    {
+        return node.nodeLayout.measuredDimensions[(int)dim[(int)axis]] + NodeLeadingMargin(node, axis, widthSize) +
             NodeTrailingMargin(node, axis, widthSize);
+    }
 
     internal static bool nodeIsStyleDimDefined(Node node, FlexDirection axis, float parentSize)
     {
@@ -647,17 +698,23 @@ public partial class Flex
         return (!FloatIsUndefined(value) && value >= 0);
     }
 
-    internal static bool nodeIsLeadingPosDefined(Node node, FlexDirection axis) => (FlexDirectionIsRow(axis) &&
+    internal static bool nodeIsLeadingPosDefined(Node node, FlexDirection axis)
+    {
+        return (FlexDirectionIsRow(axis) &&
             ComputedEdgeValue(node.nodeStyle.Position, Edge.Start, ValueUndefined).Unit !=
                 Unit.Undefined) ||
             ComputedEdgeValue(node.nodeStyle.Position, leading[(int)axis], ValueUndefined).Unit !=
                 Unit.Undefined;
+    }
 
-    internal static bool nodeIsTrailingPosDefined(Node node, FlexDirection axis) => (FlexDirectionIsRow(axis) &&
+    internal static bool nodeIsTrailingPosDefined(Node node, FlexDirection axis)
+    {
+        return (FlexDirectionIsRow(axis) &&
             ComputedEdgeValue(node.nodeStyle.Position, Edge.End, ValueUndefined).Unit !=
                 Unit.Undefined) ||
             ComputedEdgeValue(node.nodeStyle.Position, trailing[(int)axis], ValueUndefined).Unit !=
                 Unit.Undefined;
+    }
 
     internal static float nodeLeadingPosition(Node node, FlexDirection axis, float axisSize)
     {
@@ -754,8 +811,11 @@ public partial class Flex
 
     // nodeBoundAxis is like nodeBoundAxisWithinMinAndMax but also ensures that
     // the value doesn't go below the padding and border amount.
-    internal static float nodeBoundAxis(Node node, FlexDirection axis, float value, float axisSize, float widthSize) => fmaxf(nodeBoundAxisWithinMinAndMax(node, axis, value, axisSize),
+    internal static float nodeBoundAxis(Node node, FlexDirection axis, float value, float axisSize, float widthSize)
+    {
+        return fmaxf(nodeBoundAxisWithinMinAndMax(node, axis, value, axisSize),
             NodePaddingAndBorderForAxis(node, axis, widthSize));
+    }
 
     internal static void nodeSetChildTrailingPosition(Node node, Node child, FlexDirection axis)
     {
@@ -2756,13 +2816,22 @@ public partial class Flex
         return Constant.measureModeNames[(int)mode];
     }
 
-    internal static bool measureModeSizeIsExactAndMatchesOldMeasuredSize(MeasureMode sizeMode, float size, float lastComputedSize) => sizeMode == MeasureMode.Exactly && FloatsEqual(size, lastComputedSize);
+    internal static bool measureModeSizeIsExactAndMatchesOldMeasuredSize(MeasureMode sizeMode, float size, float lastComputedSize)
+    {
+        return sizeMode == MeasureMode.Exactly && FloatsEqual(size, lastComputedSize);
+    }
 
-    internal static bool measureModeOldSizeIsUnspecifiedAndStillFits(MeasureMode sizeMode, float size, MeasureMode lastSizeMode, float lastComputedSize) => sizeMode == MeasureMode.AtMost && lastSizeMode == MeasureMode.Undefined &&
+    internal static bool measureModeOldSizeIsUnspecifiedAndStillFits(MeasureMode sizeMode, float size, MeasureMode lastSizeMode, float lastComputedSize)
+    {
+        return sizeMode == MeasureMode.AtMost && lastSizeMode == MeasureMode.Undefined &&
             (size >= lastComputedSize || FloatsEqual(size, lastComputedSize));
+    }
 
-    internal static bool measureModeNewMeasureSizeIsStricterAndStillValid(MeasureMode sizeMode, float size, MeasureMode lastSizeMode, float lastSize, float lastComputedSize) => lastSizeMode == MeasureMode.AtMost && sizeMode == MeasureMode.AtMost &&
+    internal static bool measureModeNewMeasureSizeIsStricterAndStillValid(MeasureMode sizeMode, float size, MeasureMode lastSizeMode, float lastSize, float lastComputedSize)
+    {
+        return lastSizeMode == MeasureMode.AtMost && sizeMode == MeasureMode.AtMost &&
             lastSize > size && (lastComputedSize <= size || FloatsEqual(size, lastComputedSize));
+    }
 
 
     // nodeCanUseCachedMeasurement returns true if can use cached measurement
@@ -3189,7 +3258,10 @@ public partial class Flex
 
 
 
-    internal static void log(Node node, LogLevel level, string format, params object[] args) => Console.WriteLine(format, args);
+    internal static void log(Node node, LogLevel level, string format, params object[] args)
+    {
+        Console.WriteLine(format, args);
+    }
 
     internal static void assertCond(bool cond, string format, params object[] args)
     {
@@ -3199,10 +3271,16 @@ public partial class Flex
         }
     }
 
-    internal static void assertWithNode(Node node, bool cond, string format, params object[] args) => assertCond(cond, format, args);
+    internal static void assertWithNode(Node node, bool cond, string format, params object[] args)
+    {
+        assertCond(cond, format, args);
+    }
 
+    internal static float fmodf(float a, float b)
+    {
+        return a % b;
+    }
 
-    internal static float fmodf(float a, float b) => a % b;
     static internal float fmaxf(float a, float b)
     {
         if (float.IsNaN(a))

@@ -47,7 +47,11 @@ public struct Layout : IEquatable<Layout>
         direction = node.LayoutGetDirection();
     }
 
-    public override readonly string ToString() => ToStr(0);
+    public override readonly string ToString()
+    {
+        return ToStr(0);
+    }
+
     public readonly string ToStr(int indent)
     {
         var line = new System.Text.StringBuilder("{\n");
@@ -66,7 +70,9 @@ public struct Layout : IEquatable<Layout>
 
     public static bool operator ==(Layout a, Layout b) => a.Equals(b);
     public static bool operator !=(Layout a, Layout b) => !a.Equals(b);
-    public readonly bool Equals(Layout l) => x == l.x
+    public readonly bool Equals(Layout l)
+    {
+        return x == l.x
                 && y == l.y
                 && width == l.width
                 && height == l.height
@@ -80,8 +86,17 @@ public struct Layout : IEquatable<Layout>
                 && content == l.content
                 && hadOverflow == l.hadOverflow
                 && direction == l.direction;
-    public override readonly bool Equals(object? l) => base.Equals(l);
-    public override readonly int GetHashCode() => base.GetHashCode();
+    }
+
+    public override readonly bool Equals(object? l)
+    {
+        return base.Equals(l);
+    }
+
+    public override readonly int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
 }
 
 public struct Layout8D : IEquatable<Layout8D>
@@ -133,9 +148,14 @@ public struct Layout8D : IEquatable<Layout8D>
         this.height = layout.height + (top + bottom);
     }
 
-    public override readonly string ToString() => string.Format("(x:{0} y:{1} w:{2} h:{3}) (l:{4} t:{5} r:{6} b:{7}))", x, y, width, height, left, top, right, bottom);
+    public override readonly string ToString()
+    {
+        return string.Format("(x:{0} y:{1} w:{2} h:{3}) (l:{4} t:{5} r:{6} b:{7}))", x, y, width, height, left, top, right, bottom);
+    }
 
-    public readonly bool Equals(Layout8D l) => x == l.x
+    public readonly bool Equals(Layout8D l)
+    {
+        return x == l.x
             && y == l.y
             && width == l.width
             && height == l.height
@@ -143,8 +163,17 @@ public struct Layout8D : IEquatable<Layout8D>
             && right == l.right
             && top == l.top
             && bottom == l.bottom;
+    }
+
     public static bool operator ==(Layout8D a, Layout8D b) => a.Equals(b);
     public static bool operator !=(Layout8D a, Layout8D b) => !a.Equals(b);
-    public override readonly bool Equals(object? l) => base.Equals(l);
-    public override readonly int GetHashCode() => base.GetHashCode();
+    public override readonly bool Equals(object? l)
+    {
+        return base.Equals(l);
+    }
+
+    public override readonly int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
 }

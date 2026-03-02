@@ -45,10 +45,16 @@ public class Config
     }
 
     // SetExperimentalFeatureEnabled enables experimental feature
-    public void SetExperimentalFeatureEnabled(ExperimentalFeature feature, bool enabled) => this.experimentalFeatures[(int)feature] = enabled;
+    public void SetExperimentalFeatureEnabled(ExperimentalFeature feature, bool enabled)
+    {
+        this.experimentalFeatures[(int)feature] = enabled;
+    }
 
     // IsExperimentalFeatureEnabled returns if experimental feature is enabled
-    public bool IsExperimentalFeatureEnabled(ExperimentalFeature feature) => this.experimentalFeatures[(int)feature];
+    public bool IsExperimentalFeatureEnabled(ExperimentalFeature feature)
+    {
+        return this.experimentalFeatures[(int)feature];
+    }
 
 
     // SetPointScaleFactor sets scale factor

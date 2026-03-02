@@ -12,6 +12,7 @@ using StrideButton = Stride.UI.Controls.Button;
 using SUIM.Layout;
 using SUIMElement = Parse.Components.UIElement;
 using SUIMStride;
+using SUIM.Parse.Components;
 
 public class PopupIntegrationTests
 {

@@ -100,6 +100,7 @@ public class ComponentStylingTests
 
         var c2Div = (Div)c2Comp.Children[0];
         // Child2 should NOT be green (styles from Child1 should not leak to sibling)
+        Assert.NotEqual("green", c2Div.Color);
     }
 
     [Fact]

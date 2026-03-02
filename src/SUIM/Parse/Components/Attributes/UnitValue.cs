@@ -54,7 +54,10 @@ public record struct UnitValue(float Value, UnitType Type = UnitType.Pixels)
         return new UnitValue(0, UnitType.Pixels);
     }
 
-    public readonly bool IsExplicit() => Type != UnitType.None && Type != UnitType.Auto;
+    public readonly bool IsExplicit()
+    {
+        return Type != UnitType.None && Type != UnitType.Auto;
+    }
 }
 
 public enum UnitType
