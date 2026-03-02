@@ -1,6 +1,7 @@
 namespace SUIM.Tests.Layout;
 
 using Xunit;
+using SUIM.Parse;
 using SUIM.Parse.Components;
 
 public class FlexLayoutTests
@@ -8,78 +9,88 @@ public class FlexLayoutTests
     [Fact]
     public void FlexLayout_RowDirection_DistributesSpace()
     {
-        var div = new Div { Display = "flex", FlexDirection = "row", Width = "300px", Height = "100px" };
-        var child1 = new Div { Width = "100px", Height = "50px" };
-        var child2 = new Div { Width = "1fr", Height = "50px" };
-        
-        div.AddChild(child1, null);
-        div.AddChild(child2, null);
-        
-        div.CalculateLayout(300, 100);
-        
-        Assert.Equal(100, child1.ActualWidth);
-        Assert.Equal(200, child2.ActualWidth); // 300 - 100
-        Assert.Equal(0, child1.ActualX);
-        Assert.Equal(100, child2.ActualX);
+        var markup = """
+            <div width="300px" height="100px" Display="flex" FlexDirection="row">
+                <div width="100px" height="50px"><div/>
+                <div width="100%" height="50px"><div/>
+            </div>
+            """;
+        var (element, _) = MarkupParser.Parse(markup);
+        element.CalculateLayout(300, 100);
+        var child1 = (Div)element.Children[0];
+        var child2 = (Div)element.Children[1];
+                
+        Assert.Equal(100, child1.GetLeft());
+        Assert.Equal(200, child2.GetLeft()); // 300 - 100
+        Assert.Equal(0, child1.GetTop());
+        Assert.Equal(100, child2.GetTop());
     }
 
     [Fact]
     public void FlexLayout_JustifyContent_Center()
     {
-        var div = new Div { Display = "flex", FlexDirection = "row", JustifyContent = "center", Width = "300px", Height = "100px" };
-        var child1 = new Div { Width = "100px", Height = "50px" };
-        
-        div.AddChild(child1, null);
-        
-        div.CalculateLayout(300, 100);
-        
-        Assert.Equal(100, child1.ActualX); // (300 - 100) / 2
+        var markup = """
+            <div width="300px" height="100px" justify-content="center" AlignItems="center" Display="flex" FlexDirection="row">
+                <div width="100px" height="50px"></div>
+            </div>
+            """;
+        var (element, _) = MarkupParser.Parse(markup);
+        element.CalculateLayout(300, 100);
+        var child1 = (Div)element.Children[0];
+
+        Assert.Equal(100, child1.GetLeft()); // (300 - 100) / 2
     }
 
     [Fact]
     public void FlexLayout_JustifyContent_SpaceBetween()
     {
-        var div = new Div { Display = "flex", FlexDirection = "row", JustifyContent = "space-between", Width = "300px", Height = "100px" };
-        var child1 = new Div { Width = "50px", Height = "50px" };
-        var child2 = new Div { Width = "50px", Height = "50px" };
+        var markup = """
+            <div width="300px" height="100px" justifycontent="space-between" AlignItems="center" Display="flex" FlexDirection="row">
+                <div width="50px" height="50px"></div>
+                <div width="50px" height="50px"></div>
+            </div>
+            """;
+        var (element, _) = MarkupParser.Parse(markup);
+        element.CalculateLayout(300, 100);
+        var child1 = (Div)element.Children[0];
+        var child2 = (Div)element.Children[1];
         
-        div.AddChild(child1, null);
-        div.AddChild(child2, null);
-        
-        div.CalculateLayout(300, 100);
-        
-        Assert.Equal(0, child1.ActualX);
-        Assert.Equal(250, child2.ActualX); // 300 - 50
+        Assert.Equal(0, child1.GetLeft());
+        Assert.Equal(250, child2.GetLeft()); // 300 - 50
     }
 
     [Fact]
     public void FlexLayout_AlignItems_Stretch()
     {
-        var div = new Div { Display = "flex", FlexDirection = "row", AlignItems = "stretch", Width = "300px", Height = "100px" };
-        var child1 = new Div { Width = "100px" }; // Height is auto/none
+        var markup = """
+            <div width="300px" height="100px" AlignItems="stretch" Display="flex" FlexDirection="row">
+                <div width="100px" height="50px"></div>
+            </div>
+            """;
+        var (element, _) = MarkupParser.Parse(markup);
+        element.CalculateLayout(300, 100);
+        var child1 = (Div)element.Children[0]; // Height is auto/none
         
-        div.AddChild(child1, null);
-        
-        div.CalculateLayout(300, 100);
-        
-        Assert.Equal(100, child1.ActualHeight);
+        Assert.Equal(100, child1.GetHeight());
     }
 
     [Fact]
     public void FlexLayout_ColumnDirection()
     {
-        var div = new Div { Display = "flex", FlexDirection = "column", Width = "100px", Height = "300px" };
-        var child1 = new Div { Width = "50px", Height = "100px" };
-        var child2 = new Div { Width = "50px", Height = "1fr" };
+        var markup = """
+            <div width="100px" height="300px" Display="flex" FlexDirection="column">
+                <div width="50px" height="100px"></div>
+                <div width="50px" flex="1"></div>
+            </div>
+            """;
+        var (element, _) = MarkupParser.Parse(markup);
+        element.CalculateLayout(100, 300);
+        var child1 = (Div)element.Children[0];
+        var child2 = (Div)element.Children[1];
         
-        div.AddChild(child1, null);
-        div.AddChild(child2, null);
-        
-        div.CalculateLayout(100, 300);
-        
-        Assert.Equal(100, child1.ActualHeight);
-        Assert.Equal(200, child2.ActualHeight);
-        Assert.Equal(0, child1.ActualY);
-        Assert.Equal(100, child2.ActualY);
+        Assert.Equal(100, child1.GetHeight());
+        Assert.Equal(200, child2.GetHeight());
+        Assert.Equal(0, child1.GetTop());
+        Assert.Equal(100, child2.GetTop());
     }
 }
