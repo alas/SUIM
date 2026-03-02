@@ -59,11 +59,11 @@ public partial class Node
         _layout = null;
         Flex.CalculateLayout(this, parentWidth, parentHeight, parentDirection);
     }
+
     public void MarkAsDirty()
     {
         Flex.NodeMarkDirtyInternal(this);
     }
-
 
     #region Layout
 

@@ -244,12 +244,12 @@ public static class Style
     private static readonly HashSet<string> LayoutAttributeNames = new(StringComparer.OrdinalIgnoreCase)
     {
         "id", "width", "height", "padding", "margin",
-        "justify-self", "align-self",
+        "justify-self", "align-self", "justify-content", "align-content", "justify-items", "align-items",
         "visibility", "opacity", "background", "bg", "class",
         "left", "top", "anchor"
     };
 
-    private static bool IsLayoutAttribute(string name)
+    internal static bool IsLayoutAttribute(string name)
     {
         return LayoutAttributeNames.Contains(name);
     }

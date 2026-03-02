@@ -3,7 +3,6 @@ namespace SUIM.Parse.Components;
 using System;
 using System.Xml.Linq;
 using SUIM.Flexbox;
-using SUIM.Parse.Components.Attributes;
 
 public class Grid() : LayoutElement(nameof(Grid))
 {
@@ -11,7 +10,7 @@ public class Grid() : LayoutElement(nameof(Grid))
     public string? Rows { get; set; }
     public List<GridChild> GridChildren { get; } = [];
 
-    public override void ApplySUIMLayout()
+    internal override void ApplySUIMLayout()
     {
         throw new NotImplementedException();
     }

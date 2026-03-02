@@ -25,6 +25,6 @@
         <button onclick="OpenPopup('Save', 'Save() Not implemented yet!')">Save</button>
     </vstack>
 
-	<Popup title="@PopupTitle" message="@PopupMessage" visibility="@PopupVisibility" onYes="@YesHandler" onNo="@NoHandler" />
-    <ScreenOverlay message="@OverlayMessage" visibility="@OverlayVisibility" />
+	<Popup title="@PopupTitle" message="@PopupMessage" display="@PopupVisibility" onYes="@YesHandler" onNo="@NoHandler" />
+    <ScreenOverlay message="@OverlayMessage" display="@OverlayVisibility" />
 </grid>

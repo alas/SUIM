@@ -3,7 +3,6 @@ namespace SUIM.Tests;
 using System;
 using System.IO;
 using Xunit;
-using SUIM.Layout;
 using SUIM.Parse;
 using SUIM.Parse.Components;
 
@@ -209,7 +208,7 @@ public class ComponentStylingTests
         Assert.Equal("5px", button.Margin);
 
         // Now layout it
-        LayoutEngine.Layout(suimElement, 16, 1280, 720);
+        suimElement.CalculateLayout(1280, 720);
 
         // Check actual dimensions
         var buttonActual = vstack.Children[0];

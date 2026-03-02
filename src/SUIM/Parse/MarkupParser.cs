@@ -259,7 +259,7 @@ public static partial class MarkupParser
     private static void SetAttribute(XAttribute attr, UIElement rootElement, UIElement innerElement)
     {
         var name = attr.Name.LocalName;
-        var target = IsLayoutAttribute(name) ? rootElement : innerElement;
+        var target = Style.IsLayoutAttribute(name) ? rootElement : innerElement;
 
         // Store raw attribute for CustomComponent expansion or other metadata
         var value = attr.Value;
@@ -279,19 +279,6 @@ public static partial class MarkupParser
             var modelPropName = value[1..];
             target.Bindings.Add(new BindingDefinition(name, modelPropName));
         }
-    }
-
-    private static readonly HashSet<string> LayoutAttributeNames = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "id", "width", "height", "padding", "margin",
-        "justify-self", "align-self",
-        "visibility", "opacity", "background", "bg", "class",
-        "left", "top", "anchor"
-    };
-
-    private static bool IsLayoutAttribute(string name)
-    {
-        return LayoutAttributeNames.Contains(name);
     }
 
     private static readonly HashSet<string> StyleApplicationAttributeNames = new(StringComparer.OrdinalIgnoreCase)

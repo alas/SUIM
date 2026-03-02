@@ -9,10 +9,8 @@ using Stride.UI.Controls;
 using Stride.UI.Panels;
 using StrideUIElement = Stride.UI.UIElement;
 using StrideButton = Stride.UI.Controls.Button;
-using SUIM.Layout;
 using SUIMElement = Parse.Components.UIElement;
 using SUIMStride;
-using SUIM.Parse.Components;
 
 public class PopupIntegrationTests
 {
@@ -188,7 +186,7 @@ public class PopupIntegrationTests
         }
 
         // Now layout
-        LayoutEngine.Layout(suimRoot, 16, 1280, 720);
+        suimRoot.CalculateLayout(1280, 720);
 
         foreach (var btn in buttons)
         {
@@ -298,7 +296,7 @@ public class PopupIntegrationTests
         var (suimRoot, _) = Parse.MarkupParser.Parse(markup, model: null, basePath: rootPath);
 
         // First layout with generic values
-        LayoutEngine.Layout(suimRoot, 16, 1280, 720);
+        suimRoot.CalculateLayout(1280, 720);
 
         // Find the Popup (it's a component, probably resolved to something else, or we find it by searching child elements)
         // In the parsed tree, it should have the class or id that matches the popup, let's just find the first thing with visibility="collapsed"
@@ -316,7 +314,7 @@ public class PopupIntegrationTests
             // Try to set title and message if those IDs exist, or just layout again
         }
 
-        LayoutEngine.Layout(suimRoot, 16, 1280, 720);
+        suimRoot.CalculateLayout(1280, 720);
 
         // Verify no NaNs in the tree
         VerifyNoNaNs(suimRoot);

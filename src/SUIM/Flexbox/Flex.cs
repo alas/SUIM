@@ -21,7 +21,7 @@ public partial class Flex
         if (FloatsEqual(fractial, 0))
         {
             // First we check if the value is already rounded
-            scaledValue = scaledValue - fractial;
+            scaledValue -= fractial;
         }
         else if (FloatsEqual(fractial, 1))
         {
@@ -34,7 +34,7 @@ public partial class Flex
         }
         else if (forceFloor)
         {
-            scaledValue = scaledValue - fractial;
+            scaledValue -= fractial;
         }
         else
         {

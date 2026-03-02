@@ -134,10 +134,18 @@ public class Style
                 var tail = attr == "border-width" ? "-width" : "";
                 var name = attr == "border-width" ? "border" : attr;
                 if (Flex.ParseFourValueFromString(value, out var vals))
+                {
                     foreach (var kv in edgeNameToId)
+                    {
+#pragma warning disable CA2011 // Avoid infinite recursion
                         this[name + "-" + kv.Key + tail] = $"{vals![kv.Value].ValueUnit.ToString("F", System.Globalization.CultureInfo.InvariantCulture)}{(vals[kv.Value].Unit == Unit.Percent ? "%" : "")}";
+#pragma warning restore CA2011 // Avoid infinite recursion
+                    }
+                }
                 else
+                {
                     throw new Exception("Failed to parse attribute [" + attr + ":" + value + "]");
+                }
 
                 return;
             }

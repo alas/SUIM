@@ -2,17 +2,11 @@
 	<model>
 	{
 		"message": "",
-		"visibility": null
+		"display": null
 	}
 	</model>
-	<style>
-	.mygrid {
-		justify-self: center;
-		align-self: center;
-	}
-	</style>
-	<overlay visibility="@visibility">
-		<grid class="mygrid">
+	<overlay display="@display" class="centeredcontent">
+		<grid class="centeredcontent">
 			<label value="@message" />
 		</grid>
 	</overlay>

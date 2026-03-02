@@ -8,7 +8,7 @@ public class Overlay : LayoutElement
         BackgroundColor = "#80000000";
     }
 
-    public override void ApplySUIMLayout()
+    internal override void ApplySUIMLayout()
     {
         throw new NotImplementedException();
     }

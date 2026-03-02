@@ -47,7 +47,7 @@ public class Stack : LayoutElement
         return base.GetAttribute(name);
     }
 
-    public override void ApplySUIMLayout()
+    internal override void ApplySUIMLayout()
     {
         if (Gap != null && Flex.ParseValueFromString(Gap, out var gap))
         {

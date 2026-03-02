@@ -1,9 +1,11 @@
 namespace SUIM.Tests.Layout;
 
-using Xunit;
-using SUIM.Layout;
+using Stride.Rendering;
+using SUIM.Flexbox;
+using SUIM.Parse;
 using SUIM.Parse.Components;
 using SUIM.Parse.Components.Attributes;
+using Xunit;
 
 public class LayoutTests
 {
@@ -17,12 +19,24 @@ public class LayoutTests
         stack.AddChild(child1, null);
         stack.AddChild(child2, null);
         
-        LayoutEngine.Layout(stack, 16, 200, 200);
+        stack.CalculateLayout(200, 200);
         
         Assert.Equal(100, stack.ActualWidth);
         Assert.Equal(90, stack.ActualHeight); // 50 + 30 + 10 gap
     }
-    
+
+    [Fact]
+    public void Parse_Size_FractionalUnits()
+    {
+        var markup = "<div width=\"100%\" height=\"50%\" />";
+        var (element, _) = MarkupParser.Parse(markup);
+
+        Assert.IsType<Div>(element);
+        var div = (Div)element;
+        Assert.Equal(new Value(100, Unit.Percent), div.Node.StyleGetWidth());
+        Assert.Equal(new Value(50, Unit.Percent), div.Node.StyleGetHeight());
+    }
+
     [Fact]
     public void LayoutEngine_MeasuresStackWithFractionalUnits()
     {
@@ -33,7 +47,7 @@ public class LayoutTests
         stack.AddChild(child1, null);
         stack.AddChild(child2, null);
         
-        LayoutEngine.Layout(stack, 16, 300, 100);
+        stack.CalculateLayout(300, 100);
         
         Assert.Equal(300, stack.ActualWidth);
         Assert.Equal(50, stack.ActualHeight);
@@ -49,7 +63,7 @@ public class LayoutTests
         grid.AddChild(child1, null);
         grid.AddChild(child2, null);
         
-        LayoutEngine.Layout(grid, 16, 300, 200);
+        grid.CalculateLayout(300, 200);
         
         Assert.Equal(300, grid.ActualWidth);
         Assert.Equal(200, grid.ActualHeight);
@@ -63,7 +77,7 @@ public class LayoutTests
         
         div.AddChild(child, null);
         
-        LayoutEngine.Layout(div, 16, 400, 300);
+        div.CalculateLayout(400, 300);
         
         Assert.Equal(100, div.ActualWidth);
         Assert.Equal(50, div.ActualHeight);
@@ -77,7 +91,7 @@ public class LayoutTests
 
         grid.AddChild(child, null);
         
-        LayoutEngine.Layout(grid, 16, 800, 600);
+        grid.CalculateLayout(800, 600);
         
         Assert.Equal(100, grid.ActualWidth);
         Assert.Equal(50, grid.ActualHeight);
@@ -202,7 +216,7 @@ public class LayoutTests
         grid.AddChild(overlay2, null);
         
         // Layout with screen size
-        LayoutEngine.Layout(grid, 16, 1280, 720);
+        grid.CalculateLayout(1280, 720);
         
         // Grid should size to its explicit dimensions
         Assert.Equal(1280, grid.ActualWidth);

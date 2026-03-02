@@ -19,7 +19,6 @@ using SUIM.Parse;
 using SUIM.Parse.Components;
 using SUIMElement = SUIM.Parse.Components.UIElement;
 using SUIM.Parse.Components.Attributes;
-using SUIM.Flexbox;
 
 public class Parser
 {
@@ -31,11 +30,6 @@ public class Parser
     private dynamic? _currentModel;
     private Game? _game;
     public string? RootPath { get; set; }
-
-    public (StrideUIElement StrideRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
-    {
-        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, null);
-    }
 
     public (StrideUIElement StrideRoot, dynamic? Model) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
@@ -49,6 +43,11 @@ public class Parser
         project.ResolveDependencies(markup);
 
         return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath, viewName);
+    }
+
+    public (StrideUIElement StrideRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    {
+        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, null);
     }
 
     private (StrideUIElement StrideRoot, dynamic? Model) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null)
@@ -107,7 +106,7 @@ public class Parser
             preferredWidth = game.GraphicsDeviceManager.PreferredBackBufferWidth;
             preferredHeight = game.GraphicsDeviceManager.PreferredBackBufferHeight;
         }
-        //LayoutEngine.Layout(root, defaultFontSize, preferredWidth, preferredHeight);
+        root.CalculateLayout(preferredWidth, preferredHeight);
     }
 
     /// <summary>

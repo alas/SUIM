@@ -1,6 +1,7 @@
 ﻿namespace SUIM.Tests.Parsing;
 
 using Xunit;
+using SUIM.Flexbox;
 using SUIM.Parse;
 using SUIM.Parse.Components;
 using SUIM.Parse.Components.Attributes;
@@ -26,18 +27,18 @@ public class MarkupParserTests
     [Fact]
     public void Parse_DivWithAttributes()
     {
-        var markup = "<div id=\"main\" width=\"100\" height=\"200\" justify-self=\"center\" align-self=\"start\" margin=\"10\" padding=\"5\" bg=\"blue\" />";
+        var markup = "<div id=\"main\" width=\"100\" height=\"200\" justify-content=\"center\" align-self=\"start\" margin=\"10\" padding=\"5\" bg=\"blue\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Equal("main", div.Id);
-        Assert.Equal(new UnitValue(100), UnitValue.Parse(div.Width));
-        Assert.Equal(new UnitValue(200), UnitValue.Parse(div.Height));
-        Assert.Equal(HorizontalAlignment.Center, HorizontalAlignment.Parse(div.JustifySelf));
-        Assert.Equal(VerticalAlignment.Top, VerticalAlignment.Parse(div.AlignSelf));
-        Assert.Equal(new Thickness(10), Thickness.Parse(div.Margin));
-        Assert.Equal(new Thickness(5), Thickness.Parse(div.Padding));
+        Assert.Equal(100, div.GetWidth());
+        Assert.Equal(200, div.GetHeight());
+        Assert.Equal("center", div.GetAttribute("justify-content"));
+        Assert.Equal("top", div.GetAttribute("align-self"));
+        Assert.Equal("10", div.GetAttribute("margin"));
+        Assert.Equal("5", div.GetAttribute("padding"));
         Assert.Equal("blue", div.BackgroundColor);
     }
 
@@ -190,7 +191,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_AnchorAttribute_Top()
     {
-        var markup = "<div anchor=\"Top\" />";
+        var markup = "<div anchor=\"top\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
@@ -201,24 +202,12 @@ public class MarkupParserTests
     [Fact]
     public void Parse_AnchorAttribute_Left()
     {
-        var markup = "<div anchor=\"Left\" />";
+        var markup = "<div anchor=\"left\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Equal(Anchor.Left, Anchor.Parse(div.Anchor));
-    }
-
-    [Fact]
-    public void Parse_SynonymAttributes()
-    {
-        var markup = "<div justify-self=\"end\" align-self=\"end\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Equal(HorizontalAlignment.Right, HorizontalAlignment.Parse(div.JustifySelf));
-        Assert.Equal(VerticalAlignment.Bottom, VerticalAlignment.Parse(div.AlignSelf));
     }
 
     [Fact]
@@ -366,8 +355,8 @@ public class MarkupParserTests
         Assert.IsType<TextArea>(element);
         var textarea = (TextArea)element;
         Assert.Equal("notes", textarea.Id);
-        Assert.Equal(new UnitValue(300), UnitValue.Parse(textarea.Width));
-        Assert.Equal(new UnitValue(200), UnitValue.Parse(textarea.Height));
+        Assert.Equal(300, textarea.GetWidth());
+        Assert.Equal(200, textarea.GetHeight());
     }
 
     // ============== STACK SYNONYMS TESTS ==============
@@ -457,12 +446,12 @@ public class MarkupParserTests
     [Fact]
     public void Parse_Visibility_Attribute()
     {
-        var markup = "<div visibility=\"hidden\" />";
+        var markup = "<div display=\"hidden\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Visibility.Hidden, Visibility.Parse(div.Visibility));
+        Assert.Equal("hidden", div.GetAttribute("display"));
     }
 
     [Fact]
@@ -484,8 +473,8 @@ public class MarkupParserTests
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(50f, UnitValue.Parse(div.Left).Value);
-        Assert.Equal(100f, UnitValue.Parse(div.Top).Value);
+        Assert.Equal(50f, div.GetLeft());
+        Assert.Equal(100f, div.GetTop());
     }
 
     [Fact]
@@ -625,20 +614,8 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(new UnitValue(100), UnitValue.Parse(div.Width));
-        Assert.Equal(new UnitValue(200), UnitValue.Parse(div.Height));
-    }
-
-    [Fact]
-    public void Parse_Size_FractionalUnits()
-    {
-        var markup = "<div width=\"fr\" height=\"2fr\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Equal(new UnitValue(1, UnitType.Fr), UnitValue.Parse(div.Width));
-        Assert.Equal(new UnitValue(2, UnitType.Fr), UnitValue.Parse(div.Height));
+        Assert.Equal(100, div.GetWidth());
+        Assert.Equal(200, div.GetHeight());
     }
 
     [Fact]
@@ -649,7 +626,7 @@ else
 
         Assert.IsType<Label>(element);
         var label = (Label)element;
-        Assert.Equal(new UnitValue(0, UnitType.Auto), UnitValue.Parse(label.Width));
+        Assert.Equal("auto", label.GetAttribute("width"));
     }
 
     // ============== ADDITIONAL INPUT TYPES TESTS ==============
@@ -981,23 +958,23 @@ else
     [Fact]
     public void Parse_Visibility_Visible()
     {
-        var markup = "<div visibility=\"visible\" />";
+        var markup = "<div display=\"flex\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Visibility.Visible, Visibility.Parse(div.Visibility));
+        Assert.Equal("flex", div.Display);
     }
 
     [Fact]
     public void Parse_Visibility_Collapsed()
     {
-        var markup = "<div visibility=\"collapsed\" />";
+        var markup = "<div visibility=\"hidden\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal(Visibility.Collapsed, Visibility.Parse(div.Visibility));
+        Assert.Equal("hidden", div.Display);
     }
 
     // ============== GRID SPAN EDGE CASES ==============

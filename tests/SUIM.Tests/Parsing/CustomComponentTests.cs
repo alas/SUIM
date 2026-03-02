@@ -80,7 +80,7 @@ StyledTag { width: 450; background: red; }
 
             // 4. Verify style application
             var custom = Assert.IsType<CustomComponent>(element.Children[0]);
-            Assert.Equal(450f, UnitValue.Parse(custom.Width).Value);
+            Assert.Equal(450f, custom.GetWidth());
             Assert.Equal("red", custom.BackgroundColor);
         }
         finally

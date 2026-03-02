@@ -2,7 +2,6 @@ namespace SUIM.Tests.Layout;
 
 using Xunit;
 using Stride.UI.Panels;
-using SUIM.Layout;
 using SUIMStride;
 using SUIM.Parse;
 using SUIM.Parse.Components;
@@ -19,7 +18,7 @@ public class StrideLayoutTests
             </stack>";
             
         var (element, _) = MarkupParser.Parse(markup);
-        LayoutEngine.Layout(element, 16, 200, 200);
+        element.CalculateLayout(200, 200);
         
         Assert.Equal(100, element.ActualWidth);
         Assert.Equal(90, element.ActualHeight); // 50 + 30 + 10 gap
@@ -35,7 +34,7 @@ public class StrideLayoutTests
             </stack>";
             
         var (element, _) = MarkupParser.Parse(markup);
-        LayoutEngine.Layout(element, 16, 300, 100);
+        element.CalculateLayout(300, 100);
         
         Assert.Equal(300, element.ActualWidth);
         Assert.Equal(50, element.ActualHeight);
@@ -51,7 +50,7 @@ public class StrideLayoutTests
             </stack>";
             
         var (element, _) = MarkupParser.Parse(markup);
-        LayoutEngine.Layout(element, 16, 200, 200);
+        element.CalculateLayout(200, 200);
         
         // 2rem = 32px, 1rem = 16px
         Assert.Equal(200, element.ActualWidth);
@@ -76,7 +75,7 @@ public class StrideLayoutTests
             </stack>";
 
         var (element, _) = MarkupParser.Parse(markup);
-        LayoutEngine.Layout(element, 16, 200, 200);
+        element.CalculateLayout(200, 200);
 
         // 2rem = 32px, 1rem = 16px
         Assert.Equal(32, element.ActualWidth);
@@ -111,7 +110,7 @@ public class StrideLayoutTests
             </stack>";
 
         var (element, _) = MarkupParser.Parse(markup);
-        LayoutEngine.Layout(element, 25, 640, 480);
+        element.CalculateLayout(640, 480);
 
         Assert.Equal(640, element.ActualWidth);
         Assert.Equal(480, element.ActualHeight);
@@ -145,30 +144,30 @@ public class StrideLayoutTests
     {
         // Simulates MainView layout: root grid with main UI and overlays
         var markup = @"
-            <grid>
+            <grid class=""centeredcontent"">
                 <style>
-                    .container { justify-self: center; align-self: center; }
+                    .centeredcontent { justify-content: center; align-content: center; }
                     .overlay { visibility: collapsed; }
                 </style>
-                <vstack class=""container"" width=""400"" height=""300"">
+                <vstack width=""400"" height=""300"">
                     <label value=""Main UI"" />
                 </vstack>
                 
-                <overlay class=""overlay"" id=""popup"">
-                    <grid width=""360"" height=""180"" justify-self=""center"" align-self=""center"">
+                <overlay class=""overlay centeredcontent"" id=""popup"">
+                    <grid width=""360"" height=""180"">
                         <label value=""Popup"" />
                     </grid>
                 </overlay>
                 
-                <overlay class=""overlay"" id=""screenOverlay"">
-                    <grid justify-self=""center"" align-self=""center"">
+                <overlay class=""overlay centeredcontent"" id=""screenOverlay"">
+                    <grid>
                         <label value=""Blocker"" />
                     </grid>
                 </overlay>
             </grid>";
         
         var (root, _) = MarkupParser.Parse(markup);
-        LayoutEngine.Layout(root, 16, 1280, 720);
+        root.CalculateLayout(1280, 720);
         
         // Root grid should measure to 1280x720 (available space with no explicit size)
         Assert.Equal(1280, root.ActualWidth);
@@ -222,7 +221,7 @@ public class StrideLayoutTests
         
         // Parse and layout in SUIM
         var (suimRoot, _) = MarkupParser.Parse(markup);
-        LayoutEngine.Layout(suimRoot, 16, 1280, 720);
+        suimRoot.CalculateLayout(1280, 720);
         
         // Map to Stride
         var mapper = new Parser();

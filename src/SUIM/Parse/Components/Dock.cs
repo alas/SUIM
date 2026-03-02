@@ -19,15 +19,9 @@ public class Dock() : UIElement(nameof(Dock))
         }
     }
 
-    public override void ApplySUIMLayout()
+    internal override void ApplySUIMLayout()
     {
         Node.StyleSetFlexDirection(FlexDirection.Row);
-
-        base.ApplySUIMLayout();
-    }
-
-    public void CalculateLayout(float parentWidth, float parentHeight, Direction parentDirection)
-    {
         Node.Children.Clear();
         var current = Node;
 
@@ -89,7 +83,7 @@ public class Dock() : UIElement(nameof(Dock))
             }
         }
 
-        Node.CalculateLayout(parentWidth, parentHeight, parentDirection);
+        base.ApplySUIMLayout();
     }
 
     private static Node CreateFillColumn()

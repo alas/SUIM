@@ -537,52 +537,6 @@ public partial class Flex
         }
         return false;
     }
-    public static string RenderStyleAttrValue(Style style, string attrKey)
-    {
-        switch (attrKey)
-        {
-            case "direction":
-                break;
-            case "flex-direction":
-                break;
-            case "justify-content":
-                break;
-            case "align-content":
-                break;
-            case "align-items":
-                break;
-            case "align-self":
-                break;
-            case "flex-wrap":
-                break;
-            case "overflow":
-                break;
-            case "display":
-                break;
-            case "flex-grow":
-                break;
-            case "flex-shrink":
-                break;
-            case "flex-basis":
-                break;
-            case "position":
-                break;
-            case "width":
-                break;
-            case "height":
-                break;
-            case "min-width":
-                break;
-            case "min-height":
-                break;
-            case "max-width":
-                break;
-            case "max-height":
-                break;
-        }
-
-        return "";
-    }
 
     public static bool ParseStyleAttr(Style style, string attrKey, string attrValue)
     {

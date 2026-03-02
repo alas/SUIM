@@ -91,9 +91,9 @@ public abstract class UIElement(string tagName)
         {
             ReadOnly = value as string;
         }
-        else
+        else if (value is string s)
         {
-            // todo: send to Yoga
+            Node.nodeStyle[name] = s;
         }
     }
 
@@ -109,8 +109,7 @@ public abstract class UIElement(string tagName)
         if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase)) return (this as IPlaceholder)?.Placeholder;
         if (name.Equals("readonly", StringComparison.OrdinalIgnoreCase)) return ReadOnly;
 
-        // todo: get from Yoga
-        return null;
+        return Node.nodeStyle[name];
     }
 
     public float GetLeft()
@@ -157,12 +156,18 @@ public abstract class UIElement(string tagName)
         return Parent?.GetEffectiveModel();
     }
 
-    public virtual void ApplySUIMLayout()
+    internal virtual void ApplySUIMLayout()
     {
         foreach (var child in Children)
         {
             child.ApplySUIMLayout();
         }
+    }
+
+    public void CalculateLayout(float parentWidth, float parentHeight, Direction parentDirection = Direction.LTR)
+    {
+        ApplySUIMLayout();
+        Node.CalculateLayout(parentWidth, parentHeight, parentDirection);
     }
 }
 

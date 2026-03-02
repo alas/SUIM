@@ -1,6 +1,8 @@
+.centeredcontent {
+    justify-content: center;
+    align-content: center;
+}
 text, label {
-    justify-self: start;
-    align-self: start;
     color: white;
     font-size: 16px;
 }

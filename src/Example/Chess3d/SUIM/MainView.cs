@@ -97,22 +97,22 @@ public class MainView
     {
         Model.PopupTitle = title;
         Model.PopupMessage = message;
-        Model.PopupVisibility = "visible";
+        Model.PopupVisibility = "grid";
     }
 
     private void UnshowPopup()
     {
-        Model.PopupVisibility = "collapsed";
+        Model.PopupVisibility = "none";
     }
 
     private void ShowBlocker(string message)
     {
         Model.OverlayMessage = message;
-        Model.OverlayVisibility = "visible";
+        Model.OverlayVisibility = "grid";
     }
 
     private void UnshowBlocker()
     {
-        Model.OverlayVisibility = "collapsed";
+        Model.OverlayVisibility = "none";
     }
 }

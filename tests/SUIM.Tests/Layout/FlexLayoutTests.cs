@@ -1,7 +1,6 @@
 namespace SUIM.Tests.Layout;
 
 using Xunit;
-using SUIM.Layout;
 using SUIM.Parse.Components;
 
 public class FlexLayoutTests
@@ -16,7 +15,7 @@ public class FlexLayoutTests
         div.AddChild(child1, null);
         div.AddChild(child2, null);
         
-        LayoutEngine.Layout(div, 16, 300, 100);
+        div.CalculateLayout(300, 100);
         
         Assert.Equal(100, child1.ActualWidth);
         Assert.Equal(200, child2.ActualWidth); // 300 - 100
@@ -32,7 +31,7 @@ public class FlexLayoutTests
         
         div.AddChild(child1, null);
         
-        LayoutEngine.Layout(div, 16, 300, 100);
+        div.CalculateLayout(300, 100);
         
         Assert.Equal(100, child1.ActualX); // (300 - 100) / 2
     }
@@ -47,7 +46,7 @@ public class FlexLayoutTests
         div.AddChild(child1, null);
         div.AddChild(child2, null);
         
-        LayoutEngine.Layout(div, 16, 300, 100);
+        div.CalculateLayout(300, 100);
         
         Assert.Equal(0, child1.ActualX);
         Assert.Equal(250, child2.ActualX); // 300 - 50
@@ -61,7 +60,7 @@ public class FlexLayoutTests
         
         div.AddChild(child1, null);
         
-        LayoutEngine.Layout(div, 16, 300, 100);
+        div.CalculateLayout(300, 100);
         
         Assert.Equal(100, child1.ActualHeight);
     }
@@ -76,7 +75,7 @@ public class FlexLayoutTests
         div.AddChild(child1, null);
         div.AddChild(child2, null);
         
-        LayoutEngine.Layout(div, 16, 100, 300);
+        div.CalculateLayout(100, 300);
         
         Assert.Equal(100, child1.ActualHeight);
         Assert.Equal(200, child2.ActualHeight);
