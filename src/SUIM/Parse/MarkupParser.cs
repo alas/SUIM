@@ -121,9 +121,6 @@ public static partial class MarkupParser
             {
                 scroll.Direction = dir;
             }
-            // If the inner element was unspecified, change it to auto when wrapped by a scroll-viewport.
-            rootElement.Width ??= "auto";
-            rootElement.Height ??= "auto";
 
             scroll.AddChild(rootElement, element);
             rootElement = scroll;
@@ -133,10 +130,6 @@ public static partial class MarkupParser
         {
             var border = new Border();
             border.SetAttribute("border", borderAttr.Value);
-            // Similar behavior for border wrapper: inner element should become `auto` for sizing if it was unspecified.
-            rootElement.Width ??= "auto";
-            rootElement.Height ??= "auto";
-
             border.AddChild(rootElement, element);
             rootElement = border;
         }
@@ -145,9 +138,6 @@ public static partial class MarkupParser
         {
             var bg = new BackgroundImage();
             bg.SetAttribute("backgroundimage", bgAttr.Value);
-            rootElement.Width ??= "auto";
-            rootElement.Height ??= "auto";
-
             bg.AddChild(rootElement, element);
             rootElement = bg;
         }

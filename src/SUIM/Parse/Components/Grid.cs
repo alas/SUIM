@@ -3,7 +3,6 @@ namespace SUIM.Parse.Components;
 using System;
 using System.Xml.Linq;
 using SUIM.Flexbox;
-using SUIM.Layout;
 using SUIM.Parse.Components.Attributes;
 
 public class Grid() : LayoutElement(nameof(Grid))
@@ -12,7 +11,7 @@ public class Grid() : LayoutElement(nameof(Grid))
     public string? Rows { get; set; }
     public List<GridChild> GridChildren { get; } = [];
 
-    public override void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection)
+    public override void ApplySUIMLayout()
     {
         throw new NotImplementedException();
     }
@@ -69,54 +68,19 @@ public class Grid() : LayoutElement(nameof(Grid))
         }
     }
 
-    public static float[] ParseUnits(string? unitsString, float totalSize)
+    public static Value[] ParseUnits(string? unitsString, Value totalSize)
     {
         if (string.IsNullOrWhiteSpace(unitsString))
             return [totalSize];
 
-        var parts = unitsString.Split([','], StringSplitOptions.RemoveEmptyEntries)
+        var parts = unitsString.Split([',', ' '], StringSplitOptions.RemoveEmptyEntries)
             .Select(s => s.Trim())
             .ToArray();
 
         if (parts.Length == 0)
             return [totalSize];
 
-        var result = new float[parts.Length];
-        var frUnits = new List<UnitValue>();
-        float fixedSize = 0;
-
-        for (int i = 0; i < parts.Length; i++)
-        {
-            var unit = UnitValue.Parse(parts[i]);
-            if (unit.Type == UnitType.Fr)
-            {
-                frUnits.Add(unit);
-            }
-            else
-            {
-                result[i] = ToPixels(unit);
-                fixedSize += result[i];
-            }
-        }
-
-        float remainingSpace = Math.Max(0, totalSize - fixedSize);
-        if (frUnits.Count > 0)
-        {
-            var values = frUnits.Select(u => u.Value).ToArray();
-            var resolvedValues = FractionalUnit.Resolve(values, remainingSpace);
-
-            int index = 0;
-            for (int i = 0; i < parts.Length; i++)
-            {
-                var unit = UnitValue.Parse(parts[i]);
-                if (unit.Type == UnitType.Fr)
-                {
-                    result[i] = resolvedValues[index++];
-                }
-            }
-        }
-
-        return result;
+        return [.. parts.Select(x => Flex.ParseValueFromString(x, out var v) ? v : Value.UndefinedValue)];
     }
 
     public static float GetSpanSize(float[] sizes, int start, int length)

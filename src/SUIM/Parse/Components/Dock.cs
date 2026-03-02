@@ -19,23 +19,11 @@ public class Dock() : UIElement(nameof(Dock))
         }
     }
 
-    public override void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection)
+    public override void ApplySUIMLayout()
     {
-        var width = Flex.ParseValueFromString(Width ?? "0", out var v) ? v : new Value(0, Unit.Point);
-        var height = Flex.ParseValueFromString(Height ?? "0", out var h) ? h : new Value(0, Unit.Point);
-        Node.Helper_SetDimensions(width, Dimension.Width);
-        Node.Helper_SetDimensions(height, Dimension.Height);
         Node.StyleSetFlexDirection(FlexDirection.Row);
 
-        foreach (var child in Children)
-        {
-            child.ApplyLayout(parentWidth, parentHeight, parentDirection);
-        }
-    }
-
-    public void AddDockChild(DockChild item)
-    {
-        DockChildren.Add(item);
+        base.ApplySUIMLayout();
     }
 
     public void CalculateLayout(float parentWidth, float parentHeight, Direction parentDirection)

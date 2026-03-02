@@ -474,6 +474,7 @@ public partial class Flex
         result = res;
         return parsed;
     }
+
     /// <summary>
     /// margin="2px" | margin="12px 13px" | margin="12px 13px 1px" | margin="1px 2px 3px 4px"
     /// </summary>

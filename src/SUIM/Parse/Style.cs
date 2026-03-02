@@ -201,10 +201,6 @@ public static class Style
             if (properties.TryGetValue("width", out var w)) scroll.SetAttribute("width", w);
             if (properties.TryGetValue("height", out var h)) scroll.SetAttribute("height", h);
 
-            // When a style creates a scroll wrapper, the inner element should default to `auto` if it was unspecified.
-            element.Width ??= "auto";
-            element.Height ??= "auto";
-
             scroll.AddChild(element, null);
             element = scroll;
         }
@@ -220,22 +216,7 @@ public static class Style
             {
                 border.SetAttribute(kvp.Key, kvp.Value);
             }
-            // Fallback: also apply explicit width/height from properties if present (defensive)
-            if (properties.TryGetValue("width", out var w)) border.SetAttribute("width", w);
-            if (properties.TryGetValue("height", out var h)) border.SetAttribute("height", h);
 
-            // Ensure numeric width/height in styles are parsed and applied directly (defensive - avoids any SetAttribute parsing quirks)
-            if (properties.TryGetValue("width", out var pw) && !string.IsNullOrWhiteSpace(pw))
-            {
-                border.Width = pw;
-            }
-            if (properties.TryGetValue("height", out var ph) && !string.IsNullOrWhiteSpace(ph))
-            {
-                border.Height = ph;
-            }
-
-            element.Width ??= "auto";
-            element.Height ??= "auto";
             border.AddChild(element, null);
             element = border;
         }
@@ -253,8 +234,6 @@ public static class Style
             if (properties.TryGetValue("width", out var w)) bg.SetAttribute("width", w);
             if (properties.TryGetValue("height", out var h)) bg.SetAttribute("height", h);
 
-            element.Width ??= "auto";
-            element.Height ??= "auto";
             bg.AddChild(element, null);
             element = bg;
         }

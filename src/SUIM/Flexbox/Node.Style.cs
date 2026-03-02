@@ -471,6 +471,15 @@ public partial class Node
     }
 
     // StyleSetMargin sets margin
+    public void StyleSetMargin(Edge edge, Value value)
+    {
+        if (this.nodeStyle.Margin[(int)edge] != value)
+        {
+            this.nodeStyle.Margin[(int)edge] = value;
+            Flex.NodeMarkDirtyInternal(this);
+        }
+    }
+
     public void StyleSetMargin(Edge edge, float margin)
     {
         if (this.nodeStyle.Margin[(int)edge].ValueUnit != margin ||

@@ -24,7 +24,7 @@ public abstract class UIElement(string tagName)
     public List<BindingDefinition> Bindings { get; } = [];
     public dynamic? Model { get; set; }
     public Dictionary<string, string> Events { get; set; } = [];
-    public Node Node { get; } = new();
+    internal Node Node { get; } = new();
 
     public virtual void AddChild(UIElement child, XElement? element)
     {
@@ -113,6 +113,26 @@ public abstract class UIElement(string tagName)
         return null;
     }
 
+    public float GetLeft()
+    {
+        return Node.LayoutGetLeft();
+    }
+
+    public float GetTop()
+    {
+        return Node.LayoutGetTop();
+    }
+
+    public float GetWidth()
+    {
+        return Node.LayoutGetWidth();
+    }
+
+    public float GetHeight()
+    {
+        return Node.LayoutGetHeight();
+    }
+
     public static float ToPixels(string? value)
     {
         return ToPixels(UnitValue.Parse(value));
@@ -137,7 +157,13 @@ public abstract class UIElement(string tagName)
         return Parent?.GetEffectiveModel();
     }
 
-    public virtual void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection) { }
+    public virtual void ApplySUIMLayout()
+    {
+        foreach (var child in Children)
+        {
+            child.ApplySUIMLayout();
+        }
+    }
 }
 
 public record BindingDefinition(string TargetPropertyName, string ModelPropertyName);

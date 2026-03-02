@@ -4,8 +4,6 @@ using SUIM.Flexbox;
 
 public class Stack : LayoutElement
 {
-    public Node Node { get; } = new Node();
-
     public Orientation Orientation
     {
         get;
@@ -21,36 +19,6 @@ public class Stack : LayoutElement
         Node.StyleSetDisplay(Display.Flex);
         Node.StyleSetAlignItems(Align.FlexStart);
         Node.StyleSetJustifyContent(Justify.FlexStart);
-    }
-
-    public override void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection)
-    {
-        // Gap
-        // Yoga added gap support later; if your version doesn't support Gap,
-        // emulate spacing using margins on children:
-        for (int i = 0; i < Node.Children.Count; i++)
-        {
-            var node = Node.Children[i];
-            var succes = Flex.ParseValueFromString(Gap ?? "0", out var gap);
-
-            if (Orientation == Orientation.Vertical)
-            {
-                var resolved = succes ? Flex.ResolveValue(gap, Parent?.MeasuredContentHeight ?? 0) : 0; ;
-                node.StyleSetMargin(Edge.Top, i == 0 ? 0 : resolved);
-                node.StyleSetMargin(Edge.Left, 0);
-            }
-            else
-            {
-                var resolved = succes ? Flex.ResolveValue(gap, Parent?.MeasuredContentWidth ?? 0) : 0; ;
-                node.StyleSetMargin(Edge.Left, i == 0 ? 0 : resolved);
-                node.StyleSetMargin(Edge.Top, 0);
-            }
-        }
-
-        foreach (var child in Children)
-        {
-            child.ApplyLayout(parentWidth, parentHeight, parentDirection);
-        }
     }
 
     public override void SetAttribute(string name, object? value)
@@ -70,6 +38,39 @@ public class Stack : LayoutElement
         {
             base.SetAttribute(name, value);
         }
+    }
+
+    public override string? GetAttribute(string name)
+    {
+        if (name.Equals("orientation", StringComparison.OrdinalIgnoreCase)) return Orientation.ToString();
+
+        return base.GetAttribute(name);
+    }
+
+    public override void ApplySUIMLayout()
+    {
+        if (Gap != null && Flex.ParseValueFromString(Gap, out var gap))
+        {
+            // Yoga added gap support later; if your version doesn't support Gap,
+            // emulate spacing using margins on children:
+            for (int i = 0; i < Node.Children.Count; i++)
+            {
+                var node = Node.Children[i];
+
+                if (Orientation == Orientation.Vertical)
+                {
+                    node.StyleSetMargin(Edge.Top, i == 0 ? Value.Zero : gap);
+                    node.StyleSetMargin(Edge.Left, 0);
+                }
+                else
+                {
+                    node.StyleSetMargin(Edge.Left, i == 0 ? Value.Zero : gap);
+                    node.StyleSetMargin(Edge.Top, 0);
+                }
+            }
+        }
+
+        base.ApplySUIMLayout();
     }
 }
 

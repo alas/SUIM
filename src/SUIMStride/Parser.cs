@@ -14,12 +14,12 @@ using StrideUIElement = Stride.UI.UIElement;
 using StrideButton = Stride.UI.Controls.Button;
 using Stride.UI.Panels;
 using SUIM;
-using SUIM.Layout;
 using SUIM.Model;
 using SUIM.Parse;
 using SUIM.Parse.Components;
 using SUIMElement = SUIM.Parse.Components.UIElement;
 using SUIM.Parse.Components.Attributes;
+using SUIM.Flexbox;
 
 public class Parser
 {
@@ -307,32 +307,14 @@ public class Parser
     {
         stride.Name = suim.Id;
         stride.Opacity = suim.Opacity == null ? 1 : Convert.ToSingle(suim.Opacity);
-        var vis = SUIM.Parse.Components.Attributes.Visibility.Parse(suim.Visibility);
-        stride.Visibility = vis switch
-        {
-            SUIM.Parse.Components.Attributes.Visibility.Hidden => Stride.UI.Visibility.Hidden,
-            SUIM.Parse.Components.Attributes.Visibility.Collapsed => Stride.UI.Visibility.Collapsed,
-            _ => Stride.UI.Visibility.Visible,
-        };
 
         // Use calculated dimensions
         stride.SetCanvasAbsolutePosition(new Vector3(
-            FractionalUnit.Sanitize(suim.ActualX),
-            FractionalUnit.Sanitize(suim.ActualY), 0));
-        stride.Width = SanitizeSizeForStride(suim.ActualWidth);
-        stride.Height = SanitizeSizeForStride(suim.ActualHeight);
+            suim.GetLeft(),
+            suim.GetTop(), 0));
+        stride.Width = SanitizeSizeForStride(suim.GetWidth());
+        stride.Height = SanitizeSizeForStride(suim.GetHeight());
 
-        // Use the computed margins from SUIM, which represent the actual margin values applied to the element
-        stride.Margin = new Stride.UI.Thickness(
-            FractionalUnit.Sanitize(suim.ComputedMarginLeft),
-            FractionalUnit.Sanitize(suim.ComputedMarginTop),
-            FractionalUnit.Sanitize(suim.ComputedMarginRight),
-            FractionalUnit.Sanitize(suim.ComputedMarginBottom));
-
-        if (stride is ContentControl cc)
-        {
-            cc.Padding = ThicknessToStride(suim.Padding, suim);
-        }
         if (suim.BackgroundColor != null)
         {
             stride.BackgroundColor = ParseColor(suim.BackgroundColor);
@@ -565,9 +547,9 @@ public class Parser
 
     private static float SanitizeSizeForStride(float value)
     {
-        // Dimensions of MaxValue break Stride UI matrices (infinity)
-        // Dimensions should be resolved to pixels by LayoutEngine, if it's still MaxValue here, it's effectively 0 for rendering
-        if (value == float.MaxValue) return 0;
-        return FractionalUnit.Sanitize(value);
+        if (float.IsNaN(value) || float.IsInfinity(value) || value < 0 || value == float.MaxValue)
+            return 0;
+
+        return value;
     }
 }
