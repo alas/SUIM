@@ -1,73 +1,30 @@
 namespace SUIM.Parse.Components;
 
+using System.Xml.Linq;
 using SUIM.Flexbox;
 using SUIM.Parse.Components.Attributes;
-using System.Xml.Linq;
-
-public class LayoutEngine { public static void Layout(UIElement? x, float a, float b, float c) { } }
 
 public abstract class UIElement(string tagName)
 {
     public string? Id { get; set; }
     public string? Class { get; set; }
-    public string? JustifySelf { get; set; }
-    public string? JustifyItems { get; set; }
-    public string? JustifyContent { get; set; }
-    public string? AlignSelf { get; set; }
-    public string? AlignItems { get; set; }
-    public string? AlignContent { get; set; }
-    public string? Top { get; set; }
-    public string? Left { get; set; }
-    public string? Bottom { get; set; }
-    public string? Right { get; set; }
-    public string? Width { get; set; }
-    public string? Height { get; set; }
-    public string? Margin { get; set; }
-    public string? Padding { get; set; }
-    public string? Font { get; set; }
-    public string? FontSize { get; set; }
     public string? Anchor { get; set; }
     public string? Color { get; set; }
     public string? BackgroundColor { get; set; }
     public string? Opacity { get; set; }
-    public string? ZIndex { get; set; }
-    public string? Visibility { get; set; } = "visible";
     public string? ReadOnly { get; set; }
     public string? StopClicks { get; set; }
     public string? BackgroundImage { get; set; }
 
     // Internal properties to the engine - not directly settable via markup attributes
     public string TagName { get; } = tagName.ToLowerInvariant();
+    public bool IsComponentRoot { get; set; }
     public UIElement? Parent { get; set; }
-    public string? RootFont { get; set; }
-    public float RootFontSize { get; set; } = float.NaN;
+    public List<UIElement> Children { get; } = [];
     public List<BindingDefinition> Bindings { get; } = [];
     public dynamic? Model { get; set; }
-    public bool IsComponentRoot { get; set; }
     public Dictionary<string, string> Events { get; set; } = [];
-    public List<UIElement> Children { get; } = [];
-    public Dictionary<string, object?> Attributes { get; } = [];
-
-    // Actual layout properties calculated during measurement/arrangement
-    public float ActualX { get; set; } = float.NaN;
-    public float ActualY { get; set; } = float.NaN;
-    public float ActualWidth { get; set; } = float.NaN;
-    public float ActualHeight { get; set; } = float.NaN;
-
-    // Layout calculation properties (transient, used during measurement/positioning)
-    public float MeasuredContentWidth { get; set; }
-    public float MeasuredContentHeight { get; set; }
-    public float ComputedMarginLeft { get; set; }
-    public float ComputedMarginTop { get; set; }
-    public float ComputedMarginRight { get; set; }
-    public float ComputedMarginBottom { get; set; }
-    public float ComputedPaddingLeft { get; set; }
-    public float ComputedPaddingTop { get; set; }
-    public float ComputedPaddingRight { get; set; }
-    public float ComputedPaddingBottom { get; set; }
-    public float CurrentFontSize { get; set; }
-    public bool NeedsVerticalScroll { get; set; }
-    public bool NeedsHorizontalScroll { get; set; }
+    public Node Node { get; } = new();
 
     public virtual void AddChild(UIElement child, XElement? element)
     {
@@ -96,113 +53,9 @@ public abstract class UIElement(string tagName)
         {
             Id = value as string;
         }
-        else if (name.Equals("top", StringComparison.OrdinalIgnoreCase))
-        {
-            Top = value as string;
-        }
-        else if (name.Equals("left", StringComparison.OrdinalIgnoreCase))
-        {
-            Left = value as string;
-        }
-        else if (name.Equals("bottom", StringComparison.OrdinalIgnoreCase))
-        {
-            Bottom = value as string;
-        }
-        else if (name.Equals("right", StringComparison.OrdinalIgnoreCase))
-        {
-            Right = value as string;
-        }
-        else if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase))
-        {
-            Opacity = value as string;
-        }
-        else if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase) || name.Equals("zindex", StringComparison.OrdinalIgnoreCase))
-        {
-            ZIndex = value as string;
-        }
-        else if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase))
-        {
-            Visibility = value as string;
-        }
-        else if (name.Equals("justify-self", StringComparison.OrdinalIgnoreCase) || name.Equals("justifyself", StringComparison.OrdinalIgnoreCase))
-        {
-            JustifySelf = value as string;
-        }
-        else if (name.Equals("justify-items", StringComparison.OrdinalIgnoreCase) || name.Equals("justifyitems", StringComparison.OrdinalIgnoreCase))
-        {
-            JustifyItems = value as string;
-        }
-        else if (name.Equals("justify-content", StringComparison.OrdinalIgnoreCase) || name.Equals("justifycontent", StringComparison.OrdinalIgnoreCase))
-        {
-            JustifyContent = value as string;
-        }
-        else if (name.Equals("align-self", StringComparison.OrdinalIgnoreCase) || name.Equals("alignself", StringComparison.OrdinalIgnoreCase))
-        {
-            AlignSelf = value as string;
-        }
-        else if (name.Equals("align-items", StringComparison.OrdinalIgnoreCase) || name.Equals("alignitems", StringComparison.OrdinalIgnoreCase))
-        {
-            AlignItems = value as string;
-        }
-        else if (name.Equals("align-content", StringComparison.OrdinalIgnoreCase) || name.Equals("aligncontent", StringComparison.OrdinalIgnoreCase))
-        {
-            AlignContent = value as string;
-        }
-        else if (name.Equals("margin", StringComparison.OrdinalIgnoreCase))
-        {
-            Margin = value as string;
-        }
-        else if (name.Equals("padding", StringComparison.OrdinalIgnoreCase))
-        {
-            Padding = value as string;
-        }
-        else if (name.Equals("width", StringComparison.OrdinalIgnoreCase))
-        {
-            Width = value as string;
-        }
-        else if (name.Equals("height", StringComparison.OrdinalIgnoreCase))
-        {
-            Height = value as string;
-        }
         else if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase))
         {
             Anchor = value as string;
-        }
-        else if (name.Equals("class", StringComparison.OrdinalIgnoreCase))
-        {
-            Class = value as string;
-        }
-        else if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
-        {
-            var handlerName = value as string;
-            // Treat only known event attributes (e.g., onclick) as events. Attributes that simply start with "on" but
-            // are intended as component properties (like "onbuttonclick") should be preserved as regular attributes.
-            var eventName = name[2..];
-            if (string.Equals(eventName, "click", StringComparison.OrdinalIgnoreCase))
-            {
-                Events[eventName] = handlerName ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-            }
-            else
-            {
-                // Preserve as regular attribute for components or custom usage
-                Attributes[name] = value;
-            }
-        }
-        else if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase))
-        {
-            (this as IPlaceholder)?.Placeholder = value as string;
-        }
-        else if (name.Equals("font", StringComparison.OrdinalIgnoreCase))
-        {
-            Font = value as string;
-        }
-        else if (name.Equals("font-size", StringComparison.OrdinalIgnoreCase) || name.Equals("fontsize", StringComparison.OrdinalIgnoreCase))
-        {
-            FontSize = value as string;
-        }
-        else if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
-        {
-            Color = value as string;
         }
         else if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase))
         {
@@ -212,48 +65,51 @@ public abstract class UIElement(string tagName)
         {
             BackgroundImage = value as string;
         }
+        else if (name.Equals("class", StringComparison.OrdinalIgnoreCase))
+        {
+            Class = value as string;
+        }
+        else if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
+        {
+            Color = value as string;
+        }
+        else if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase))
+        {
+            Opacity = value as string;
+        }
+        else if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
+        {
+            var handlerName = value as string;
+            var eventName = name[2..];
+            Events[eventName] = handlerName ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+        }
+        else if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase))
+        {
+            (this as IPlaceholder)?.Placeholder = value as string;
+        }
         else if (name.Equals("readonly", StringComparison.OrdinalIgnoreCase))
         {
             ReadOnly = value as string;
         }
-        else if (name.Equals("stopclicks", StringComparison.OrdinalIgnoreCase))
-        {
-            StopClicks = value as string;
-        }
-        else if (name.Contains('.'))
-        {
-            // ignore parent properties
-        }
         else
         {
-            Attributes[name] = value;
+            // todo: send to Yoga
         }
     }
 
     public virtual string? GetAttribute(string name)
     {
         if (name.Equals("id", StringComparison.OrdinalIgnoreCase)) return Id;
-        if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) return Class;
-        if (name.Equals("top", StringComparison.OrdinalIgnoreCase)) return Top;
-        if (name.Equals("left", StringComparison.OrdinalIgnoreCase)) return Left;
-        if (name.Equals("bottom", StringComparison.OrdinalIgnoreCase)) return Bottom;
-        if (name.Equals("right", StringComparison.OrdinalIgnoreCase)) return Right;
-        if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase)) return Opacity;
-        if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase) || name.Equals("zindex", StringComparison.OrdinalIgnoreCase)) return ZIndex;
-        if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase)) return Visibility;
-        if (name.Equals("justify-self", StringComparison.OrdinalIgnoreCase) || name.Equals("justifyself", StringComparison.OrdinalIgnoreCase)) return JustifySelf;
-        if (name.Equals("justify-items", StringComparison.OrdinalIgnoreCase) || name.Equals("justifyitems", StringComparison.OrdinalIgnoreCase)) return JustifyItems;
-        if (name.Equals("justify-content", StringComparison.OrdinalIgnoreCase) || name.Equals("justifycontent", StringComparison.OrdinalIgnoreCase)) return JustifyContent;
-        if (name.Equals("align-self", StringComparison.OrdinalIgnoreCase) || name.Equals("alignself", StringComparison.OrdinalIgnoreCase)) return AlignSelf;
-        if (name.Equals("align-items", StringComparison.OrdinalIgnoreCase) || name.Equals("alignitems", StringComparison.OrdinalIgnoreCase)) return AlignItems;
-        if (name.Equals("align-content", StringComparison.OrdinalIgnoreCase) || name.Equals("aligncontent", StringComparison.OrdinalIgnoreCase)) return AlignContent;
-        if (name.Equals("margin", StringComparison.OrdinalIgnoreCase)) return Margin;
-        if (name.Equals("padding", StringComparison.OrdinalIgnoreCase)) return Padding;
-        if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase)) return BackgroundColor;
-        if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase)) return BackgroundImage;
-        if (name.Equals("width", StringComparison.OrdinalIgnoreCase)) return Width;
-        if (name.Equals("height", StringComparison.OrdinalIgnoreCase)) return Height;
         if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase)) return Anchor;
+        if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase) || name.Equals("background-color", StringComparison.OrdinalIgnoreCase)) return BackgroundColor;
+        if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase)) return BackgroundImage;
+        if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) return Class;
+        if (name.Equals("color", StringComparison.OrdinalIgnoreCase)) return Color;
+        if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase)) return Opacity;
+        if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase)) return (this as IPlaceholder)?.Placeholder;
+        if (name.Equals("readonly", StringComparison.OrdinalIgnoreCase)) return ReadOnly;
+
+        // todo: get from Yoga
         return null;
     }
 
@@ -281,7 +137,7 @@ public abstract class UIElement(string tagName)
         return Parent?.GetEffectiveModel();
     }
 
-    public abstract void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection);
+    public virtual void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection) { }
 }
 
 public record BindingDefinition(string TargetPropertyName, string ModelPropertyName);

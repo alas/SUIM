@@ -296,7 +296,7 @@ public static partial class MarkupParser
         "id", "width", "height", "padding", "margin",
         "justify-self", "align-self",
         "visibility", "opacity", "background", "bg", "class",
-        "left", "top", "z-index", "anchor"
+        "left", "top", "anchor"
     };
 
     private static bool IsLayoutAttribute(string name)

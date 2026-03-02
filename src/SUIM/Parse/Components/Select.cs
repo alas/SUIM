@@ -1,6 +1,4 @@
-﻿using SUIM.Flexbox;
-
-namespace SUIM.Parse.Components;
+﻿namespace SUIM.Parse.Components;
 
 public class Select() : UIElement(nameof(Select))
 {
@@ -8,11 +6,6 @@ public class Select() : UIElement(nameof(Select))
     public int SelectedIndex { get; set; }
     public bool Multiple { get; set; }
     public List<Option> Options { get; set; } = [];
-
-    public override void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection)
-    {
-        throw new NotImplementedException();
-    }
 
     public override void SetAttribute(string name, object? value)
     {
@@ -30,11 +23,6 @@ public class Select() : UIElement(nameof(Select))
 public class Option() : UIElement(nameof(Option))
 {
     public string? Value { get; set; }
-
-    public override void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection)
-    {
-        throw new NotImplementedException();
-    }
 
     public override void SetAttribute(string name, object? value)
     {

@@ -1,19 +1,14 @@
 namespace SUIM.Parse.Components;
 
-using SUIM.Flexbox;
-using SUIM.Model;
-using SUIM.Parse;
 using System;
 using System.IO;
+using SUIM.Model;
+using SUIM.Parse;
 
 public class CustomComponent(string tagName) : LayoutElement(tagName)
 {
     public string? Source { get; set; }
-
-    public override void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection)
-    {
-        throw new NotImplementedException();
-    }
+    public Dictionary<string, object?> Attributes { get; } = [];
 
     public override void SetAttribute(string name, object? value)
     {
@@ -23,6 +18,9 @@ public class CustomComponent(string tagName) : LayoutElement(tagName)
         }
         else
         {
+            // Preserve as regular attribute for components or custom usage
+            Attributes[name] = value;
+
             base.SetAttribute(name, value);
         }
     }

@@ -477,17 +477,6 @@ public class MarkupParserTests
     }
 
     [Fact]
-    public void Parse_ZIndex_Attribute()
-    {
-        var markup = "<div z-index=\"10\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Equal(10, Convert.ToInt32(div.ZIndex));
-    }
-
-    [Fact]
     public void Parse_XY_Positioning()
     {
         var markup = "<div left=\"50\" top=\"100\" width=\"200\" height=\"150\" />";
@@ -950,28 +939,6 @@ else
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Equal(0.75f, Convert.ToSingle(div.Opacity));
-    }
-
-    [Fact]
-    public void Parse_ZIndex_Negative()
-    {
-        var markup = "<div z-index=\"-5\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Equal(-5, Convert.ToInt32(div.ZIndex));
-    }
-
-    [Fact]
-    public void Parse_ZIndex_Large()
-    {
-        var markup = "<div z-index=\"1000\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
-
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
-        Assert.Equal(1000, Convert.ToInt32(div.ZIndex));
     }
 
     [Fact]

@@ -1,16 +1,11 @@
-using SUIM.Flexbox;
-
 namespace SUIM.Parse.Components;
 
 public class Text(string? tagName = null) : UIElement(tagName ?? nameof(Text))
 {
     public string? Value { get; set; }
     public bool Wrap { get; set; }
-
-    public override void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection)
-    {
-        throw new NotImplementedException();
-    }
+    public string? Font { get; set; }
+    public string? FontSize { get; set; }
 
     public override void SetAttribute(string name, object? value)
     {
@@ -21,6 +16,14 @@ public class Text(string? tagName = null) : UIElement(tagName ?? nameof(Text))
         else if (name.Equals("wrap", StringComparison.OrdinalIgnoreCase))
         {
             Wrap = value is bool b ? b : Convert.ToBoolean(value);
+        }
+        else if (name.Equals("font", StringComparison.OrdinalIgnoreCase))
+        {
+            Font = value as string;
+        }
+        else if (name.Equals("font-size", StringComparison.OrdinalIgnoreCase) || name.Equals("fontsize", StringComparison.OrdinalIgnoreCase))
+        {
+            FontSize = value as string;
         }
         else
         {
@@ -34,11 +37,6 @@ public class TextArea() : UIElement(nameof(TextArea)), IPlaceholder
     public string? Placeholder { get; set; }
     public int Rows { get; set; }
     public int Columns { get; set; }
-
-    public override void ApplyLayout(float parentWidth, float parentHeight, Direction parentDirection)
-    {
-        throw new NotImplementedException();
-    }
 
     public override void SetAttribute(string name, object? value)
     {
