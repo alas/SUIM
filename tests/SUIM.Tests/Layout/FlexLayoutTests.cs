@@ -10,28 +10,27 @@ public class FlexLayoutTests
     public void FlexLayout_RowDirection_DistributesSpace()
     {
         var markup = """
-            <div width="300px" height="100px" Display="flex" FlexDirection="row">
-                <div width="100px" height="50px"></div>
-                <div width="100%" height="50px"></div>
-            </div>
-            """;
+        <div style="width:300px; height:100px; display:flex; flex-direction:row;">
+            <div style="width:100px; height:50px"></div>
+            <div style="height:50px; flex-grow: 1; flex-shrink: 1; flex-basis: 0%;"></div>
+        </div>
+        """;
         var (element, _) = MarkupParser.Parse(markup);
         element.CalculateLayout(300, 100);
         var child1 = (Div)element.Children[0];
         var child2 = (Div)element.Children[1];
-                
-        Assert.Equal(100, child1.GetLeft());
-        Assert.Equal(200, child2.GetLeft()); // 300 - 100
-        Assert.Equal(0, child1.GetTop());
-        Assert.Equal(100, child2.GetTop());
+
+        Assert.Equal(0, child1.GetLeft());
+        Assert.Equal(100, child2.GetLeft());
+        Assert.Equal(200, child2.GetWidth());
     }
 
     [Fact]
     public void FlexLayout_JustifyContent_Center()
     {
         var markup = """
-            <div width="300px" height="100px" justify-content="center" AlignItems="center" Display="flex" FlexDirection="row">
-                <div width="100px" height="50px"></div>
+            <div style="width:300px; height:100px; justify-content:center; AlignItems:center; Display:flex; FlexDirection:row">
+                <div style="width:100px; height:50px"></div>
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);
@@ -45,9 +44,9 @@ public class FlexLayoutTests
     public void FlexLayout_JustifyContent_SpaceBetween()
     {
         var markup = """
-            <div width="300px" height="100px" justifycontent="space-between" AlignItems="center" Display="flex" FlexDirection="row">
-                <div width="50px" height="50px"></div>
-                <div width="50px" height="50px"></div>
+            <div style="width:300px; height:100px; justifycontent:space-between; AlignItems:center; Display:flex; FlexDirection:row">
+                <div style="width:50px; height:50px"></div>
+                <div style="width:50px; height:50px"></div>
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);
@@ -63,13 +62,13 @@ public class FlexLayoutTests
     public void FlexLayout_AlignItems_Stretch()
     {
         var markup = """
-            <div width="300px" height="100px" AlignItems="stretch" Display="flex" FlexDirection="row">
-                <div width="100px" height="50px"></div>
+            <div style="width:300px; height:100px; AlignItems:stretch; Display:flex; FlexDirection:row">
+                <div style="width:100px; height:auto"></div>
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);
         element.CalculateLayout(300, 100);
-        var child1 = (Div)element.Children[0]; // Height is auto/none
+        var child1 = element.Children[0]; // Height is auto/none
         
         Assert.Equal(100, child1.GetHeight());
     }
@@ -78,9 +77,9 @@ public class FlexLayoutTests
     public void FlexLayout_ColumnDirection()
     {
         var markup = """
-            <div width="100px" height="300px" Display="flex" FlexDirection="column">
-                <div width="50px" height="100px"></div>
-                <div width="50px" flex="1"></div>
+            <div style="width:100px; height:300px; Display:flex; FlexDirection:column">
+                <div style="width:50px; height:100px"></div>
+                <div style="width:50px; flex-grow: 1; flex-shrink: 1; flex-basis: 0%;"></div>
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);

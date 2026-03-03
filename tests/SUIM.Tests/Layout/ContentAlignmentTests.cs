@@ -10,10 +10,10 @@ public class ContentAlignmentTests
     public void Div_CentersChildrenVerticallyAndHorizontally()
     {
         var markup = """
-            <div width="200px" height="200px" justify-content="center" align-items="center" display="flex" flex-direction="column">
-                <label width="100px" height="20px">text</label>
-                <label width="100px" height="20px">text</label>
-                <label width="100px" height="20px">text</label>
+            <div style="width:200px; height:200px; justify-content:center; align-items:center; display:flex; flex-direction:column;">
+                <label style="width:100px; height:20px;">text</label>
+                <label style="width:100px; height:20px;">text</label>
+                <label style="width:100px; height:20px;">text</label>
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);
@@ -38,9 +38,9 @@ public class ContentAlignmentTests
     public void Div_ChildAlignmentOverridesParentContentAlignment()
     {
         var markup = """
-            <div width="200px" height="200px" align-items="center" display="flex" flex-direction="column">
-                <label width="100px" height="20px" AlignSelf="flex-end" />
-                <label width="100px" height="20px" />
+            <div style="width:200px; height:200px; align-items:center; display:flex; flex-direction:column">
+                <label style="width:100px; heigh:20px; AlignSelf:flex-end" />
+                <label style="width:100px; heigh:20px" />
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);
@@ -69,8 +69,8 @@ public class ContentAlignmentTests
     public void Overlay_AlignsChildren()
     {
         var markup = """
-            <overlay width="500px" height="500px" justify-content="center">
-                <label width="100px" height="50px" AlignSelf="center" />
+            <overlay style="width:500px; height:500px; display:flex; justify-content:center">
+                <label style="width:100px; height:50px;" />
             </overlay>
             """;
         var (element, _) = MarkupParser.Parse(markup);
@@ -87,8 +87,8 @@ public class ContentAlignmentTests
     public void Child_WithUnspecifiedAlignment_InheritsParentContentAlignment()
     {
         var markup = """
-            <div width="200px" height="200px" justify-content="center" Align-Items="center">
-                <label width="100px" height="20px" />
+            <div style="width:200px; height:200px; justify-content:center; Align-Items:center">
+                <label style="width:100px; height:20px" />
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);
@@ -107,8 +107,8 @@ public class ContentAlignmentTests
     public void Child_WithUnspecifiedAlignment_DefaultsToLeftTopIfParentHasNoContentAlignment()
     {
         var markup = """
-            <div width="200px" height="200px">
-                <label width="100px" height="20px" />
+            <div style="width:200px; height:200px">
+                <label style="width:100px; height:20px" />
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);

@@ -100,20 +100,20 @@ public class StrideLayoutTests
     public void MarkupParser_FractionalUnitsLabels_CreatesFractionalUnitsLayout()
     {
         var markup = @"
-            <stack orientation=""horizontal"" gap=""10"">
-                <stack orientation=""vertical"" gap=""5"">
-                    <label width=""fr"" />
-                    <label width=""fr"" />
-                    <label width=""fr"" />
-                    <label width=""fr"" />
-                    <label width=""fr"" />
-                </stack>
-                <stack orientation=""vertical"" gap=""15"">
-                    <label width=""fr"" />
-                    <label width=""fr"" />
-                    <label width=""fr"" />
-                </stack>
-            </stack>";
+            <hstack style=""gap:10px"">
+                <vstack style=""gap:5px"">
+                    <label style=""flex-grow:1; flex-basis:0"" />
+                    <label style=""flex-grow:1; flex-basis:0"" />
+                    <label style=""flex-grow:1; flex-basis:0"" />
+                    <label style=""flex-grow:1; flex-basis:0"" />
+                    <label style=""flex-grow:1; flex-basis:0"" />
+                </vstack>
+                <vstack style=""gap:15px"">
+                    <label style=""flex-grow:1; flex-basis:0"" />
+                    <label style=""flex-grow:1; flex-basis:0"" />
+                    <label style=""flex-grow:1; flex-basis:0"" />
+                </vstack>
+            </hstack>";
 
         var (element, _) = MarkupParser.Parse(markup);
         element.CalculateLayout(640, 480);

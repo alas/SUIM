@@ -54,7 +54,24 @@ public abstract class UIElement(string tagName)
 
     public virtual void SetAttribute(string name, object? value)
     {
-        if (name.Equals("id", StringComparison.OrdinalIgnoreCase))
+        if (name.Equals("style", StringComparison.OrdinalIgnoreCase))
+        {
+            if (value is string s)
+            {
+                var stylePairs = s.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var pair in stylePairs)
+                {
+                    var kv = pair.Split(':', 2);
+                    if (kv.Length == 2)
+                    {
+                        var key = kv[0].Trim();
+                        var val = kv[1].Trim();
+                        SetAttribute(key, val);
+                    }
+                }
+            }
+        }
+        else if (name.Equals("id", StringComparison.OrdinalIgnoreCase))
         {
             Id = value as string;
         }

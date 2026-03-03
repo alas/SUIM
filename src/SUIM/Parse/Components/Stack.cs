@@ -2,24 +2,9 @@ namespace SUIM.Parse.Components;
 
 using SUIM.Flexbox;
 
-public class Stack : LayoutElement
+public class Stack() : LayoutElement(nameof(Stack))
 {
-    public Orientation Orientation
-    {
-        get;
-        set
-        {
-            field = value;
-            Node.StyleSetFlexDirection(value == Orientation.Horizontal ? FlexDirection.Row : FlexDirection.Column);
-        }
-    } = Orientation.Vertical;
-
-    public Stack() : base(nameof(Stack))
-    {
-        Node.StyleSetDisplay(Display.Flex);
-        Node.StyleSetAlignItems(Align.FlexStart);
-        Node.StyleSetJustifyContent(Justify.FlexStart);
-    }
+    public Orientation Orientation { get; set; } = Orientation.Vertical;
 
     public override void SetAttribute(string name, object? value)
     {
@@ -49,6 +34,11 @@ public class Stack : LayoutElement
 
     internal override void ApplySUIMLayout()
     {
+        Node.StyleSetDisplay(Display.Flex);
+        Node.StyleSetJustifyContent(Justify.FlexStart);
+        Node.StyleSetAlignItems(Align.FlexStart);
+        Node.StyleSetFlexDirection(Orientation == Orientation.Horizontal ? FlexDirection.Row : FlexDirection.Column);
+
         if (Gap != null && Flex.ParseValueFromString(Gap, out var gap))
         {
             // Yoga added gap support later; if your version doesn't support Gap,

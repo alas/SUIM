@@ -1,5 +1,7 @@
 namespace SUIM.Parse.Components;
 
+using SUIM.Flexbox;
+
 public class Overlay : LayoutElement
 {
     public Overlay() : base(nameof(Overlay))
@@ -10,9 +12,14 @@ public class Overlay : LayoutElement
 
     internal override void ApplySUIMLayout()
     {
-        Node.StyleSetWidthPercent(100f);
-        Node.StyleSetHeightPercent(100f);
-        Node.StyleSetJustifyContent(Flexbox.Justify.Center);
-        Node.StyleSetAlignItems(Flexbox.Align.Center);
+        Node.StyleSetPositionType(PositionType.Absolute);
+        Node.StyleSetPosition(Edge.Left, 0);
+        Node.StyleSetPosition(Edge.Right, 0);
+        Node.StyleSetPosition(Edge.Top, 0);
+        Node.StyleSetPosition(Edge.Bottom, 0);
+        Node.StyleSetJustifyContent(Justify.Center);
+        Node.StyleSetAlignItems(Align.Center);
+
+        base.ApplySUIMLayout();
     }
 }

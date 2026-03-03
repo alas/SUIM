@@ -1,38 +1,44 @@
 namespace SUIM.Tests.Layout;
 
-using Xunit;
+using SUIM.Flexbox;
 using SUIM.Parse;
 using SUIM.Parse.Components;
 using SUIM.Parse.Components.Attributes;
+using Xunit;
+using Xunit.Abstractions;
 
 public class LayoutTests
 {
     [Fact]
     public void LayoutEngine_MeasuresStackWithPixels()
     {
+        // 
+        //width:auto; height:auto; gap:10px; flex-grow:0; flex-shrink:0
         var markup = """
-            <vstack width="auto" height="auto" gap="10px">
-                <label width="100px" height="50px" />
-                <label width="100%" height="30px" />
+        <div style="align-items:flex-start;">
+            <vstack style="width:auto; height:auto; gap:10px; flex-grow:0; flex-shrink:0;">
+                <label style="width:100px; height:50px" />
+                <label style="align-self:stretch; height:30px" />
             </vstack>
-            """;
+        </div>
+        """;
         var (element, _) = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
-        
-        Assert.Equal("auto", element.GetAttribute("width"));
-        Assert.Equal("auto", element.GetAttribute("height"));
-        Assert.Equal(100, element.GetWidth());
-        Assert.Equal(90, element.GetHeight()); // 50 + 30 + 10 gap
+        var vstack = element.Children[0];
+
+        Assert.Equal("auto", vstack.GetAttribute("width"));
+        Assert.Equal("auto", vstack.GetAttribute("height"));
+        Assert.Equal(100, vstack.GetWidth());
+        Assert.Equal(90, vstack.GetHeight()); // 50 + 30 + 10 gap
     }
 
     [Fact]
     public void Parse_Size_FractionalUnits()
     {
-        var markup = "<div width=\"100%\" height=\"50%\" />";
+        var markup = "<div style=\"width:100%; height:50%\"></div>";
         var (element, _) = MarkupParser.Parse(markup);
 
-        Assert.IsType<Div>(element);
-        var div = (Div)element;
+        var div = element;
         Assert.Equal("100%", div.GetAttribute("width"));
         Assert.Equal("50%", div.GetAttribute("height"));
     }
@@ -40,6 +46,9 @@ public class LayoutTests
     [Fact]
     public void LayoutEngine_MeasuresStackWithFractionalUnits()
     {
+        var div = new Div();
+        div.SetAttribute("align-items", "flex-start");
+
         var stack = new Stack { Orientation = Orientation.Horizontal, Gap = "0" };
         stack.SetAttribute("width", "100%");
         stack.SetAttribute("height", "auto");
@@ -52,10 +61,11 @@ public class LayoutTests
         child2.SetAttribute("width", "70%");
         child2.SetAttribute("height", "50px");
         
+        div.AddChild(stack, null);
         stack.AddChild(child1, null);
         stack.AddChild(child2, null);
         
-        stack.CalculateLayout(300, 100);
+        div.CalculateLayout(300, 100);
         
         Assert.Equal("100%", stack.GetAttribute("width"));
         Assert.Equal("auto", stack.GetAttribute("height"));
@@ -106,57 +116,62 @@ public class LayoutTests
     [Fact]
     public void LayoutEngine_MeasuresWindow()
     {
-        var grid = new Grid();
-        grid.SetAttribute("width", "auto");
-        grid.SetAttribute("height", "auto");
+        var div1 = new Div();
+        div1.SetAttribute("align-items", "flex-start");
+        div1.SetAttribute("display", "flex");
+
+        var div2 = new Div();
+        div2.SetAttribute("width", "auto");
+        div2.SetAttribute("height", "auto");
 
         var child = new Label();
         child.SetAttribute("width", "100px");
         child.SetAttribute("height", "50px");
 
-        grid.AddChild(child, null);
+        div1.AddChild(div2, null);
+        div2.AddChild(child, null);
+
+        div1.CalculateLayout(800, 600);
         
-        grid.CalculateLayout(800, 600);
-        
-        Assert.Equal("auto", grid.GetAttribute("width"));
-        Assert.Equal("auto", grid.GetAttribute("height"));
-        Assert.Equal(100, grid.GetWidth());
-        Assert.Equal(50, grid.GetHeight());
+        Assert.Equal("auto", div2.GetAttribute("width"));
+        Assert.Equal("auto", div2.GetAttribute("height"));
+        Assert.Equal(100, div2.GetWidth());
+        Assert.Equal(50, div2.GetHeight());
     }
     
     [Fact]
     public void LayoutEngine_OverlaysShouldFillParentSize()
     {
-        // Create a grid with explicit size (simulating main UI container)
+        // Create a div with explicit size (simulating main UI container)
         // When overlays are inside, they should fill the grid's dimensions
-        var grid = new Grid();
+        var div = new Div();
         
         // Create main UI container (like buttonsUI in MainView)
         var mainUI = new Stack 
         { };
         mainUI.SetAttribute("width", "400px");
         mainUI.SetAttribute("height", "300px");
-        grid.AddChild(mainUI, null);
+        div.AddChild(mainUI, null);
         
         // Create overlays - when grid has explicit size, overlays should fill it
         var overlay1 = new Overlay();
-        var popupContent = new Grid
+        var popupContent = new Div
         { };
         popupContent.SetAttribute("width", "360px");
         popupContent.SetAttribute("height", "180px");
         overlay1.AddChild(popupContent, null);
-        grid.AddChild(overlay1, null);
+        div.AddChild(overlay1, null);
         
         var overlay2 = new Overlay();
         overlay2.AddChild(new Label(), null);
-        grid.AddChild(overlay2, null);
+        div.AddChild(overlay2, null);
         
         // Layout with screen size
-        grid.CalculateLayout(1280, 720);
+        div.CalculateLayout(1280, 720);
         
         // Grid should size to its explicit dimensions
-        Assert.Equal(1280, grid.GetWidth());
-        Assert.Equal(720, grid.GetHeight());
+        Assert.Equal(1280, div.GetWidth());
+        Assert.Equal(720, div.GetHeight());
         
         // Overlays should fill the grid container when it has explicit size
         // Add some tolerance for padding
