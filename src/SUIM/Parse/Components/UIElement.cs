@@ -1,8 +1,8 @@
 namespace SUIM.Parse.Components;
 
+using System.ComponentModel.Design;
 using System.Xml.Linq;
 using SUIM.Flexbox;
-using SUIM.Parse.Components.Attributes;
 
 public abstract class UIElement(string tagName)
 {
@@ -91,9 +91,24 @@ public abstract class UIElement(string tagName)
         {
             ReadOnly = value as string;
         }
-        else if (value is string s && !s.StartsWith('@'))
+        else if (value is string s)
         {
-            Node.nodeStyle[name] = s;
+            if (s.StartsWith('@'))
+            {
+                // ignore
+            }
+            else if (AllProperties.TryGetValue(name, out var normalized))
+            {
+                Node.nodeStyle[name] = normalized;
+            }
+            else
+            {
+                Console.WriteLine($"Not recognized property: ${value}");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Not string property: ${value}");
         }
     }
 
@@ -109,7 +124,13 @@ public abstract class UIElement(string tagName)
         if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase)) return (this as IPlaceholder)?.Placeholder;
         if (name.Equals("readonly", StringComparison.OrdinalIgnoreCase)) return ReadOnly;
 
-        return Node.nodeStyle[name];
+        if (AllProperties.TryGetValue(name, out var normalized))
+        {
+            return Node.nodeStyle[normalized];
+        }
+
+        Console.WriteLine($"Not recognized property: ${name}");
+        return null;
     }
 
     public float GetLeft()
@@ -152,6 +173,94 @@ public abstract class UIElement(string tagName)
         ApplySUIMLayout();
         Node.CalculateLayout(parentWidth, parentHeight, parentDirection);
     }
+
+    public static readonly Dictionary<string, string> AllProperties =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            // Flex container                            
+            { "flex-direction",                                 "flex-direction" },
+            { "flex-wrap",                                      "flex-wrap" },
+            { "flex-flow",                                      "flex-flow" },
+            { "justify-content",                                "justify-content" },
+            { "align-items",                                    "align-items" },
+            { "align-content",                                  "align-content" },
+            { "gap",                                            "gap" },
+            { "row-gap",                                        "row-gap" },
+            { "column-gap",                                     "column-gap" },
+
+            // Flex items
+            { "flex",                                           "flex" },
+            { "flex-grow",                                      "flex-grow" },
+            { "flex-shrink",                                    "flex-shrink" },
+            { "flex-basis",                                     "flex-basis" },
+            { "align-self",                                     "align-self" },
+            { "order",                                          "order" },
+
+            // Positioning
+            { "position",                                       "position" },
+            { "top",                                            "top" },
+            { "right",                                          "right" },
+            { "bottom",                                         "bottom" },
+            { "left",                                           "left" },
+            { "inset",                                          "inset" },
+            { "inset-block",                                    "inset-block" },
+            { "inset-inline",                                   "inset-inline" },
+
+            // Margin
+            { "margin",                                         "margin" },
+            { "margin-top",                                     "margin-top" },
+            { "margin-right",                                   "margin-right" },
+            { "margin-bottom",                                  "margin-bottom" },
+            { "margin-left",                                    "margin-left" },
+            { "margin-inline",                                  "margin-inline" },
+            { "margin-inline-start",                            "margin-inline-start" },
+            { "margin-inline-end",                              "margin-inline-end" },
+            { "margin-block",                                   "margin-block" },
+            { "margin-block-start",                             "margin-block-start" },
+            { "margin-block-end",                               "margin-block-end" },
+
+            // Padding
+            { "padding",                                        "padding" },
+            { "padding-top",                                    "padding-top" },
+            { "padding-right",                                  "padding-right" },
+            { "padding-bottom",                                 "padding-bottom" },
+            { "padding-left",                                   "padding-left" },
+            { "padding-inline",                                 "padding-inline" },
+            { "padding-inline-start",                           "padding-inline-start" },
+            { "padding-inline-end",                             "padding-inline-end" },
+            { "padding-block",                                  "padding-block" },
+            { "padding-block-start",                            "padding-block-start" },
+            { "padding-block-end",                              "padding-block-end" },
+
+            // Border (width only matters)
+            { "border",                                         "border" },
+            { "border-top",                                     "border-top" },
+            { "border-right",                                   "border-right" },
+            { "border-bottom",                                  "border-bottom" },
+            { "border-left",                                    "border-left" },
+            { "border-width",                                   "border-width" },
+            { "border-top-width",                               "border-top-width" },
+            { "border-right-width",                             "border-right-width" },
+            { "border-bottom-width",                            "border-bottom-width" },
+            { "border-left-width",                              "border-left-width" },
+
+            // Size
+            { "width",                                          "width" },
+            { "height",                                         "height" },
+            { "min-width",                                      "min-width" },
+            { "min-height",                                     "min-height" },
+            { "max-width",                                      "max-width" },
+            { "max-height",                                     "max-height" },
+            { "aspect-ratio",                                   "aspect-ratio" },
+
+            // Layout behavior
+            { "display",                                        "display" },
+            { "overflow",                                       "overflow" },
+            { "box-sizing",                                     "box-sizing" },
+
+            // Direction
+            { "direction",                                      "direction" },
+        };
 }
 
 public record BindingDefinition(string TargetPropertyName, string ModelPropertyName);

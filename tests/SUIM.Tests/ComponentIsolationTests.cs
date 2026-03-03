@@ -82,6 +82,7 @@ public class ComponentIsolationTests
         Assert.NotNull(found);
         Assert.Equal(Stride.UI.Visibility.Collapsed, found!.Visibility);
 
+        // todo: bind SUIM display to Stride visibility
         model!.LabelVisibility = Stride.UI.Visibility.Visible;
         Assert.Equal(Stride.UI.Visibility.Visible, found!.Visibility);
     }
@@ -116,6 +117,7 @@ public class ComponentIsolationTests
         Assert.NotNull(found);
         Assert.Equal(Stride.UI.Visibility.Collapsed, found!.Visibility);
 
+        // todo: bind SUIM display to Stride visibility
         model!.LabelVisibility = Stride.UI.Visibility.Visible;
         Assert.Equal(Stride.UI.Visibility.Visible, found!.Visibility);
     }
