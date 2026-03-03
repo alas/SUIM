@@ -121,7 +121,7 @@ public partial class Node
     // LayoutGetMargin gets margin
     internal float LayoutGetMargin(Edge edge)
     {
-        Flex.assertWithNode(this, edge < Edge.End, "Cannot get layout properties of multi-edge shorthands");
+        Flex.AssertWithNode(this, edge < Edge.End, "Cannot get layout properties of multi-edge shorthands");
         if (edge == Edge.Left)
         {
             if (this.nodeLayout.Direction == Direction.RTL)
@@ -144,7 +144,7 @@ public partial class Node
     // LayoutGetBorder gets border
     internal float LayoutGetBorder(Edge edge)
     {
-        Flex.assertWithNode(this, edge < Edge.End,
+        Flex.AssertWithNode(this, edge < Edge.End,
             "Cannot get layout properties of multi-edge shorthands");
         if (edge == Edge.Left)
         {
@@ -168,7 +168,7 @@ public partial class Node
     // LayoutGetPadding gets padding
     internal float LayoutGetPadding(Edge edge)
     {
-        Flex.assertWithNode(this, edge < Edge.End,
+        Flex.AssertWithNode(this, edge < Edge.End,
             "Cannot get layout properties of multi-edge shorthands");
         if (edge == Edge.Left)
         {

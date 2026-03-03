@@ -17,7 +17,7 @@ public partial class Flex
     public static float RoundValueToPixelGrid(float value, float pointScaleFactor, bool forceCeil, bool forceFloor)
     {
         var scaledValue = value * pointScaleFactor;
-        var fractial = fmodf(scaledValue, 1f);
+        var fractial = Fmodf(scaledValue, 1f);
         if (FloatsEqual(fractial, 0))
         {
             // First we check if the value is already rounded
@@ -62,8 +62,8 @@ public partial class Flex
     // // Reset resets a node
     public static void Reset(ref Node node)
     {
-        assertWithNode(node, node.Children.Count == 0, "Cannot reset a node which still has children attached");
-        assertWithNode(node, node.Parent == null, "Cannot reset a node still attached to a parent");
+        AssertWithNode(node, node.Children.Count == 0, "Cannot reset a node which still has children attached");
+        AssertWithNode(node, node.Parent == null, "Cannot reset a node still attached to a parent");
         node.Children.Clear();
 
         var config = node.config;
@@ -116,14 +116,14 @@ public partial class Flex
         ResolveDimensions(node);
 
         CalcStartWidth(node, parentWidth, out float width, out MeasureMode widthMeasureMode);
-        calcStartHeight(node, parentWidth, parentHeight, out float height, out MeasureMode heightMeasureMode);
+        CalcStartHeight(node, parentWidth, parentHeight, out float height, out MeasureMode heightMeasureMode);
 
-        if (layoutNodeInternal(node, width, height, parentDirection,
+        if (LayoutNodeInternal(node, width, height, parentDirection,
             widthMeasureMode, heightMeasureMode, parentWidth, parentHeight,
             true, "initial", node.config))
         {
-            nodeSetPosition(node, node.nodeLayout.Direction, parentWidth, parentHeight, parentWidth);
-            roundToPixelGrid(node, node.config.PointScaleFactor, 0, 0);
+            NodeSetPosition(node, node.nodeLayout.Direction, parentWidth, parentHeight, parentWidth);
+            RoundToPixelGrid(node, node.config.PointScaleFactor, 0, 0);
 
             if (gPrintTree)
             {
@@ -274,7 +274,7 @@ public partial class Flex
         }
         else
         {
-            assertWithNode(
+            AssertWithNode(
                 node,
                 node.Children.Count == 0,
                 "Cannot set measure function: Nodes with measure functions cannot have children.");
@@ -287,8 +287,8 @@ public partial class Flex
     // InsertChild inserts a child
     internal static void InsertChild(Node node, Node child, int idx)
     {
-        assertWithNode(node, child.Parent == null, "Child already has a parent, it must be removed first.");
-        assertWithNode(node, node.measureFunc == null, "Cannot add child: Nodes with measure functions cannot have children.");
+        AssertWithNode(node, child.Parent == null, "Child already has a parent, it must be removed first.");
+        AssertWithNode(node, node.measureFunc == null, "Cannot add child: Nodes with measure functions cannot have children.");
 
         node.Children.Insert(idx, child);
         child.Parent = node;
@@ -315,7 +315,7 @@ public partial class Flex
     // MarkDirty marks node as dirty
     internal static void MarkDirty(Node node)
     {
-        assertWithNode(node, node.measureFunc != null,
+        AssertWithNode(node, node.measureFunc != null,
             "Only leaf nodes with custom measure functions should manually mark themselves as dirty");
         NodeMarkDirtyInternal(node);
     }
@@ -496,7 +496,7 @@ public partial class Flex
             return ResolveValue(node.nodeStyle.Padding[(int)Edge.Start], widthSize);
         }
 
-        return fmaxf(ResolveValue(ComputedEdgeValue(node.nodeStyle.Padding, leading[(int)axis], ValueZero), widthSize), 0);
+        return Fmaxf(ResolveValue(ComputedEdgeValue(node.nodeStyle.Padding, leading[(int)axis], ValueZero), widthSize), 0);
     }
 
     internal static float NodeTrailingPadding(Node node, FlexDirection axis, float widthSize)
@@ -507,7 +507,7 @@ public partial class Flex
             return ResolveValue(node.nodeStyle.Padding[(int)Edge.End], widthSize);
         }
 
-        return fmaxf(ResolveValue(ComputedEdgeValue(node.nodeStyle.Padding, trailing[(int)axis], ValueZero), widthSize), 0);
+        return Fmaxf(ResolveValue(ComputedEdgeValue(node.nodeStyle.Padding, trailing[(int)axis], ValueZero), widthSize), 0);
     }
 
     internal static float NodeLeadingBorder(Node node, FlexDirection axis)
@@ -518,7 +518,7 @@ public partial class Flex
             return node.nodeStyle.Border[(int)Edge.Start].ValueUnit;
         }
 
-        return fmaxf(ComputedEdgeValue(node.nodeStyle.Border, leading[(int)axis], ValueZero).ValueUnit, 0);
+        return Fmaxf(ComputedEdgeValue(node.nodeStyle.Border, leading[(int)axis], ValueZero).ValueUnit, 0);
     }
 
     internal static float NodeTrailingBorder(Node node, FlexDirection axis)
@@ -529,7 +529,7 @@ public partial class Flex
             return node.nodeStyle.Border[(int)Edge.End].ValueUnit;
         }
 
-        return fmaxf(ComputedEdgeValue(node.nodeStyle.Border, trailing[(int)axis], ValueZero).ValueUnit, 0);
+        return Fmaxf(ComputedEdgeValue(node.nodeStyle.Border, trailing[(int)axis], ValueZero).ValueUnit, 0);
     }
 
     internal static float NodeLeadingPaddingAndBorder(Node node, FlexDirection axis, float widthSize)
@@ -588,7 +588,7 @@ public partial class Flex
         if (node.baselineFunc != null)
         {
             var baseline = node.baselineFunc(node, node.nodeLayout.measuredDimensions[(int)Dimension.Width], node.nodeLayout.measuredDimensions[(int)Dimension.Height]);
-            assertWithNode(node, !FloatIsUndefined(baseline), "Expect custom baseline function to not return NaN");
+            AssertWithNode(node, !FloatIsUndefined(baseline), "Expect custom baseline function to not return NaN");
             return baseline;
         }
         else
@@ -813,7 +813,7 @@ public partial class Flex
     // the value doesn't go below the padding and border amount.
     internal static float NodeBoundAxis(Node node, FlexDirection axis, float value, float axisSize, float widthSize)
     {
-        return fmaxf(NodeBoundAxisWithinMinAndMax(node, axis, value, axisSize),
+        return Fmaxf(NodeBoundAxisWithinMinAndMax(node, axis, value, axisSize),
             NodePaddingAndBorderForAxis(node, axis, widthSize));
     }
 
@@ -863,7 +863,7 @@ public partial class Flex
         }
     }
 
-    internal static void nodeSetPosition(Node node, Direction direction, float mainSize, float crossSize, float parentWidth)
+    internal static void NodeSetPosition(Node node, Direction direction, float mainSize, float crossSize, float parentWidth)
     {
         /* Root nodes should be always layouted as LTR, so we don't return negative values. */
         var directionRespectingRoot = Direction.LTR;
@@ -922,21 +922,21 @@ public partial class Flex
                     child.nodeLayout.computedFlexBasisGeneration != currentGenerationCount))
             {
                 child.nodeLayout.computedFlexBasis =
-                    fmaxf(resolvedFlexBasis, NodePaddingAndBorderForAxis(child, mainAxis, parentWidth));
+                    Fmaxf(resolvedFlexBasis, NodePaddingAndBorderForAxis(child, mainAxis, parentWidth));
             }
         }
         else if (isMainAxisRow && isRowStyleDimDefined)
         {
             // The width is definite, so use that as the flex basis.
             child.nodeLayout.computedFlexBasis =
-                fmaxf(ResolveValue(child.resolvedDimensions[(int)Dimension.Width], parentWidth),
+                Fmaxf(ResolveValue(child.resolvedDimensions[(int)Dimension.Width], parentWidth),
                     NodePaddingAndBorderForAxis(child, FlexDirection.Row, parentWidth));
         }
         else if (!isMainAxisRow && isColumnStyleDimDefined)
         {
             // The height is definite, so use that as the flex basis.
             child.nodeLayout.computedFlexBasis =
-                fmaxf(ResolveValue(child.resolvedDimensions[(int)Dimension.Height], parentHeight),
+                Fmaxf(ResolveValue(child.resolvedDimensions[(int)Dimension.Height], parentHeight),
                     NodePaddingAndBorderForAxis(child, FlexDirection.Column, parentWidth));
         }
         else
@@ -1007,14 +1007,14 @@ public partial class Flex
                 if (!isMainAxisRow && childWidthMeasureMode == MeasureMode.Exactly)
                 {
                     child.nodeLayout.computedFlexBasis =
-                        fmaxf((childWidth - marginRow) / child.nodeStyle.AspectRatio,
+                        Fmaxf((childWidth - marginRow) / child.nodeStyle.AspectRatio,
                             NodePaddingAndBorderForAxis(child, FlexDirection.Column, parentWidth));
                     return;
                 }
                 else if (isMainAxisRow && childHeightMeasureMode == MeasureMode.Exactly)
                 {
                     child.nodeLayout.computedFlexBasis =
-                        fmaxf((childHeight - marginColumn) * child.nodeStyle.AspectRatio,
+                        Fmaxf((childHeight - marginColumn) * child.nodeStyle.AspectRatio,
                             NodePaddingAndBorderForAxis(child, FlexDirection.Row, parentWidth));
                     return;
                 }
@@ -1030,7 +1030,7 @@ public partial class Flex
                 ref childHeight);
 
             // Measure the child
-            layoutNodeInternal(child,
+            LayoutNodeInternal(child,
                 childWidth,
                 childHeight,
                 direction,
@@ -1043,7 +1043,7 @@ public partial class Flex
                 config);
 
             child.nodeLayout.computedFlexBasis =
-                fmaxf(child.nodeLayout.measuredDimensions[(int)dim[(int)mainAxis]],
+                Fmaxf(child.nodeLayout.measuredDimensions[(int)dim[(int)mainAxis]],
                     NodePaddingAndBorderForAxis(child, mainAxis, parentWidth));
         }
 
@@ -1112,13 +1112,13 @@ public partial class Flex
                 if (FloatIsUndefined(childWidth))
                 {
                     childWidth =
-                        marginRow + fmaxf((childHeight - marginColumn) * child.nodeStyle.AspectRatio,
+                        marginRow + Fmaxf((childHeight - marginColumn) * child.nodeStyle.AspectRatio,
                             NodePaddingAndBorderForAxis(child, FlexDirection.Column, width));
                 }
                 else if (FloatIsUndefined(childHeight))
                 {
                     childHeight =
-                        marginColumn + fmaxf((childWidth - marginRow) / child.nodeStyle.AspectRatio,
+                        marginColumn + Fmaxf((childWidth - marginRow) / child.nodeStyle.AspectRatio,
                             NodePaddingAndBorderForAxis(child, FlexDirection.Row, width));
                 }
             }
@@ -1149,7 +1149,7 @@ public partial class Flex
                 childWidthMeasureMode = MeasureMode.AtMost;
             }
 
-            layoutNodeInternal(child,
+            LayoutNodeInternal(child,
                 childWidth,
                 childHeight,
                 direction,
@@ -1166,7 +1166,7 @@ public partial class Flex
                 NodeMarginForAxis(child, FlexDirection.Column, width);
         }
 
-        layoutNodeInternal(child,
+        LayoutNodeInternal(child,
             childWidth,
             childHeight,
             direction,
@@ -1237,9 +1237,9 @@ public partial class Flex
     }
 
     // nodeWithMeasureFuncSetMeasuredDimensions sets measure dimensions for node with measure func
-    internal static void nodeWithMeasureFuncSetMeasuredDimensions(Node node, float availableWidth, float availableHeight, MeasureMode widthMeasureMode, MeasureMode heightMeasureMode, float parentWidth, float parentHeight)
+    internal static void NodeWithMeasureFuncSetMeasuredDimensions(Node node, float availableWidth, float availableHeight, MeasureMode widthMeasureMode, MeasureMode heightMeasureMode, float parentWidth, float parentHeight)
     {
-        assertWithNode(node, node.measureFunc != null, "Expected node to have custom measure function");
+        AssertWithNode(node, node.measureFunc != null, "Expected node to have custom measure function");
 
         var paddingAndBorderAxisRow = NodePaddingAndBorderForAxis(node, FlexDirection.Row, availableWidth);
         var paddingAndBorderAxisColumn = NodePaddingAndBorderForAxis(node, FlexDirection.Column, availableWidth);
@@ -1247,12 +1247,12 @@ public partial class Flex
         var marginAxisColumn = NodeMarginForAxis(node, FlexDirection.Column, availableWidth);
 
         // We want to make sure we don't call measure with negative size
-        var innerWidth = fmaxf(0, availableWidth - marginAxisRow - paddingAndBorderAxisRow);
+        var innerWidth = Fmaxf(0, availableWidth - marginAxisRow - paddingAndBorderAxisRow);
         if (FloatIsUndefined(availableWidth))
         {
             innerWidth = availableWidth;
         }
-        var innerHeight = fmaxf(0, availableHeight - marginAxisColumn - paddingAndBorderAxisColumn);
+        var innerHeight = Fmaxf(0, availableHeight - marginAxisColumn - paddingAndBorderAxisColumn);
         if (FloatIsUndefined(availableHeight))
         {
             innerHeight = availableHeight;
@@ -1294,7 +1294,7 @@ public partial class Flex
     // nodeEmptyContainerSetMeasuredDimensions sets measure dimensions for empty container
     // For nodes with no children, use the available values if they were provided,
     // or the minimum size as indicated by the padding and border sizes.
-    internal static void nodeEmptyContainerSetMeasuredDimensions(Node node, float availableWidth, float availableHeight, MeasureMode widthMeasureMode, MeasureMode heightMeasureMode, float parentWidth, float parentHeight)
+    internal static void NodeEmptyContainerSetMeasuredDimensions(Node node, float availableWidth, float availableHeight, MeasureMode widthMeasureMode, MeasureMode heightMeasureMode, float parentWidth, float parentHeight)
     {
         var paddingAndBorderAxisRow = NodePaddingAndBorderForAxis(node, FlexDirection.Row, parentWidth);
         var paddingAndBorderAxisColumn = NodePaddingAndBorderForAxis(node, FlexDirection.Column, parentWidth);
@@ -1316,7 +1316,7 @@ public partial class Flex
         node.nodeLayout.measuredDimensions[(int)Dimension.Height] = NodeBoundAxis(node, FlexDirection.Column, height, parentHeight, parentWidth);
     }
 
-    internal static bool nodeFixedSizeSetMeasuredDimensions(Node node,
+    internal static bool NodeFixedSizeSetMeasuredDimensions(Node node,
         float availableWidth,
         float availableHeight,
         MeasureMode widthMeasureMode,
@@ -1354,7 +1354,7 @@ public partial class Flex
     }
 
     // zeroOutLayoutRecursivly zeros out layout recursively
-    internal static void zeroOutLayoutRecursivly(Node node)
+    internal static void ZeroOutLayoutRecursivly(Node node)
     {
         node.nodeLayout.Dimensions[(int)Dimension.Height] = 0;
         node.nodeLayout.Dimensions[(int)Dimension.Width] = 0;
@@ -1371,7 +1371,7 @@ public partial class Flex
         node.hasNewLayout = true;
         foreach (var child in node.Children)
         {
-            zeroOutLayoutRecursivly(child);
+            ZeroOutLayoutRecursivly(child);
         }
     }
 
@@ -1459,7 +1459,7 @@ public partial class Flex
     //    an available size of
     //    undefined then it must also pass a measure mode of YGMeasureModeUndefined
     //    in that dimension.
-    internal static void nodelayoutImpl(Node node, float availableWidth, float availableHeight,
+    internal static void NodelayoutImpl(Node node, float availableWidth, float availableHeight,
         Direction parentDirection, MeasureMode widthMeasureMode,
         MeasureMode heightMeasureMode, float parentWidth, float parentHeight,
         bool performLayout, Config config)
@@ -1491,20 +1491,20 @@ public partial class Flex
 
         if (node.measureFunc != null)
         {
-            nodeWithMeasureFuncSetMeasuredDimensions(node, availableWidth, availableHeight, widthMeasureMode, heightMeasureMode, parentWidth, parentHeight);
+            NodeWithMeasureFuncSetMeasuredDimensions(node, availableWidth, availableHeight, widthMeasureMode, heightMeasureMode, parentWidth, parentHeight);
             return;
         }
 
         var childCount = node.Children.Count;
         if (childCount == 0)
         {
-            nodeEmptyContainerSetMeasuredDimensions(node, availableWidth, availableHeight, widthMeasureMode, heightMeasureMode, parentWidth, parentHeight);
+            NodeEmptyContainerSetMeasuredDimensions(node, availableWidth, availableHeight, widthMeasureMode, heightMeasureMode, parentWidth, parentHeight);
             return;
         }
 
         // If we're not being asked to perform a full layout we can skip the algorithm if we already know
         // the size
-        if (!performLayout && nodeFixedSizeSetMeasuredDimensions(node, availableWidth, availableHeight, widthMeasureMode, heightMeasureMode, parentWidth, parentHeight))
+        if (!performLayout && NodeFixedSizeSetMeasuredDimensions(node, availableWidth, availableHeight, widthMeasureMode, heightMeasureMode, parentWidth, parentHeight))
         {
             return;
         }
@@ -1580,14 +1580,14 @@ public partial class Flex
         if (!FloatIsUndefined(availableInnerWidth))
         {
             // We want to make sure our available width does not violate min and max raints
-            availableInnerWidth = fmaxf(Fminf(availableInnerWidth, maxInnerWidth), minInnerWidth);
+            availableInnerWidth = Fmaxf(Fminf(availableInnerWidth, maxInnerWidth), minInnerWidth);
         }
 
         var availableInnerHeight = availableHeight - marginAxisColumn - paddingAndBorderAxisColumn;
         if (!FloatIsUndefined(availableInnerHeight))
         {
             // We want to make sure our available height does not violate min and max raints
-            availableInnerHeight = fmaxf(Fminf(availableInnerHeight, maxInnerHeight), minInnerHeight);
+            availableInnerHeight = Fmaxf(Fminf(availableInnerHeight, maxInnerHeight), minInnerHeight);
         }
 
         var availableInnerMainDim = availableInnerHeight;
@@ -1629,7 +1629,7 @@ public partial class Flex
         {
             if (child.nodeStyle.Display == Display.None)
             {
-                zeroOutLayoutRecursivly(child);
+                ZeroOutLayoutRecursivly(child);
                 child.hasNewLayout = true;
                 child.IsDirty = false;
                 continue;
@@ -1639,7 +1639,7 @@ public partial class Flex
             {
                 // Set the initial position (relative to the parent).
                 var childDirection = NodeResolveDirection(child, direction);
-                nodeSetPosition(child,
+                NodeSetPosition(child,
                     childDirection,
                     availableInnerMainDim,
                     availableInnerCrossDim,
@@ -1745,7 +1745,7 @@ public partial class Flex
                 {
                     var childMarginMainAxis = NodeMarginForAxis(child, mainAxis, availableInnerWidth);
                     var flexBasisWithMaxConstraints = Fminf(ResolveValue(child.nodeStyle.MaxDimensions[(int)dim[(int)mainAxis]], mainAxisParentSize), child.nodeLayout.computedFlexBasis);
-                    var flexBasisWithMinAndMaxConstraints = fmaxf(ResolveValue(child.nodeStyle.MinDimensions[(int)dim[(int)mainAxis]], mainAxisParentSize), flexBasisWithMaxConstraints);
+                    var flexBasisWithMinAndMaxConstraints = Fmaxf(ResolveValue(child.nodeStyle.MinDimensions[(int)dim[(int)mainAxis]], mainAxisParentSize), flexBasisWithMaxConstraints);
 
                     // If this is a multi-line flow and this item pushes us over the
                     // available size, we've
@@ -1889,7 +1889,7 @@ public partial class Flex
                     childFlexBasis =
                         Fminf(ResolveValue(currentRelativeChild.nodeStyle.MaxDimensions[(int)dim[(int)mainAxis]],
                             mainAxisParentSize),
-                            fmaxf(ResolveValue(currentRelativeChild.nodeStyle.MinDimensions[(int)dim[(int)mainAxis]],
+                            Fmaxf(ResolveValue(currentRelativeChild.nodeStyle.MinDimensions[(int)dim[(int)mainAxis]],
                                 mainAxisParentSize),
                                 currentRelativeChild.nodeLayout.computedFlexBasis));
 
@@ -1965,7 +1965,7 @@ public partial class Flex
                     childFlexBasis =
                         Fminf(ResolveValue(currentRelativeChild.nodeStyle.MaxDimensions[(int)dim[(int)mainAxis]],
                             mainAxisParentSize),
-                            fmaxf(ResolveValue(currentRelativeChild.nodeStyle.MinDimensions[(int)dim[(int)mainAxis]],
+                            Fmaxf(ResolveValue(currentRelativeChild.nodeStyle.MinDimensions[(int)dim[(int)mainAxis]],
                                 mainAxisParentSize),
                                 currentRelativeChild.nodeLayout.computedFlexBasis));
                     float updatedMainSize = childFlexBasis;
@@ -2063,7 +2063,7 @@ public partial class Flex
                         {
                             v = (childMainSize - marginMain) / currentRelativeChild.nodeStyle.AspectRatio;
                         }
-                        childCrossSize = fmaxf(v, NodePaddingAndBorderForAxis(currentRelativeChild, crossAxis, availableInnerWidth));
+                        childCrossSize = Fmaxf(v, NodePaddingAndBorderForAxis(currentRelativeChild, crossAxis, availableInnerWidth));
                         childCrossMeasureMode = MeasureMode.Exactly;
 
                         // Parent size raint should have higher priority than flex
@@ -2124,7 +2124,7 @@ public partial class Flex
 
                     // Recursively call the layout algorithm for this child with the updated
                     // main size.
-                    layoutNodeInternal(currentRelativeChild,
+                    LayoutNodeInternal(currentRelativeChild,
                         childWidth,
                         childHeight,
                         direction,
@@ -2168,7 +2168,7 @@ public partial class Flex
                     ResolveValue(node.nodeStyle.MinDimensions[(int)dim[(int)mainAxis]], mainAxisParentSize) >= 0)
                 {
                     remainingFreeSpace =
-                        fmaxf(0,
+                        Fmaxf(0,
                             ResolveValue(node.nodeStyle.MinDimensions[(int)dim[(int)mainAxis]], mainAxisParentSize) -
                                 (availableInnerMainDim - remainingFreeSpace));
                 }
@@ -2208,7 +2208,7 @@ public partial class Flex
                     case Justify.SpaceBetween:
                         if (itemsOnLine > 1)
                         {
-                            betweenMainDim = fmaxf(remainingFreeSpace, 0) / (float)(itemsOnLine - 1);
+                            betweenMainDim = Fmaxf(remainingFreeSpace, 0) / (float)(itemsOnLine - 1);
                         }
                         else
                         {
@@ -2287,7 +2287,7 @@ public partial class Flex
 
                             // The cross dimension is the max of the elements dimension since
                             // there can only be one element in that cross dimension.
-                            crossDim = fmaxf(crossDim, NodeDimWithMargin(child, crossAxis, availableInnerWidth));
+                            crossDim = Fmaxf(crossDim, NodeDimWithMargin(child, crossAxis, availableInnerWidth));
                         }
                     }
                     else if (performLayout)
@@ -2434,7 +2434,7 @@ public partial class Flex
                                     childHeightMeasureMode = MeasureMode.Undefined;
                                 }
 
-                                layoutNodeInternal(child,
+                                LayoutNodeInternal(child,
                                     childWidth,
                                     childHeight,
                                     direction,
@@ -2454,7 +2454,7 @@ public partial class Flex
                             if (MarginLeadingValue(child, crossAxis).Unit == Unit.Auto &&
                                 MarginTrailingValue(child, crossAxis).Unit == Unit.Auto)
                             {
-                                leadingCrossDim += fmaxf(0, remainingCrossDim / 2);
+                                leadingCrossDim += Fmaxf(0, remainingCrossDim / 2);
                             }
                             else if (MarginTrailingValue(child, crossAxis).Unit == Unit.Auto)
                             {
@@ -2462,7 +2462,7 @@ public partial class Flex
                             }
                             else if (MarginLeadingValue(child, crossAxis).Unit == Unit.Auto)
                             {
-                                leadingCrossDim += fmaxf(0, remainingCrossDim);
+                                leadingCrossDim += Fmaxf(0, remainingCrossDim);
                             }
                             else if (alignItem == Align.FlexStart)
                             {
@@ -2484,7 +2484,7 @@ public partial class Flex
             }
 
             totalLineCrossDim += crossDim;
-            maxLineMainDim = fmaxf(maxLineMainDim, mainDim);
+            maxLineMainDim = Fmaxf(maxLineMainDim, mainDim);
 
             lineCount++;
             startOfLineIndex = endOfLineIndex;
@@ -2565,7 +2565,7 @@ public partial class Flex
                         }
                         if (NodeIsLayoutDimDefined(child, crossAxis))
                         {
-                            lineHeight = fmaxf(lineHeight,
+                            lineHeight = Fmaxf(lineHeight,
                                 child.nodeLayout.measuredDimensions[(int)dim[(int)crossAxis]] +
                                     NodeMarginForAxis(child, crossAxis, availableInnerWidth));
                         }
@@ -2573,9 +2573,9 @@ public partial class Flex
                         {
                             float ascent = Baseline(child) + NodeLeadingMargin(child, FlexDirection.Column, availableInnerWidth);
                             float descent = child.nodeLayout.measuredDimensions[(int)Dimension.Height] + NodeMarginForAxis(child, FlexDirection.Column, availableInnerWidth) - ascent;
-                            maxAscentForCurrentLine = fmaxf(maxAscentForCurrentLine, ascent);
-                            maxDescentForCurrentLine = fmaxf(maxDescentForCurrentLine, descent);
-                            lineHeight = fmaxf(lineHeight, maxAscentForCurrentLine + maxDescentForCurrentLine);
+                            maxAscentForCurrentLine = Fmaxf(maxAscentForCurrentLine, ascent);
+                            maxDescentForCurrentLine = Fmaxf(maxDescentForCurrentLine, descent);
+                            lineHeight = Fmaxf(lineHeight, maxAscentForCurrentLine + maxDescentForCurrentLine);
                         }
                     }
                 }
@@ -2643,7 +2643,7 @@ public partial class Flex
                                                 FloatsEqual(childHeight,
                                                     child.nodeLayout.measuredDimensions[(int)Dimension.Height])))
                                             {
-                                                layoutNodeInternal(child,
+                                                LayoutNodeInternal(child,
                                                     childWidth,
                                                     childHeight,
                                                     direction,
@@ -2697,7 +2697,7 @@ public partial class Flex
         else if (measureModeMainDim == MeasureMode.AtMost &&
           node.nodeStyle.Overflow == Overflow.Scroll)
         {
-            node.nodeLayout.measuredDimensions[(int)dim[(int)mainAxis]] = fmaxf(
+            node.nodeLayout.measuredDimensions[(int)dim[(int)mainAxis]] = Fmaxf(
                 Fminf(availableInnerMainDim + paddingAndBorderAxisMain,
                     NodeBoundAxisWithinMinAndMax(node, mainAxis, maxLineMainDim, mainAxisParentSize)),
                 paddingAndBorderAxisMain);
@@ -2719,7 +2719,7 @@ public partial class Flex
           node.nodeStyle.Overflow == Overflow.Scroll)
         {
             node.nodeLayout.measuredDimensions[(int)dim[(int)crossAxis]] =
-                fmaxf(Fminf(availableInnerCrossDim + paddingAndBorderAxisCross,
+                Fmaxf(Fminf(availableInnerCrossDim + paddingAndBorderAxisCross,
                     NodeBoundAxisWithinMinAndMax(node,
                         crossAxis,
                         totalLineCrossDim + paddingAndBorderAxisCross,
@@ -2791,7 +2791,7 @@ public partial class Flex
     const string spacerStr = "";
 
     // spacer returns spacer string
-    internal static string spacer(int level)
+    internal static string Spacer(int level)
     {
         if (level > spacerStr.Length)
         {
@@ -2801,7 +2801,7 @@ public partial class Flex
     }
 
     // measureModeName returns name of measure mode
-    internal static string measureModeName(MeasureMode mode, bool performLayout)
+    internal static string MeasureModeName(MeasureMode mode, bool performLayout)
     {
 
         if ((int)mode >= Constant.measureModeCount)
@@ -2816,18 +2816,18 @@ public partial class Flex
         return Constant.measureModeNames[(int)mode];
     }
 
-    internal static bool measureModeSizeIsExactAndMatchesOldMeasuredSize(MeasureMode sizeMode, float size, float lastComputedSize)
+    internal static bool MeasureModeSizeIsExactAndMatchesOldMeasuredSize(MeasureMode sizeMode, float size, float lastComputedSize)
     {
         return sizeMode == MeasureMode.Exactly && FloatsEqual(size, lastComputedSize);
     }
 
-    internal static bool measureModeOldSizeIsUnspecifiedAndStillFits(MeasureMode sizeMode, float size, MeasureMode lastSizeMode, float lastComputedSize)
+    internal static bool MeasureModeOldSizeIsUnspecifiedAndStillFits(MeasureMode sizeMode, float size, MeasureMode lastSizeMode, float lastComputedSize)
     {
         return sizeMode == MeasureMode.AtMost && lastSizeMode == MeasureMode.Undefined &&
             (size >= lastComputedSize || FloatsEqual(size, lastComputedSize));
     }
 
-    internal static bool measureModeNewMeasureSizeIsStricterAndStillValid(MeasureMode sizeMode, float size, MeasureMode lastSizeMode, float lastSize, float lastComputedSize)
+    internal static bool MeasureModeNewMeasureSizeIsStricterAndStillValid(MeasureMode sizeMode, float size, MeasureMode lastSizeMode, float lastSize, float lastComputedSize)
     {
         return lastSizeMode == MeasureMode.AtMost && sizeMode == MeasureMode.AtMost &&
             lastSize > size && (lastComputedSize <= size || FloatsEqual(size, lastComputedSize));
@@ -2835,7 +2835,7 @@ public partial class Flex
 
 
     // nodeCanUseCachedMeasurement returns true if can use cached measurement
-    internal static bool nodeCanUseCachedMeasurement(MeasureMode widthMode, float width, MeasureMode heightMode, float height, MeasureMode lastWidthMode, float lastWidth, MeasureMode lastHeightMode, float lastHeight, float lastComputedWidth, float lastComputedHeight, float marginRow, float marginColumn, Config config)
+    internal static bool NodeCanUseCachedMeasurement(MeasureMode widthMode, float width, MeasureMode heightMode, float height, MeasureMode lastWidthMode, float lastWidth, MeasureMode lastHeightMode, float lastHeight, float lastComputedWidth, float lastComputedHeight, float marginRow, float marginColumn, Config config)
     {
         if (lastComputedHeight < 0 || lastComputedWidth < 0)
         {
@@ -2860,15 +2860,15 @@ public partial class Flex
 
         var widthIsCompatible =
             hasSameWidthSpec
-            || measureModeSizeIsExactAndMatchesOldMeasuredSize(widthMode, width - marginRow, lastComputedWidth)
-            || measureModeOldSizeIsUnspecifiedAndStillFits(widthMode, width - marginRow, lastWidthMode, lastComputedWidth)
-            || measureModeNewMeasureSizeIsStricterAndStillValid(widthMode, width - marginRow, lastWidthMode, lastWidth, lastComputedWidth);
+            || MeasureModeSizeIsExactAndMatchesOldMeasuredSize(widthMode, width - marginRow, lastComputedWidth)
+            || MeasureModeOldSizeIsUnspecifiedAndStillFits(widthMode, width - marginRow, lastWidthMode, lastComputedWidth)
+            || MeasureModeNewMeasureSizeIsStricterAndStillValid(widthMode, width - marginRow, lastWidthMode, lastWidth, lastComputedWidth);
 
         var heightIsCompatible =
             hasSameHeightSpec
-            || measureModeSizeIsExactAndMatchesOldMeasuredSize(heightMode, height - marginColumn, lastComputedHeight)
-            || measureModeOldSizeIsUnspecifiedAndStillFits(heightMode, height - marginColumn, lastHeightMode, lastComputedHeight)
-            || measureModeNewMeasureSizeIsStricterAndStillValid(heightMode, height - marginColumn, lastHeightMode, lastHeight, lastComputedHeight);
+            || MeasureModeSizeIsExactAndMatchesOldMeasuredSize(heightMode, height - marginColumn, lastComputedHeight)
+            || MeasureModeOldSizeIsUnspecifiedAndStillFits(heightMode, height - marginColumn, lastHeightMode, lastComputedHeight)
+            || MeasureModeNewMeasureSizeIsStricterAndStillValid(heightMode, height - marginColumn, lastHeightMode, lastHeight, lastComputedHeight);
 
         return widthIsCompatible && heightIsCompatible;
     }
@@ -2884,7 +2884,7 @@ public partial class Flex
     // Parameters:
     //  Input parameters are the same as YGNodelayoutImpl (see above)
     //  Return parameter is true if layout was performed, false if skipped
-    internal static bool layoutNodeInternal(Node node, float availableWidth, float availableHeight,
+    internal static bool LayoutNodeInternal(Node node, float availableWidth, float availableHeight,
         Direction parentDirection, MeasureMode widthMeasureMode,
         MeasureMode heightMeasureMode, float parentWidth, float parentHeight,
         bool performLayout, string reason, Config config)
@@ -2927,7 +2927,7 @@ public partial class Flex
             var marginAxisColumn = NodeMarginForAxis(node, FlexDirection.Column, parentWidth);
 
             // First, try to use the layout cache.
-            if (nodeCanUseCachedMeasurement(widthMeasureMode,
+            if (NodeCanUseCachedMeasurement(widthMeasureMode,
                 availableWidth,
                 heightMeasureMode,
                 availableHeight,
@@ -2948,7 +2948,7 @@ public partial class Flex
                 // Try to use the measurement cache.
                 for (int i = 0; i < layout.nextCachedMeasurementsIndex; i++)
                 {
-                    if (nodeCanUseCachedMeasurement(widthMeasureMode,
+                    if (NodeCanUseCachedMeasurement(widthMeasureMode,
                         availableWidth,
                         heightMeasureMode,
                         availableHeight,
@@ -3001,11 +3001,8 @@ public partial class Flex
             if (gPrintChanges && gPrintSkips)
             {
                 // fmt.Printf("%s%d.{[skipped] ", spacer(gDepth), gDepth);
-                Console.WriteLine($"{spacer(gDepth)}{gDepth}.{{[skipped]");
-                if (node.printFunc != null)
-                {
-                    node.printFunc(node);
-                }
+                Console.WriteLine($"{Spacer(gDepth)}{gDepth}.{{[skipped]");
+                node.printFunc?.Invoke(node);
                 // fmt.Printf("wm: %s, hm: %s, aw: %f ah: %f => d: (%f, %f) %s\n",
                 //     measureModeName(widthMeasureMode, performLayout),
                 //     measureModeName(heightMeasureMode, performLayout),
@@ -3015,8 +3012,8 @@ public partial class Flex
                 //     cachedResults.computedHeight,
                 //     reason);
                 Console.WriteLine("wm: {0}, hm: {1}, aw: {2} ah: {3} => d: ({4}, {5}) {6}\n",
-                    measureModeName(widthMeasureMode, performLayout),
-                    measureModeName(heightMeasureMode, performLayout),
+                    MeasureModeName(widthMeasureMode, performLayout),
+                    MeasureModeName(heightMeasureMode, performLayout),
                     availableWidth,
                     availableHeight,
                     cachedResults.computedWidth,
@@ -3035,11 +3032,8 @@ public partial class Flex
                     s = "*";
                 }
                 // fmt.Printf("%s%d.{%s", spacer(gDepth), gDepth, s);
-                Console.WriteLine($"{spacer(gDepth)}{gDepth}.{{{s}");
-                if (node.printFunc != null)
-                {
-                    node.printFunc(node);
-                }
+                Console.WriteLine($"{Spacer(gDepth)}{gDepth}.{{{s}");
+                node.printFunc?.Invoke(node);
                 // fmt.Printf("wm: %s, hm: %s, aw: %f ah: %f %s\n",
                 //     measureModeName(widthMeasureMode, performLayout),
                 //     measureModeName(heightMeasureMode, performLayout),
@@ -3047,15 +3041,15 @@ public partial class Flex
                 //     availableHeight,
                 //     reason);
                 Console.WriteLine("wm: {0}, hm: {1}, aw: {2} ah: {3} {4}\n",
-                    measureModeName(widthMeasureMode, performLayout),
-                    measureModeName(heightMeasureMode, performLayout),
+                    MeasureModeName(widthMeasureMode, performLayout),
+                    MeasureModeName(heightMeasureMode, performLayout),
                     availableWidth,
                     availableHeight,
                     reason
                 );
             }
 
-            nodelayoutImpl(node,
+            NodelayoutImpl(node,
                 availableWidth,
                 availableHeight,
                 parentDirection,
@@ -3074,11 +3068,8 @@ public partial class Flex
                     s = "*";
                 }
                 // fmt.Printf("%s%d.}%s", spacer(gDepth), gDepth, s);
-                Console.WriteLine($"{spacer(gDepth)}{gDepth}.}}{s}");
-                if (node.printFunc != null)
-                {
-                    node.printFunc(node);
-                }
+                Console.WriteLine($"{Spacer(gDepth)}{gDepth}.}}{s}");
+                node.printFunc?.Invoke(node);
                 // fmt.Printf("wm: %s, hm: %s, d: (%f, %f) %s\n",
                 //     measureModeName(widthMeasureMode, performLayout),
                 //     measureModeName(heightMeasureMode, performLayout),
@@ -3086,8 +3077,8 @@ public partial class Flex
                 //     layout.measuredDimensions[Dimension.Height],
                 //     reason);
                 Console.WriteLine("wm: {0}, hm: {1}, d: ({2}, {3}) {4}\n",
-                    measureModeName(widthMeasureMode, performLayout),
-                    measureModeName(heightMeasureMode, performLayout),
+                    MeasureModeName(widthMeasureMode, performLayout),
+                    MeasureModeName(heightMeasureMode, performLayout),
                     layout.measuredDimensions[(int)Dimension.Width],
                     layout.measuredDimensions[(int)Dimension.Height],
                     reason
@@ -3142,7 +3133,7 @@ public partial class Flex
         return needToVisitNode || cachedResults == null;
     }
 
-    internal static void roundToPixelGrid(Node node, float pointScaleFactor, float absoluteLeft, float absoluteTop)
+    internal static void RoundToPixelGrid(Node node, float pointScaleFactor, float absoluteLeft, float absoluteTop)
     {
         if (pointScaleFactor == 0.0)
         {
@@ -3170,10 +3161,10 @@ public partial class Flex
 
         // We multiply dimension by scale factor and if the result is close to the whole number, we don't have any fraction
         // To verify if the result is close to whole number we want to check both floor and ceil numbers
-        var hasFractionalWidth = !FloatsEqual(fmodf(nodeWidth * pointScaleFactor, 1), 0) &&
-            !FloatsEqual(fmodf(nodeWidth * pointScaleFactor, 1), 1);
-        var hasFractionalHeight = !FloatsEqual(fmodf(nodeHeight * pointScaleFactor, 1), 0) &&
-            !FloatsEqual(fmodf(nodeHeight * pointScaleFactor, 1), 1);
+        var hasFractionalWidth = !FloatsEqual(Fmodf(nodeWidth * pointScaleFactor, 1), 0) &&
+            !FloatsEqual(Fmodf(nodeWidth * pointScaleFactor, 1), 1);
+        var hasFractionalHeight = !FloatsEqual(Fmodf(nodeHeight * pointScaleFactor, 1), 0) &&
+            !FloatsEqual(Fmodf(nodeHeight * pointScaleFactor, 1), 1);
 
         node.nodeLayout.Dimensions[(int)Dimension.Width] =
             RoundValueToPixelGrid(
@@ -3192,7 +3183,7 @@ public partial class Flex
 
         foreach (var child in node.Children)
         {
-            roundToPixelGrid(child, pointScaleFactor, absoluteNodeLeft, absoluteNodeTop);
+            RoundToPixelGrid(child, pointScaleFactor, absoluteNodeLeft, absoluteNodeTop);
         }
     }
 
@@ -3225,7 +3216,7 @@ public partial class Flex
             return;
         }
     }
-    internal static void calcStartHeight(Node node, float parentWidth, float parentHeight,
+    internal static void CalcStartHeight(Node node, float parentWidth, float parentHeight,
         out float out_height, out MeasureMode out_measureMode)
     {
         if (NodeIsStyleDimDefined(node, FlexDirection.Column, parentHeight))
@@ -3258,12 +3249,12 @@ public partial class Flex
 
 
 
-    internal static void log(Node node, LogLevel level, string format, params object[] args)
+    internal static void Log(Node node, LogLevel level, string format, params object[] args)
     {
         Console.WriteLine(format, args);
     }
 
-    internal static void assertCond(bool cond, string format, params object[] args)
+    internal static void AssertCond(bool cond, string format, params object[] args)
     {
         if (!cond)
         {
@@ -3271,17 +3262,17 @@ public partial class Flex
         }
     }
 
-    internal static void assertWithNode(Node node, bool cond, string format, params object[] args)
+    internal static void AssertWithNode(Node node, bool cond, string format, params object[] args)
     {
-        assertCond(cond, format, args);
+        AssertCond(cond, format, args);
     }
 
-    internal static float fmodf(float a, float b)
+    internal static float Fmodf(float a, float b)
     {
         return a % b;
     }
 
-    static internal float fmaxf(float a, float b)
+    static internal float Fmaxf(float a, float b)
     {
         if (float.IsNaN(a))
         {
