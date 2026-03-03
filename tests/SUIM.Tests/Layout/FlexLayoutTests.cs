@@ -11,8 +11,8 @@ public class FlexLayoutTests
     {
         var markup = """
             <div width="300px" height="100px" Display="flex" FlexDirection="row">
-                <div width="100px" height="50px"><div/>
-                <div width="100%" height="50px"><div/>
+                <div width="100px" height="50px"></div>
+                <div width="100%" height="50px"></div>
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);
