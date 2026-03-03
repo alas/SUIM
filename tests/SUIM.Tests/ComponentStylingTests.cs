@@ -207,7 +207,7 @@ public class ComponentStylingTests
         Assert.NotNull(button);
         Assert.Equal(200, button.GetWidth());
         Assert.Equal(50, button.GetHeight());
-        Assert.Equal("5", button.GetAttribute("margin"));
+        Assert.Equal(5, Convert.ToSingle(button.GetAttribute("margin-top")));
 
         // Now layout it
         suimElement.CalculateLayout(1280, 720);
@@ -248,9 +248,9 @@ public class ComponentStylingTests
 
         // The second button rule should merge with and override the first
         // Expected: width=200px, height=50px, margin=5px, color=red (from first rule, not overridden)
-        Assert.Equal(200, button.GetWidth());
-        Assert.Equal(50, button.GetHeight());
-        Assert.Equal("5", button.GetAttribute("margin"));
+        Assert.Equal("200px", button.GetAttribute("width"));
+        Assert.Equal("50px", button.GetAttribute("height"));
+        Assert.Equal(5, Convert.ToSingle(button.GetAttribute("margin-top")));
         Assert.Equal("red", button.GetAttribute("color"));
     }
 
@@ -267,7 +267,7 @@ public class ComponentStylingTests
         File.WriteAllText(cssPath, cssContent);
 
         var markup = $@"
-            <grid>
+            <div>
                 <style src=""{Path.GetFileName(cssPath)}"" />
                 <style>
                     button {{
@@ -277,7 +277,7 @@ public class ComponentStylingTests
                     }}
                 </style>
                 <button>Test</button>
-            </grid>";
+            </div>";
 
         var (suimElement, _) = MarkupParser.Parse(markup, basePath: GetTestPath(""));
         suimElement.CalculateLayout(500, 500);
@@ -288,7 +288,7 @@ public class ComponentStylingTests
         // Color should come from CSS (not overridden by inline)
         Assert.Equal("200px", button.GetAttribute("width"));
         Assert.Equal("50px", button.GetAttribute("height"));
-        Assert.Equal("5px", button.GetAttribute("margin"));
+        Assert.Equal(5, Convert.ToSingle(button.GetAttribute("margin-top")));
         Assert.Equal("blue", button.GetAttribute("color"));
     }
 }

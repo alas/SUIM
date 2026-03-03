@@ -298,13 +298,13 @@ public class PopupIntegrationTests
 
         // Find the Popup (it's a component, probably resolved to something else, or we find it by searching child elements)
         // In the parsed tree, it should have the class or id that matches the popup, let's just find the first thing with visibility="collapsed"
-        var popup = suimRoot.Children.FirstOrDefault(c => string.Equals(c.GetAttribute("display"), "none", StringComparison.OrdinalIgnoreCase)) 
+        var popup = suimRoot.Children.FirstOrDefault(c => string.Equals(c.GetAttribute("visibility"), "collapsed", StringComparison.OrdinalIgnoreCase)) 
                     ?? suimRoot.Children.LastOrDefault(); // Assuming it's at the end if not collapsed by default in parsed tree
         
         Assert.NotNull(popup);
 
         // Change visibility to Visible
-        popup.SetAttribute("display", "flex");
+        popup.SetAttribute("visibility", "visible");
         
         // Set some dummy values
         if (popup is SUIMElement popupElement)

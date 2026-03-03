@@ -446,12 +446,12 @@ public class MarkupParserTests
     [Fact]
     public void Parse_Visibility_Attribute()
     {
-        var markup = "<div display=\"hidden\" />";
+        var markup = "<div visibility=\"hidden\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal("hidden", div.GetAttribute("display"));
+        Assert.Equal("hidden", div.GetAttribute("visibility"));
     }
 
     [Fact]
@@ -958,12 +958,12 @@ else
     [Fact]
     public void Parse_Visibility_Visible()
     {
-        var markup = "<div display=\"flex\" />";
+        var markup = "<div visibility=\"visible\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal("flex", div.Display);
+        Assert.Equal("flex", div.Visibility);
     }
 
     [Fact]
@@ -974,7 +974,7 @@ else
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal("hidden", div.Display);
+        Assert.Equal("hidden", div.Visibility);
     }
 
     // ============== GRID SPAN EDGE CASES ==============

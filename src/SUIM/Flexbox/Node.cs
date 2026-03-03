@@ -232,9 +232,11 @@ public partial class Node
     {
         return this.printFunc;
     }
+
     #endregion
 
     #region tree
+
     public Node? GetChild(int idx)
     {
         return Flex.GetChild(this, idx);
@@ -254,5 +256,6 @@ public partial class Node
     {
         Flex.RemoveChild(this, child);
     }
+
     #endregion
 }

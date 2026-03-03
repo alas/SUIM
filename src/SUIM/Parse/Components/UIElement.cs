@@ -1,6 +1,5 @@
 namespace SUIM.Parse.Components;
 
-using System.ComponentModel.Design;
 using System.Xml.Linq;
 using SUIM.Flexbox;
 
@@ -30,12 +29,16 @@ public abstract class UIElement(string tagName)
     {
         child.Parent = this;
         Children.Add(child);
+
+        Node.AddChild(child.Node);
     }
 
     public virtual void RemoveChild(UIElement child)
     {
         child.Parent = null;
         Children.Remove(child);
+
+        Node.RemoveChild(child.Node);
     }
 
     public virtual void ClearChildren()
@@ -45,6 +48,8 @@ public abstract class UIElement(string tagName)
             child.Parent = null;
         }
         Children.Clear();
+
+        Node.Children.Clear();
     }
 
     public virtual void SetAttribute(string name, object? value)
@@ -99,16 +104,16 @@ public abstract class UIElement(string tagName)
             }
             else if (AllProperties.TryGetValue(name, out var normalized))
             {
-                Node.nodeStyle[name] = normalized;
+                Node.nodeStyle[normalized] = s;
             }
             else
             {
-                Console.WriteLine($"Not recognized property: ${value}");
+                Console.WriteLine($"Not recognized property: ${s}");
             }
         }
         else
         {
-            Console.WriteLine($"Not string property: ${value}");
+            Console.WriteLine($"Not string property value: ${value}");
         }
     }
 
@@ -174,8 +179,7 @@ public abstract class UIElement(string tagName)
         Node.CalculateLayout(parentWidth, parentHeight, parentDirection);
     }
 
-    public static readonly Dictionary<string, string> AllProperties =
-        new(StringComparer.OrdinalIgnoreCase)
+    public static readonly Dictionary<string, string> AllProperties = new(StringComparer.OrdinalIgnoreCase)
         {
             // Flex container                            
             { "flex-direction",                                 "flex-direction" },

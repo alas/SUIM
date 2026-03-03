@@ -14,12 +14,10 @@ using StrideUIElement = Stride.UI.UIElement;
 using StrideButton = Stride.UI.Controls.Button;
 using Stride.UI.Panels;
 using SUIM;
-using SUIM.Flexbox;
 using SUIM.Model;
 using SUIM.Parse;
 using SUIM.Parse.Components;
 using SUIMElement = SUIM.Parse.Components.UIElement;
-using SUIM.Parse.Components.Attributes;
 
 public class Parser
 {

@@ -2,18 +2,13 @@ namespace SUIM.Parse.Components;
 
 public class Div() : LayoutElement(nameof(Div))
 {
-    public string? Display { get; set; }
-    public string? FlexDirection { get; set; }
+    public string? Visibility { get; set; }
 
     public override void SetAttribute(string name, object? value)
     {
-        if (name.Equals("display", StringComparison.OrdinalIgnoreCase))
+        if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase))
         {
-            Display = value as string;
-        }
-        else if (name.Equals("flex-direction", StringComparison.OrdinalIgnoreCase) || name.Equals("flexdirection", StringComparison.OrdinalIgnoreCase))
-        {
-            FlexDirection = value as string;
+            Visibility = value as string;
         }
         else
         {
@@ -23,8 +18,7 @@ public class Div() : LayoutElement(nameof(Div))
 
     public override string? GetAttribute(string name)
     {
-        if (name.Equals("display", StringComparison.OrdinalIgnoreCase)) return Display;
-        if (name.Equals("flex-direction", StringComparison.OrdinalIgnoreCase) || name.Equals("flexdirection", StringComparison.OrdinalIgnoreCase)) return FlexDirection;
+        if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase)) return Visibility;
         return base.GetAttribute(name);
     }
 }

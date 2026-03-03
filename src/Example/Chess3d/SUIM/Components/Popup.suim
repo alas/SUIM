@@ -5,7 +5,7 @@
 		"message": "",
 		"onYes": null,
 		"onNo": null,
-		"display": null
+		"visibility": null
 	}
 	</model>
 	<style>
@@ -22,7 +22,7 @@
 	}
 	</style>
 
-    <overlay display="@display" class="centeredcontent">
+    <overlay visibility="@visibility" class="centeredcontent">
 			<vstack class="wood-panel centeredcontent">
 				<hstack>
 					<label value="@title" />

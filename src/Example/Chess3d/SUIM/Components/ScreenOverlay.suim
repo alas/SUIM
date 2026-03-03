@@ -2,10 +2,10 @@
 	<model>
 	{
 		"message": "",
-		"display": null
+		"visibility": null
 	}
 	</model>
-	<overlay display="@display" class="centeredcontent">
+	<overlay visibility="@visibility" class="centeredcontent">
 		<grid class="centeredcontent">
 			<label value="@message" />
 		</grid>
