@@ -95,6 +95,7 @@ public class ComponentStylingTests
 
         var parentDiv = (Div)root;
         var c1Comp = (CustomComponent)parentDiv.Children[0];
+        Assert.NotNull(c1Comp);
         var c2Comp = (CustomComponent)parentDiv.Children[1];
 
         var c2Div = (Div)c2Comp.Children[0];

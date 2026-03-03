@@ -1580,14 +1580,14 @@ public partial class Flex
         if (!FloatIsUndefined(availableInnerWidth))
         {
             // We want to make sure our available width does not violate min and max raints
-            availableInnerWidth = fmaxf(fminf(availableInnerWidth, maxInnerWidth), minInnerWidth);
+            availableInnerWidth = fmaxf(Fminf(availableInnerWidth, maxInnerWidth), minInnerWidth);
         }
 
         var availableInnerHeight = availableHeight - marginAxisColumn - paddingAndBorderAxisColumn;
         if (!FloatIsUndefined(availableInnerHeight))
         {
             // We want to make sure our available height does not violate min and max raints
-            availableInnerHeight = fmaxf(fminf(availableInnerHeight, maxInnerHeight), minInnerHeight);
+            availableInnerHeight = fmaxf(Fminf(availableInnerHeight, maxInnerHeight), minInnerHeight);
         }
 
         var availableInnerMainDim = availableInnerHeight;
@@ -1744,7 +1744,7 @@ public partial class Flex
                 if (child.nodeStyle.PositionType != PositionType.Absolute)
                 {
                     var childMarginMainAxis = NodeMarginForAxis(child, mainAxis, availableInnerWidth);
-                    var flexBasisWithMaxConstraints = fminf(ResolveValue(child.nodeStyle.MaxDimensions[(int)dim[(int)mainAxis]], mainAxisParentSize), child.nodeLayout.computedFlexBasis);
+                    var flexBasisWithMaxConstraints = Fminf(ResolveValue(child.nodeStyle.MaxDimensions[(int)dim[(int)mainAxis]], mainAxisParentSize), child.nodeLayout.computedFlexBasis);
                     var flexBasisWithMinAndMaxConstraints = fmaxf(ResolveValue(child.nodeStyle.MinDimensions[(int)dim[(int)mainAxis]], mainAxisParentSize), flexBasisWithMaxConstraints);
 
                     // If this is a multi-line flow and this item pushes us over the
@@ -1887,7 +1887,7 @@ public partial class Flex
                 while (currentRelativeChild != null)
                 {
                     childFlexBasis =
-                        fminf(ResolveValue(currentRelativeChild.nodeStyle.MaxDimensions[(int)dim[(int)mainAxis]],
+                        Fminf(ResolveValue(currentRelativeChild.nodeStyle.MaxDimensions[(int)dim[(int)mainAxis]],
                             mainAxisParentSize),
                             fmaxf(ResolveValue(currentRelativeChild.nodeStyle.MinDimensions[(int)dim[(int)mainAxis]],
                                 mainAxisParentSize),
@@ -1963,7 +1963,7 @@ public partial class Flex
                 while (currentRelativeChild != null)
                 {
                     childFlexBasis =
-                        fminf(ResolveValue(currentRelativeChild.nodeStyle.MaxDimensions[(int)dim[(int)mainAxis]],
+                        Fminf(ResolveValue(currentRelativeChild.nodeStyle.MaxDimensions[(int)dim[(int)mainAxis]],
                             mainAxisParentSize),
                             fmaxf(ResolveValue(currentRelativeChild.nodeStyle.MinDimensions[(int)dim[(int)mainAxis]],
                                 mainAxisParentSize),
@@ -2069,7 +2069,7 @@ public partial class Flex
                         // Parent size raint should have higher priority than flex
                         if (NodeIsFlex(currentRelativeChild))
                         {
-                            childCrossSize = fminf(childCrossSize - marginCross, availableInnerCrossDim);
+                            childCrossSize = Fminf(childCrossSize - marginCross, availableInnerCrossDim);
                             childMainSize = marginMain;
                             if (isMainAxisRow)
                             {
@@ -2698,7 +2698,7 @@ public partial class Flex
           node.nodeStyle.Overflow == Overflow.Scroll)
         {
             node.nodeLayout.measuredDimensions[(int)dim[(int)mainAxis]] = fmaxf(
-                fminf(availableInnerMainDim + paddingAndBorderAxisMain,
+                Fminf(availableInnerMainDim + paddingAndBorderAxisMain,
                     NodeBoundAxisWithinMinAndMax(node, mainAxis, maxLineMainDim, mainAxisParentSize)),
                 paddingAndBorderAxisMain);
         }
@@ -2719,7 +2719,7 @@ public partial class Flex
           node.nodeStyle.Overflow == Overflow.Scroll)
         {
             node.nodeLayout.measuredDimensions[(int)dim[(int)crossAxis]] =
-                fmaxf(fminf(availableInnerCrossDim + paddingAndBorderAxisCross,
+                fmaxf(Fminf(availableInnerCrossDim + paddingAndBorderAxisCross,
                     NodeBoundAxisWithinMinAndMax(node,
                         crossAxis,
                         totalLineCrossDim + paddingAndBorderAxisCross,
@@ -3298,7 +3298,7 @@ public partial class Flex
         }
         return b;
     }
-    static internal float fminf(float a, float b)
+    static internal float Fminf(float a, float b)
     {
         if (float.IsNaN(a))
         {
