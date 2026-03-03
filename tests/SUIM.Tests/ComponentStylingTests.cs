@@ -203,17 +203,17 @@ public class ComponentStylingTests
         var button = vstack.Children[0];
 
         Assert.NotNull(button);
-        Assert.Equal("200px", button.Width);
-        Assert.Equal("50px", button.Height);
-        Assert.Equal("5px", button.Margin);
+        Assert.Equal(200, button.GetWidth());
+        Assert.Equal(50, button.GetHeight());
+        Assert.Equal("5", button.GetAttribute("margin"));
 
         // Now layout it
         suimElement.CalculateLayout(1280, 720);
 
         // Check actual dimensions
         var buttonActual = vstack.Children[0];
-        Assert.Equal(200, buttonActual.ActualWidth);
-        Assert.Equal(50, buttonActual.ActualHeight);
+        Assert.Equal(200, buttonActual.GetWidth());
+        Assert.Equal(50, buttonActual.GetHeight());
     }
 
     [Fact]
@@ -246,10 +246,10 @@ public class ComponentStylingTests
 
         // The second button rule should merge with and override the first
         // Expected: width=200px, height=50px, margin=5px, color=red (from first rule, not overridden)
-        Assert.Equal("200px", button.Width);
-        Assert.Equal("50px", button.Height);
-        Assert.Equal("5px", button.Margin);
-        Assert.Equal("red", button.Color);
+        Assert.Equal(200, button.GetWidth());
+        Assert.Equal(50, button.GetHeight());
+        Assert.Equal("5", button.GetAttribute("margin"));
+        Assert.Equal("red", button.GetAttribute("color"));
     }
 
     [Fact]
@@ -283,9 +283,9 @@ public class ComponentStylingTests
         // External CSS should be merged with inline style
         // Inline style (later) should override CSS file values for width/height
         // Color should come from CSS (not overridden by inline)
-        Assert.Equal("200px", button.Width);
-        Assert.Equal("50px", button.Height);
-        Assert.Equal("5px", button.Margin);
-        Assert.Equal("blue", button.Color);
+        Assert.Equal("200px", button.GetAttribute("width"));
+        Assert.Equal("50px", button.GetAttribute("height"));
+        Assert.Equal("5px", button.GetAttribute("margin"));
+        Assert.Equal("blue", button.GetAttribute("color"));
     }
 }
