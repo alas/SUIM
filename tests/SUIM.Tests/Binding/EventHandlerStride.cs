@@ -289,10 +289,10 @@ public class EventHandlerStrideTests
     {
         // Arrange
         var markup = @"
-            <grid>
+            <div>
                 <model>{ ""title"": ""Click Button"" }</model>
                 <button id=""btn"" onclick=""OnSimpleClick()"">Click</button>
-            </grid>";
+            </div>";
         var model = new TestModel();
         var suim = new Parser();
 

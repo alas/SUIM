@@ -9,7 +9,7 @@ using SUIM.Parse.Components;
 /// Handles CSS-like style parsing and application to UI elements.
 /// Supports multiple selectors separated by commas and various selector types (tag, class, id, universal).
 /// </summary>
-public static class Style
+public static class CssStyle
 {
     /// <summary>
     /// Parses CSS-like style content and populates the styles dictionary.

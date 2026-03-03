@@ -1402,7 +1402,7 @@ Text after
     {
         var styleContent = ".myclass { width: 500; height: 400; border: 5 #FF0000; }";
         var styleDictionary = new Dictionary<string, Dictionary<string, string>>();
-        Style.Parse(styleContent, styleDictionary);
+        CssStyle.Parse(styleContent, styleDictionary);
         Assert.True(styleDictionary.ContainsKey(".myclass"));
         var props = styleDictionary[".myclass"];
         Assert.Equal("500", props["width"]);

@@ -184,7 +184,7 @@ public class ComponentStylingTests
     {
         // Create a simple button with CSS-style sizing
         var markup = @"
-            <grid>
+            <div>
                 <style>
                     button {
                         width: 200px;
@@ -195,9 +195,10 @@ public class ComponentStylingTests
                 <vstack>
                     <button>Test</button>
                 </vstack>
-            </grid>";
+            </div>";
 
         var (suimElement, _) = MarkupParser.Parse(markup);
+        suimElement.CalculateLayout(500, 500);
 
         // Check that the button has the right width/height attributes
         var vstack = suimElement.Children[0];
@@ -279,6 +280,7 @@ public class ComponentStylingTests
             </grid>";
 
         var (suimElement, _) = MarkupParser.Parse(markup, basePath: GetTestPath(""));
+        suimElement.CalculateLayout(500, 500);
         var button = suimElement.Children[0];
 
         // External CSS should be merged with inline style

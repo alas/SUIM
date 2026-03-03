@@ -5,6 +5,7 @@ using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
 using SUIM.Flexbox;
+using SUIM.Parse.Components;
 using SUIMStride;
 using System.Collections.Generic;
 using System.Linq;
@@ -329,7 +330,7 @@ public class PopupIntegrationTests
 </Div>";
         var game = CreateTestGame();
         var (strideRoot, _) = new Parser().Parse(markup, game);
-        
+
         // Find the grid in the Stride tree
         var canvas = (Canvas)strideRoot;
         var grid = (Canvas)canvas.Children[0];         

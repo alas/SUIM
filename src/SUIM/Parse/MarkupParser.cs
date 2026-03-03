@@ -47,7 +47,7 @@ public static partial class MarkupParser
                     if (!string.IsNullOrEmpty(text))
                     {
                         UIElement textElement = new Text { Value = text };
-                        if (styles.Count > 0) textElement = Style.ApplyToElement(textElement, styles);
+                        if (styles.Count > 0) textElement = CssStyle.ApplyToElement(textElement, styles);
                         element.AddChild(textElement, root);
                     }
                 }
@@ -85,15 +85,15 @@ public static partial class MarkupParser
                 }
 
                 var content = File.ReadAllText(stylePath);
-                Style.Parse(content, styles);
-                if (!isScoped) Style.Parse(content, leakableStyles);
+                CssStyle.Parse(content, styles);
+                if (!isScoped) CssStyle.Parse(content, leakableStyles);
             }
 
             var styleContent = element.Value.Trim();
             if (!string.IsNullOrEmpty(styleContent))
             {
-                Style.Parse(styleContent, styles);
-                if (!isScoped) Style.Parse(styleContent, leakableStyles);
+                CssStyle.Parse(styleContent, styles);
+                if (!isScoped) CssStyle.Parse(styleContent, leakableStyles);
             }
         }
     }
@@ -215,7 +215,7 @@ public static partial class MarkupParser
                         UIElement textElement = new Text { Value = text };
                         if (styles != null && styles.Count > 0)
                         {
-                            textElement = Style.ApplyToElement(textElement, styles);
+                            textElement = CssStyle.ApplyToElement(textElement, styles);
                         }
                         innerElement.AddChild(textElement, element);
                     }
@@ -237,7 +237,7 @@ public static partial class MarkupParser
 
         if (styles != null && styles.Count > 0)
         {
-            rootElement = Style.ApplyToElement(rootElement, styles);
+            rootElement = CssStyle.ApplyToElement(rootElement, styles);
         }
 
         foreach (var attr in attributes)
@@ -259,7 +259,7 @@ public static partial class MarkupParser
     private static void SetAttribute(XAttribute attr, UIElement rootElement, UIElement innerElement)
     {
         var name = attr.Name.LocalName;
-        var target = Style.IsLayoutAttribute(name) ? rootElement : innerElement;
+        var target = CssStyle.IsLayoutAttribute(name) ? rootElement : innerElement;
 
         // Store raw attribute for CustomComponent expansion or other metadata
         var value = attr.Value;

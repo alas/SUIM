@@ -21,7 +21,14 @@ public class CustomComponent(string tagName) : LayoutElement(tagName)
             // Preserve as regular attribute for components or custom usage
             Attributes[name] = value;
 
-            base.SetAttribute(name, value);
+            try
+            {
+                base.SetAttribute(name, value);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error setting attribute: {ex}");
+            }
         }
     }
 
