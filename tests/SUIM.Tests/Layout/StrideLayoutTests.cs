@@ -13,35 +13,41 @@ public class StrideLayoutTests
     public void MarkupParser_WithLayoutEngine_CreatesLayout()
     {
         var markup = @"
-            <stack orientation=""vertical"" gap=""10"" width=""auto"" height=""auto"">
-                <label width=""100"" height=""50"" />
-                <label width=""100"" height=""30"" />
-            </stack>";
+            <div style=""display:flex; align-items:flex-start;"">
+                <vstack style=""gap:10; width:auto; height:auto"">
+                    <label style=""width:100; height:50"" />
+                    <label style=""width:100; height:30"" />
+                </vstack>
+            </div>";
             
         var (element, _) = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
-        
-        Assert.Equal("auto", element.GetAttribute("width"));
-        Assert.Equal("auto", element.GetAttribute("height"));
-        Assert.Equal(100, element.GetWidth());
-        Assert.Equal(90, element.GetHeight()); // 50 + 30 + 10 gap
+        var stack = (Stack)element.Children[0];
+
+        Assert.Equal("auto", stack.GetAttribute("width"));
+        Assert.Equal("auto", stack.GetAttribute("height"));
+        Assert.Equal(100, stack.GetWidth());
+        Assert.Equal(90, stack.GetHeight()); // 50 + 30 + 10 gap
     }
     
     [Fact]
     public void MarkupParser_WithFractionalUnits_CreatesProportionalLayout()
     {
         var markup = @"
-            <stack orientation=""horizontal"" gap=""0"" height=""auto"">
-                <label width=""1fr"" height=""50"" />
-                <label width=""2fr"" height=""50"" />
-            </stack>";
+            <div style=""display:flex; align-items:flex-start; justify-items:flex-start;"">
+                <hstack style=""gap:0; height:auto"">
+                    <label style=""height:50; flex-grow:1; flex-shrink:0;"" />
+                    <label style=""height:50; flex-grow:1; flex-shrink:0;"" />
+                </hstack>
+            </div>";
             
         var (element, _) = MarkupParser.Parse(markup);
         element.CalculateLayout(300, 100);
-        
-        Assert.Equal("auto", element.GetAttribute("height"));
-        Assert.Equal(300, element.GetWidth());
-        Assert.Equal(50, element.GetHeight());
+        var stack = element.Children[0];
+
+        Assert.Equal("auto", stack.GetAttribute("height"));
+        Assert.Equal(300, stack.GetWidth());
+        Assert.Equal(50, stack.GetHeight());
     }
     
     [Fact]
