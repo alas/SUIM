@@ -14,6 +14,7 @@ using StrideUIElement = Stride.UI.UIElement;
 using StrideButton = Stride.UI.Controls.Button;
 using Stride.UI.Panels;
 using SUIM;
+using SUIM.Flexbox;
 using SUIM.Model;
 using SUIM.Parse;
 using SUIM.Parse.Components;
@@ -276,9 +277,26 @@ public class Parser
 
     private Stride.UI.Controls.Border MapBorder(SUIM.Parse.Components.Border border, Game? game)
     {
+        var borderThickness = new Stride.UI.Thickness();
+        //var borderStyle = BorderStyle.None;
+        var borderColor = Color.Transparent;
+        var borderAttribute = border.Children[0].GetAttribute("border");
+        if (!string.IsNullOrWhiteSpace(borderAttribute))
+        {
+            var borderAttributes = borderAttribute.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var thicknessStr = borderAttributes[0];
+            if (!string.IsNullOrEmpty(thicknessStr))
+            {
+                //todo: medium|thin|thick|initial|inherit;
+                var value = Convert.ToSingle(thicknessStr.Replace("px", ""));
+                borderThickness = new Stride.UI.Thickness(value, value, value, value);
+            }
+        }
+
         var borderElem = new Stride.UI.Controls.Border
         {
-            BorderThickness = ThicknessToStride(border.Thickness, border)
+            BorderThickness = borderThickness,
+            BorderColor = borderColor,
         };
 
         if (!string.IsNullOrEmpty(border.Color))
@@ -323,16 +341,6 @@ public class Parser
         {
             stride.CanBeHitByUser = true;
         }
-    }
-
-    private static Stride.UI.Thickness ThicknessToStride(string? thicknessString, SUIMElement suim)
-    {
-        var thickness = SUIM.Parse.Components.Attributes.Thickness.Parse(thicknessString);
-        return new Stride.UI.Thickness(
-            SUIMElement.ToPixels(thickness.Left),
-            SUIMElement.ToPixels(thickness.Top),
-            SUIMElement.ToPixels(thickness.Right),
-            SUIMElement.ToPixels(thickness.Bottom));
     }
 
     private static Color ParseColor(string colorStr)

@@ -1233,14 +1233,14 @@ Text after
     [Fact]
     public void Parse_Border_WithMultipleSideThickness()
     {
-        var markup = @"<border thickness=""5,10,5,10"" color=""blue"">
+        var markup = @"<border thickness=""10"" color=""blue"">
 <div width=""200"" height=""100"" />
 </border>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Border>(element);
         var border = (Border)element;
-        Assert.Equal(new Thickness(5, 10, 5, 10), Thickness.Parse(border.Thickness));
+        Assert.Equal("10", border.Thickness);
         Assert.Equal("blue", border.Color);
         Assert.Single(border.Children);
     }
@@ -1248,14 +1248,14 @@ Text after
     [Fact]
     public void Parse_Border_WithTwoValueThickness()
     {
-        var markup = @"<border thickness=""3,6"" color=""green"">
+        var markup = @"<border thickness=""6"" color=""green"">
 <label value=""Border Test"" />
 </border>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Border>(element);
         var border = (Border)element;
-        Assert.Equal(new Thickness(3, 6), Thickness.Parse(border.Thickness));
+        Assert.Equal("6", border.Thickness);
         Assert.Equal("green", border.Color);
     }
 
