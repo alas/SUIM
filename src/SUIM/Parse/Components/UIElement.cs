@@ -132,23 +132,6 @@ public abstract class UIElement(string tagName)
         return Node.LayoutGetHeight();
     }
 
-    public static float ToPixels(string? value)
-    {
-        return ToPixels(UnitValue.Parse(value));
-    }
-
-    public static float ToPixels(UnitValue unitValue)
-    {
-        float val = unitValue.Type switch
-        {
-            UnitType.Pixels => unitValue.Value,
-            UnitType.Auto => 0f, // Will be calculated during layout
-            UnitType.Fr => 0f, // Will be calculated during fr distribution
-            _ => 0f
-        };
-        return float.IsNaN(val) || float.IsInfinity(val) ? 0f : val;
-    }
-
     public dynamic? GetEffectiveModel()
     {
         if (Model != null) return Model;

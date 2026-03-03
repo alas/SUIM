@@ -185,7 +185,7 @@ public class Parser
 
     private TextBlock MapText(Text text)
     {
-        var fontSize = text.FontSize != null ? SUIMElement.ToPixels(UnitValue.Parse(text.FontSize)) : 0f;
+        var fontSize = text.FontSize != null ? Convert.ToSingle(text.FontSize) : 0f;
         if (fontSize <= 0f)
         {
             fontSize = 16f; // Default font size if not specified or invalid
@@ -284,12 +284,18 @@ public class Parser
         if (!string.IsNullOrWhiteSpace(borderAttribute))
         {
             var borderAttributes = borderAttribute.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            var thicknessStr = borderAttributes[0];
-            if (!string.IsNullOrEmpty(thicknessStr))
+            if (borderAttributes.Length > 0 && !string.IsNullOrEmpty(borderAttributes[0]))
             {
                 //todo: medium|thin|thick|initial|inherit;
-                var value = Convert.ToSingle(thicknessStr.Replace("px", ""));
+                var value = Convert.ToSingle(borderAttributes[0].Replace("px", ""));
                 borderThickness = new Stride.UI.Thickness(value, value, value, value);
+            }
+
+            //borderStyle = BorderStyle.Solid;
+
+            if (borderAttributes.Length > 2 && !string.IsNullOrEmpty(borderAttributes[2]))
+            {
+                borderColor = ParseColor(borderAttributes[2]);
             }
         }
 

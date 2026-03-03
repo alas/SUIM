@@ -1300,7 +1300,7 @@ Text after
     [Fact]
     public void Parse_Div_WithBorderAttribute()
     {
-        var markup = @"<div width=""300"" height=""200"" bg=""lightgray"" border=""2 red"">
+        var markup = @"<div width=""300"" height=""200"" bg=""lightgray"" border=""2 thin red"">
 <label value=""Bordered Div"" />
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1310,7 +1310,7 @@ Text after
         
         // Border props
         // "2 red" -> Thickness 2, Color red
-        Assert.Equal(2, Thickness.Parse(border.Thickness).Left.Value); 
+        Assert.Equal("2", border.Thickness); 
         Assert.Equal("red", border.Color);
         
         Assert.Single(border.Children);
@@ -1353,7 +1353,7 @@ Text after
         Assert.IsType<Border>(element);
         var border = (Border)element;
         
-        Assert.Equal(5f, Thickness.Parse(border.Thickness).Left.Value); // Assuming uniform
+        Assert.Equal("5", border.Thickness); // Assuming uniform
         Assert.Equal("#FF0000", border.Color);
         Assert.Equal("500", border.GetAttribute("width"));
         Assert.Equal("400", border.GetAttribute("height"));
