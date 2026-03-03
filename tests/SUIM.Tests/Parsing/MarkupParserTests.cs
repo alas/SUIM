@@ -1820,8 +1820,8 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(5), Thickness.Parse(div.GetAttribute("padding")));      // from universal
-        Assert.Equal(new Thickness(10), Thickness.Parse(div.GetAttribute("margin")));      // from class
+        Assert.Equal("5", div.GetAttribute("padding"));      // from universal
+        Assert.Equal("10", div.GetAttribute("margin"));      // from class
         Assert.Equal("gray", div.BackgroundColor); // from tag
     }
 
@@ -1841,8 +1841,8 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(20), Thickness.Parse(div.GetAttribute("padding")));      // ID selector overrides all
-        Assert.Equal(new Thickness(1), Thickness.Parse(div.GetAttribute("margin")));        // from universal
+        Assert.Equal("20", div.GetAttribute("padding"));      // ID selector overrides all
+        Assert.Equal("1", div.GetAttribute("margin"));        // from universal
         Assert.Equal("blue", div.BackgroundColor);  // from tag selector
     }
 
@@ -1861,7 +1861,7 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(12), Thickness.Parse(div.GetAttribute("padding"))); // class overrides tag and universal
+        Assert.Equal("12", div.GetAttribute("padding")); // class overrides tag and universal
     }
 
     [Fact]
@@ -1878,10 +1878,10 @@ Text after
         var stack = element.Children.Single() as Stack;
         Assert.NotNull(stack);
         var label = (Label)stack.Children[0];
-        Assert.Equal(new Thickness(6), Thickness.Parse(label.GetAttribute("padding")));
+        Assert.Equal("6", label.GetAttribute("padding"));
 
         var button = (Button)stack.Children[1];
-        Assert.Equal(new Thickness(new UnitValue(0, UnitType.None)), Thickness.Parse(button.GetAttribute("padding"))); // button not styled
+        Assert.Null(button.GetAttribute("padding")); // button not styled
     }
 
     [Fact]
@@ -1899,7 +1899,7 @@ Text after
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
         // Class selector should not match "header other" exactly
-        Assert.Equal(new Thickness(new UnitValue(0, UnitType.None)), Thickness.Parse(div.GetAttribute("padding"))); // div not styled
+        Assert.Equal("new UnitValue(0, UnitType.None)", div.GetAttribute("padding")); // div not styled
     }
 
     [Fact]
@@ -1909,8 +1909,8 @@ Text after
         var (element, _) = MarkupParser.Parse(markup);
 
         var div = (Div)element;
-        Assert.Equal(new Thickness(5), Thickness.Parse(div.GetAttribute("padding")));
-        Assert.Equal(new Thickness(10), Thickness.Parse(div.GetAttribute("margin")));
+        Assert.Equal("5", div.GetAttribute("padding"));
+        Assert.Equal("10", div.GetAttribute("margin"));
     }
 
     [Fact]
@@ -1921,7 +1921,7 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(5), Thickness.Parse(div.GetAttribute("padding")));
+        Assert.Equal("5",div.GetAttribute("padding"));
     }
 
     [Fact]
@@ -1938,7 +1938,7 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(8), Thickness.Parse(div.GetAttribute("padding")));
+        Assert.Equal("8",div.GetAttribute("padding"));
         Assert.NotNull(model);
         Assert.Equal("test", model!.name);
     }
@@ -1958,7 +1958,7 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(15), Thickness.Parse(div.GetAttribute("padding"))); // ID takes highest precedence
+        Assert.Equal("15",div.GetAttribute("padding")); // ID takes highest precedence
     }
 
     [Fact]
@@ -1976,8 +1976,8 @@ Text after
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
-        Assert.Equal(new Thickness(5), Thickness.Parse(div.GetAttribute("margin")));        // from universal
-        Assert.Equal(new Thickness(10), Thickness.Parse(div.GetAttribute("padding")));      // from class
+        Assert.Equal("5",div.GetAttribute("margin"));        // from universal
+        Assert.Equal("10",div.GetAttribute("padding"));      // from class
         Assert.Equal("white", div.BackgroundColor); // from tag
     }
 

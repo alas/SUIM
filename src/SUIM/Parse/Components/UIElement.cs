@@ -91,7 +91,7 @@ public abstract class UIElement(string tagName)
         {
             ReadOnly = value as string;
         }
-        else if (value is string s)
+        else if (value is string s && !s.StartsWith('@'))
         {
             Node.nodeStyle[name] = s;
         }
