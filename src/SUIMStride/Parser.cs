@@ -1,22 +1,23 @@
 namespace SUIMStride;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Stride.Core.Mathematics;
 using Stride.Core.Serialization.Contents;
 using Stride.Engine;
 using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
-using StrideUIElement = Stride.UI.UIElement;
-using StrideButton = Stride.UI.Controls.Button;
 using Stride.UI.Panels;
 using SUIM;
 using SUIM.Model;
 using SUIM.Parse;
 using SUIM.Parse.Components;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using static System.Net.Mime.MediaTypeNames;
+using StrideButton = Stride.UI.Controls.Button;
+using StrideUIElement = Stride.UI.UIElement;
 using SUIMElement = SUIM.Parse.Components.UIElement;
 
 public class Parser
@@ -117,7 +118,7 @@ public class Parser
         StrideUIElement strideElement = element switch
         {
             SUIM.Parse.Components.Button b => MapButton(b, game),
-            Text t => MapText(t),
+            SUIM.Parse.Components.Text t => MapText(t),
             Input i => MapInput(i),
             SUIM.Parse.Components.Image img => MapImage(img, game),
             SUIM.Parse.Components.Border br => MapBorder(br, game),
@@ -181,9 +182,9 @@ public class Parser
         return btn;
     }
 
-    private TextBlock MapText(Text text)
+    private TextBlock MapText(SUIM.Parse.Components.Text text)
     {
-        var fontSize = text.FontSize != null ? Convert.ToSingle(text.FontSize) : 0f;
+        var fontSize = text.FontSize != null && float.TryParse(text.FontSize.AsSpan()[..^2], out var f) ? f : 0f;
         if (fontSize <= 0f)
         {
             fontSize = 16f; // Default font size if not specified or invalid
@@ -285,8 +286,8 @@ public class Parser
             if (borderAttributes.Length > 0 && !string.IsNullOrEmpty(borderAttributes[0]))
             {
                 //todo: medium|thin|thick|initial|inherit;
-                var value = Convert.ToSingle(borderAttributes[0].Replace("px", ""));
-                borderThickness = new Stride.UI.Thickness(value, value, value, value);
+                var value = float.TryParse(borderAttributes[0].AsSpan()[..^2], out var f) ? f : 0f;
+                borderThickness = new Thickness(value, value, value, value);
             }
 
             //borderStyle = BorderStyle.Solid;

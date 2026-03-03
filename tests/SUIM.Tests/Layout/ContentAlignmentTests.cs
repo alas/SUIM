@@ -10,10 +10,10 @@ public class ContentAlignmentTests
     public void Div_CentersChildrenVerticallyAndHorizontally()
     {
         var markup = """
-            <div width="200px" height="200px" justify-content="center" align-items="center">
-                <label width="100px" height="20px" />
-                <label width="100px" height="20px" />
-                <label width="100px" height="20px" />
+            <div width="200px" height="200px" justify-content="center" align-items="center" display="flex" flex-direction="column">
+                <label width="100px" height="20px">text</label>
+                <label width="100px" height="20px">text</label>
+                <label width="100px" height="20px">text</label>
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);
@@ -38,8 +38,8 @@ public class ContentAlignmentTests
     public void Div_ChildAlignmentOverridesParentContentAlignment()
     {
         var markup = """
-            <div width="200px" height="200px" align-content="center">
-                <label width="100px" height="20px" AlignSelf="right" />
+            <div width="200px" height="200px" align-items="center" display="flex" flex-direction="column">
+                <label width="100px" height="20px" AlignSelf="flex-end" />
                 <label width="100px" height="20px" />
             </div>
             """;
@@ -49,9 +49,9 @@ public class ContentAlignmentTests
         var label2 = (Label)element.Children[1]; // Should use parent Center
 
         // label1 is Right: 200 - 100 = 100
-        Assert.Equal(100, label1.GetTop());
+        Assert.Equal(100, label1.GetLeft());
         // label2 uses parent Center: (200 - 100) / 2 = 50
-        Assert.Equal(50, label2.GetTop());
+        Assert.Equal(50, label2.GetLeft());
     }
 
     [Fact]
@@ -59,10 +59,10 @@ public class ContentAlignmentTests
     {
         var div = new Div();
         div.SetAttribute("justify-content", "center");
-        div.SetAttribute("align-items", "end");
+        div.SetAttribute("align-items", "flex-end");
 
         Assert.Equal("center", div.GetAttribute("justifycontent"));
-        Assert.Equal("end", div.GetAttribute("alignitems"));
+        Assert.Equal("flex-end", div.GetAttribute("alignitems"));
     }
     
     [Fact]
@@ -87,7 +87,7 @@ public class ContentAlignmentTests
     public void Child_WithUnspecifiedAlignment_InheritsParentContentAlignment()
     {
         var markup = """
-            <div width="200px" height="200px" justify-content="center" AlignItems="center">
+            <div width="200px" height="200px" justify-content="center" Align-Items="center">
                 <label width="100px" height="20px" />
             </div>
             """;

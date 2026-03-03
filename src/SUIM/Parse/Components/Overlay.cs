@@ -10,6 +10,9 @@ public class Overlay : LayoutElement
 
     internal override void ApplySUIMLayout()
     {
-        throw new NotImplementedException();
+        Node.StyleSetWidthPercent(100f);
+        Node.StyleSetHeightPercent(100f);
+        Node.StyleSetJustifyContent(Flexbox.Justify.Center);
+        Node.StyleSetAlignItems(Flexbox.Align.Center);
     }
 }

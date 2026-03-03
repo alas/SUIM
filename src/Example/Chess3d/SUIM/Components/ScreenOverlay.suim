@@ -6,8 +6,8 @@
 	}
 	</model>
 	<overlay visibility="@visibility" class="centeredcontent">
-		<grid class="centeredcontent">
+		<div class="centeredcontent">
 			<label value="@message" />
-		</grid>
+		</div>
 	</overlay>
 </ScreenOverlay>

@@ -191,6 +191,15 @@ public abstract class UIElement(string tagName)
             { "gap",                                            "gap" },
             { "row-gap",                                        "row-gap" },
             { "column-gap",                                     "column-gap" },
+            //
+            { "flexdirection",                                 "flex-direction" },
+            { "flexwrap",                                      "flex-wrap" },
+            { "flexflow",                                      "flex-flow" },
+            { "justifycontent",                                "justify-content" },
+            { "alignitems",                                    "align-items" },
+            { "aligncontent",                                  "align-content" },
+            { "rowgap",                                        "row-gap" },
+            { "columngap",                                     "column-gap" },
 
             // Flex items
             { "flex",                                           "flex" },
@@ -199,6 +208,11 @@ public abstract class UIElement(string tagName)
             { "flex-basis",                                     "flex-basis" },
             { "align-self",                                     "align-self" },
             { "order",                                          "order" },
+            //
+            { "flexgrow",                                      "flex-grow" },
+            { "flexshrink",                                    "flex-shrink" },
+            { "flexbasis",                                     "flex-basis" },
+            { "alignself",                                     "align-self" },
 
             // Positioning
             { "position",                                       "position" },
@@ -209,6 +223,9 @@ public abstract class UIElement(string tagName)
             { "inset",                                          "inset" },
             { "inset-block",                                    "inset-block" },
             { "inset-inline",                                   "inset-inline" },
+            //
+            { "insetblock",                                    "inset-block" },
+            { "insetinline",                                   "inset-inline" },
 
             // Margin
             { "margin",                                         "margin" },
@@ -222,6 +239,17 @@ public abstract class UIElement(string tagName)
             { "margin-block",                                   "margin-block" },
             { "margin-block-start",                             "margin-block-start" },
             { "margin-block-end",                               "margin-block-end" },
+            //
+            { "margintop",                                     "margin-top" },
+            { "marginright",                                   "margin-right" },
+            { "marginbottom",                                  "margin-bottom" },
+            { "marginleft",                                    "margin-left" },
+            { "margininline",                                  "margin-inline" },
+            { "margininlinestart",                            "margin-inline-start" },
+            { "margininlineend",                              "margin-inline-end" },
+            { "marginblock",                                   "margin-block" },
+            { "marginblockstart",                             "margin-block-start" },
+            { "marginblockend",                               "margin-block-end" },
 
             // Padding
             { "padding",                                        "padding" },
@@ -235,6 +263,17 @@ public abstract class UIElement(string tagName)
             { "padding-block",                                  "padding-block" },
             { "padding-block-start",                            "padding-block-start" },
             { "padding-block-end",                              "padding-block-end" },
+            //
+            { "paddingtop",                                    "padding-top" },
+            { "paddingright",                                  "padding-right" },
+            { "paddingbottom",                                 "padding-bottom" },
+            { "paddingleft",                                   "padding-left" },
+            { "paddinginline",                                 "padding-inline" },
+            { "paddinginlinestart",                           "padding-inline-start" },
+            { "paddinginlineend",                             "padding-inline-end" },
+            { "paddingblock",                                  "padding-block" },
+            { "paddingblockstart",                            "padding-block-start" },
+            { "paddingblockend",                              "padding-block-end" },
 
             // Border (width only matters)
             { "border",                                         "border" },
@@ -247,6 +286,16 @@ public abstract class UIElement(string tagName)
             { "border-right-width",                             "border-right-width" },
             { "border-bottom-width",                            "border-bottom-width" },
             { "border-left-width",                              "border-left-width" },
+            //
+            { "bordertop",                                     "border-top" },
+            { "borderright",                                   "border-right" },
+            { "borderbottom",                                  "border-bottom" },
+            { "borderleft",                                    "border-left" },
+            { "borderwidth",                                   "border-width" },
+            { "bordertopwidth",                               "border-top-width" },
+            { "borderrightwidth",                             "border-right-width" },
+            { "borderbottomwidth",                            "border-bottom-width" },
+            { "borderleftwidth",                              "border-left-width" },
 
             // Size
             { "width",                                          "width" },
@@ -256,11 +305,19 @@ public abstract class UIElement(string tagName)
             { "max-width",                                      "max-width" },
             { "max-height",                                     "max-height" },
             { "aspect-ratio",                                   "aspect-ratio" },
+            //
+            { "minwidth",                                      "min-width" },
+            { "minheight",                                     "min-height" },
+            { "maxwidth",                                      "max-width" },
+            { "maxheight",                                     "max-height" },
+            { "aspectratio",                                   "aspect-ratio" },
 
             // Layout behavior
             { "display",                                        "display" },
             { "overflow",                                       "overflow" },
             { "box-sizing",                                     "box-sizing" },
+            //
+            { "boxsizing",                                     "box-sizing" },
 
             // Direction
             { "direction",                                      "direction" },
