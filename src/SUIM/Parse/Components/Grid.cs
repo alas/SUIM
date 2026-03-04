@@ -12,6 +12,7 @@ public class Grid() : LayoutElement(nameof(Grid))
 
     internal override void ApplySUIMLayout()
     {
+        // todo: implement grid layout logic here, using Columns, Rows, and GridChildren to calculate positions and sizes of children
         throw new NotImplementedException();
     }
 
