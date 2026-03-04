@@ -2,54 +2,45 @@ namespace SUIM.Parse.Components;
 
 public class Border() : UIElement(nameof(Border))
 {
+    public string? Value { get; set; }
     public string? Thickness { get; set; }
+    public string? Style { get; set; }
 
     public override void SetAttribute(string name, object? value)
     {
-        if (name.Equals("thickness", StringComparison.OrdinalIgnoreCase))
+        if (name.Equals("border", StringComparison.OrdinalIgnoreCase) || name.Equals("value", StringComparison.OrdinalIgnoreCase))
+        {
+            Value = value as string;
+            if (!string.IsNullOrWhiteSpace(Value))
+            {
+                var borderAttributes = Value.Split([' ', '\t'], StringSplitOptions.RemoveEmptyEntries);
+                if (borderAttributes.Length > 0 && !string.IsNullOrEmpty(borderAttributes[0]))
+                {
+                    Thickness = borderAttributes[0];
+                }
+
+                if (borderAttributes.Length > 1 && !string.IsNullOrEmpty(borderAttributes[1]))
+                {
+                    Style = borderAttributes[1];
+                }
+
+                if (borderAttributes.Length > 2 && !string.IsNullOrEmpty(borderAttributes[2]))
+                {
+                    Color = borderAttributes[2];
+                }
+            }
+        }
+        else if (name.Equals("thickness", StringComparison.OrdinalIgnoreCase))
         {
             Thickness = value as string;
         }
-        else if (name.Equals("border", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("style", StringComparison.OrdinalIgnoreCase))
         {
-             // Parse shorthand: "10 White" or "10 5 0 2 White"
-            var str = value as string;
-            ParseShorthand(str);
+            Style = value as string;
         }
         else
         {
             base.SetAttribute(name, value);
-        }
-    }
-
-    private void ParseShorthand(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value)) return;
-        
-        var parts = value.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        // Heuristic: Last part is color if it's not a number? Or try to parse thickness from start.
-        // Spec examples: "10 White", "10 5 0 2 White".
-        // Color is last. Numbers are first.
-        
-        // Find where numbers end.
-        int numCount = 0;
-        for (int i = 0; i < parts.Length; i++)
-        {
-            if (char.IsDigit(parts[i][0]) || parts[i] == "0") // Simplistic check
-                numCount++;
-            else
-                break; 
-        }
-        
-        if (numCount > 0)
-        {
-            var thicknessStr = string.Join(",", parts.Take(numCount));
-            Thickness = thicknessStr;
-        }
-        
-        if (numCount < parts.Length)
-        {
-             Color = parts[^1]; // Color is last
         }
     }
 }

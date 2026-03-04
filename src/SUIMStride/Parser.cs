@@ -276,26 +276,23 @@ public class Parser
 
     private Stride.UI.Controls.Border MapBorder(SUIM.Parse.Components.Border border, Game? game)
     {
-        var borderThickness = new Stride.UI.Thickness();
+        var borderThickness = new Thickness();
         //var borderStyle = BorderStyle.None;
         var borderColor = Color.Transparent;
-        var borderAttribute = border.Children[0].GetAttribute("border");
-        if (!string.IsNullOrWhiteSpace(borderAttribute))
+        if (!string.IsNullOrEmpty(border.Thickness))
         {
-            var borderAttributes = borderAttribute.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (borderAttributes.Length > 0 && !string.IsNullOrEmpty(borderAttributes[0]))
-            {
-                //todo: medium|thin|thick|initial|inherit;
-                var value = float.TryParse(borderAttributes[0].AsSpan()[..^2], out var f) ? f : 0f;
-                borderThickness = new Thickness(value, value, value, value);
-            }
+            //todo: medium|thin|thick|initial|inherit;
+            var span = border.Thickness.EndsWith("px") ? border.Thickness.AsSpan()[..^2] : border.Thickness.AsSpan();
+            var value = float.TryParse(span, out var f) ? f : 0f;
+            borderThickness = new Thickness(value, value, value, value);
+        }
 
-            //borderStyle = BorderStyle.Solid;
+        // todo
+        //borderStyle = BorderStyle.Solid;
 
-            if (borderAttributes.Length > 2 && !string.IsNullOrEmpty(borderAttributes[2]))
-            {
-                borderColor = ParseColor(borderAttributes[2]);
-            }
+        if (!string.IsNullOrEmpty(border.Color))
+        {
+            borderColor = ParseColor(border.Color);
         }
 
         var borderElem = new Stride.UI.Controls.Border

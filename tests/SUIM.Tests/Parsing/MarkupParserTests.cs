@@ -1219,7 +1219,7 @@ Text after
     [Fact]
     public void Parse_Border_WithThicknessAndColor()
     {
-        var markup = @"<border thickness=""2"" color=""#FF0000"">
+        var markup = @"<border value=""2 solid #FF0000"">
 <label value=""Bordered Content"" />
 </border>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1262,7 +1262,7 @@ Text after
     [Fact]
     public void Parse_Div_WithBorder()
     {
-        var markup = @"<div width=""300"" height=""200"" bg=""lightgray"">
+        var markup = @"<div style=""width:300px; height:200px; background:lightgray;"">
 <border thickness=""2"" color=""red"">
 <label value=""Bordered Inner Content"" />
 </border>
@@ -1300,7 +1300,7 @@ Text after
     [Fact]
     public void Parse_Div_WithBorderAttribute()
     {
-        var markup = @"<div width=""300"" height=""200"" bg=""lightgray"" border=""2 thin red"">
+        var markup = @"<div width=""300"" height=""200"" bg=""lightgray"" border=""2 solid red"">
 <label value=""Bordered Div"" />
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1345,7 +1345,7 @@ Text after
     {
         // Note: Styles are not applied in MarkupParser, so we test inline attribute to ensure wrapper creation logic works.
         // Fixed XML hierarchy and tag matching.
-        var markup = @"<div width=""500"" height=""400"" border=""5 #FF0000"">
+        var markup = @"<div width=""500"" height=""400"" border=""5 solid #FF0000"">
 <label value=""Bordered Content"" />
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1370,7 +1370,7 @@ Text after
                 .myclass {
 	                width: 500;
 	                height: 400;
-	                border: 5 #FF0000;
+	                border: 5 solid #FF0000;
                 }
                 </style>
                 <div class=""myclass"">
