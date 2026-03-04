@@ -11,10 +11,10 @@
     <overlay visibility="@visibility" class="centeredcontent">
 		<vstack class="wood-panel centeredcontent">
 			<hstack>
-				<label value="@title"></label>
+				<h1 value="@title"></h1>
 			</hstack>
 			<vstack margin="6" scroll="auto" class="centeredcontent">
-				<label value="@message"></label>
+				<h3 value="@message"></h3>
 			</vstack>
 			<hstack class="hstack2 centeredcontent">
 				<button onclick="@onYes">YES</button>
