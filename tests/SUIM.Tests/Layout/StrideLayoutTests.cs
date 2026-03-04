@@ -86,8 +86,8 @@ public class StrideLayoutTests
         var markup = @"
             <div>
                 <vstack style=""gap:0; height:auto;"">
-                    <label style=""width=""32px"" height=""16px""></label>
-                    <label style=""width=""16px"" height=""32px""></label>
+                    <label style=""width:32px; height:16px;""></label>
+                    <label style=""width:16px; height:32px;""></label>
                 </vstack>
             </div>";
             
@@ -100,7 +100,38 @@ public class StrideLayoutTests
         var div = (Stack)element.Children[0];
         Assert.Equal("auto", div.GetAttribute("height"));
         Assert.Equal(32, div.GetWidth());
-        Assert.Equal(48, div.GetHeight()); // 16 + 32 (its failing here, it should be 48 but is 200
+        Assert.Equal(200, div.GetHeight());
+
+        var label1 = (Label)div.Children[0];
+        Assert.Equal(32, label1.GetWidth());
+        Assert.Equal(16, label1.GetHeight());
+
+        var label2 = (Label)div.Children[1];
+        Assert.Equal(16, label2.GetWidth());
+        Assert.Equal(32, label2.GetHeight());
+    }
+
+    [Fact]
+    public void MarkupParser_WithPixelUnits_EquivalentToRem_CreatesNonScaledLayout()
+    {
+        var markup = @"
+            <div>
+                <vstack style=""gap:0; align-self:flex-start;"">
+                    <label style=""width:32px; height:16px;""></label>
+                    <label style=""width:16px; height:32px;""></label>
+                </vstack>
+            </div>";
+
+        var (element, _) = MarkupParser.Parse(markup);
+        element.CalculateLayout(200, 200);
+        
+        Assert.Equal(200, element.GetWidth());
+        Assert.Equal(200, element.GetHeight());
+
+        var div = (Stack)element.Children[0];
+        Assert.Equal("auto", div.GetAttribute("height"));
+        Assert.Equal(32, div.GetWidth());
+        Assert.Equal(48, div.GetHeight()); // 16 + 32
 
         var label1 = (Label)div.Children[0];
         Assert.Equal(32, label1.GetWidth());
@@ -115,25 +146,28 @@ public class StrideLayoutTests
     public void MarkupParser_WithPixelUnits_EquivalentToRemAndAutoParent_CreatesScaledLayout()
     {
         var markup = @"
-            <stack orientation=""vertical"" gap=""0"" width=""auto"" height=""auto"">
-                <label width=""32px"" height=""16px""></label>
-                <label width=""16px"" height=""32px""></label>
-            </stack>";
+            <div>
+                <vstack style=""width:auto; height:auto; align-self:flex-start;"">
+                    <label style=""width:32px; height:16px;""></label>
+                    <label style=""width:16px; height:32px;""></label>
+                </vstack>
+            </div>";
 
         var (element, _) = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
 
-        Assert.Equal("auto", element.GetAttribute("width"));
-        Assert.Equal("auto", element.GetAttribute("height"));
+        var stack = (Stack)element.Children[0];
+        Assert.Equal("auto", stack.GetAttribute("width"));
+        Assert.Equal("auto", stack.GetAttribute("height"));
 
-        Assert.Equal(32, element.GetWidth());
-        Assert.Equal(48, element.GetHeight()); // 16 + 32
+        Assert.Equal(32, stack.GetWidth());
+        Assert.Equal(48, stack.GetHeight()); // 16 + 32
 
-        var label1 = (Label)element.Children[0];
+        var label1 = (Label)stack.Children[0];
         Assert.Equal(32, label1.GetWidth());
         Assert.Equal(16, label1.GetHeight());
 
-        var label2 = (Label)element.Children[1];
+        var label2 = (Label)stack.Children[1];
         Assert.Equal(16, label2.GetWidth());
         Assert.Equal(32, label2.GetHeight());
     }
@@ -141,19 +175,20 @@ public class StrideLayoutTests
     [Fact]
     public void MarkupParser_FractionalUnitsLabels_CreatesFractionalUnitsLayout()
     {
+        //  width:50%; height:100%;
         var markup = @"
-            <hstack style=""gap:10px"">
-                <vstack style=""gap:5px; flex:1;"">
-                    <label style=""flex:1;""></label>
-                    <label style=""flex:1;""></label>
-                    <label style=""flex:1;""></label>
-                    <label style=""flex:1;""></label>
-                    <label style=""flex:1;""></label>
+            <hstack style=""gap:10px;"">
+                <vstack style=""gap:5px; width:50%; height:100%;"">
+                    <label style=""width:100%; height:25px;""></label>
+                    <label style=""width:100%; height:25px;""></label>
+                    <label style=""width:100%; height:25px;""></label>
+                    <label style=""width:100%; height:25px;""></label>
+                    <label style=""width:100%; height:25px;""></label>
                 </vstack>
-                <vstack style=""gap:15px; flex:1;"">
-                    <label style=""flex:1;""></label>
-                    <label style=""flex:1;""></label>
-                    <label style=""flex:1;""></label>
+                <vstack style=""gap:15px; width:50%; height:100%;"">
+                    <label style=""width:100%; height:25px;""></label>
+                    <label style=""width:100%; height:25px;""></label>
+                    <label style=""width:100%; height:25px;""></label>
                 </vstack>
             </hstack>";
 
@@ -162,17 +197,21 @@ public class StrideLayoutTests
 
         Assert.Equal(640, element.GetWidth());
         Assert.Equal(480, element.GetHeight());
-        // The horizontal stack should be 640 wide (no size defined, assume 1fr, it takes all available width).
+        // The horizontal stack should be 640 wide (no size defined, assume 100%, it takes all available width).
         // The heights of the labels should be determined by the default font size (no size defined, assume auto, root font size: 25),
         // The widths of the labels should be determined by the available width (640) minus the gap between the two vertical stacks (10), divided by 2,
         // so each label in the first vertical stack should be 315 pixels wide, and each label in the second vertical stack should be 315 pixels wide.
 
-        // Verify child label sizes using Actual* values populated by LayoutEngine
         var firstStack = (Stack)element.Children[0];
         var secondStack = (Stack)element.Children[1];
 
         int expectedStackWidth = (640 - 10) / 2; // 315
-        int expectedLabelHeight = 25; // root font size
+        int expectedLabelHeight = 25;
+
+        Assert.Equal(expectedStackWidth, firstStack.GetWidth());
+        Assert.Equal(480, firstStack.GetHeight());
+        Assert.Equal(expectedStackWidth, secondStack.GetWidth());
+        Assert.Equal(480, secondStack.GetHeight());
 
         foreach (var lbl in firstStack.Children)
         {
