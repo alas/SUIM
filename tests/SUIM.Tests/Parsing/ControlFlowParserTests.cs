@@ -28,7 +28,7 @@ public class ControlFlowParserTests
         var markup = @"<div>
 @if identifierbool
 {
-    <label value=""True""></label>
+    <label>True</label>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -38,7 +38,8 @@ public class ControlFlowParserTests
         Assert.Single(div.Children);
         Assert.IsType<Label>(div.Children[0]);
         var label = (Label)div.Children[0];
-        Assert.Equal("True", label.Value);
+        var text = (Text)label.Children[0];
+        Assert.Equal("True", text.Value);
     }
 
     [Fact]
@@ -47,11 +48,11 @@ public class ControlFlowParserTests
         var markup = @"<div>
 @if identifierbool2
 {
-    <label value=""True""></label>
+    <h1>True</h1>
 }
 else
 {
-    <label value=""False""></label>
+    <h1>False</h1>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -59,9 +60,9 @@ else
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("True", label.Value);
+        Assert.IsType<H1>(div.Children[0]);
+        var h1 = (H1)div.Children[0];
+        Assert.Equal("True", h1.Value);
     }
 
     [Fact]
@@ -70,11 +71,11 @@ else
         var markup = @"<div>
 @if identifierbool3
 {
-    <label value=""True""></label>
+    <h1>True</h1>
 }
 else
 {
-    <label value=""False""></label>
+    <h1>False</h1>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -82,9 +83,9 @@ else
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("False", label.Value);
+        Assert.IsType<H1>(div.Children[0]);
+        var h1 = (H1)div.Children[0];
+        Assert.Equal("False", h1.Value);
     }
 
     [Fact]
@@ -93,15 +94,15 @@ else
         var markup = @"<div>
 @if identifierbool3
 {
-    <label value=""False""></label>
+    <h1>False</h1>
 }
 else if identifierbool3
 {
-    <label value=""False""></label>
+    <h1>False</h1>
 }
 else
 {
-    <label value=""True""></label>
+    <h1>True</h1>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -109,9 +110,9 @@ else
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("True", label.Value);
+        Assert.IsType<H1>(div.Children[0]);
+        var h1 = (H1)div.Children[0];
+        Assert.Equal("True", h1.Value);
     }
 
     [Fact]
@@ -120,19 +121,19 @@ else
         var markup = @"<div>
 @if identifierbool3
 {
-    <label value=""False""></label>
+    <h1>False</h1>
 }
 else if identifierbool3
 {
-    <label value=""False""></label>
+    <h1>False</h1>
 }
 else if identifierbool3
 {
-    <label value=""False""></label>
+    <h1>False</h1>
 }
 else
 {
-    <label value=""FinalElse""></label>
+    <h1>FinalElse</h1>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -140,9 +141,9 @@ else
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("FinalElse", label.Value);
+        Assert.IsType<H1>(div.Children[0]);
+        var h1 = (H1)div.Children[0];
+        Assert.Equal("FinalElse", h1.Value);
     }
 
     [Fact]
@@ -151,19 +152,19 @@ else
         var markup = @"<div>
 @if identifierbool3
 {
-    <label value=""False""></label>
+    <h1>False</h1>
 }
 else if identifierbool3
 {
-    <label value=""False""></label>
+    <h1>False</h1>
 }
 else if identifierbool2
 {
-    <label value=""True""></label>
+    <h1>True</h1>
 }
 else
 {
-    <label value=""False""></label>
+    <h1>False</h1>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -171,18 +172,18 @@ else
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("True", label.Value);
+        Assert.IsType<H1>(div.Children[0]);
+        var h1 = (H1)div.Children[0];
+        Assert.Equal("True", h1.Value);
     }
 
     [Fact]
-    public void Parse_ForDirective()
+    public void Parse_ForDirectiveLabel()
     {
         var markup = @"<stack>
 @for i=0 count=3
 {
-    <label value=""@i""></label>
+    <label>@i</label>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -194,7 +195,31 @@ else
         {
             Assert.IsType<Label>(stack.Children[i]);
             var label = (Label)stack.Children[i];
-            Assert.Equal(i.ToString(), label.Value);
+            var text = (Text)label.Children[0];
+            Assert.Equal(i.ToString(), text.Value);
+        }
+    }
+
+    [Fact]
+    public void Parse_ForDirective()
+    {
+        var markup = @"<stack>
+@for i=0 count=3
+{
+    <label>@i</label>
+}
+</stack>";
+        var (element, _) = MarkupParser.Parse(markup, _model);
+
+        Assert.IsType<Stack>(element);
+        var stack = (Stack)element;
+        Assert.Equal(3, stack.Children.Count);
+        for (int i = 0; i < 3; i++)
+        {
+            Assert.IsType<Label>(stack.Children[i]);
+            var label = (Label)stack.Children[i];
+            var text = (Text)label.Children[0];
+            Assert.Equal(i.ToString(), text.Value);
         }
     }
 
@@ -204,7 +229,7 @@ else
         var markup = @"<stack>
 @for i=0 count=3
 {
-    <label value=""@i""></label>
+    <h1>@i</h1>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -214,9 +239,9 @@ else
         Assert.Equal(3, stack.Children.Count);
         for (int i = 0; i < 3; i++)
         {
-            Assert.IsType<Label>(stack.Children[i]);
-            var label = (Label)stack.Children[i];
-            Assert.Equal(i.ToString(), label.Value);
+            Assert.IsType<H1>(stack.Children[i]);
+            var h1 = (H1)stack.Children[i];
+            Assert.Equal(i.ToString(), h1.Value);
         }
     }
 
@@ -228,11 +253,11 @@ else
 {
     case 500
     {
-        <label value=""Matched""></label>
+        <h1>Matched</h1>
     }
     default
     {
-        <label value=""Default""></label>
+        <h1>Default</h1>
     }
 }
 </div>";
@@ -241,9 +266,9 @@ else
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Single(div.Children);
-        Assert.IsType<Label>(div.Children[0]);
-        var label = (Label)div.Children[0];
-        Assert.Equal("Matched", label.Value);
+        Assert.IsType<H1>(div.Children[0]);
+        var h1 = (H1)div.Children[0];
+        Assert.Equal("Matched", h1.Value);
     }
 
     [Fact]
@@ -254,15 +279,15 @@ else
 {
     case 500
     {
-        <label value=""Matched""></label>
+        <label>Matched</label>
     }
     default
     {
-        <label value=""Default""></label>
+        <label>Default</label>
     }
 }";
         var expanded = parser.ExpandDirectives(markup);
-        Assert.Equal("<label value=\"Matched\"></label>", expanded.Trim());
+        Assert.Equal("<label>Matched</label>", expanded.Trim());
     }
 
     // ============== CONTROL FLOW - FOR WITH STEP ==============
@@ -273,7 +298,7 @@ else
         var markup = @"<stack>
 @for i=2 count=3 step=-1
 {
-    <label value=""@i""></label>
+    <label>@i</label>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -283,9 +308,9 @@ else
         Assert.Equal(3, stack.Children.Count);
         // Should contain: 2, 1, 0
         var labels = stack.Children.Cast<Label>();
-        Assert.Equal("2", labels.ElementAt(0).Value);
-        Assert.Equal("1", labels.ElementAt(1).Value);
-        Assert.Equal("0", labels.ElementAt(2).Value);
+        Assert.Equal("2", ((Text)labels.ElementAt(0).Children[0]).Value);
+        Assert.Equal("1", ((Text)labels.ElementAt(1).Children[0]).Value);
+        Assert.Equal("0", ((Text)labels.ElementAt(2).Children[0]).Value);
     }
 
     [Fact]
@@ -294,7 +319,7 @@ else
         var markup = @"<stack>
 @for i=0 count=3 step=2
 {
-    <label value=""@i""></label>
+    <label>@i</label>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -303,9 +328,9 @@ else
         var stack = (Stack)element;
         Assert.Equal(3, stack.Children.Count);
         var labels = stack.Children.Cast<Label>();
-        Assert.Equal("0", labels.ElementAt(0).Value);
-        Assert.Equal("2", labels.ElementAt(1).Value);
-        Assert.Equal("4", labels.ElementAt(2).Value);
+        Assert.Equal("0", ((Text)labels.ElementAt(0).Children[0]).Value);
+        Assert.Equal("2", ((Text)labels.ElementAt(1).Children[0]).Value);
+        Assert.Equal("4", ((Text)labels.ElementAt(2).Children[0]).Value);
     }
 
     // ============== CONTROL FLOW - SWITCH WITH STRING ==============
@@ -318,11 +343,11 @@ else
 {
     case ""test""
     {
-        <label value=""Matched String""></label>
+        <label>Matched String</label>
     }
     default
     {
-        <label value=""No Match""></label>
+        <label>No Match</label>
     }
 }
 </div>";
@@ -332,7 +357,8 @@ else
         var div = (Div)element;
         Assert.Single(div.Children);
         var label = (Label)div.Children[0];
-        Assert.Equal("Matched String", label.Value);
+        var text = (Text)label.Children[0];
+        Assert.Equal("Matched String", text.Value);
     }
 
     [Fact]
@@ -343,15 +369,15 @@ else
 {
     case 100
     {
-        <label value=""Hundred""></label>
+        <h1 value=""Hundred""></h1>
     }
     case 500
     {
-        <label value=""FiveHundred""></label>
+        <h1 value=""FiveHundred""></h1>
     }
     default
     {
-        <label value=""Other""></label>
+        <h1 value=""Other""></h1>
     }
 }
 </div>";
@@ -360,7 +386,7 @@ else
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Single(div.Children);
-        var label = (Label)div.Children[0];
+        var label = (H1)div.Children[0];
         Assert.Equal("FiveHundred", label.Value);
     }
 
@@ -372,11 +398,11 @@ else
 {
     case @identifier2
     {
-        <label value=""Variable Match""></label>
+        <h1 value=""Variable Match""></h1>
     }
     default
     {
-        <label value=""No Match""></label>
+        <h1 value=""No Match""></h1>
     }
 }";
         var expanded = parser.ExpandDirectives(markup);
@@ -391,7 +417,7 @@ else
         var markup = @"<stack>
 @foreach item in Collection
 {
-    <label value=""@item""></label>
+    <h1 value=""@item""></h1>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -399,7 +425,7 @@ else
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
         Assert.Equal(2, stack.Children.Count);
-        var labels = stack.Children.Cast<Label>();
+        var labels = stack.Children.Cast<H1>();
         Assert.Equal("item1", labels.ElementAt(0).Value);
         Assert.Equal("item2", labels.ElementAt(1).Value);
     }
@@ -410,7 +436,7 @@ else
         var markup = @"<stack>
 @foreach item in items
 {
-    <label value=""@item.Name""></label>
+    <h1 value=""@item.Name""></h1>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -418,7 +444,7 @@ else
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
         Assert.Equal(2, stack.Children.Count);
-        var labels = stack.Children.Cast<Label>();
+        var labels = stack.Children.Cast<H1>();
         Assert.Equal("Apple", labels.ElementAt(0).Value);
         Assert.Equal("Banana", labels.ElementAt(1).Value);
     }
@@ -429,7 +455,7 @@ else
         var markup = @"<stack>
 @foreach i in 0..3
 {
-    <label value=""@i""></label>
+    <h1 value=""@i""></h1>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -437,7 +463,7 @@ else
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
         Assert.Equal(3, stack.Children.Count);
-        var labels = stack.Children.Cast<Label>();
+        var labels = stack.Children.Cast<H1>();
         Assert.Equal("0", labels.ElementAt(0).Value);
         Assert.Equal("1", labels.ElementAt(1).Value);
         Assert.Equal("2", labels.ElementAt(2).Value);
@@ -451,11 +477,11 @@ else
         var markup = @"<button>
 @if identifierbool
 {
-    <label value=""Click Me""></label>
+    <h1 value=""Click Me""></h1>
 }
 else
 {
-    <label value=""Disabled""></label>
+    <h1 value=""Disabled""></h1>
 }
 </button>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -463,7 +489,7 @@ else
         Assert.IsType<Button>(element);
         var button = (Button)element;
         Assert.Single(button.Children);
-        var label = (Label)button.Children[0];
+        var label = (H1)button.Children[0];
         Assert.Equal("Click Me", label.Value);
     }
 
@@ -475,7 +501,7 @@ else
         var markup = @"<div>
 @if identifierbool3
 {
-    <label value=""Should not appear""></label>
+    <h1 value=""Should not appear""></h1>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);

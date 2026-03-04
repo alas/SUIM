@@ -81,29 +81,6 @@ public class TextArea() : Text(nameof(TextArea)), IPlaceholder
     }
 }
 
-public class Label() : Text(nameof(Label))
-{
-    public string? For { get; set; }
-
-    public override void SetAttribute(string name, object? value)
-    {
-        if (name.Equals("for", StringComparison.OrdinalIgnoreCase))
-        {
-            For = value is string s ? s : value?.ToString();
-        }
-        else
-        {
-            base.SetAttribute(name, value);
-        }
-    }
-
-    public override string? GetAttribute(string name)
-    {
-        if (name.Equals("for", StringComparison.OrdinalIgnoreCase)) return For;
-        return base.GetAttribute(name);
-    }
-}
-
 public class P() : Text(nameof(P)) { }
 
 public class H1() : Text(nameof(H1)) { }

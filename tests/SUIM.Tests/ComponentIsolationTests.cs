@@ -27,7 +27,7 @@ public class ComponentIsolationTests
         var componentMarkup = """
             <div id="popuproot">
                 <model>{ "title": "" }</model>
-                <label id="thelabel" value="@title"></label>
+                <h1 id="thelabel" value="@title"></h1>
             </div>
             """;
         File.WriteAllText(compPath, componentMarkup);
@@ -60,7 +60,7 @@ public class ComponentIsolationTests
         var componentMarkup = """
             <div id="popuproot">
                 <model>{ "labelvisibility": null }</model>
-                <label id="thelabel" visibility="@labelvisibility"></label>
+                <h1 id="thelabel" visibility="@labelvisibility"></h1>
             </div>
             """;
         File.WriteAllText(compPath, componentMarkup);
@@ -94,7 +94,7 @@ public class ComponentIsolationTests
             """
             <div id="popuproot">
                 <model>{ "labelvisibility": "block" }</model>
-                <label id="thelabel" visibility="@labelvisibility"></label>
+                <h1 id="thelabel" visibility="@labelvisibility"></h1>
             </div>
             """;
         File.WriteAllText(compPath, componentMarkup);

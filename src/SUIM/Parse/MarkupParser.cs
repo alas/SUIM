@@ -1,10 +1,11 @@
 namespace SUIM.Parse;
 
+using SUIM.Flexbox;
+using SUIM.Model;
+using SUIM.Parse.Components;
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using SUIM.Model;
-using SUIM.Parse.Components;
 
 public static partial class MarkupParser
 {
@@ -212,12 +213,17 @@ public static partial class MarkupParser
                     var text = textNode.Value.Trim();
                     if (!string.IsNullOrEmpty(text))
                     {
-                        UIElement textElement = new Text { Value = text };
+                        var textElement = innerElement is Text t ? t : new Text();
+                        textElement.Value = text;
+                        UIElement result = textElement;
                         if (styles != null && styles.Count > 0)
                         {
-                            textElement = CssStyle.ApplyToElement(textElement, styles);
+                            result = CssStyle.ApplyToElement(textElement, styles);
                         }
-                        innerElement.AddChild(textElement, element);
+                        if (innerElement is not Text)
+                        {
+                            innerElement.AddChild(result, element);
+                        }
                     }
                 }
                 else if (node is XElement childXElement)
@@ -308,7 +314,6 @@ public static partial class MarkupParser
         if (tag.Equals("border", StringComparison.OrdinalIgnoreCase)) return new Border();
         
         // Content tags
-        if (tag.Equals("label", StringComparison.OrdinalIgnoreCase)) return new Label();
         if (tag.Equals("button", StringComparison.OrdinalIgnoreCase)) return new Button();
         if (tag.Equals("image", StringComparison.OrdinalIgnoreCase) || tag.Equals("img", StringComparison.OrdinalIgnoreCase)) return new Image();
         if (tag.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || tag.Equals("bg", StringComparison.OrdinalIgnoreCase)) return new BackgroundImage();
@@ -316,6 +321,16 @@ public static partial class MarkupParser
         if (tag.Equals("select", StringComparison.OrdinalIgnoreCase)) return new Select();
         if (tag.Equals("option", StringComparison.OrdinalIgnoreCase)) return new Option();
         if (tag.Equals("textarea", StringComparison.OrdinalIgnoreCase)) return new TextArea();
+        if (tag.Equals("label", StringComparison.OrdinalIgnoreCase)) return new Label();
+        if (tag.Equals("p", StringComparison.OrdinalIgnoreCase)) return new P();
+        if (tag.Equals("h1", StringComparison.OrdinalIgnoreCase)) return new H1();
+        if (tag.Equals("h2", StringComparison.OrdinalIgnoreCase)) return new H2();
+        if (tag.Equals("h3", StringComparison.OrdinalIgnoreCase)) return new H3();
+        if (tag.Equals("h4", StringComparison.OrdinalIgnoreCase)) return new H4();
+        if (tag.Equals("h5", StringComparison.OrdinalIgnoreCase)) return new H5();
+        if (tag.Equals("h6", StringComparison.OrdinalIgnoreCase)) return new H6();
+        if (tag.Equals("h7", StringComparison.OrdinalIgnoreCase)) return new H7();
+        if (tag.Equals("h8", StringComparison.OrdinalIgnoreCase)) return new H8();
         
         // Special tags
         if (tag.Equals("style", StringComparison.OrdinalIgnoreCase)) return null;

@@ -44,14 +44,14 @@ public class PropertyBindingTests
     [Fact]
     public void Parse_DataBinding_Text_CreatesBindingDefinition()
     {
-        var markup = "<label value=\"@stringValue\"></label>";
+        var markup = "<input id=\"username\" name=\"username\" type=\"text\" value=\"@stringValue\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
-        Assert.IsType<Label>(element);
-        var label = (Label)element;
+        Assert.IsType<Input>(element);
+        var input = (Input)element;
         
-        Assert.Single(label.Bindings);
-        var binding = label.Bindings[0];
+        Assert.Single(input.Bindings);
+        var binding = input.Bindings[0];
         Assert.Equal("value", binding.TargetPropertyName);
         Assert.Equal("stringValue", binding.ModelPropertyName);
     }
