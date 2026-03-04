@@ -1,9 +1,5 @@
 namespace SUIMStride;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Stride.Core.Mathematics;
 using Stride.Core.Serialization.Contents;
 using Stride.Engine;
@@ -14,9 +10,11 @@ using Stride.UI.Panels;
 using StrideButton = Stride.UI.Controls.Button;
 using StrideUIElement = Stride.UI.UIElement;
 using SUIM;
+using SUIM.Flexbox;
 using SUIM.Model;
 using SUIM.Parse;
 using SUIM.Parse.Components;
+using SUIMButton = SUIM.Parse.Components.Button;
 using SUIMElement = SUIM.Parse.Components.UIElement;
 
 public class Parser
@@ -72,6 +70,31 @@ public class Parser
         ContentManager = game.Content;
 
         // Not cached: parse markup, map and store the canonical instance
+        Text.MeasureFunc = (Node node, float width, MeasureMode widthMode, float height, MeasureMode heightMode) =>
+        {
+            var text = (Text)node.Context!;
+            var fontSize = text.FontSize != null && float.TryParse(text.FontSize.AsSpan()[..^2], out var f) ? f : 0f;
+            if (fontSize <= 0f)
+            {
+                fontSize = defaultFontSize; // Default font size if not specified or invalid
+            }
+            var fontName = text.Font ?? "StrideDefaultFont";
+            var sf = Fonts.TryGetValue(fontName, out SpriteFont? value) ? value : null;
+            if (sf == null && !Fonts.ContainsKey(fontName))
+            {
+                sf = ContentLoader.LoadFont(ContentManager, fontName);
+                if (sf != null)
+                {
+                    Fonts[fontName] = sf;
+                }
+            }
+            if (sf != null)
+            {
+                var size = sf.MeasureString(text.Value ?? "");
+                return new Size(size.X, size.Y);
+            }
+            return new Size(0, 0);
+        };
         var (suimRoot, model2) = MarkupParser.Parse(markup, model, basePath: basePath, componentName: viewName);
         Layout(suimRoot, game, defaultFontSize, fullscreen);
         _currentModel = model2;
@@ -116,8 +139,8 @@ public class Parser
     {
         StrideUIElement strideElement = element switch
         {
-            SUIM.Parse.Components.Button b => MapButton(b, game),
-            SUIM.Parse.Components.Text t => MapText(t),
+            SUIMButton b => MapButton(b, game),
+            Text t => MapText(t),
             Input i => MapInput(i),
             SUIM.Parse.Components.Image img => MapImage(img, game),
             SUIM.Parse.Components.Border br => MapBorder(br, game),
@@ -157,7 +180,7 @@ public class Parser
         return strideElement;
     }
 
-    private StrideButton MapButton(SUIM.Parse.Components.Button button, Game? game)
+    private StrideButton MapButton(SUIMButton button, Game? game)
     {
         var btn = new StrideButton();
         
@@ -181,7 +204,7 @@ public class Parser
         return btn;
     }
 
-    private TextBlock MapText(SUIM.Parse.Components.Text text)
+    private TextBlock MapText(Text text)
     {
         var fontSize = text.FontSize != null && float.TryParse(text.FontSize.AsSpan()[..^2], out var f) ? f : 0f;
         if (fontSize <= 0f)
@@ -473,7 +496,7 @@ public class Parser
 
         // Cast to object to avoid dynamic dispatch issues
         object targetObject = model;
-        var methods = targetObject.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+        var methods = targetObject.GetType().GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
         var matchingMethods = methods.Where(m => m.Name == methodName).ToList();
         if (matchingMethods.Count == 0)
             return null;
@@ -541,7 +564,7 @@ public class Parser
             // Handle other common properties
             else if (string.Equals(targetPropertyName, "visibility", StringComparison.OrdinalIgnoreCase))
             {
-                if (value != null && Enum.TryParse<Stride.UI.Visibility>(value.ToString(), true, out var vis))
+                if (value != null && Enum.TryParse<Visibility>(value.ToString(), true, out var vis))
                     strideElement.Visibility = vis;
             }
             else if (string.Equals(targetPropertyName, "opacity", StringComparison.OrdinalIgnoreCase))

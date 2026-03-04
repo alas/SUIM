@@ -3,7 +3,7 @@ namespace SUIM.Parse.Components;
 using System.Xml.Linq;
 using SUIM.Flexbox;
 
-public abstract class UIElement(string tagName)
+public abstract class UIElement
 {
     public string? Id { get; set; }
     public string? Class { get; set; }
@@ -16,14 +16,23 @@ public abstract class UIElement(string tagName)
     public string? BackgroundImage { get; set; }
 
     // Internal properties to the engine - not directly settable via markup attributes
-    public string TagName { get; } = tagName.ToLowerInvariant();
+    public string TagName { get; }
     public bool IsComponentRoot { get; set; }
     public UIElement? Parent { get; set; }
     public List<UIElement> Children { get; } = [];
     public List<BindingDefinition> Bindings { get; } = [];
     public dynamic? Model { get; set; }
     public Dictionary<string, string> Events { get; set; } = [];
-    internal Node Node { get; } = new();
+    internal Node Node { get; }
+
+    public UIElement(string tagName)
+    {
+        TagName = tagName.ToLowerInvariant();
+        Node = new Node
+        {
+            Context = this
+        };
+    }
 
     public virtual void AddChild(UIElement child, XElement? element)
     {

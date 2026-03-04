@@ -1,5 +1,3 @@
-using static System.Net.Mime.MediaTypeNames;
-
 namespace SUIM.Parse.Components;
 
 public class Button() : UIElement(nameof(Button))
