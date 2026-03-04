@@ -3,9 +3,9 @@ namespace SUIM.Tests.Layout;
 using System.Linq;
 using Xunit;
 using Stride.UI.Panels;
-using SUIMStride;
 using SUIM.Parse;
 using SUIM.Parse.Components;
+using SUIMStride;
 
 public class StrideLayoutTests
 {
@@ -33,23 +33,53 @@ public class StrideLayoutTests
     [Fact]
     public void MarkupParser_WithFractionalUnits_CreatesProportionalLayout()
     {
-        var markup = @"
+        var markup1 = @"
             <div style=""display:flex; align-items:flex-start; justify-items:flex-start;"">
-                <hstack style=""gap:0; height:auto"">
+                <hstack style=""gap:0; height:auto; flex:1;"">
                     <label style=""height:50; flex:1;"" />
                     <label style=""height:50; flex:1;"" />
                 </hstack>
             </div>";
-            
-        var (element, _) = MarkupParser.Parse(markup);
-        element.CalculateLayout(300, 100);
-        var stack = element.Children[0];
+        var markup2 = @"
+            <div style=""display:flex; align-items:flex-start; justify-content:flex-start; width:100%; height:100%"">
+                <div style=""display:flex; align-items:flex-start; justify-content:flex-start; flex-direction:row; height:auto; flex:1;"">
+                    <label style=""height:50; flex:1;""></label>
+                    <label style=""height:50; flex:1;""></label>
+                </div>
+            </div>";
 
-        Assert.Equal("auto", stack.GetAttribute("height"));
-        Assert.Equal(300, stack.GetWidth());
-        Assert.Equal(50, stack.GetHeight());
+        var trees = new[] { markup1, markup2 }.Select(markup =>
+        {
+            var (element, _) = MarkupParser.Parse(markup);
+            element.CalculateLayout(300, 100);
+            var stack = element.Children[0];
+
+            Assert.Equal("auto", stack.GetAttribute("height"));
+            Assert.Equal(300, stack.GetWidth());
+            Assert.Equal(50, stack.GetHeight());
+
+            return element;
+        }).ToList();
+
+        Assert.True(IsSameLayout(trees[0], trees[1]), "Both markup variations should produce the same layout results.");
+
+        static bool IsSameLayout(UIElement x, UIElement y)
+        {
+            Assert.Equal(x.GetWidth(), y.GetWidth());
+            Assert.Equal(x.GetHeight(), y.GetHeight());
+            Assert.Equal(x.GetLeft(), y.GetLeft());
+            Assert.Equal(x.GetTop(), y.GetTop());
+
+            Assert.Equal(x.Children.Count, y.Children.Count);
+            for (int i = 0; i < x.Children.Count; i++)
+            {
+                return IsSameLayout(x.Children[i], y.Children[i]);
+            }
+
+            return true;
+        }
     }
-    
+
     [Fact]
     public void MarkupParser_WithPixelUnits_EquivalentToRem_CreatesScaledLayout()
     {
@@ -107,14 +137,14 @@ public class StrideLayoutTests
     {
         var markup = @"
             <hstack style=""gap:10px"">
-                <vstack style=""gap:5px"">
+                <vstack style=""gap:5px; flex:1;"">
                     <label style=""flex:1;"" />
                     <label style=""flex:1;"" />
                     <label style=""flex:1;"" />
                     <label style=""flex:1;"" />
                     <label style=""flex:1;"" />
                 </vstack>
-                <vstack style=""gap:15px"">
+                <vstack style=""gap:15px; flex:1;"">
                     <label style=""flex:1;"" />
                     <label style=""flex:1;"" />
                     <label style=""flex:1;"" />
@@ -156,27 +186,27 @@ public class StrideLayoutTests
     {
         // Simulates MainView layout: root grid with main UI and overlays
         var markup = @"
-            <grid class=""centeredcontent"">
+            <div class=""centeredcontent"">
                 <style>
                     .centeredcontent { justify-content: center; align-content: center; }
                     .overlay { visibility: collapsed; }
                 </style>
-                <vstack width=""400"" height=""300"">
+                <vstack  style=""width:400; height:300"">
                     <label value=""Main UI"" />
                 </vstack>
                 
                 <overlay class=""overlay centeredcontent"" id=""popup"">
-                    <grid width=""360"" height=""180"">
+                    <div style=""width:360; height:180"">
                         <label value=""Popup"" />
-                    </grid>
+                    </div>
                 </overlay>
                 
                 <overlay class=""overlay centeredcontent"" id=""screenOverlay"">
-                    <grid>
+                    <div>
                         <label value=""Blocker"" />
-                    </grid>
+                    </div>
                 </overlay>
-            </grid>";
+            </div>";
         
         var (root, _) = MarkupParser.Parse(markup);
         root.CalculateLayout(1280, 720);
@@ -213,23 +243,23 @@ public class StrideLayoutTests
     {
         // Test that Stride mapping preserves overlay dimensions from SUIM layout
         var markup = @"
-            <grid>
-                <vstack width=""400"" height=""300"">
+            <div>
+                <vstack style=""width:400; height:300"">
                     <label value=""Main UI"" />
                 </vstack>
                 
                 <overlay id=""popup"">
-                    <grid width=""360"" height=""180"">
+                    <div style=""width:360; height:180"">
                         <label value=""Popup"" />
-                    </grid>
+                    </div>
                 </overlay>
                 
-                <overlay id=""screenOverlay"" visibility=""collapsed"">
-                    <grid>
+                <overlay id=""screenOverlay"" style=""visibility:collapsed"">
+                    <div>
                         <label value=""Blocker"" />
-                    </grid>
+                    </div>
                 </overlay>
-            </grid>";
+            </div>";
         
         // Parse and layout in SUIM
         var (suimRoot, _) = MarkupParser.Parse(markup);
