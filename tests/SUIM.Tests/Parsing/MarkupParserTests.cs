@@ -415,7 +415,7 @@ public class MarkupParserTests
         var markup = @"<grid>
 <row height=""2rem"">
     <div width=""100"" bg=""blue"" />
-    <div width=""*"" bg=""green"" />
+    <div width=""100%"" bg=""green"" />
 </row>
 </grid>";
         var (element, _) = MarkupParser.Parse(markup, _model);
