@@ -34,6 +34,7 @@ public class Style
         {"align-content", "stretch"},
         {"align-items", "stretch"},
         {"align-self", "auto"},
+        {"flex", "0 1 auto"},
         {"flex-direction", "row"},
         {"flex-wrap", "no-wrap"},
         {"flex-basis", "auto"},

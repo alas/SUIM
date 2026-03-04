@@ -36,8 +36,8 @@ public class StrideLayoutTests
         var markup = @"
             <div style=""display:flex; align-items:flex-start; justify-items:flex-start;"">
                 <hstack style=""gap:0; height:auto"">
-                    <label style=""height:50; flex-grow:1; flex-shrink:0;"" />
-                    <label style=""height:50; flex-grow:1; flex-shrink:0;"" />
+                    <label style=""height:50; flex:1;"" />
+                    <label style=""height:50; flex:1;"" />
                 </hstack>
             </div>";
             
@@ -108,16 +108,16 @@ public class StrideLayoutTests
         var markup = @"
             <hstack style=""gap:10px"">
                 <vstack style=""gap:5px"">
-                    <label style=""flex-grow:1; flex-basis:0"" />
-                    <label style=""flex-grow:1; flex-basis:0"" />
-                    <label style=""flex-grow:1; flex-basis:0"" />
-                    <label style=""flex-grow:1; flex-basis:0"" />
-                    <label style=""flex-grow:1; flex-basis:0"" />
+                    <label style=""flex:1;"" />
+                    <label style=""flex:1;"" />
+                    <label style=""flex:1;"" />
+                    <label style=""flex:1;"" />
+                    <label style=""flex:1;"" />
                 </vstack>
                 <vstack style=""gap:15px"">
-                    <label style=""flex-grow:1; flex-basis:0"" />
-                    <label style=""flex-grow:1; flex-basis:0"" />
-                    <label style=""flex-grow:1; flex-basis:0"" />
+                    <label style=""flex:1;"" />
+                    <label style=""flex:1;"" />
+                    <label style=""flex:1;"" />
                 </vstack>
             </hstack>";
 

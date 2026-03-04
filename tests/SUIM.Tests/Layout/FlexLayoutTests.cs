@@ -12,9 +12,9 @@ public class FlexLayoutTests
         var markup = """
         <div style="width:300px; height:100px; display:flex; flex-direction:row;">
             <div style="width:100px; height:50px"></div>
-            <div style="height:50px; flex-grow: 1; flex-shrink: 1; flex-basis: 0%;"></div>
+            <div style="height:50px; flex: 1;"></div>
         </div>
-        """;
+        """;//-grow: 1; flex-shrink: 1; flex-basis: 0%;
         var (element, _) = MarkupParser.Parse(markup);
         element.CalculateLayout(300, 100);
         var child1 = (Div)element.Children[0];
@@ -79,7 +79,7 @@ public class FlexLayoutTests
         var markup = """
             <div style="width:100px; height:300px; Display:flex; FlexDirection:column">
                 <div style="width:50px; height:100px"></div>
-                <div style="width:50px; flex-grow: 1; flex-shrink: 1; flex-basis: 0%;"></div>
+                <div style="width:50px; flex: 1;"></div>
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);
