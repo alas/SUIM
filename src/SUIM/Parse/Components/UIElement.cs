@@ -113,6 +113,10 @@ public abstract class UIElement(string tagName)
         {
             ReadOnly = value as string;
         }
+        else if (name.Contains('.'))
+        {
+            // ignore parent properties
+        }
         else if (value is string s)
         {
             if (s.StartsWith('@'))

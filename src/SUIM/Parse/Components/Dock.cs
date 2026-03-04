@@ -1,6 +1,7 @@
 namespace SUIM.Parse.Components;
 
 using SUIM.Flexbox;
+using System.Xml.Linq;
 
 public class Dock() : UIElement(nameof(Dock))
 {
@@ -19,6 +20,38 @@ public class Dock() : UIElement(nameof(Dock))
         }
     }
 
+
+    #region Children
+
+    public override void AddChild(UIElement child, XElement? element)
+    {
+        base.AddChild(child, element);
+
+        var edge = Enum.TryParse<DockEdge>(element?.Attribute("dock.edge")?.Value, true, out var parsedEdge) ? parsedEdge : DockEdge.Top;
+        var dockChild = new DockChild(child, edge);
+
+        DockChildren.Add(dockChild);
+    }
+
+    public override void RemoveChild(UIElement child)
+    {
+        base.RemoveChild(child);
+
+        var gridChild = DockChildren.FirstOrDefault(gc => gc.Element == child);
+        if (gridChild != null)
+            DockChildren.Remove(gridChild);
+    }
+
+    public override void ClearChildren()
+    {
+        base.ClearChildren();
+        DockChildren.Clear();
+    }
+
+    #endregion
+
+    #region ApplySUIMLayout
+
     internal override void ApplySUIMLayout()
     {
         Node.StyleSetFlexDirection(FlexDirection.Row);
@@ -32,8 +65,8 @@ public class Dock() : UIElement(nameof(Dock))
 
             if (item.Edge == DockEdge.Fill || (isLast && "true".Equals(LastChildFill, StringComparison.OrdinalIgnoreCase)))
             {
-                item.Node.StyleSetFlexGrow(1);
-                current.AddChild(item.Node);
+                item.Element.Node.StyleSetFlexGrow(1);
+                current.AddChild(item.Element.Node);
                 break;
             }
 
@@ -44,17 +77,16 @@ public class Dock() : UIElement(nameof(Dock))
                     current.StyleSetFlexDirection(FlexDirection.Row);
 
                     var mainCol = CreateFillColumn();
-                    ApplyDockSize(item, isWidth: true);
 
                     if (item.Edge == DockEdge.Left)
                     {
-                        current.AddChild(item.Node);
+                        current.AddChild(item.Element.Node);
                         current.AddChild(mainCol);
                     }
                     else
                     {
                         current.AddChild(mainCol);
-                        current.AddChild(item.Node);
+                        current.AddChild(item.Element.Node);
                     }
 
                     current = mainCol;
@@ -65,17 +97,16 @@ public class Dock() : UIElement(nameof(Dock))
                     current.StyleSetFlexDirection(FlexDirection.Column);
 
                     var mainRow = CreateFillRow();
-                    ApplyDockSize(item, isWidth: false);
 
                     if (item.Edge == DockEdge.Top)
                     {
-                        current.AddChild(item.Node);
+                        current.AddChild(item.Element.Node);
                         current.AddChild(mainRow);
                     }
                     else
                     {
                         current.AddChild(mainRow);
-                        current.AddChild(item.Node);
+                        current.AddChild(item.Element.Node);
                     }
 
                     current = mainRow;
@@ -102,24 +133,10 @@ public class Dock() : UIElement(nameof(Dock))
         return node;
     }
 
-    private static void ApplyDockSize(DockChild item, bool isWidth)
-    {
-        if (item.Size.HasValue)
-        {
-            if (isWidth)
-                item.Node.StyleSetWidthPercent(item.Size.Value * 100f);
-            else
-                item.Node.StyleSetHeightPercent(item.Size.Value * 100f);
-        }
-    }
+    #endregion
 }
 
-public class DockChild
-{
-    public DockEdge Edge { get; init; }
-    public float? Size { get; init; } // % (0..1) or absolute px
-    public required Node Node { get; init; }
-}
+public record class DockChild(UIElement Element, DockEdge Edge);
 
 public enum DockEdge
 {
