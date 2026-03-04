@@ -1,5 +1,7 @@
 namespace SUIM.Flexbox;
 
+using System.Globalization;
+
 public partial class Flex
 {
     #region XXXX_ToSring
@@ -461,7 +463,7 @@ public partial class Flex
             uu = Unit.Point;
         }
 
-        if (float.TryParse(dig, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var value))
+        if (TryParseFloat(dig, out var value))
         {
             res = new Value(value, uu);
         }
@@ -514,7 +516,7 @@ public partial class Flex
         return result != null;
     }
 
-    static bool ParseBreakWork(string input, out string head, out string tail)
+    private static bool ParseBreakWork(string input, out string head, out string tail)
     {
         // margin --> ("margin", "")
         // margin-left --> ("margin", "left")
@@ -570,11 +572,14 @@ public partial class Flex
             case "display":
                 parsed = StringToDisplay(attrValue, out style.Display);
                 break;
+            case "flex":
+                parsed = ApplyFlex(attrValue, style);
+                break;
             case "flex-grow":
-                parsed = float.TryParse(attrValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out style.FlexGrow);
+                parsed = TryParseFloat(attrValue, out style.FlexGrow);
                 break;
             case "flex-shrink":
-                parsed = float.TryParse(attrValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out style.FlexShrink);
+                parsed = TryParseFloat(attrValue, out style.FlexShrink);
                 break;
             case "flex-basis":
                 parsed = ParseValueFromString(attrValue, out style.FlexBasis);
@@ -662,5 +667,99 @@ public partial class Flex
         }
 
         return parsed;
+    }
+
+    private static bool ApplyFlex(string value, Style style)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        value = value.Trim().ToLowerInvariant();
+
+        // Keywords
+        if (value == "none")
+        {
+            style.FlexGrow = 0;
+            style.FlexShrink = 0;
+            style.FlexBasis = new(float.NaN, Unit.Auto);
+            return true;
+        }
+
+        if (value == "auto")
+        {
+            style.FlexGrow = 1;
+            style.FlexShrink = 1;
+            style.FlexBasis = new(float.NaN, Unit.Auto);
+            return true;
+        }
+
+        var parts = value.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        float grow = 0;
+        float shrink = 1; // CSS default
+        var basis = Value.Zero;
+
+        // 1 value
+        if (parts.Length == 1)
+        {
+            if (float.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out grow))
+            {
+                shrink = 1;
+                basis = Value.Zero;
+            }
+            else
+            {
+                basis = ParseBasis(parts[0]);
+            }
+        }
+
+        // 2 values
+        else if (parts.Length == 2)
+        {
+            _ = TryParseFloat(parts[0], out grow);
+            _ = TryParseFloat(parts[1], out shrink);
+            basis = Value.Zero;
+        }
+
+        // 3 values
+        else if (parts.Length == 3)
+        {
+            _ = TryParseFloat(parts[0], out grow);
+            _ = TryParseFloat(parts[1], out shrink);
+            basis = ParseBasis(parts[2]);
+        }
+
+        style.FlexGrow = grow;
+        style.FlexShrink = shrink;
+        style.FlexBasis = basis;
+
+        return true;
+    }
+
+    private static Value ParseBasis(string value)
+    {
+        if (value == "auto")
+            return Value.Auto;
+
+        if (value.EndsWith("px"))
+        {
+            var number = value.Replace("px", "");
+            if (float.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out var px))
+                return new Value(px, Unit.Point);
+        }
+
+        if (value.EndsWith('%'))
+        {
+            var number = value.Replace("%", "");
+            if (float.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out var percent))
+                return new Value(percent, Unit.Percent);
+        }
+
+        return Value.Zero;
+    }
+
+    private static bool TryParseFloat(string attrValue, out float result)
+    {
+        return float.TryParse(attrValue, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
     }
 }
