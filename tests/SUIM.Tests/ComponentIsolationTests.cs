@@ -27,7 +27,7 @@ public class ComponentIsolationTests
         var componentMarkup = """
             <div id="popuproot">
                 <model>{ "title": "" }</model>
-                <label id="thelabel" value="@title" />
+                <label id="thelabel" value="@title"></label>
             </div>
             """;
         File.WriteAllText(compPath, componentMarkup);
@@ -60,7 +60,7 @@ public class ComponentIsolationTests
         var componentMarkup = """
             <div id="popuproot">
                 <model>{ "labelvisibility": null }</model>
-                <label id="thelabel" visibility="@labelvisibility" />
+                <label id="thelabel" visibility="@labelvisibility"></label>
             </div>
             """;
         File.WriteAllText(compPath, componentMarkup);
@@ -94,7 +94,7 @@ public class ComponentIsolationTests
             """
             <div id="popuproot">
                 <model>{ "labelvisibility": "block" }</model>
-                <label id="thelabel" visibility="@labelvisibility" />
+                <label id="thelabel" visibility="@labelvisibility"></label>
             </div>
             """;
         File.WriteAllText(compPath, componentMarkup);
@@ -166,7 +166,7 @@ public class ComponentIsolationTests
         var compPath = GetTestPath("TestComponent.suim");
         var componentMarkup = @"<div id=""compRoot"">
             <model>{ ""compProp"": 123.0 }</model>
-            <label value=""@compProp"" />
+            <label value=""@compProp""></label>
         </div>";
         File.WriteAllText(compPath, componentMarkup);
 
@@ -211,7 +211,7 @@ public class ComponentIsolationTests
         // Arrange
         var componentMarkup = @"<TestComp>
             <model>{ ""val"": 10.0 }</model>
-            <label value=""@val"" />
+            <label value=""@val""></label>
         </TestComp>";
         File.WriteAllText(compPath, componentMarkup);
 
@@ -235,7 +235,7 @@ public class ComponentIsolationTests
         var compPath = GetTestPath("NoModelComp.suim");
         // Arrange
         var componentMarkup = @"<div id=""comp"">
-            <label value=""@missingProp"" />
+            <label value=""@missingProp""></label>
         </div>";
 
         File.WriteAllText(compPath, componentMarkup);

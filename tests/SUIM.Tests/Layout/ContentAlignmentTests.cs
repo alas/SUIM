@@ -39,8 +39,8 @@ public class ContentAlignmentTests
     {
         var markup = """
             <div style="width:200px; height:200px; align-items:center; display:flex; flex-direction:column">
-                <label style="width:100px; heigh:20px; AlignSelf:flex-end" />
-                <label style="width:100px; heigh:20px" />
+                <label style="width:100px; heigh:20px; AlignSelf:flex-end"></label>
+                <label style="width:100px; heigh:20px"></label>
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);
@@ -70,7 +70,7 @@ public class ContentAlignmentTests
     {
         var markup = """
             <overlay style="width:500px; height:500px; display:flex; justify-content:center">
-                <label style="width:100px; height:50px;" />
+                <label style="width:100px; height:50px;"></label>
             </overlay>
             """;
         var (element, _) = MarkupParser.Parse(markup);
@@ -88,7 +88,7 @@ public class ContentAlignmentTests
     {
         var markup = """
             <div style="width:200px; height:200px; justify-content:center; Align-Items:center">
-                <label style="width:100px; height:20px" />
+                <label style="width:100px; height:20px"></label>
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);
@@ -108,7 +108,7 @@ public class ContentAlignmentTests
     {
         var markup = """
             <div style="width:200px; height:200px">
-                <label style="width:100px; height:20px" />
+                <label style="width:100px; height:20px"></label>
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);

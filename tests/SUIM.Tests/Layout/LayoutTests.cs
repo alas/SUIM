@@ -13,8 +13,8 @@ public class LayoutTests
         var markup = """
         <div style="align-items:flex-start;">
             <vstack style="width:auto; height:auto; gap:10px; flex:0 0 auto;">
-                <label style="width:100px; height:50px" />
-                <label style="align-self:stretch; height:30px" />
+                <label style="width:100px; height:50px"></label>
+                <label style="align-self:stretch; height:30px"></label>
             </vstack>
         </div>
         """;

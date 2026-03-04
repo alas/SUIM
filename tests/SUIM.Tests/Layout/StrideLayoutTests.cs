@@ -15,8 +15,8 @@ public class StrideLayoutTests
         var markup = @"
             <div style=""display:flex; align-items:flex-start;"">
                 <vstack style=""gap:10; width:auto; height:auto"">
-                    <label style=""width:100; height:50"" />
-                    <label style=""width:100; height:30"" />
+                    <label style=""width:100; height:50""></label>
+                    <label style=""width:100; height:30""></label>
                 </vstack>
             </div>";
             
@@ -36,8 +36,8 @@ public class StrideLayoutTests
         var markup1 = @"
             <div style=""display:flex; align-items:flex-start; justify-items:flex-start;"">
                 <hstack style=""gap:0; height:auto; flex:1;"">
-                    <label style=""height:50; flex:1;"" />
-                    <label style=""height:50; flex:1;"" />
+                    <label style=""height:50; flex:1;""></label>
+                    <label style=""height:50; flex:1;""></label>
                 </hstack>
             </div>";
         var markup2 = @"
@@ -84,23 +84,29 @@ public class StrideLayoutTests
     public void MarkupParser_WithPixelUnits_EquivalentToRem_CreatesScaledLayout()
     {
         var markup = @"
-            <stack orientation=""vertical"" gap=""0"" height=""auto"">
-                <label width=""32px"" height=""16px"" />
-                <label width=""16px"" height=""32px"" />
-            </stack>";
+            <div>
+                <vstack style=""gap:0; height:auto;"">
+                    <label style=""width=""32px"" height=""16px""></label>
+                    <label style=""width=""16px"" height=""32px""></label>
+                </vstack>
+            </div>";
             
         var (element, _) = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
         
-        Assert.Equal("auto", element.GetAttribute("height"));
-        Assert.Equal(32, element.GetWidth());
-        Assert.Equal(48, element.GetHeight()); // 16 + 32
+        Assert.Equal(200, element.GetWidth());
+        Assert.Equal(200, element.GetHeight());
 
-        var label1 = (Label)element.Children[0];
+        var div = (Stack)element.Children[0];
+        Assert.Equal("auto", div.GetAttribute("height"));
+        Assert.Equal(32, div.GetWidth());
+        Assert.Equal(48, div.GetHeight()); // 16 + 32 (its failing here, it should be 48 but is 200
+
+        var label1 = (Label)div.Children[0];
         Assert.Equal(32, label1.GetWidth());
         Assert.Equal(16, label1.GetHeight());
 
-        var label2 = (Label)element.Children[1];
+        var label2 = (Label)div.Children[1];
         Assert.Equal(16, label2.GetWidth());
         Assert.Equal(32, label2.GetHeight());
     }
@@ -110,8 +116,8 @@ public class StrideLayoutTests
     {
         var markup = @"
             <stack orientation=""vertical"" gap=""0"" width=""auto"" height=""auto"">
-                <label width=""32px"" height=""16px"" />
-                <label width=""16px"" height=""32px"" />
+                <label width=""32px"" height=""16px""></label>
+                <label width=""16px"" height=""32px""></label>
             </stack>";
 
         var (element, _) = MarkupParser.Parse(markup);
@@ -138,16 +144,16 @@ public class StrideLayoutTests
         var markup = @"
             <hstack style=""gap:10px"">
                 <vstack style=""gap:5px; flex:1;"">
-                    <label style=""flex:1;"" />
-                    <label style=""flex:1;"" />
-                    <label style=""flex:1;"" />
-                    <label style=""flex:1;"" />
-                    <label style=""flex:1;"" />
+                    <label style=""flex:1;""></label>
+                    <label style=""flex:1;""></label>
+                    <label style=""flex:1;""></label>
+                    <label style=""flex:1;""></label>
+                    <label style=""flex:1;""></label>
                 </vstack>
                 <vstack style=""gap:15px; flex:1;"">
-                    <label style=""flex:1;"" />
-                    <label style=""flex:1;"" />
-                    <label style=""flex:1;"" />
+                    <label style=""flex:1;""></label>
+                    <label style=""flex:1;""></label>
+                    <label style=""flex:1;""></label>
                 </vstack>
             </hstack>";
 
@@ -192,18 +198,18 @@ public class StrideLayoutTests
                     .overlay { visibility: collapsed; }
                 </style>
                 <vstack  style=""width:400; height:300"">
-                    <label value=""Main UI"" />
+                    <label value=""Main UI""></label>
                 </vstack>
                 
                 <overlay class=""overlay centeredcontent"" id=""popup"">
                     <div style=""width:360; height:180"">
-                        <label value=""Popup"" />
+                        <label value=""Popup""></label>
                     </div>
                 </overlay>
                 
                 <overlay class=""overlay centeredcontent"" id=""screenOverlay"">
                     <div>
-                        <label value=""Blocker"" />
+                        <label value=""Blocker""></label>
                     </div>
                 </overlay>
             </div>";
@@ -245,18 +251,18 @@ public class StrideLayoutTests
         var markup = @"
             <div>
                 <vstack style=""width:400; height:300"">
-                    <label value=""Main UI"" />
+                    <label value=""Main UI""></label>
                 </vstack>
                 
                 <overlay id=""popup"">
                     <div style=""width:360; height:180"">
-                        <label value=""Popup"" />
+                        <label value=""Popup""></label>
                     </div>
                 </overlay>
                 
                 <overlay id=""screenOverlay"" style=""visibility:collapsed"">
                     <div>
-                        <label value=""Blocker"" />
+                        <label value=""Blocker""></label>
                     </div>
                 </overlay>
             </div>";

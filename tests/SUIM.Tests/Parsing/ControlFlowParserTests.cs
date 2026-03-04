@@ -28,7 +28,7 @@ public class ControlFlowParserTests
         var markup = @"<div>
 @if identifierbool
 {
-    <label value=""True"" />
+    <label value=""True""></label>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -47,11 +47,11 @@ public class ControlFlowParserTests
         var markup = @"<div>
 @if identifierbool2
 {
-    <label value=""True"" />
+    <label value=""True""></label>
 }
 else
 {
-    <label value=""False"" />
+    <label value=""False""></label>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -70,11 +70,11 @@ else
         var markup = @"<div>
 @if identifierbool3
 {
-    <label value=""True"" />
+    <label value=""True""></label>
 }
 else
 {
-    <label value=""False"" />
+    <label value=""False""></label>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -93,15 +93,15 @@ else
         var markup = @"<div>
 @if identifierbool3
 {
-    <label value=""False"" />
+    <label value=""False""></label>
 }
 else if identifierbool3
 {
-    <label value=""False"" />
+    <label value=""False""></label>
 }
 else
 {
-    <label value=""True"" />
+    <label value=""True""></label>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -120,19 +120,19 @@ else
         var markup = @"<div>
 @if identifierbool3
 {
-    <label value=""False"" />
+    <label value=""False""></label>
 }
 else if identifierbool3
 {
-    <label value=""False"" />
+    <label value=""False""></label>
 }
 else if identifierbool3
 {
-    <label value=""False"" />
+    <label value=""False""></label>
 }
 else
 {
-    <label value=""FinalElse"" />
+    <label value=""FinalElse""></label>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -151,19 +151,19 @@ else
         var markup = @"<div>
 @if identifierbool3
 {
-    <label value=""False"" />
+    <label value=""False""></label>
 }
 else if identifierbool3
 {
-    <label value=""False"" />
+    <label value=""False""></label>
 }
 else if identifierbool2
 {
-    <label value=""True"" />
+    <label value=""True""></label>
 }
 else
 {
-    <label value=""False"" />
+    <label value=""False""></label>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -182,7 +182,7 @@ else
         var markup = @"<stack>
 @for i=0 count=3
 {
-    <label value=""@i"" />
+    <label value=""@i""></label>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -204,7 +204,7 @@ else
         var markup = @"<stack>
 @for i=0 count=3
 {
-    <label value=""@i"" />
+    <label value=""@i""></label>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -228,11 +228,11 @@ else
 {
     case 500
     {
-        <label value=""Matched"" />
+        <label value=""Matched""></label>
     }
     default
     {
-        <label value=""Default"" />
+        <label value=""Default""></label>
     }
 }
 </div>";
@@ -254,15 +254,15 @@ else
 {
     case 500
     {
-        <label value=""Matched"" />
+        <label value=""Matched""></label>
     }
     default
     {
-        <label value=""Default"" />
+        <label value=""Default""></label>
     }
 }";
         var expanded = parser.ExpandDirectives(markup);
-        Assert.Equal("<label value=\"Matched\" />", expanded.Trim());
+        Assert.Equal("<label value=\"Matched\"></label>", expanded.Trim());
     }
 
     // ============== CONTROL FLOW - FOR WITH STEP ==============
@@ -273,7 +273,7 @@ else
         var markup = @"<stack>
 @for i=2 count=3 step=-1
 {
-    <label value=""@i"" />
+    <label value=""@i""></label>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -294,7 +294,7 @@ else
         var markup = @"<stack>
 @for i=0 count=3 step=2
 {
-    <label value=""@i"" />
+    <label value=""@i""></label>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -318,11 +318,11 @@ else
 {
     case ""test""
     {
-        <label value=""Matched String"" />
+        <label value=""Matched String""></label>
     }
     default
     {
-        <label value=""No Match"" />
+        <label value=""No Match""></label>
     }
 }
 </div>";
@@ -343,15 +343,15 @@ else
 {
     case 100
     {
-        <label value=""Hundred"" />
+        <label value=""Hundred""></label>
     }
     case 500
     {
-        <label value=""FiveHundred"" />
+        <label value=""FiveHundred""></label>
     }
     default
     {
-        <label value=""Other"" />
+        <label value=""Other""></label>
     }
 }
 </div>";
@@ -372,11 +372,11 @@ else
 {
     case @identifier2
     {
-        <label value=""Variable Match"" />
+        <label value=""Variable Match""></label>
     }
     default
     {
-        <label value=""No Match"" />
+        <label value=""No Match""></label>
     }
 }";
         var expanded = parser.ExpandDirectives(markup);
@@ -391,7 +391,7 @@ else
         var markup = @"<stack>
 @foreach item in Collection
 {
-    <label value=""@item"" />
+    <label value=""@item""></label>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -410,7 +410,7 @@ else
         var markup = @"<stack>
 @foreach item in items
 {
-    <label value=""@item.Name"" />
+    <label value=""@item.Name""></label>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -429,7 +429,7 @@ else
         var markup = @"<stack>
 @foreach i in 0..3
 {
-    <label value=""@i"" />
+    <label value=""@i""></label>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -451,11 +451,11 @@ else
         var markup = @"<button>
 @if identifierbool
 {
-    <label value=""Click Me"" />
+    <label value=""Click Me""></label>
 }
 else
 {
-    <label value=""Disabled"" />
+    <label value=""Disabled""></label>
 }
 </button>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -475,7 +475,7 @@ else
         var markup = @"<div>
 @if identifierbool3
 {
-    <label value=""Should not appear"" />
+    <label value=""Should not appear""></label>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);

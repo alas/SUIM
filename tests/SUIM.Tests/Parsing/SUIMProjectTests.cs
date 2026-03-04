@@ -23,7 +23,7 @@ public class SUIMProjectTests
         var compAMarkup = @"<stack>
     <CompB />
 </stack>";
-        var compBMarkup = @"<label value=""Hello from B"" />";
+        var compBMarkup = @"<label value=""Hello from B""></label>";
         var styleContent = "grid { background: blue; }";
 
         File.WriteAllText(Path.Combine(tempDir, "views", "Main.suim"), viewMarkup);

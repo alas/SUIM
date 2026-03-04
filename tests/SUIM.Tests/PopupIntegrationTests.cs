@@ -325,7 +325,7 @@ public class PopupIntegrationTests
         var markup = @"
 <Div Width='400' Height='400'>
     <Div Width='auto' Height='200'>
-        <Label Value='Hello World' Width='100' Height='50' />
+        <Label Value='Hello World' Width='100' Height='50'></Label>
     </Div>
 </Div>";
         var game = CreateTestGame();

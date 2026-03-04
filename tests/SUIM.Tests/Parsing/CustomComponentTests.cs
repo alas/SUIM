@@ -12,7 +12,7 @@ public class CustomComponentTests
     {
         // 1. Create a dummy .suim file
         var tempFile = Path.GetTempFileName() + ".suim";
-        File.WriteAllText(tempFile, "<stack><label value=\"Inside Custom\" /></stack>");
+        File.WriteAllText(tempFile, "<stack><label value=\"Inside Custom\"></label></stack>");
 
         try
         {

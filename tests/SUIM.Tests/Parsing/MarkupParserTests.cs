@@ -60,7 +60,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_StackHorizontal()
     {
-        var markup = "<stack orientation=\"horizontal\"><label value=\"Hello\" /><button /></stack>";
+        var markup = "<stack orientation=\"horizontal\"><label value=\"Hello\"></label><button /></stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
@@ -132,7 +132,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_Label()
     {
-        var markup = "<label value=\"Test Label\" />";
+        var markup = "<label value=\"Test Label\"></label>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
@@ -143,7 +143,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_Button()
     {
-        var markup = "<button><label value=\"Click me\" /></button>";
+        var markup = "<button><label value=\"Click me\"></label></button>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Button>(element);
@@ -176,7 +176,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_NestedElements()
     {
-        var markup = "<stack><div><label value=\"Nested\" /></div></stack>";
+        var markup = "<stack><div><label value=\"Nested\"></label></div></stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
@@ -296,7 +296,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_Label_WithAllAttributes()
     {
-        var markup = "<label value=\"Hello\" font=\"Arial\" fontsize=\"16\" color=\"#FF0000\" wrap=\"true\" />";
+        var markup = "<label value=\"Hello\" wrap=\"true\" style=\"font:Arial; fontsize:16; color:#FF0000\"></label>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
@@ -376,7 +376,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_VBox_Synonym()
     {
-        var markup = "<vbox><label value=\"A\" /><label value=\"B\" /></vbox>";
+        var markup = "<vbox><label value=\"A\"></label><label value=\"B\"></label></vbox>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
@@ -399,7 +399,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_HBox_Synonym()
     {
-        var markup = "<hbox><label value=\"X\" /><label value=\"Y\" /></hbox>";
+        var markup = "<hbox><label value=\"X\"></label><label value=\"Y\"></label></hbox>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
@@ -517,8 +517,8 @@ public class MarkupParserTests
     {
         var markup = @"<grid columns=""*,*"" rows=""auto,*"">
 <stack grid.row=""0"" grid.column=""0"" orientation=""horizontal"" gap=""10"">
-    <label value=""Top Left"" />
-    <label value=""Top"" />
+    <label value=""Top Left""></label>
+    <label value=""Top""></label>
 </stack>
 <div grid.row=""1"" grid.column=""0"" grid.columnspan=""2"" bg=""lightgray"" />
 </grid>";
@@ -553,11 +553,11 @@ public class MarkupParserTests
         var markup = @"<button>
 @if identifierbool
 {
-    <label value=""Click Me"" />
+    <label value=""Click Me""></label>
 }
 else
 {
-    <label value=""Disabled"" />
+    <label value=""Disabled""></label>
 }
 </button>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -633,7 +633,7 @@ else
     [Fact]
     public void Parse_Size_Auto()
     {
-        var markup = "<label value=\"Auto\" width=\"auto\" />";
+        var markup = "<label value=\"Auto\" width=\"auto\"></label>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
@@ -946,7 +946,7 @@ else
     [Fact]
     public void Parse_Label_WithoutWrap()
     {
-        var markup = "<label value=\"Test\" wrap=\"false\" />";
+        var markup = "<label value=\"Test\" wrap=\"false\"></label>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
@@ -957,7 +957,7 @@ else
     [Fact]
     public void Parse_Label_WithColor()
     {
-        var markup = "<label value=\"Colored\" color=\"blue\" />";
+        var markup = "<label value=\"Colored\" color=\"blue\"></label>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
@@ -1015,7 +1015,7 @@ else
 <stack>
 <div>
 <stack>
-<label value=""Deep"" />
+<label value=""Deep""></label>
 </stack>
 </div>
 </stack>
@@ -1038,8 +1038,8 @@ else
     {
         var markup = @"<button>
 <stack>
-<label value=""Icon"" />
-<label value=""Label"" />
+<label value=""Icon""></label>
+<label value=""Label""></label>
 </stack>
 </button>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1085,7 +1085,7 @@ else
     {
         var markup = @"<stack>
 Text before
-<label value=""Label"" />
+<label value=""Label""></label>
 Text after
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1129,7 +1129,7 @@ Text after
     {
         var markup = @"<div>
             
-            <label value=""Only label"" />
+            <label value=""Only label""></label>
             
         </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1147,9 +1147,9 @@ Text after
     public void Parse_Stack_WithScroll_Vertical()
     {
         var markup = @"<stack orientation=""vertical"" scroll=""vertical"">
-<label value=""Item 1"" />
-<label value=""Item 2"" />
-<label value=""Item 3"" />
+<label value=""Item 1""></label>
+<label value=""Item 2""></label>
+<label value=""Item 3""></label>
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1168,8 +1168,8 @@ Text after
     public void Parse_Stack_WithScroll_Horizontal()
     {
         var markup = @"<stack orientation=""horizontal"" scroll=""horizontal"">
-<label value=""Item 1"" />
-<label value=""Item 2"" />
+<label value=""Item 1""></label>
+<label value=""Item 2""></label>
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1204,9 +1204,9 @@ Text after
     public void Parse_Stack_WithScroll_WithAllAttributes()
     {
         var markup = @"<stack orientation=""vertical"" scroll=""vertical"" width=""400"" height=""300"" gap=""5"">
-<label value=""Scrollable Item 1"" />
-<label value=""Scrollable Item 2"" />
-<label value=""Scrollable Item 3"" />
+<label value=""Scrollable Item 1""></label>
+<label value=""Scrollable Item 2""></label>
+<label value=""Scrollable Item 3""></label>
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1232,7 +1232,7 @@ Text after
     public void Parse_Border_WithThicknessAndColor()
     {
         var markup = @"<border value=""2 solid #FF0000"">
-<label value=""Bordered Content"" />
+<label value=""Bordered Content""></label>
 </border>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1261,7 +1261,7 @@ Text after
     public void Parse_Border_WithTwoValueThickness()
     {
         var markup = @"<border thickness=""6"" color=""green"">
-<label value=""Border Test"" />
+<label value=""Border Test""></label>
 </border>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1276,7 +1276,7 @@ Text after
     {
         var markup = @"<div style=""width:300px; height:200px; background:lightgray;"">
 <border thickness=""2"" color=""red"">
-<label value=""Bordered Inner Content"" />
+<label value=""Bordered Inner Content""></label>
 </border>
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1313,7 +1313,7 @@ Text after
     public void Parse_Div_WithBorderAttribute()
     {
         var markup = @"<div width=""300"" height=""200"" bg=""lightgray"" border=""2 solid red"">
-<label value=""Bordered Div"" />
+<label value=""Bordered Div""></label>
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1358,7 +1358,7 @@ Text after
         // Note: Styles are not applied in MarkupParser, so we test inline attribute to ensure wrapper creation logic works.
         // Fixed XML hierarchy and tag matching.
         var markup = @"<div width=""500"" height=""400"" border=""5 solid #FF0000"">
-<label value=""Bordered Content"" />
+<label value=""Bordered Content""></label>
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1386,7 +1386,7 @@ Text after
                 }
                 </style>
                 <div class=""myclass"">
-                    <label value=""Bordered Content"" />
+                    <label value=""Bordered Content""></label>
                 </div>
             </grid>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1466,8 +1466,8 @@ Text after
     <model></model>
     <style>.btn { }</style>
     <stack orientation=""vertical"">
-        <label value=""Item 1"" />
-        <label value=""Item 2"" />
+        <label value=""Item 1""></label>
+        <label value=""Item 2""></label>
     </stack>
 </grid>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1483,7 +1483,7 @@ Text after
         var markup = @"<button>
 <model>{ ""value"": ""ignored"" }</model>
 <style>.button { color: red; }</style>
-    <label value=""Click"" />
+    <label value=""Click""></label>
 </button>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
@@ -1549,7 +1549,7 @@ Text after
     {
         var markup = @"<grid>
     <model>{ ""title"": ""Hello World"", ""description"": ""Test"" }</model>
-    <label value=""@title"" />
+    <label value=""@title""></label>
 </grid>";
         var (element, model) = MarkupParser.Parse(markup);
 
@@ -1685,7 +1685,7 @@ Text after
     {
         var markup = @"<grid>
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
-    <button><label value=""@buttonText"" /></button>
+    <button><label value=""@buttonText""></label></button>
 </grid>";
         var (element, model) = MarkupParser.Parse(markup);
 
@@ -1799,7 +1799,7 @@ Text after
     <style>
         * { margin: 5; padding: 3; }
     </style>
-    <stack><div /><label /></stack>
+    <stack><div></div><label></label></stack>
 </grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
@@ -1883,7 +1883,7 @@ Text after
     <style>
         label { padding: 6; }
     </style>
-    <stack><label /><button /></stack>
+    <stack><label></label><button></button></stack>
 </grid>";
         var (element, _) = MarkupParser.Parse(markup);
 

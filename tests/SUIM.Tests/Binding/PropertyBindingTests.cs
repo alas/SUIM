@@ -44,7 +44,7 @@ public class PropertyBindingTests
     [Fact]
     public void Parse_DataBinding_Text_CreatesBindingDefinition()
     {
-        var markup = "<label value=\"@stringValue\" />";
+        var markup = "<label value=\"@stringValue\"></label>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
@@ -61,7 +61,7 @@ public class PropertyBindingTests
     {
         var markup = @"<grid>
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
-    <button><label value=""@buttonText"" /></button>
+    <button><label value=""@buttonText""></label></button>
 </grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
