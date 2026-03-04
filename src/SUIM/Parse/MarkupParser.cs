@@ -2,7 +2,6 @@ namespace SUIM.Parse;
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Xml.Linq;
 using SUIM.Model;
 using SUIM.Parse.Components;
@@ -235,6 +234,7 @@ public static partial class MarkupParser
                                 {
                                     textElement = CssStyle.ApplyToElement(textElement, styles);
                                 }
+
                                 innerElement.AddChild(textElement, null);
                             }
                         }
@@ -380,62 +380,59 @@ public static partial class MarkupParser
         throw new NotSupportedException($"Unknown tag: {element.Name.LocalName}");
     }
 
-    private static List<string> SplitAtSingleAtTokens(string input)
+    private static List<string> SplitAtSingleAtTokens(ReadOnlySpan<char> input)
     {
         var result = new List<string>();
-        if (string.IsNullOrEmpty(input))
-            return result;
 
-        var buffer = new StringBuilder();
         int i = 0;
+        int segmentStart = 0;
 
         while (i < input.Length)
         {
-            // Check for escaped @@
+            // Escaped @@ → normal text
             if (i + 1 < input.Length && input[i] == '@' && input[i + 1] == '@')
             {
-                buffer.Append("@@");
                 i += 2;
                 continue;
             }
 
-            // Check for single @ token start
-            if (input[i] == '@')
+            // Single @ that forms a valid token (@ + non-whitespace)
+            if (input[i] == '@' &&
+                i + 1 < input.Length &&
+                !char.IsWhiteSpace(input[i + 1]))
             {
-                // Flush previous text
-                if (buffer.Length > 0)
+                // Flush preceding text
+                if (i > segmentStart)
                 {
-                    result.Add(buffer.ToString());
-                    buffer.Clear();
+                    result.Add(input[segmentStart..i].ToString());
                 }
 
-                var token = new StringBuilder();
-                token.Append('@');
-                i++;
+                int tokenStart = i;
+                i++; // skip '@'
 
-                // Capture token characters until whitespace or end
                 while (i < input.Length && !char.IsWhiteSpace(input[i]))
                 {
-                    // Stop if we encounter @@ (escape inside token should stay normal text)
+                    // Stop if escaped @@ appears
                     if (i + 1 < input.Length && input[i] == '@' && input[i + 1] == '@')
                         break;
 
-                    token.Append(input[i]);
                     i++;
                 }
 
-                result.Add(token.ToString());
+                result.Add(input[tokenStart..i].ToString());
+
+                segmentStart = i;
                 continue;
             }
 
-            // Normal character
-            buffer.Append(input[i]);
             i++;
         }
 
         // Flush remaining text
-        if (buffer.Length > 0)
-            result.Add(buffer.ToString());
+        if (segmentStart < input.Length)
+        {
+            result.Add(input[segmentStart..].ToString());
+        }
 
         return result;
     }
