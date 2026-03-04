@@ -1,11 +1,11 @@
 namespace SUIM.Parse;
 
-using SUIM.Flexbox;
-using SUIM.Model;
-using SUIM.Parse.Components;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml.Linq;
+using SUIM.Model;
+using SUIM.Parse.Components;
 
 public static partial class MarkupParser
 {
@@ -213,16 +213,51 @@ public static partial class MarkupParser
                     var text = textNode.Value.Trim();
                     if (!string.IsNullOrEmpty(text))
                     {
-                        var textElement = innerElement is Text t ? t : new Text();
-                        textElement.Value = text;
-                        UIElement result = textElement;
-                        if (styles != null && styles.Count > 0)
+                        List<string> chunks = [text];
+                        if (text.Contains('@'))
                         {
-                            result = CssStyle.ApplyToElement(textElement, styles);
+                            chunks = SplitAtSingleAtTokens(text);
                         }
-                        if (innerElement is not Text)
+
+                        if (chunks.Count > 1)
                         {
-                            innerElement.AddChild(result, element);
+                            // Mixed static text and dynamic tokens: "Hello @name!" -> ["Hello ", "@name", "!"]
+                            foreach (var chunk in chunks)
+                            {
+                                UIElement textElement = new Text() { Value = chunk };
+                                if (chunk.Length > 1 && chunk.StartsWith('@') && !chunk.StartsWith("@@"))
+                                {
+                                    var modelPropName = chunk[1..];
+                                    textElement.Bindings.Add(new BindingDefinition("value", modelPropName));
+                                }
+
+                                if (styles != null && styles.Count > 0)
+                                {
+                                    textElement = CssStyle.ApplyToElement(textElement, styles);
+                                }
+                                innerElement.AddChild(textElement, null);
+                            }
+                        }
+                        else if (chunks.Count == 1)
+                        {
+                            var textElement = innerElement is Text t ? t : new Text();
+                            textElement.Value = text;
+                            if (text.Length > 1 && text.StartsWith('@') && !text.StartsWith("@@"))
+                            {
+                                var modelPropName = text[1..];
+                                textElement.Bindings.Add(new BindingDefinition("value", modelPropName));
+                            }
+
+                            UIElement result = textElement;
+                            if (styles != null && styles.Count > 0)
+                            {
+                                result = CssStyle.ApplyToElement(textElement, styles);
+                            }
+
+                            if (innerElement is not Text)
+                            {
+                                innerElement.AddChild(result, null);
+                            }
                         }
                     }
                 }
@@ -343,5 +378,65 @@ public static partial class MarkupParser
         }
 
         throw new NotSupportedException($"Unknown tag: {element.Name.LocalName}");
+    }
+
+    private static List<string> SplitAtSingleAtTokens(string input)
+    {
+        var result = new List<string>();
+        if (string.IsNullOrEmpty(input))
+            return result;
+
+        var buffer = new StringBuilder();
+        int i = 0;
+
+        while (i < input.Length)
+        {
+            // Check for escaped @@
+            if (i + 1 < input.Length && input[i] == '@' && input[i + 1] == '@')
+            {
+                buffer.Append("@@");
+                i += 2;
+                continue;
+            }
+
+            // Check for single @ token start
+            if (input[i] == '@')
+            {
+                // Flush previous text
+                if (buffer.Length > 0)
+                {
+                    result.Add(buffer.ToString());
+                    buffer.Clear();
+                }
+
+                var token = new StringBuilder();
+                token.Append('@');
+                i++;
+
+                // Capture token characters until whitespace or end
+                while (i < input.Length && !char.IsWhiteSpace(input[i]))
+                {
+                    // Stop if we encounter @@ (escape inside token should stay normal text)
+                    if (i + 1 < input.Length && input[i] == '@' && input[i + 1] == '@')
+                        break;
+
+                    token.Append(input[i]);
+                    i++;
+                }
+
+                result.Add(token.ToString());
+                continue;
+            }
+
+            // Normal character
+            buffer.Append(input[i]);
+            i++;
+        }
+
+        // Flush remaining text
+        if (buffer.Length > 0)
+            result.Add(buffer.ToString());
+
+        return result;
     }
 }

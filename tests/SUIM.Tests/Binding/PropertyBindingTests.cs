@@ -61,16 +61,112 @@ public class PropertyBindingTests
     {
         var markup = @"<grid>
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
-    <button><label value=""@buttonText""></label></button>
+    <button><input type=""text"" value=""@buttonText"" /></button>
 </grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
         var button = element.Children.Single() as Button;
-        var label = button?.Children.Single() as Label;
+        var input = button?.Children.Single() as Input;
         
-        Assert.NotNull(label);
-        Assert.Single(label!.Bindings);
-        Assert.Equal("value", label.Bindings[0].TargetPropertyName);
-        Assert.Equal("buttonText", label.Bindings[0].ModelPropertyName);
+        Assert.NotNull(input);
+        Assert.Single(input!.Bindings);
+        Assert.Equal("value", input.Bindings[0].TargetPropertyName);
+        Assert.Equal("buttonText", input.Bindings[0].ModelPropertyName);
+    }
+
+    [Fact]
+    public void Parse_Suim_ModelProperties_CreatesBindingsH1()
+    {
+        var markup = @"<grid>
+    <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
+    <button><h1>@buttonText</h1></button>
+</grid>";
+        var (element, _) = MarkupParser.Parse(markup);
+
+        var button = element.Children.Single() as Button;
+        var h1 = button?.Children.Single() as H1;
+        
+        Assert.NotNull(h1);
+        Assert.Single(h1!.Bindings);
+        Assert.Equal("value", h1.Bindings[0].TargetPropertyName);
+        Assert.Equal("buttonText", h1.Bindings[0].ModelPropertyName);
+    }
+
+    [Fact]
+    public void Parse_Suim_ModelProperties_CreatesBindingsText()
+    {
+        var markup = @"<div>@buttonText</div>";
+        var (element, _) = MarkupParser.Parse(markup);
+
+        var t = element.Children.Single() as Text;
+
+        Assert.NotNull(t);
+        Assert.Single(t!.Bindings);
+        Assert.Equal("value", t.Bindings[0].TargetPropertyName);
+        Assert.Equal("buttonText", t.Bindings[0].ModelPropertyName);
+    }
+
+    [Fact]
+    public void Parse_Suim_ModelProperties_CreatesBindingsText2()
+    {
+        var markup = @"<div>@buttonText1 @buttonText2</div>";
+        var (element, _) = MarkupParser.Parse(markup);
+
+        Assert.Equal(3, element.Children.Count);
+
+        var child = element.Children[0];
+        Assert.IsType<Text>(child);
+        var t = element.Children.First() as Text;
+        Assert.NotNull(t);
+        Assert.Single(t!.Bindings);
+        Assert.Equal("value", t.Bindings[0].TargetPropertyName);
+        Assert.Equal("buttonText1", t.Bindings[0].ModelPropertyName);
+
+        child = element.Children[1];
+        Assert.IsType<Text>(child);
+        t = element.Children.Skip(1).First() as Text;
+        Assert.NotNull(t);
+        Assert.Empty(t!.Bindings);
+        Assert.Equal(" ", t.Value);
+
+        child = element.Children[2];
+        Assert.IsType<Text>(child);
+        t = element.Children.Skip(2).First() as Text;
+        Assert.NotNull(t);
+        Assert.Single(t!.Bindings);
+        Assert.Equal("value", t.Bindings[0].TargetPropertyName);
+        Assert.Equal("buttonText2", t.Bindings[0].ModelPropertyName);
+    }
+
+    [Fact]
+    public void Parse_Suim_ModelProperties_CreatesBindingsText3()
+    {
+        var markup = @"<div>@buttonText1 @@text @buttonText2</div>";
+        var (element, _) = MarkupParser.Parse(markup);
+
+        Assert.Equal(3, element.Children.Count);
+
+        var child = element.Children[0];
+        Assert.IsType<Text>(child);
+        var t = element.Children.First() as Text;
+        Assert.NotNull(t);
+        Assert.Single(t!.Bindings);
+        Assert.Equal("value", t.Bindings[0].TargetPropertyName);
+        Assert.Equal("buttonText1", t.Bindings[0].ModelPropertyName);
+
+        child = element.Children[1];
+        Assert.IsType<Text>(child);
+        t = element.Children.Skip(1).First() as Text;
+        Assert.NotNull(t);
+        Assert.Empty(t!.Bindings);
+        Assert.Equal(" @@text ", t.Value);
+
+        child = element.Children[2];
+        Assert.IsType<Text>(child);
+        t = element.Children.Skip(2).First() as Text;
+        Assert.NotNull(t);
+        Assert.Single(t!.Bindings);
+        Assert.Equal("value", t.Bindings[0].TargetPropertyName);
+        Assert.Equal("buttonText2", t.Bindings[0].ModelPropertyName);
     }
 }
