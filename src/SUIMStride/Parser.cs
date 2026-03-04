@@ -1,5 +1,9 @@
 namespace SUIMStride;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Stride.Core.Mathematics;
 using Stride.Core.Serialization.Contents;
 using Stride.Engine;
@@ -7,17 +11,12 @@ using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
+using StrideButton = Stride.UI.Controls.Button;
+using StrideUIElement = Stride.UI.UIElement;
 using SUIM;
 using SUIM.Model;
 using SUIM.Parse;
 using SUIM.Parse.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using static System.Net.Mime.MediaTypeNames;
-using StrideButton = Stride.UI.Controls.Button;
-using StrideUIElement = Stride.UI.UIElement;
 using SUIMElement = SUIM.Parse.Components.UIElement;
 
 public class Parser
@@ -162,14 +161,14 @@ public class Parser
     {
         var btn = new StrideButton();
         
-        if (!string.IsNullOrEmpty(button.MouseOverImage))
+        if (!string.IsNullOrEmpty(button.HoverImage))
         {
-            var loaded = ContentLoader.LoadSprite(ContentManager, button.MouseOverImage, game);
+            var loaded = ContentLoader.LoadSprite(ContentManager, button.HoverImage, game);
             if (loaded != null) btn.MouseOverImage = loaded;
         }
-        if (!string.IsNullOrEmpty(button.NotPressedImage))
+        if (!string.IsNullOrEmpty(button.BackgroundImage))
         {
-            var loaded = ContentLoader.LoadSprite(ContentManager, button.NotPressedImage, game);
+            var loaded = ContentLoader.LoadSprite(ContentManager, button.BackgroundImage, game);
             if (loaded != null) btn.NotPressedImage = loaded;
         }
         if (!string.IsNullOrEmpty(button.PressedImage))

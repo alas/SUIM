@@ -19,7 +19,7 @@
     <style src="Styles/Main.css" />
 
 	<vstack class="container">
-        <button onclick="OpenPopup('Quit', 'Are you sure you want to quit?')">Quit</button>
+		<button onclick="OpenPopup('Quit', 'Are you sure you want to quit?')">Quit</button>
         <button onclick="OpenPopup('Restart', 'Are you sure you want to start over?')">Restart</button>
         <button onclick="OpenPopup('Load', 'Load() Not implemented yet!')">Load</button>
         <button onclick="OpenPopup('Save', 'Save() Not implemented yet!')">Save</button>

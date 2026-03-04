@@ -2,6 +2,11 @@ namespace SUIM.Parse.Components;
 
 using SUIM.Flexbox;
 
+/// <summary>
+/// A layout element that arranges its children in a horizontal or vertical stack, with optional spacing (gap) between them.
+/// Equivalent to a CSS flex container with flex-direction set to row or column. The "orientation" attribute controls the stacking direction, and the "gap" attribute can be used to specify spacing between children.
+/// <div style="display: flex; justify-content: flex-start; align-items: flex-start; flex-direction: column|row;">...</div>
+/// </summary>
 public class Stack() : LayoutElement(nameof(Stack))
 {
     public Orientation Orientation { get; set; } = Orientation.Vertical;

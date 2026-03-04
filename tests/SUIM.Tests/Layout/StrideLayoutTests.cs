@@ -73,7 +73,7 @@ public class StrideLayoutTests
             Assert.Equal(x.Children.Count, y.Children.Count);
             for (int i = 0; i < x.Children.Count; i++)
             {
-                return IsSameLayout(x.Children[i], y.Children[i]);
+                if (!IsSameLayout(x.Children[i], y.Children[i])) return false;
             }
 
             return true;

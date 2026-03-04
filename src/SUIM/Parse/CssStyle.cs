@@ -41,7 +41,7 @@ public static class CssStyle
             foreach (System.Text.RegularExpressions.Match propMatch in propMatches)
             {
                 var propName = propMatch.Groups[1].Value.Trim();
-                var propValue = propMatch.Groups[2].Value.Trim().Trim('"');
+                var propValue = propMatch.Groups[2].Value.Trim();
                 properties[propName] = propValue;
             }
 

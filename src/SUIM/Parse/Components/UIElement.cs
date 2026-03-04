@@ -83,7 +83,7 @@ public abstract class UIElement(string tagName)
         {
             BackgroundColor = value as string ?? value?.ToString();
         }
-        else if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || name.Equals("background-image", StringComparison.OrdinalIgnoreCase))
         {
             BackgroundImage = value as string;
         }
@@ -143,7 +143,7 @@ public abstract class UIElement(string tagName)
         if (name.Equals("id", StringComparison.OrdinalIgnoreCase)) return Id;
         if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase)) return Anchor;
         if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase) || name.Equals("background-color", StringComparison.OrdinalIgnoreCase)) return BackgroundColor;
-        if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase)) return BackgroundImage;
+        if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || name.Equals("background-image", StringComparison.OrdinalIgnoreCase)) return BackgroundImage;
         if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) return Class;
         if (name.Equals("color", StringComparison.OrdinalIgnoreCase)) return Color;
         if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase)) return Opacity;

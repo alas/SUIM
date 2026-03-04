@@ -2044,14 +2044,14 @@ Text after
     [Fact]
     public void Parse_Button_ImageProperties()
     {
-        var markup = "<button mouseoverimage=\"hover.png\" notpressedimage=\"idle.png\" pressedimage=\"down.png\" />";
+        var markup = "<button style=\"hover-image:url(hover.png); background-image:url(idle.png); pressedimage:url(down.png);\" />";
         var (element, _) = MarkupParser.Parse(markup);
 
         Assert.IsType<Button>(element);
         var btn = (Button)element;
-        Assert.Equal("hover.png", btn.MouseOverImage);
-        Assert.Equal("idle.png", btn.NotPressedImage);
-        Assert.Equal("down.png", btn.PressedImage);
+        Assert.Equal("url(hover.png)", btn.HoverImage);
+        Assert.Equal("url(idle.png)", btn.BackgroundImage);
+        Assert.Equal("url(down.png)", btn.PressedImage);
     }
 
     [Fact]
