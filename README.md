@@ -11,9 +11,12 @@ SUIM aims to be familiar to web developers and easy to learn for winforms develo
 
 * ✅ Custom Layout Tags Based on WinForms Box Model (Dock, Stack, Grid)
 * ✅ Flexbox
-* ❌ Grid (maybe later)
 * ❌ float / clear
 * ❌ position: fixed
+
+If the root tag does not declare explicit width/height,
+SUIM computes layout using the current viewport size (window backbuffer, or monitor size in fullscreen mode),
+so the root effectively occupies the whole screen.
 
 #### Styling
 
@@ -31,13 +34,16 @@ SUIM aims to be familiar to web developers and easy to learn for winforms develo
 
 ### The `<div>` Tag
 
-A simple container where children are arranged in a vertical stack by default. It also support flexbox layout.
+A simple container where children are arranged in a vertical stack by default.
+Equivalent to a CSS block-like flex container:
+`display: flex; flex-direction: column; align-items: stretch;`.
 
 ### The `<stack>` Tag
 
 Arranges children sequentially along a single axis.
 
-* **Attributes:** orientation (horizontal, vertical).
+* **Attributes:** orientation (horizontal, vertical), gap.
+* **Gap behavior (current):** `gap` is emulated with child margins during layout (first child gets zero margin on the stacking axis). This matches spacing intent until native Yoga gap support is fully relied on.
 * **Synonyms:**
 * **`<vstack>`**, **`<stackv>`**, **`<stack-v>`** and **`<vbox>`**: Equivalent to `<stack orientation="vertical">`.
 * **`<hstack>`**, **`<stackh>`**, **`<stack-h>`** and **`<hbox>`**: Equivalent to `<stack orientation="horizontal">`.
@@ -84,6 +90,12 @@ Pins children to edges. Mirrors WinForms **DockPanel** behavior.
 ### The `<overlay>` Tag
 
 Forces itself to parent size and intercepts all input.
+
+Implementation details:
+* Uses absolute positioning with `left: 0`, `right: 0`, `top: 0`, `bottom: 0` to cover the parent bounds.
+* Sets `stopclicks = true` by default, so it can block pointer input behind it.
+* Default background color is semi-transparent black (`#80000000`).
+* Layering is order-based (tree/sibling order). There is no `z-index`; to ensure an overlay is visually on top, place it after the content it should cover.
 
 ---
 
@@ -412,13 +424,18 @@ Result in this output:
 
 ## ⚠️ Note: Yoga gotchas
 
-Always set explicit root size (Width, Height)
-
-Use FlexGrow = 1 instead of relying on percentages for fill
-
-Avoid % height deep in the tree unless all ancestors have sizes
-
-If you animate sizes, call CalculateLayout() after changes
+* Root sizing:
+  In SUIM, layout is calculated with the current viewport size. If root width/height are omitted, the root will generally fill the viewport.
+  If you need a smaller root, set explicit `width` and `height`.
+* Fill behavior:
+  Prefer `flex-grow: 1` for "take remaining space" layouts instead of nested percentage sizing.
+* Percentage height chains:
+  `%` height works only when ancestor heights are resolvable.
+  A deep chain of percentage heights can collapse or behave unexpectedly if any ancestor has auto/undefined height.
+* Deep percentage warning:
+  Treat deeply nested `%` heights as high risk; flatten layout or set concrete sizes on intermediate containers.
+* Re-layout after runtime size changes:
+  If you animate or mutate sizes at runtime, call `CalculateLayout()` again so Yoga recomputes positions/sizes.
 
 
 Wood Image from:
