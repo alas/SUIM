@@ -6,8 +6,6 @@ public class Text : UIElement
 
     public string? Value { get; set; }
     public bool Wrap { get; set; }
-    public string? Font { get; set; }
-    public string? FontSize { get; set; }
 
     public Text(string? tagName = null) : base(tagName ?? nameof(Text))
     {
@@ -27,14 +25,6 @@ public class Text : UIElement
         {
             Wrap = value is bool b ? b : Convert.ToBoolean(value);
         }
-        else if (name.Equals("font", StringComparison.OrdinalIgnoreCase))
-        {
-            Font = value as string;
-        }
-        else if (name.Equals("font-size", StringComparison.OrdinalIgnoreCase) || name.Equals("fontsize", StringComparison.OrdinalIgnoreCase))
-        {
-            FontSize = value as string;
-        }
         else
         {
             base.SetAttribute(name, value);
@@ -45,8 +35,8 @@ public class Text : UIElement
     {
         if (name.Equals("value", StringComparison.OrdinalIgnoreCase)) return Value;
         if (name.Equals("wrap", StringComparison.OrdinalIgnoreCase)) return Wrap.ToString();
-        if (name.Equals("font", StringComparison.OrdinalIgnoreCase)) return Font;
-        if (name.Equals("font-size", StringComparison.OrdinalIgnoreCase) || name.Equals("fontsize", StringComparison.OrdinalIgnoreCase)) return FontSize;
+        if (name.Equals("font", StringComparison.OrdinalIgnoreCase)) return Parent!.Font;
+        if (name.Equals("font-size", StringComparison.OrdinalIgnoreCase) || name.Equals("fontsize", StringComparison.OrdinalIgnoreCase)) return Parent!.FontSize;
         return base.GetAttribute(name);
     }
 }

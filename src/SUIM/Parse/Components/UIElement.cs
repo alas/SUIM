@@ -14,6 +14,7 @@ public abstract class UIElement
     public string? ReadOnly { get; set; }
     public string? StopClicks { get; set; }
     public string? BackgroundImage { get; set; }
+    public string? Visibility { get; set; }
 
     // Text related properties (for elements that support text)
     public string? Font { get; set; }
@@ -37,6 +38,8 @@ public abstract class UIElement
             Context = this
         };
     }
+
+    #region Children
 
     public virtual void AddChild(UIElement child, XElement? element)
     {
@@ -65,6 +68,28 @@ public abstract class UIElement
         Node.Children.Clear();
     }
 
+    #endregion
+
+    #region Layout
+    
+    internal virtual void ApplySUIMLayout()
+    {
+        foreach (var child in Children)
+        {
+            child.ApplySUIMLayout();
+        }
+    }
+
+    public void CalculateLayout(float parentWidth, float parentHeight, Direction parentDirection = Direction.LTR)
+    {
+        ApplySUIMLayout();
+        Node.CalculateLayout(parentWidth, parentHeight, parentDirection);
+    }
+
+    #endregion
+
+    #region Attributes
+
     public virtual void SetAttribute(string name, object? value)
     {
         if (name.Equals("style", StringComparison.OrdinalIgnoreCase))
@@ -87,6 +112,10 @@ public abstract class UIElement
         else if (name.Equals("id", StringComparison.OrdinalIgnoreCase))
         {
             Id = value as string;
+        }
+        else if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase))
+        {
+            Visibility = value as string;
         }
         else if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase))
         {
@@ -172,6 +201,7 @@ public abstract class UIElement
         if (name.Equals("readonly", StringComparison.OrdinalIgnoreCase)) return ReadOnly;
         if (name.Equals("font", StringComparison.OrdinalIgnoreCase)) return Font;
         if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase) || name.Equals("font-size", StringComparison.OrdinalIgnoreCase)) return FontSize;
+        if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase)) return Visibility;
 
         if (AllProperties.TryGetValue(name, out var normalized))
         {
@@ -207,20 +237,6 @@ public abstract class UIElement
         if (Model != null) return Model;
         if (IsComponentRoot) return null;
         return Parent?.GetEffectiveModel();
-    }
-
-    internal virtual void ApplySUIMLayout()
-    {
-        foreach (var child in Children)
-        {
-            child.ApplySUIMLayout();
-        }
-    }
-
-    public void CalculateLayout(float parentWidth, float parentHeight, Direction parentDirection = Direction.LTR)
-    {
-        ApplySUIMLayout();
-        Node.CalculateLayout(parentWidth, parentHeight, parentDirection);
     }
 
     public static readonly Dictionary<string, string> AllProperties = new(StringComparer.OrdinalIgnoreCase)
@@ -366,6 +382,8 @@ public abstract class UIElement
             // Direction
             { "direction",                                      "direction" },
         };
+
+    #endregion
 }
 
 public record BindingDefinition(string TargetPropertyName, string ModelPropertyName);

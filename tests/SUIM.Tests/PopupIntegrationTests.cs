@@ -1,18 +1,16 @@
 namespace SUIM.Tests;
 
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 using Stride.Engine;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
-using SUIM.Flexbox;
-using SUIM.Parse.Components;
-using SUIMStride;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
 using StrideButton = Stride.UI.Controls.Button;
 using StrideUIElement = Stride.UI.UIElement;
 using SUIMElement = Parse.Components.UIElement;
+using SUIMStride;
 
 public class PopupIntegrationTests
 {
