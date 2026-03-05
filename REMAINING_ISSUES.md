@@ -15,7 +15,20 @@
 
 
 
-# SUIM Remaining Issues
+
+
+
+## Status: Nice to Have 🟡
+
+
+**Add Validation Warnings**
+- No Yoga gotcha detection
+- Grid auto-placement conflict warnings
+- Warn about Grid auto-placement conflicts
+
+
+
+
 
 ## Status: Major Work Required 🔴
 1. **Grid Component** - Fundamentally broken
@@ -83,7 +96,6 @@ internal override void ApplySUIMLayout()
 - ❌ **Span implementation is incorrect** - uses FlexGrow instead of proper grid spanning
 - ❌ **No true grid layout** - fakes it with nested flex containers
 - ❌ **Auto-placement missing** - children without explicit row/column fall to (0,0)
-- ❌ **No `<row>` or `<column>` helper support** as shown in spec examples
 
 **Mental Model Friction:**
 - **Web developers** expect CSS Grid behavior (auto-placement, fr units, grid-template-areas)
@@ -131,27 +143,10 @@ internal override void ApplySUIMLayout()
 
 
 
-## Status: Nice to Have 🟡
 
-1. Update Specification
-- Clarify Div default behavior
-- Document Grid limitations (flex-based vs true grid)
-- Add Overlay layer rendering details
-- Expand Yoga gotchas section
 
-2. Stack Gap Uses Margin Emulation
 
-3. **Validation Warnings** - No Yoga gotcha detection
-   - Missing root size warnings
-   - Deep percentage height warnings
-   - Grid auto-placement conflict warnings
 
----
-
-Add Validation Warnings
-- Warn about missing root size
-- Warn about deep percentage heights
-- Warn about Grid auto-placement conflicts
 
 
 ## Testing Priorities
