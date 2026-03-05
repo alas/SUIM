@@ -5,7 +5,7 @@ using SUIM.Flexbox;
 /// <summary>
 /// A layout element that arranges its children in a horizontal or vertical stack, with optional spacing (gap) between them.
 /// Equivalent to a CSS flex container with flex-direction set to row or column. The "orientation" attribute controls the stacking direction, and the "gap" attribute can be used to specify spacing between children.
-/// <div style="display: flex; justify-content: flex-start; align-items: flex-start; flex-direction: column|row;">...</div>
+/// <div style="display: flex; justify-content: flex-start; align-items: flex-start; align-self: flex-start; flex-grow: 0; flex-direction: column|row; ">...</div>
 /// </summary>
 public class Stack : LayoutElement
 {
@@ -21,6 +21,8 @@ public class Stack : LayoutElement
         Node.StyleSetDisplay(Display.Flex);
         Node.StyleSetJustifyContent(Justify.FlexStart);
         Node.StyleSetAlignItems(Align.FlexStart);
+        Node.StyleSetAlignSelf(Align.FlexStart);
+        Node.StyleSetFlexGrow(0);
     }
 
     public override void SetAttribute(string name, object? value)

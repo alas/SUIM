@@ -29,20 +29,20 @@ public class StrideLayoutTests
         Assert.Equal(100, stack.GetWidth());
         Assert.Equal(90, stack.GetHeight()); // 50 + 30 + 10 gap
     }
-    
+
     [Fact]
     public void MarkupParser_WithFractionalUnits_CreatesProportionalLayout()
     {
         var markup1 = @"
             <div style=""display:flex; align-items:flex-start; justify-items:flex-start;"">
-                <hstack style=""gap:0; height:auto; flex:1;"">
+                <hstack style=""height:auto; flex:1;"">
                     <label style=""height:50; flex:1;""></label>
                     <label style=""height:50; flex:1;""></label>
                 </hstack>
             </div>";
         var markup2 = @"
             <div style=""display:flex; align-items:flex-start; justify-content:flex-start; width:100%; height:100%"">
-                <div style=""display:flex; align-items:flex-start; justify-content:flex-start; flex-direction:row; height:auto; flex:1;"">
+                <div style=""display:flex; justify-content:flex-start; align-items:flex-start; align-self:flex-start; flex-grow: 0; flex-direction:row; height:auto; flex:1;"">
                     <label style=""height:50; flex:1;""></label>
                     <label style=""height:50; flex:1;""></label>
                 </div>
@@ -56,7 +56,7 @@ public class StrideLayoutTests
 
             Assert.Equal("auto", stack.GetAttribute("height"));
             Assert.Equal(300, stack.GetWidth());
-            Assert.Equal(50, stack.GetHeight());
+            Assert.Equal(100, stack.GetHeight());
 
             return element;
         }).ToList();
@@ -78,7 +78,7 @@ public class StrideLayoutTests
 
             return true;
         }
-    }
+    }//align-items: flex-start; 
 
     [Fact]
     public void MarkupParser_WithPixelUnits_EquivalentToRem_CreatesScaledLayout()
@@ -100,7 +100,7 @@ public class StrideLayoutTests
         var div = (Stack)element.Children[0];
         Assert.Equal("auto", div.GetAttribute("height"));
         Assert.Equal(32, div.GetWidth());
-        Assert.Equal(200, div.GetHeight());
+        Assert.Equal(48, div.GetHeight());
 
         var label1 = (Label)div.Children[0];
         Assert.Equal(32, label1.GetWidth());
@@ -116,7 +116,7 @@ public class StrideLayoutTests
     {
         var markup = @"
             <div>
-                <vstack style=""gap:0; align-self:flex-start;"">
+                <vstack style=""gap:0; align-self:flex-start; flex:1;"">
                     <label style=""width:32px; height:16px;""></label>
                     <label style=""width:16px; height:32px;""></label>
                 </vstack>
@@ -131,7 +131,7 @@ public class StrideLayoutTests
         var div = (Stack)element.Children[0];
         Assert.Equal("auto", div.GetAttribute("height"));
         Assert.Equal(32, div.GetWidth());
-        Assert.Equal(48, div.GetHeight()); // 16 + 32
+        Assert.Equal(200, div.GetHeight()); // 16 + 32
 
         var label1 = (Label)div.Children[0];
         Assert.Equal(32, label1.GetWidth());

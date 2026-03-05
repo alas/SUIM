@@ -64,12 +64,12 @@ public class ContentAlignmentTests
         Assert.Equal("center", div.GetAttribute("justifycontent"));
         Assert.Equal("flex-end", div.GetAttribute("alignitems"));
     }
-    
+
     [Fact]
     public void Overlay_AlignsChildren()
     {
         var markup = """
-            <overlay style="width:500px; height:500px; display:flex; justify-content:center">
+            <overlay style="width:500px; height:500px; display:flex; justify-content:center; align-items:center;">
                 <label style="width:100px; height:50px;"></label>
             </overlay>
             """;
@@ -80,7 +80,7 @@ public class ContentAlignmentTests
         // Center horizontal: (500 - 100) / 2 = 200
         Assert.Equal(200, label.GetLeft());
         // Center vertical: (500 - 50) / 2 = 225
-        Assert.Equal(225, label.GetTop());
+        Assert.Equal(225, label.GetTop()); //fails here, its 0
     }
 
     [Fact]

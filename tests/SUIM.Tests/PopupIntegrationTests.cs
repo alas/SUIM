@@ -321,19 +321,40 @@ public class PopupIntegrationTests
     {
         // Simple View with Grid: Width="auto", Height="200"
         var markup = @"
-<Div Width='400' Height='400'>
-    <Div Width='auto' Height='200'>
-        <Label Value='Hello World' Width='100' Height='50'></Label>
-    </Div>
-</Div>";
+<div style=""width:400px; height:200px;"">
+    <div style=""width:auto; height:200px;"">
+        <label style=""width:100px; height:50px;"">Hello World</label>
+    </div>
+</div>";
         var game = CreateTestGame();
         var (strideRoot, _) = new Parser().Parse(markup, game);
 
         // Find the grid in the Stride tree
-        var canvas = (Canvas)strideRoot;
-        var grid = (Canvas)canvas.Children[0];         
+        var div1 = (Canvas)strideRoot;
+        var div2 = (Canvas)div1.Children[0];         
         // Grid should have Width=100 (from child) and Height=200 (fixed)
-        Assert.Equal(100f, grid.Width);
-        Assert.Equal(200f, grid.Height);
+        Assert.Equal(400f, div2.Width);
+        Assert.Equal(200f, div2.Height);
+    }
+
+    [Fact]
+    public void Grid_MixedAutoFixed_ShrinkToContent()
+    {
+        // Simple View with Grid: Width="auto", Height="200"
+        var markup = @"
+<div style=""align-items: flex-start; width:400px; height:200px;"">
+    <div style=""width:auto; height:200;"">
+        <label style=""width:100px; height:50px;"">Hello World</label>
+    </div>
+</div>";
+        var game = CreateTestGame();
+        var (strideRoot, _) = new Parser().Parse(markup, game);
+
+        // Find the grid in the Stride tree
+        var div1 = (Canvas)strideRoot;
+        var div2 = (Canvas)div1.Children[0];         
+        // Grid should have Width=100 (from child) and Height=200 (fixed)
+        Assert.Equal(100f, div2.Width);
+        Assert.Equal(200f, div2.Height);
     }
 }

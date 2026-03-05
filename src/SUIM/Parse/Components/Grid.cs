@@ -141,8 +141,8 @@ public class Grid() : LayoutElement(nameof(Grid))
         {
             gridChild.Row = ParseIntAttribute(element, "grid.row");
             gridChild.Column = ParseIntAttribute(element, "grid.column");
-            gridChild.RowSpan = ParseIntAttribute(element, "grid.rowspan");
-            gridChild.ColumnSpan = ParseIntAttribute(element, "grid.columnspan");
+            gridChild.RowSpan = ParseIntAttribute(element, "grid.rowspan", 1);
+            gridChild.ColumnSpan = ParseIntAttribute(element, "grid.columnspan", 1);
         }
 
         GridChildren.Add(gridChild);
