@@ -18,18 +18,6 @@
 
 
 
-## Status: Nice to Have 🟡
-
-
-**Add Validation Warnings**
-- No Yoga gotcha detection
-- Grid auto-placement conflict warnings
-- Warn about Grid auto-placement conflicts
-
-
-
-
-
 ## Status: Major Work Required 🔴
 1. **Grid Component** - Fundamentally broken
    - ❌ Uses FlexGrow for spanning (doesn't actually span cells)

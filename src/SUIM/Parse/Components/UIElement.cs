@@ -75,16 +75,38 @@ public abstract class UIElement
     
     internal virtual void ApplySUIMLayout()
     {
-        // TODO: Warn about deep percentage heights
-        //if (HasPercentageHeight() && GetDepth() > 3)
-        //{
-        //    Console.WriteLine("WARNING: Percentage heights deep in tree may not work");
-        //}
+        ValidateLayout();
 
         foreach (var child in Children)
         {
             child.ApplySUIMLayout();
         }
+    }
+
+    private void ValidateLayout()
+    {
+        // Warn about deep percentages
+        var attrs = new string[] { "width", "height" };
+        foreach (var attr in attrs)
+        {
+            var attrValue = GetAttribute(attr);
+            if (attrValue?.Contains('%') == true && GetDepth() > 3)
+            {
+                Console.WriteLine($"WARNING: <{TagName}> uses percentage {attr} at depth {GetDepth()}. Deep percentage {attr}s may not work correctly.");
+            }
+        }
+    }
+
+    private int GetDepth()
+    {
+        int depth = 0;
+        var current = Parent;
+        while (current != null)
+        {
+            depth++;
+            current = current.Parent;
+        }
+        return depth;
     }
 
     public void CalculateLayout(float parentWidth, float parentHeight, Direction parentDirection = Direction.LTR)

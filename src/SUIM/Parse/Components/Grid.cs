@@ -14,6 +14,8 @@ public class Grid() : LayoutElement(nameof(Grid))
 
     internal override void ApplySUIMLayout()
     {
+        ValidateGridPlacement();
+
         foreach (var child in Node.Children.ToList())
         {
             Flex.RemoveChild(Node, child);
@@ -127,6 +129,26 @@ public class Grid() : LayoutElement(nameof(Grid))
         return [.. parts.Select(x => Flex.ParseValueFromString(x, out var v) ? v : Value.UndefinedValue)];
     }
 
+    private void ValidateGridPlacement()
+    {
+        var cellOccupancy = new HashSet<(int row, int col)>();
+
+        foreach (var gridChild in GridChildren)
+        {
+            // Check for overlaps
+            for (int r = gridChild.Row; r < gridChild.Row + gridChild.RowSpan; r++)
+            {
+                for (int c = gridChild.Column; c < gridChild.Column + gridChild.ColumnSpan; c++)
+                {
+                    if (!cellOccupancy.Add((r, c)))
+                    {
+                        Console.WriteLine($"WARNING: Grid cell ({r},{c}) is occupied by multiple children. This will cause overlap.");
+                    }
+                }
+            }
+        }
+    }
+
     #endregion
 
     #region Children
@@ -139,16 +161,16 @@ public class Grid() : LayoutElement(nameof(Grid))
 
         if (element != null)
         {
-            gridChild.Row = ParseIntAttribute(element, "grid.row");
-            gridChild.Column = ParseIntAttribute(element, "grid.column");
-            gridChild.RowSpan = ParseIntAttribute(element, "grid.rowspan", 1);
-            gridChild.ColumnSpan = ParseIntAttribute(element, "grid.columnspan", 1);
+            gridChild.Row = ParseIntAttribute(element, "grid.row", child);
+            gridChild.Column = ParseIntAttribute(element, "grid.column", child);
+            gridChild.RowSpan = ParseIntAttribute(element, "grid.rowspan", child);
+            gridChild.ColumnSpan = ParseIntAttribute(element, "grid.columnspan", child);
         }
 
         GridChildren.Add(gridChild);
     }
 
-    private static int ParseIntAttribute(XElement element, string attributeName, int defaultValue = 0)
+    private static int ParseIntAttribute(XElement element, string attributeName, UIElement child, int defaultValue = 0)
     {
         var attr = element.Attribute(attributeName);
         if (attr != null)
@@ -162,6 +184,7 @@ public class Grid() : LayoutElement(nameof(Grid))
         }
 
         // todo: get next available row/column[span] index if not specified, for now just default to 0
+        Console.WriteLine($"WARNING: Grid child <{child.TagName}> has no grid.row/grid.column. Defaulting to (0,0) may cause overlap.");
         return defaultValue;
     }
 
