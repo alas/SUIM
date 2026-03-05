@@ -29,20 +29,20 @@ SUIM aims to be familiar to web developers and easy to learn for winforms develo
 
 ## Structural and Layout Tags
 
-### The <div> Tag
+### The `<div>` Tag
 
 A simple container where children are arranged in a vertical stack by default. It also support flexbox layout.
 
-### The <stack> Tag
+### The `<stack>` Tag
 
 Arranges children sequentially along a single axis.
 
 * **Attributes:** orientation (horizontal, vertical).
 * **Synonyms:**
-* **<vstack>**, **<stackv>**, **<stack-v>** and **<vbox>**: Equivalent to <stack orientation="vertical">.
-* **<hstack>**, **<stackh>**, **<stack-h>** and **<hbox>**: Equivalent to <stack orientation="horizontal">.
+* **`<vstack>`**, **`<stackv>`**, **`<stack-v>`** and **`<vbox>`**: Equivalent to `<stack orientation="vertical">`.
+* **`<hstack>`**, **`<stackh>`**, **`<stack-h>`** and **`<hbox>`**: Equivalent to `<stack orientation="horizontal">`.
 
-### The <grid> Tag
+### The `<grid>` Tag
 
 Divides space into a matrix.
 
@@ -56,7 +56,7 @@ Divides space into a matrix.
 	<div grid.row="1" grid.column="0" grid.columnspan="2" bg="white" />
 </grid>
 
-**Example 2: Using <row>**
+**Example 2: Using `<row>`**
 <grid>
 	<row height="500px">
 		<div width="100" bg="blue" />
@@ -65,7 +65,7 @@ Divides space into a matrix.
 	</row>
 </grid>
 
-**Example 3: Using <column>**
+**Example 3: Using `<column>`**
 <grid columns="200, auto">
 	<column>
 		<div height="100" bg="blue" />
@@ -74,14 +74,14 @@ Divides space into a matrix.
 	</column>
 </grid>
 
-### The <dock> Tag
+### The `<dock>` Tag
 
 Pins children to edges. Mirrors WinForms **DockPanel** behavior.
 
 * **Attributes:** lastchildfill (default true).
 * **Child Logic:** dock.edge (left, right, top, bottom).
 
-### The <overlay> Tag
+### The `<overlay>` Tag
 
 Forces itself to parent size and intercepts all input. **Overlays always render on the highest global layer**.
 
@@ -89,7 +89,7 @@ Forces itself to parent size and intercepts all input. **Overlays always render 
 
 ## Content Tags
 
-### The <button> Tag
+### The `<button>` Tag
 
 Interactive element for triggering actions.
 
@@ -98,7 +98,7 @@ Interactive element for triggering actions.
 * `pressed`: `string` - The sprite for "Pressed" state.
 * `onclick`: `string` - Method name in the model to call.
 
-### The <input> Tag
+### The `<input>` Tag
 
 Data entry field.
 
@@ -109,15 +109,15 @@ Data entry field.
 * `min`: `integer` - min for number slider.
 * `max`: `integer` - max for number slider.
 
-### The <textarea> Tag
+### The `<textarea>` Tag
 
 Multi-line text input for long content.
 
-### The <select> and <option> Tags
+### The `<select>` and `<option>` Tags
 
 Dropdown menu. Supports **multiple** selection attribute.
 
-### The <label> Tag
+### The `<label>` Tag
 
 Text Display.
 
@@ -127,7 +127,7 @@ Text Display.
 * `color`: `Color` - Text color.
 * `wrap`: `bool` - Enable word wrapping.
 
-### The <image> Tag
+### The `<image>` Tag
 
 Graphic Display.
 
