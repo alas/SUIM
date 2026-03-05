@@ -7,9 +7,21 @@ using SUIM.Flexbox;
 /// Equivalent to a CSS flex container with flex-direction set to row or column. The "orientation" attribute controls the stacking direction, and the "gap" attribute can be used to specify spacing between children.
 /// <div style="display: flex; justify-content: flex-start; align-items: flex-start; flex-direction: column|row;">...</div>
 /// </summary>
-public class Stack() : LayoutElement(nameof(Stack))
+public class Stack : LayoutElement
 {
-    public Orientation Orientation { get; set; } = Orientation.Vertical;
+    public Orientation Orientation { get;
+        set
+        {
+            field = value;
+            Node.StyleSetFlexDirection(value == Orientation.Horizontal ? FlexDirection.Row : FlexDirection.Column);
+        } } = Orientation.Vertical;
+
+    public Stack() : base(nameof(Stack))
+    {
+        Node.StyleSetDisplay(Display.Flex);
+        Node.StyleSetJustifyContent(Justify.FlexStart);
+        Node.StyleSetAlignItems(Align.FlexStart);
+    }
 
     public override void SetAttribute(string name, object? value)
     {
@@ -39,11 +51,6 @@ public class Stack() : LayoutElement(nameof(Stack))
 
     internal override void ApplySUIMLayout()
     {
-        Node.StyleSetDisplay(Display.Flex);
-        Node.StyleSetJustifyContent(Justify.FlexStart);
-        Node.StyleSetAlignItems(Align.FlexStart);
-        Node.StyleSetFlexDirection(Orientation == Orientation.Horizontal ? FlexDirection.Row : FlexDirection.Column);
-
         if (Gap != null && Flex.ParseValueFromString(Gap, out var gap))
         {
             // Yoga added gap support later; if your version doesn't support Gap,

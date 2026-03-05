@@ -8,10 +8,7 @@ public class Overlay : LayoutElement
     {
         StopClicks = "true";
         BackgroundColor = "#80000000";
-    }
 
-    internal override void ApplySUIMLayout()
-    {
         Node.StyleSetPositionType(PositionType.Absolute);
         Node.StyleSetPosition(Edge.Left, 0);
         Node.StyleSetPosition(Edge.Right, 0);
@@ -19,7 +16,5 @@ public class Overlay : LayoutElement
         Node.StyleSetPosition(Edge.Bottom, 0);
         Node.StyleSetJustifyContent(Justify.Center);
         Node.StyleSetAlignItems(Align.Center);
-
-        base.ApplySUIMLayout();
     }
 }
