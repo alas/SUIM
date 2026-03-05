@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SUIM\SUIM.csproj" />
+    <PackageReference Include="Stride.Engine" Version="4.3.0.2507" />
+    <PackageReference Include="Stride.UI" Version="4.3.0.2507" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Stride.Engine" Version="4.3.0.2507" />
-    <PackageReference Include="Stride.UI" Version="4.3.0.2507" />
+    <ProjectReference Include="..\SUIM\SUIM.csproj" />
   </ItemGroup>
 
 </Project>

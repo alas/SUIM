@@ -1,10 +1,10 @@
 namespace SUIM.Model;
 
-using SUIM.Parse.Components;
 using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
+using SUIM.Parse.Components;
 
 public class ObservableObject : DynamicObject, INotifyPropertyChanged
 {

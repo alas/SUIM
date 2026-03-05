@@ -46,7 +46,10 @@ public class BoardManager : SyncScript
         DropPiece();
     }
 
-    public static BoardManager GetInstance() => Instance;
+    public static BoardManager GetInstance()
+    {
+        return Instance;
+    }
 
     public void InitBoard()
     {

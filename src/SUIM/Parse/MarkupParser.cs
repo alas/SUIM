@@ -47,7 +47,7 @@ public static partial class MarkupParser
                     if (!string.IsNullOrEmpty(text))
                     {
                         UIElement textElement = new Text { Value = text };
-                        if (styles.Count > 0) textElement = Style.ApplyToElement(textElement, styles);
+                        if (styles.Count > 0) textElement = CssStyle.ApplyToElement(textElement, styles);
                         element.AddChild(textElement, root);
                     }
                 }
@@ -85,15 +85,15 @@ public static partial class MarkupParser
                 }
 
                 var content = File.ReadAllText(stylePath);
-                Style.Parse(content, styles);
-                if (!isScoped) Style.Parse(content, leakableStyles);
+                CssStyle.Parse(content, styles);
+                if (!isScoped) CssStyle.Parse(content, leakableStyles);
             }
 
             var styleContent = element.Value.Trim();
             if (!string.IsNullOrEmpty(styleContent))
             {
-                Style.Parse(styleContent, styles);
-                if (!isScoped) Style.Parse(styleContent, leakableStyles);
+                CssStyle.Parse(styleContent, styles);
+                if (!isScoped) CssStyle.Parse(styleContent, leakableStyles);
             }
         }
     }
@@ -121,9 +121,6 @@ public static partial class MarkupParser
             {
                 scroll.Direction = dir;
             }
-            // If the inner element was unspecified, change it to auto when wrapped by a scroll-viewport.
-            rootElement.Width ??= "auto";
-            rootElement.Height ??= "auto";
 
             scroll.AddChild(rootElement, element);
             rootElement = scroll;
@@ -133,10 +130,6 @@ public static partial class MarkupParser
         {
             var border = new Border();
             border.SetAttribute("border", borderAttr.Value);
-            // Similar behavior for border wrapper: inner element should become `auto` for sizing if it was unspecified.
-            rootElement.Width ??= "auto";
-            rootElement.Height ??= "auto";
-
             border.AddChild(rootElement, element);
             rootElement = border;
         }
@@ -145,9 +138,6 @@ public static partial class MarkupParser
         {
             var bg = new BackgroundImage();
             bg.SetAttribute("backgroundimage", bgAttr.Value);
-            rootElement.Width ??= "auto";
-            rootElement.Height ??= "auto";
-
             bg.AddChild(rootElement, element);
             rootElement = bg;
         }
@@ -222,12 +212,32 @@ public static partial class MarkupParser
                     var text = textNode.Value.Trim();
                     if (!string.IsNullOrEmpty(text))
                     {
-                        UIElement textElement = new Text { Value = text };
-                        if (styles != null && styles.Count > 0)
+                        List<string> chunks = [text];
+                        if (text.Contains('@'))
                         {
-                            textElement = Style.ApplyToElement(textElement, styles);
+                            chunks = SplitAtSingleAtTokens(text);
                         }
-                        innerElement.AddChild(textElement, element);
+
+                        if (chunks.Count > 0)
+                        {
+                            // Mixed static text and dynamic tokens: "Hello @name!" -> ["Hello ", "@name", "!"]
+                            foreach (var chunk in chunks)
+                            {
+                                UIElement textElement = new Text() { Value = chunk, Font = innerElement.Font, FontSize = innerElement.FontSize };
+                                if (chunk.Length > 1 && chunk.StartsWith('@') && !chunk.StartsWith("@@"))
+                                {
+                                    var modelPropName = chunk[1..];
+                                    textElement.Bindings.Add(new BindingDefinition("value", modelPropName));
+                                }
+
+                                if (styles != null && styles.Count > 0)
+                                {
+                                    textElement = CssStyle.ApplyToElement(textElement, styles);
+                                }
+
+                                innerElement.AddChild(textElement, null);
+                            }
+                        }
                     }
                 }
                 else if (node is XElement childXElement)
@@ -247,7 +257,7 @@ public static partial class MarkupParser
 
         if (styles != null && styles.Count > 0)
         {
-            rootElement = Style.ApplyToElement(rootElement, styles);
+            rootElement = CssStyle.ApplyToElement(rootElement, styles);
         }
 
         foreach (var attr in attributes)
@@ -269,7 +279,7 @@ public static partial class MarkupParser
     private static void SetAttribute(XAttribute attr, UIElement rootElement, UIElement innerElement)
     {
         var name = attr.Name.LocalName;
-        var target = IsLayoutAttribute(name) ? rootElement : innerElement;
+        var target = CssStyle.IsLayoutAttribute(name) ? rootElement : innerElement;
 
         // Store raw attribute for CustomComponent expansion or other metadata
         var value = attr.Value;
@@ -289,19 +299,6 @@ public static partial class MarkupParser
             var modelPropName = value[1..];
             target.Bindings.Add(new BindingDefinition(name, modelPropName));
         }
-    }
-
-    private static readonly HashSet<string> LayoutAttributeNames = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "id", "width", "height", "padding", "margin",
-        "justify-self", "align-self",
-        "visibility", "opacity", "background", "bg", "class",
-        "left", "top", "z-index", "anchor"
-    };
-
-    private static bool IsLayoutAttribute(string name)
-    {
-        return LayoutAttributeNames.Contains(name);
     }
 
     private static readonly HashSet<string> StyleApplicationAttributeNames = new(StringComparer.OrdinalIgnoreCase)
@@ -331,7 +328,6 @@ public static partial class MarkupParser
         if (tag.Equals("border", StringComparison.OrdinalIgnoreCase)) return new Border();
         
         // Content tags
-        if (tag.Equals("label", StringComparison.OrdinalIgnoreCase)) return new Label();
         if (tag.Equals("button", StringComparison.OrdinalIgnoreCase)) return new Button();
         if (tag.Equals("image", StringComparison.OrdinalIgnoreCase) || tag.Equals("img", StringComparison.OrdinalIgnoreCase)) return new Image();
         if (tag.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || tag.Equals("bg", StringComparison.OrdinalIgnoreCase)) return new BackgroundImage();
@@ -339,6 +335,16 @@ public static partial class MarkupParser
         if (tag.Equals("select", StringComparison.OrdinalIgnoreCase)) return new Select();
         if (tag.Equals("option", StringComparison.OrdinalIgnoreCase)) return new Option();
         if (tag.Equals("textarea", StringComparison.OrdinalIgnoreCase)) return new TextArea();
+        if (tag.Equals("label", StringComparison.OrdinalIgnoreCase)) return new Label();
+        if (tag.Equals("p", StringComparison.OrdinalIgnoreCase)) return new P();
+        if (tag.Equals("h1", StringComparison.OrdinalIgnoreCase)) return new H1();
+        if (tag.Equals("h2", StringComparison.OrdinalIgnoreCase)) return new H2();
+        if (tag.Equals("h3", StringComparison.OrdinalIgnoreCase)) return new H3();
+        if (tag.Equals("h4", StringComparison.OrdinalIgnoreCase)) return new H4();
+        if (tag.Equals("h5", StringComparison.OrdinalIgnoreCase)) return new H5();
+        if (tag.Equals("h6", StringComparison.OrdinalIgnoreCase)) return new H6();
+        if (tag.Equals("h7", StringComparison.OrdinalIgnoreCase)) return new H7();
+        if (tag.Equals("h8", StringComparison.OrdinalIgnoreCase)) return new H8();
         
         // Special tags
         if (tag.Equals("style", StringComparison.OrdinalIgnoreCase)) return null;
@@ -351,5 +357,62 @@ public static partial class MarkupParser
         }
 
         throw new NotSupportedException($"Unknown tag: {element.Name.LocalName}");
+    }
+
+    private static List<string> SplitAtSingleAtTokens(ReadOnlySpan<char> input)
+    {
+        var result = new List<string>();
+
+        int i = 0;
+        int segmentStart = 0;
+
+        while (i < input.Length)
+        {
+            // Escaped @@ → normal text
+            if (i + 1 < input.Length && input[i] == '@' && input[i + 1] == '@')
+            {
+                i += 2;
+                continue;
+            }
+
+            // Single @ that forms a valid token (@ + non-whitespace)
+            if (input[i] == '@' &&
+                i + 1 < input.Length &&
+                !char.IsWhiteSpace(input[i + 1]))
+            {
+                // Flush preceding text
+                if (i > segmentStart)
+                {
+                    result.Add(input[segmentStart..i].ToString());
+                }
+
+                int tokenStart = i;
+                i++; // skip '@'
+
+                while (i < input.Length && !char.IsWhiteSpace(input[i]))
+                {
+                    // Stop if escaped @@ appears
+                    if (i + 1 < input.Length && input[i] == '@' && input[i + 1] == '@')
+                        break;
+
+                    i++;
+                }
+
+                result.Add(input[tokenStart..i].ToString());
+
+                segmentStart = i;
+                continue;
+            }
+
+            i++;
+        }
+
+        // Flush remaining text
+        if (segmentStart < input.Length)
+        {
+            result.Add(input[segmentStart..].ToString());
+        }
+
+        return result;
     }
 }

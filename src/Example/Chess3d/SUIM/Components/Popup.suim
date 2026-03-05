@@ -8,35 +8,18 @@
 		"visibility": null
 	}
 	</model>
-	<style>
-	.wood-panel {
-		width: 500px;
-		height: 220px;
-		gap: 8px;
-		padding: 12px;
-		justify-self: center;
-		align-items: center;
-		backgroundimage: "Assets/seamless-texture-wood-old-oak-small2.jpg";
-		shadow: 0 8 16 rgba(0,0,0,0.5);
-	}
-	.hstack2 {
-		gap: 10;
-		justify-self: center;
-	}
-	</style>
-
-    <overlay visibility="@visibility">
-			<vstack class="wood-panel">
-				<hstack>
-					<label value="@title" />
-				</hstack>
-				<vstack margin="6" scroll="auto">
-					<label value="@message" />
-				</vstack>
-				<hstack class="hstack2">
-					<button onclick="@onYes">YES</button>
-					<button onclick="@onNo">NO</button>
-				</hstack>
+    <overlay visibility="@visibility" class="centeredcontent">
+		<vstack class="wood-panel centeredcontent">
+			<hstack>
+				<h1 value="@title"></h1>
+			</hstack>
+			<vstack margin="6" scroll="auto" class="centeredcontent">
+				<h3 value="@message"></h3>
+			</vstack>
+			<hstack class="hstack2 centeredcontent">
+				<button onclick="@onYes">YES</button>
+				<button onclick="@onNo">NO</button>
+			</hstack>
 		</vstack>
     </overlay>
 </popup>

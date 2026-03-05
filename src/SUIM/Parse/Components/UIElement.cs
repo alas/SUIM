@@ -1,81 +1,60 @@
 namespace SUIM.Parse.Components;
 
 using System.Xml.Linq;
-using SUIM.Parse.Components.Attributes;
+using SUIM.Flexbox;
 
-public abstract class UIElement(string tagName)
+public abstract class UIElement
 {
     public string? Id { get; set; }
     public string? Class { get; set; }
-    public string? JustifySelf { get; set; }
-    public string? JustifyItems { get; set; }
-    public string? JustifyContent { get; set; }
-    public string? AlignSelf { get; set; }
-    public string? AlignItems { get; set; }
-    public string? AlignContent { get; set; }
-    public string? Top { get; set; }
-    public string? Left { get; set; }
-    public string? Bottom { get; set; }
-    public string? Right { get; set; }
-    public string? Width { get; set; }
-    public string? Height { get; set; }
-    public string? Margin { get; set; }
-    public string? Padding { get; set; }
-    public string? Font { get; set; }
-    public string? FontSize { get; set; }
     public string? Anchor { get; set; }
     public string? Color { get; set; }
     public string? BackgroundColor { get; set; }
     public string? Opacity { get; set; }
-    public string? ZIndex { get; set; }
-    public string? Visibility { get; set; } = "visible";
     public string? ReadOnly { get; set; }
     public string? StopClicks { get; set; }
     public string? BackgroundImage { get; set; }
+    public string? Visibility { get; set; }
+
+    // Text related properties (for elements that support text)
+    public string? Font { get; set; }
+    public string? FontSize { get; set; }
 
     // Internal properties to the engine - not directly settable via markup attributes
-    public string TagName { get; } = tagName.ToLowerInvariant();
+    public string TagName { get; }
+    public bool IsComponentRoot { get; set; }
     public UIElement? Parent { get; set; }
-    public string? RootFont { get; set; }
-    public float RootFontSize { get; set; } = float.NaN;
+    public List<UIElement> Children { get; } = [];
     public List<BindingDefinition> Bindings { get; } = [];
     public dynamic? Model { get; set; }
-    public bool IsComponentRoot { get; set; }
     public Dictionary<string, string> Events { get; set; } = [];
-    public List<UIElement> Children { get; } = [];
-    public Dictionary<string, object?> Attributes { get; } = [];
+    internal Node Node { get; }
 
-    // Actual layout properties calculated during measurement/arrangement
-    public float ActualX { get; set; } = float.NaN;
-    public float ActualY { get; set; } = float.NaN;
-    public float ActualWidth { get; set; } = float.NaN;
-    public float ActualHeight { get; set; } = float.NaN;
+    public UIElement(string tagName)
+    {
+        TagName = tagName.ToLowerInvariant();
+        Node = new Node
+        {
+            Context = this
+        };
+    }
 
-    // Layout calculation properties (transient, used during measurement/positioning)
-    public float MeasuredContentWidth { get; set; }
-    public float MeasuredContentHeight { get; set; }
-    public float ComputedMarginLeft { get; set; }
-    public float ComputedMarginTop { get; set; }
-    public float ComputedMarginRight { get; set; }
-    public float ComputedMarginBottom { get; set; }
-    public float ComputedPaddingLeft { get; set; }
-    public float ComputedPaddingTop { get; set; }
-    public float ComputedPaddingRight { get; set; }
-    public float ComputedPaddingBottom { get; set; }
-    public float CurrentFontSize { get; set; }
-    public bool NeedsVerticalScroll { get; set; }
-    public bool NeedsHorizontalScroll { get; set; }
+    #region Children
 
     public virtual void AddChild(UIElement child, XElement? element)
     {
         child.Parent = this;
         Children.Add(child);
+
+        Node.AddChild(child.Node);
     }
 
     public virtual void RemoveChild(UIElement child)
     {
         child.Parent = null;
         Children.Remove(child);
+
+        Node.RemoveChild(child.Node);
     }
 
     public virtual void ClearChildren()
@@ -85,190 +64,172 @@ public abstract class UIElement(string tagName)
             child.Parent = null;
         }
         Children.Clear();
+
+        Node.Children.Clear();
     }
+
+    #endregion
+
+    #region Layout
+    
+    internal virtual void ApplySUIMLayout()
+    {
+        foreach (var child in Children)
+        {
+            child.ApplySUIMLayout();
+        }
+    }
+
+    public void CalculateLayout(float parentWidth, float parentHeight, Direction parentDirection = Direction.LTR)
+    {
+        ApplySUIMLayout();
+        Node.CalculateLayout(parentWidth, parentHeight, parentDirection);
+    }
+
+    #endregion
+
+    #region Attributes
 
     public virtual void SetAttribute(string name, object? value)
     {
-        if (name.Equals("id", StringComparison.OrdinalIgnoreCase))
+        if (name.Equals("style", StringComparison.OrdinalIgnoreCase))
+        {
+            if (value is string s)
+            {
+                var stylePairs = s.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var pair in stylePairs)
+                {
+                    var kv = pair.Split(':', 2);
+                    if (kv.Length == 2)
+                    {
+                        var key = kv[0].Trim();
+                        var val = kv[1].Trim();
+                        SetAttribute(key, val);
+                    }
+                }
+            }
+        }
+        else if (name.Equals("id", StringComparison.OrdinalIgnoreCase))
         {
             Id = value as string;
-        }
-        else if (name.Equals("top", StringComparison.OrdinalIgnoreCase))
-        {
-            Top = value as string;
-        }
-        else if (name.Equals("left", StringComparison.OrdinalIgnoreCase))
-        {
-            Left = value as string;
-        }
-        else if (name.Equals("bottom", StringComparison.OrdinalIgnoreCase))
-        {
-            Bottom = value as string;
-        }
-        else if (name.Equals("right", StringComparison.OrdinalIgnoreCase))
-        {
-            Right = value as string;
-        }
-        else if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase))
-        {
-            Opacity = value as string;
-        }
-        else if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase) || name.Equals("zindex", StringComparison.OrdinalIgnoreCase))
-        {
-            ZIndex = value as string;
         }
         else if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase))
         {
             Visibility = value as string;
         }
-        else if (name.Equals("justify-self", StringComparison.OrdinalIgnoreCase) || name.Equals("justifyself", StringComparison.OrdinalIgnoreCase))
-        {
-            JustifySelf = value as string;
-        }
-        else if (name.Equals("justify-items", StringComparison.OrdinalIgnoreCase) || name.Equals("justifyitems", StringComparison.OrdinalIgnoreCase))
-        {
-            JustifyItems = value as string;
-        }
-        else if (name.Equals("justify-content", StringComparison.OrdinalIgnoreCase) || name.Equals("justifycontent", StringComparison.OrdinalIgnoreCase))
-        {
-            JustifyContent = value as string;
-        }
-        else if (name.Equals("align-self", StringComparison.OrdinalIgnoreCase) || name.Equals("alignself", StringComparison.OrdinalIgnoreCase))
-        {
-            AlignSelf = value as string;
-        }
-        else if (name.Equals("align-items", StringComparison.OrdinalIgnoreCase) || name.Equals("alignitems", StringComparison.OrdinalIgnoreCase))
-        {
-            AlignItems = value as string;
-        }
-        else if (name.Equals("align-content", StringComparison.OrdinalIgnoreCase) || name.Equals("aligncontent", StringComparison.OrdinalIgnoreCase))
-        {
-            AlignContent = value as string;
-        }
-        else if (name.Equals("margin", StringComparison.OrdinalIgnoreCase))
-        {
-            Margin = value as string;
-        }
-        else if (name.Equals("padding", StringComparison.OrdinalIgnoreCase))
-        {
-            Padding = value as string;
-        }
-        else if (name.Equals("width", StringComparison.OrdinalIgnoreCase))
-        {
-            Width = value as string;
-        }
-        else if (name.Equals("height", StringComparison.OrdinalIgnoreCase))
-        {
-            Height = value as string;
-        }
         else if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase))
         {
-            var s = value as string;
             Anchor = value as string;
-        }
-        else if (name.Equals("class", StringComparison.OrdinalIgnoreCase))
-        {
-            Class = value as string;
-        }
-        else if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
-        {
-            var handlerName = value as string;
-            // Treat only known event attributes (e.g., onclick) as events. Attributes that simply start with "on" but
-            // are intended as component properties (like "onbuttonclick") should be preserved as regular attributes.
-            var eventName = name[2..];
-            if (string.Equals(eventName, "click", StringComparison.OrdinalIgnoreCase))
-            {
-                Events[eventName] = handlerName ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
-            }
-            else
-            {
-                // Preserve as regular attribute for components or custom usage
-                Attributes[name] = value;
-            }
-        }
-        else if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase))
-        {
-            (this as IPlaceholder)?.Placeholder = value as string;
-        }
-        else if (name.Equals("font", StringComparison.OrdinalIgnoreCase))
-        {
-            Font = value as string;
-        }
-        else if (name.Equals("font-size", StringComparison.OrdinalIgnoreCase) || name.Equals("fontsize", StringComparison.OrdinalIgnoreCase))
-        {
-            FontSize = value as string;
-        }
-        else if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
-        {
-            Color = value as string;
         }
         else if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase))
         {
             BackgroundColor = value as string ?? value?.ToString();
         }
-        else if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || name.Equals("background-image", StringComparison.OrdinalIgnoreCase))
         {
             BackgroundImage = value as string;
+        }
+        else if (name.Equals("class", StringComparison.OrdinalIgnoreCase))
+        {
+            Class = value as string;
+        }
+        else if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
+        {
+            Color = value as string;
+        }
+        else if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase))
+        {
+            Opacity = value as string;
+        }
+        else if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
+        {
+            var handlerName = value as string;
+            var eventName = name[2..];
+            Events[eventName] = handlerName ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+        }
+        else if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase))
+        {
+            (this as IPlaceholder)?.Placeholder = value as string;
         }
         else if (name.Equals("readonly", StringComparison.OrdinalIgnoreCase))
         {
             ReadOnly = value as string;
         }
-        else if (name.Equals("stopclicks", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("font", StringComparison.OrdinalIgnoreCase))
         {
-            StopClicks = value as string;
+            Font = value as string;
+        }
+        else if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase) || name.Equals("font-size", StringComparison.OrdinalIgnoreCase))
+        {
+            FontSize = value as string;
         }
         else if (name.Contains('.'))
         {
             // ignore parent properties
         }
+        else if (value is string s)
+        {
+            if (s.StartsWith('@'))
+            {
+                // ignore
+            }
+            else if (AllProperties.TryGetValue(name, out var normalized))
+            {
+                Node.nodeStyle[normalized] = s;
+            }
+            else
+            {
+                Console.WriteLine($"Not recognized property: ${s}");
+            }
+        }
         else
         {
-            Attributes[name] = value;
+            Console.WriteLine($"Not string property value: ${value}");
         }
     }
 
     public virtual string? GetAttribute(string name)
     {
         if (name.Equals("id", StringComparison.OrdinalIgnoreCase)) return Id;
-        if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) return Class;
-        if (name.Equals("top", StringComparison.OrdinalIgnoreCase)) return Top;
-        if (name.Equals("left", StringComparison.OrdinalIgnoreCase)) return Left;
-        if (name.Equals("bottom", StringComparison.OrdinalIgnoreCase)) return Bottom;
-        if (name.Equals("right", StringComparison.OrdinalIgnoreCase)) return Right;
-        if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase)) return Opacity;
-        if (name.Equals("z-index", StringComparison.OrdinalIgnoreCase) || name.Equals("zindex", StringComparison.OrdinalIgnoreCase)) return ZIndex;
-        if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase)) return Visibility;
-        if (name.Equals("justify-self", StringComparison.OrdinalIgnoreCase) || name.Equals("justifyself", StringComparison.OrdinalIgnoreCase)) return JustifySelf;
-        if (name.Equals("justify-items", StringComparison.OrdinalIgnoreCase) || name.Equals("justifyitems", StringComparison.OrdinalIgnoreCase)) return JustifyItems;
-        if (name.Equals("justify-content", StringComparison.OrdinalIgnoreCase) || name.Equals("justifycontent", StringComparison.OrdinalIgnoreCase)) return JustifyContent;
-        if (name.Equals("align-self", StringComparison.OrdinalIgnoreCase) || name.Equals("alignself", StringComparison.OrdinalIgnoreCase)) return AlignSelf;
-        if (name.Equals("align-items", StringComparison.OrdinalIgnoreCase) || name.Equals("alignitems", StringComparison.OrdinalIgnoreCase)) return AlignItems;
-        if (name.Equals("align-content", StringComparison.OrdinalIgnoreCase) || name.Equals("aligncontent", StringComparison.OrdinalIgnoreCase)) return AlignContent;
-        if (name.Equals("margin", StringComparison.OrdinalIgnoreCase)) return Margin;
-        if (name.Equals("padding", StringComparison.OrdinalIgnoreCase)) return Padding;
-        if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase)) return BackgroundColor;
-        if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase)) return BackgroundImage;
-        if (name.Equals("width", StringComparison.OrdinalIgnoreCase)) return Width;
-        if (name.Equals("height", StringComparison.OrdinalIgnoreCase)) return Height;
         if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase)) return Anchor;
+        if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase) || name.Equals("background-color", StringComparison.OrdinalIgnoreCase)) return BackgroundColor;
+        if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || name.Equals("background-image", StringComparison.OrdinalIgnoreCase)) return BackgroundImage;
+        if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) return Class;
+        if (name.Equals("color", StringComparison.OrdinalIgnoreCase)) return Color;
+        if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase)) return Opacity;
+        if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase)) return (this as IPlaceholder)?.Placeholder;
+        if (name.Equals("readonly", StringComparison.OrdinalIgnoreCase)) return ReadOnly;
+        if (name.Equals("font", StringComparison.OrdinalIgnoreCase)) return Font;
+        if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase) || name.Equals("font-size", StringComparison.OrdinalIgnoreCase)) return FontSize;
+        if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase)) return Visibility;
+
+        if (AllProperties.TryGetValue(name, out var normalized))
+        {
+            return Node.nodeStyle[normalized];
+        }
+
+        Console.WriteLine($"Not recognized property: ${name}");
         return null;
     }
 
-    public float ToPixels(string? value) => ToPixels(UnitValue.Parse(value));
-
-    public float ToPixels(UnitValue unitValue)
+    public float GetLeft()
     {
-        float val = unitValue.Type switch
-        {
-            UnitType.Pixels => unitValue.Value,
-            UnitType.Rem => unitValue.Value * RootFontSize,
-            UnitType.Em => unitValue.Value * (Parent?.FontSize is string s ? Convert.ToSingle(s) : RootFontSize),
-            UnitType.Auto => 0f, // Will be calculated during layout
-            UnitType.Fr => 0f, // Will be calculated during fr distribution
-            _ => 0f
-        };
-        return float.IsNaN(val) || float.IsInfinity(val) ? 0f : val;
+        return Node.LayoutGetLeft();
+    }
+
+    public float GetTop()
+    {
+        return Node.LayoutGetTop();
+    }
+
+    public float GetWidth()
+    {
+        return Node.LayoutGetWidth();
+    }
+
+    public float GetHeight()
+    {
+        return Node.LayoutGetHeight();
     }
 
     public dynamic? GetEffectiveModel()
@@ -277,11 +238,157 @@ public abstract class UIElement(string tagName)
         if (IsComponentRoot) return null;
         return Parent?.GetEffectiveModel();
     }
+
+    public static readonly Dictionary<string, string> AllProperties = new(StringComparer.OrdinalIgnoreCase)
+        {
+            // Flex container                            
+            { "flex-direction",                                 "flex-direction" },
+            { "flex-wrap",                                      "flex-wrap" },
+            { "flex-flow",                                      "flex-flow" },
+            { "justify-content",                                "justify-content" },
+            { "align-items",                                    "align-items" },
+            { "align-content",                                  "align-content" },
+            { "gap",                                            "gap" },
+            { "row-gap",                                        "row-gap" },
+            { "column-gap",                                     "column-gap" },
+            //
+            { "flexdirection",                                 "flex-direction" },
+            { "flexwrap",                                      "flex-wrap" },
+            { "flexflow",                                      "flex-flow" },
+            { "justifycontent",                                "justify-content" },
+            { "alignitems",                                    "align-items" },
+            { "aligncontent",                                  "align-content" },
+            { "rowgap",                                        "row-gap" },
+            { "columngap",                                     "column-gap" },
+
+            // Flex items
+            { "flex",                                           "flex" },
+            { "flex-grow",                                      "flex-grow" },
+            { "flex-shrink",                                    "flex-shrink" },
+            { "flex-basis",                                     "flex-basis" },
+            { "align-self",                                     "align-self" },
+            { "order",                                          "order" },
+            //
+            { "flexgrow",                                      "flex-grow" },
+            { "flexshrink",                                    "flex-shrink" },
+            { "flexbasis",                                     "flex-basis" },
+            { "alignself",                                     "align-self" },
+
+            // Positioning
+            { "position",                                       "position" },
+            { "top",                                            "top" },
+            { "right",                                          "right" },
+            { "bottom",                                         "bottom" },
+            { "left",                                           "left" },
+            { "inset",                                          "inset" },
+            { "inset-block",                                    "inset-block" },
+            { "inset-inline",                                   "inset-inline" },
+            //
+            { "insetblock",                                    "inset-block" },
+            { "insetinline",                                   "inset-inline" },
+
+            // Margin
+            { "margin",                                         "margin" },
+            { "margin-top",                                     "margin-top" },
+            { "margin-right",                                   "margin-right" },
+            { "margin-bottom",                                  "margin-bottom" },
+            { "margin-left",                                    "margin-left" },
+            { "margin-inline",                                  "margin-inline" },
+            { "margin-inline-start",                            "margin-inline-start" },
+            { "margin-inline-end",                              "margin-inline-end" },
+            { "margin-block",                                   "margin-block" },
+            { "margin-block-start",                             "margin-block-start" },
+            { "margin-block-end",                               "margin-block-end" },
+            //
+            { "margintop",                                     "margin-top" },
+            { "marginright",                                   "margin-right" },
+            { "marginbottom",                                  "margin-bottom" },
+            { "marginleft",                                    "margin-left" },
+            { "margininline",                                  "margin-inline" },
+            { "margininlinestart",                            "margin-inline-start" },
+            { "margininlineend",                              "margin-inline-end" },
+            { "marginblock",                                   "margin-block" },
+            { "marginblockstart",                             "margin-block-start" },
+            { "marginblockend",                               "margin-block-end" },
+
+            // Padding
+            { "padding",                                        "padding" },
+            { "padding-top",                                    "padding-top" },
+            { "padding-right",                                  "padding-right" },
+            { "padding-bottom",                                 "padding-bottom" },
+            { "padding-left",                                   "padding-left" },
+            { "padding-inline",                                 "padding-inline" },
+            { "padding-inline-start",                           "padding-inline-start" },
+            { "padding-inline-end",                             "padding-inline-end" },
+            { "padding-block",                                  "padding-block" },
+            { "padding-block-start",                            "padding-block-start" },
+            { "padding-block-end",                              "padding-block-end" },
+            //
+            { "paddingtop",                                    "padding-top" },
+            { "paddingright",                                  "padding-right" },
+            { "paddingbottom",                                 "padding-bottom" },
+            { "paddingleft",                                   "padding-left" },
+            { "paddinginline",                                 "padding-inline" },
+            { "paddinginlinestart",                           "padding-inline-start" },
+            { "paddinginlineend",                             "padding-inline-end" },
+            { "paddingblock",                                  "padding-block" },
+            { "paddingblockstart",                            "padding-block-start" },
+            { "paddingblockend",                              "padding-block-end" },
+
+            // Border (width only matters)
+            { "border",                                         "border" },
+            { "border-top",                                     "border-top" },
+            { "border-right",                                   "border-right" },
+            { "border-bottom",                                  "border-bottom" },
+            { "border-left",                                    "border-left" },
+            { "border-width",                                   "border-width" },
+            { "border-top-width",                               "border-top-width" },
+            { "border-right-width",                             "border-right-width" },
+            { "border-bottom-width",                            "border-bottom-width" },
+            { "border-left-width",                              "border-left-width" },
+            //
+            { "bordertop",                                     "border-top" },
+            { "borderright",                                   "border-right" },
+            { "borderbottom",                                  "border-bottom" },
+            { "borderleft",                                    "border-left" },
+            { "borderwidth",                                   "border-width" },
+            { "bordertopwidth",                               "border-top-width" },
+            { "borderrightwidth",                             "border-right-width" },
+            { "borderbottomwidth",                            "border-bottom-width" },
+            { "borderleftwidth",                              "border-left-width" },
+
+            // Size
+            { "width",                                          "width" },
+            { "height",                                         "height" },
+            { "min-width",                                      "min-width" },
+            { "min-height",                                     "min-height" },
+            { "max-width",                                      "max-width" },
+            { "max-height",                                     "max-height" },
+            { "aspect-ratio",                                   "aspect-ratio" },
+            //
+            { "minwidth",                                      "min-width" },
+            { "minheight",                                     "min-height" },
+            { "maxwidth",                                      "max-width" },
+            { "maxheight",                                     "max-height" },
+            { "aspectratio",                                   "aspect-ratio" },
+
+            // Layout behavior
+            { "display",                                        "display" },
+            { "overflow",                                       "overflow" },
+            { "box-sizing",                                     "box-sizing" },
+            //
+            { "boxsizing",                                     "box-sizing" },
+
+            // Direction
+            { "direction",                                      "direction" },
+        };
+
+    #endregion
 }
 
 public record BindingDefinition(string TargetPropertyName, string ModelPropertyName);
 
-public class LayoutElement(string tagName) : UIElement(tagName)
+public abstract class LayoutElement(string tagName) : UIElement(tagName)
 {
     public string? Gap { get; set; }
     public string? RowGap { get; set; }

@@ -5,10 +5,11 @@ using System.IO;
 using Xunit;
 using Stride.Engine;
 using Stride.UI.Events;
-using SUIMStride;
+using Stride.UI.Panels;
 using SUIM.Parse;
 using SUIM.Model;
 using SUIM.Parse.Components;
+using SUIMStride;
 
 public class ComponentIsolationTests
 {
@@ -27,7 +28,7 @@ public class ComponentIsolationTests
         var componentMarkup = """
             <div id="popuproot">
                 <model>{ "title": "" }</model>
-                <label id="thelabel" value="@title" />
+                <h1 id="thelabel">@title</h1>
             </div>
             """;
         File.WriteAllText(compPath, componentMarkup);
@@ -45,12 +46,13 @@ public class ComponentIsolationTests
         var (strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
 
         // Find first TextBlock in the mapped Stride UI tree and assert its text was set from parent model
-        var found = XPath.Find(strideRoot, "thelabel") as Stride.UI.Controls.TextBlock;
-        Assert.NotNull(found);
-        Assert.Equal("HelloWorld", found!.Text);
+        var found = XPath.Find(strideRoot, "thelabel") as Canvas;
+        var text = found?.Children[0] as Stride.UI.Controls.TextBlock;
+        Assert.NotNull(text);
+        Assert.Equal("HelloWorld", text!.Text);
 
         model!.PopupTitle = "Changed";
-        Assert.Equal("Changed", found!.Text);
+        Assert.Equal("Changed", text!.Text);
     }
 
     [Fact]
@@ -60,7 +62,7 @@ public class ComponentIsolationTests
         var componentMarkup = """
             <div id="popuproot">
                 <model>{ "labelvisibility": null }</model>
-                <label id="thelabel" visibility="@labelvisibility" />
+                <h1 id="thelabel" visibility="@labelvisibility"></h1>
             </div>
             """;
         File.WriteAllText(compPath, componentMarkup);
@@ -78,7 +80,7 @@ public class ComponentIsolationTests
         var (strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
 
         // Find first TextBlock in the mapped Stride UI tree and assert its text was set from parent model
-        var found = XPath.Find(strideRoot, "thelabel") as Stride.UI.Controls.TextBlock;
+        var found = XPath.Find(strideRoot, "thelabel") as Canvas;
         Assert.NotNull(found);
         Assert.Equal(Stride.UI.Visibility.Collapsed, found!.Visibility);
 
@@ -93,15 +95,15 @@ public class ComponentIsolationTests
         var componentMarkup =
             """
             <div id="popuproot">
-                <model>{ "labelvisibility": "visible" }</model>
-                <label id="thelabel" visibility="@labelvisibility" />
+                <model>{ "labelvisibility": "block" }</model>
+                <h1 id="thelabel" visibility="@labelvisibility"></h1>
             </div>
             """;
         File.WriteAllText(compPath, componentMarkup);
 
         ComponentRegistry.Register("PopupTestComp", compPath);
 
-        var markup = "<div><model>{ \"LabelVisibility\": \"hidden\" }</model><PopupTestComp labelvisibility=\"@LabelVisibility\" /></div>";
+        var markup = "<div><model>{ \"LabelVisibility\": \"none\" }</model><PopupTestComp labelvisibility=\"@LabelVisibility\" /></div>";
 
         var suim = new Parser
         {
@@ -112,7 +114,7 @@ public class ComponentIsolationTests
         var (strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
 
         // Find first TextBlock in the mapped Stride UI tree and assert its text was set from parent model
-        var found = XPath.Find(strideRoot, "thelabel") as Stride.UI.Controls.TextBlock;
+        var found = XPath.Find(strideRoot, "thelabel") as Canvas;
         Assert.NotNull(found);
         Assert.Equal(Stride.UI.Visibility.Collapsed, found!.Visibility);
 
@@ -166,7 +168,7 @@ public class ComponentIsolationTests
         var compPath = GetTestPath("TestComponent.suim");
         var componentMarkup = @"<div id=""compRoot"">
             <model>{ ""compProp"": 123.0 }</model>
-            <label value=""@compProp"" />
+            <label value=""@compProp""></label>
         </div>";
         File.WriteAllText(compPath, componentMarkup);
 
@@ -211,7 +213,7 @@ public class ComponentIsolationTests
         // Arrange
         var componentMarkup = @"<TestComp>
             <model>{ ""val"": 10.0 }</model>
-            <label value=""@val"" />
+            <label value=""@val""></label>
         </TestComp>";
         File.WriteAllText(compPath, componentMarkup);
 
@@ -235,7 +237,7 @@ public class ComponentIsolationTests
         var compPath = GetTestPath("NoModelComp.suim");
         // Arrange
         var componentMarkup = @"<div id=""comp"">
-            <label value=""@missingProp"" />
+            <label value=""@missingProp""></label>
         </div>";
 
         File.WriteAllText(compPath, componentMarkup);

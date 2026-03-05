@@ -671,12 +671,25 @@ public enum Pieces : byte
 
 public static class PiecesExtensions
 {
-    public static bool IsWhite(this Pieces piece) => (piece & Pieces.White) != 0;
-    public static bool IsBlack(this Pieces piece) => (piece & Pieces.Black) != 0;
+    public static bool IsWhite(this Pieces piece)
+    {
+        return (piece & Pieces.White) != 0;
+    }
 
-    public static Pieces GetColor(this Pieces piece) => piece & (Pieces.White | Pieces.Black);
+    public static bool IsBlack(this Pieces piece)
+    {
+        return (piece & Pieces.Black) != 0;
+    }
 
-    public static Pieces GetKind(this Pieces piece) => piece & ~(Pieces.White | Pieces.Black);
+    public static Pieces GetColor(this Pieces piece)
+    {
+        return piece & (Pieces.White | Pieces.Black);
+    }
+
+    public static Pieces GetKind(this Pieces piece)
+    {
+        return piece & ~(Pieces.White | Pieces.Black);
+    }
 }
 
 public enum BoardState

@@ -5,15 +5,9 @@
 		"visibility": null
 	}
 	</model>
-	<style>
-	.mygrid {
-		justify-self: center;
-		align-self: center;
-	}
-	</style>
-	<overlay visibility="@visibility">
-		<grid class="mygrid">
-			<label value="@message" />
-		</grid>
+	<overlay visibility="@visibility" class="centeredcontent">
+		<div class="centeredcontent">
+			<h3 value="@message"></h3>
+		</div>
 	</overlay>
 </ScreenOverlay>

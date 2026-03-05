@@ -16,7 +16,7 @@
 	<ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>enable</Nullable>
   </PropertyGroup>
-
+	
   <ItemGroup>
     <ProjectReference Include="..\Chess3d\Chess3d.csproj" />
   </ItemGroup>

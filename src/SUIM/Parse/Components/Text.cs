@@ -1,9 +1,19 @@
 namespace SUIM.Parse.Components;
 
-public class Text(string? tagName = null) : UIElement(tagName ?? nameof(Text))
+public class Text : UIElement
 {
+    public static Flexbox.MeasureFunc? MeasureFunc = null;
+
     public string? Value { get; set; }
     public bool Wrap { get; set; }
+
+    public Text(string? tagName = null) : base(tagName ?? nameof(Text))
+    {
+        if (MeasureFunc != null)
+        {
+            Node.SetMeasureFunc(MeasureFunc);
+        }
+    }
 
     public override void SetAttribute(string name, object? value)
     {
@@ -20,9 +30,18 @@ public class Text(string? tagName = null) : UIElement(tagName ?? nameof(Text))
             base.SetAttribute(name, value);
         }
     }
+
+    public override string? GetAttribute(string name)
+    {
+        if (name.Equals("value", StringComparison.OrdinalIgnoreCase)) return Value;
+        if (name.Equals("wrap", StringComparison.OrdinalIgnoreCase)) return Wrap.ToString();
+        if (name.Equals("font", StringComparison.OrdinalIgnoreCase)) return Parent!.Font;
+        if (name.Equals("font-size", StringComparison.OrdinalIgnoreCase) || name.Equals("fontsize", StringComparison.OrdinalIgnoreCase)) return Parent!.FontSize;
+        return base.GetAttribute(name);
+    }
 }
 
-public class TextArea() : UIElement(nameof(TextArea)), IPlaceholder
+public class TextArea() : Text(nameof(TextArea)), IPlaceholder
 {
     public string? Placeholder { get; set; }
     public int Rows { get; set; }
@@ -43,9 +62,16 @@ public class TextArea() : UIElement(nameof(TextArea)), IPlaceholder
             base.SetAttribute(name, value);
         }
     }
+
+    public override string? GetAttribute(string name)
+    {
+        if (name.Equals("rows", StringComparison.OrdinalIgnoreCase)) return Rows.ToString();
+        if (name.Equals("columns", StringComparison.OrdinalIgnoreCase)) return Columns.ToString();
+        return base.GetAttribute(name);
+    }
 }
 
-public class Label() : Text(nameof(Label))
+public class Label() : LayoutElement(nameof(Label))
 {
     public string? For { get; set; }
 
@@ -60,22 +86,28 @@ public class Label() : Text(nameof(Label))
             base.SetAttribute(name, value);
         }
     }
+
+    public override string? GetAttribute(string name)
+    {
+        if (name.Equals("for", StringComparison.OrdinalIgnoreCase)) return For;
+        return base.GetAttribute(name);
+    }
 }
 
-public class P() : Text(nameof(P)) { }
+public class P() : UIElement(nameof(P)) { }
 
-public class H1() : Text(nameof(H1)) { }
+public class H1() : UIElement(nameof(H1)) { }
 
-public class H2() : Text(nameof(H2)) { }
+public class H2() : UIElement(nameof(H2)) { }
 
-public class H3() : Text(nameof(H3)) { }
+public class H3() : UIElement(nameof(H3)) { }
 
-public class H4() : Text(nameof(H4)) { }
+public class H4() : UIElement(nameof(H4)) { }
 
-public class H5() : Text(nameof(H5)) { }
+public class H5() : UIElement(nameof(H5)) { }
 
-public class H6() : Text(nameof(H6)) { }
+public class H6() : UIElement(nameof(H6)) { }
 
-public class H7() : Text(nameof(H7)) { }
+public class H7() : UIElement(nameof(H7)) { }
 
-public class H8() : Text(nameof(H8)) { }
+public class H8() : UIElement(nameof(H8)) { }

@@ -8,6 +8,7 @@ using SUIM.Parse;
 public class CustomComponent(string tagName) : LayoutElement(tagName)
 {
     public string? Source { get; set; }
+    public Dictionary<string, object?> Attributes { get; } = [];
 
     public override void SetAttribute(string name, object? value)
     {
@@ -17,7 +18,17 @@ public class CustomComponent(string tagName) : LayoutElement(tagName)
         }
         else
         {
-            base.SetAttribute(name, value);
+            // Preserve as regular attribute for components or custom usage
+            Attributes[name] = value;
+
+            try
+            {
+                base.SetAttribute(name, value);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error setting attribute: {ex}");
+            }
         }
     }
 

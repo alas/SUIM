@@ -1,14 +1,28 @@
+.centeredcontent {
+    justify-content: center;
+    align-content: center;
+}
 text, label {
-    justify-self: start;
-    align-self: start;
     color: white;
     font-size: 16px;
 }
 button {
+    justify-content: flex-start;
+    align-items: flex-start;
     width: 200px;
     height: 50px;
     margin: 5px;
-    normal: "Assets/btn_normal.png";
-    hover: "Assets/btn_hover.png";
-    pressed: "Assets/btn_pressed.png";
+    background-image: url(Assets/btn_normal.png);
+    hover-image: url(Assets/btn_hover.png);
+    pressed-image: url(Assets/btn_pressed.png);
+}
+.wood-panel {
+    width: 500px;
+    height: 220px;
+    gap: 8px;
+    padding: 12px;
+    background-image: url(Assets/seamless-texture-wood-old-oak-small2.jpg);
+}
+.hstack2 {
+    gap: 10px;
 }

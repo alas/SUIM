@@ -4,7 +4,6 @@ using System.IO;
 using Xunit;
 using SUIM.Parse;
 using SUIM.Parse.Components;
-using SUIM.Parse.Components.Attributes;
 
 public class CustomComponentTests
 {
@@ -13,7 +12,7 @@ public class CustomComponentTests
     {
         // 1. Create a dummy .suim file
         var tempFile = Path.GetTempFileName() + ".suim";
-        File.WriteAllText(tempFile, "<stack><label value=\"Inside Custom\" /></stack>");
+        File.WriteAllText(tempFile, "<stack><h1>Inside Custom</h1></stack>");
 
         try
         {
@@ -34,7 +33,7 @@ public class CustomComponentTests
             var stack = Assert.IsType<Stack>(custom.Children[0]);
             Assert.Single(stack.Children);
             
-            var label = Assert.IsType<Label>(stack.Children[0]);
+            var label = Assert.IsType<Text>(stack.Children[0].Children[0]);
             Assert.Equal("Inside Custom", label.Value);
         }
         finally
@@ -80,7 +79,7 @@ StyledTag { width: 450; background: red; }
 
             // 4. Verify style application
             var custom = Assert.IsType<CustomComponent>(element.Children[0]);
-            Assert.Equal(450f, UnitValue.Parse(custom.Width).Value);
+            Assert.Equal("450", custom.GetAttribute("width"));
             Assert.Equal("red", custom.BackgroundColor);
         }
         finally

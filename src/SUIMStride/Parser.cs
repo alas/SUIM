@@ -1,25 +1,20 @@
 namespace SUIMStride;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Stride.Core.Mathematics;
 using Stride.Core.Serialization.Contents;
 using Stride.Engine;
 using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
-using StrideUIElement = Stride.UI.UIElement;
-using StrideButton = Stride.UI.Controls.Button;
 using Stride.UI.Panels;
+using StrideButton = Stride.UI.Controls.Button;
+using StrideUIElement = Stride.UI.UIElement;
 using SUIM;
-using SUIM.Layout;
-using SUIM.Model;
+using SUIM.Flexbox;
 using SUIM.Parse;
 using SUIM.Parse.Components;
+using SUIMButton = SUIM.Parse.Components.Button;
 using SUIMElement = SUIM.Parse.Components.UIElement;
-using SUIM.Parse.Components.Attributes;
 
 public class Parser
 {
@@ -31,11 +26,6 @@ public class Parser
     private dynamic? _currentModel;
     private Game? _game;
     public string? RootPath { get; set; }
-
-    public (StrideUIElement StrideRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
-    {
-        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, null);
-    }
 
     public (StrideUIElement StrideRoot, dynamic? Model) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
@@ -49,6 +39,11 @@ public class Parser
         project.ResolveDependencies(markup);
 
         return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath, viewName);
+    }
+
+    public (StrideUIElement StrideRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    {
+        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, null);
     }
 
     private (StrideUIElement StrideRoot, dynamic? Model) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null)
@@ -74,6 +69,31 @@ public class Parser
         ContentManager = game.Content;
 
         // Not cached: parse markup, map and store the canonical instance
+        Text.MeasureFunc = (Node node, float width, MeasureMode widthMode, float height, MeasureMode heightMode) =>
+        {
+            var text = (Text)node.Context!;
+            var fontSize = text.FontSize != null && float.TryParse(text.FontSize.AsSpan()[..^2], out var f) ? f : 0f;
+            if (fontSize <= 0f)
+            {
+                fontSize = defaultFontSize; // Default font size if not specified or invalid
+            }
+            var fontName = text.Font ?? "StrideDefaultFont";
+            var sf = Fonts.TryGetValue(fontName, out SpriteFont? value) ? value : null;
+            if (sf == null && !Fonts.ContainsKey(fontName))
+            {
+                sf = ContentLoader.LoadFont(ContentManager, fontName);
+                if (sf != null)
+                {
+                    Fonts[fontName] = sf;
+                }
+            }
+            if (sf != null)
+            {
+                var size = sf.MeasureString(text.Value ?? "");
+                return new Size(size.X, size.Y);
+            }
+            return new Size(0, 0);
+        };
         var (suimRoot, model2) = MarkupParser.Parse(markup, model, basePath: basePath, componentName: viewName);
         Layout(suimRoot, game, defaultFontSize, fullscreen);
         _currentModel = model2;
@@ -107,7 +127,13 @@ public class Parser
             preferredWidth = game.GraphicsDeviceManager.PreferredBackBufferWidth;
             preferredHeight = game.GraphicsDeviceManager.PreferredBackBufferHeight;
         }
-        LayoutEngine.Layout(root, defaultFontSize, preferredWidth, preferredHeight);
+        root.CalculateLayout(preferredWidth, preferredHeight);
+    }
+
+    // Test helper to retrieve a bound click handler (returns null if none)
+    public Delegate? GetBoundClickHandler(StrideButton btn)
+    {
+        return _clickHandlers.TryGetValue(btn, out var d) ? d : null;
     }
 
     /// <summary>
@@ -118,7 +144,7 @@ public class Parser
     {
         StrideUIElement strideElement = element switch
         {
-            SUIM.Parse.Components.Button b => MapButton(b, game),
+            SUIMButton b => MapButton(b, game),
             Text t => MapText(t),
             Input i => MapInput(i),
             SUIM.Parse.Components.Image img => MapImage(img, game),
@@ -129,7 +155,7 @@ public class Parser
 
         ApplyCommonProperties(element, strideElement);
         
-        TransferBindings(element, strideElement);
+        Bindings.TransferBindings(element, strideElement, _clickHandlers);
 
         // Handle Children for generic containers if not already handled
         if (strideElement is Panel panel && element.Children.Count > 0)
@@ -159,18 +185,18 @@ public class Parser
         return strideElement;
     }
 
-    private StrideButton MapButton(SUIM.Parse.Components.Button button, Game? game)
+    private StrideButton MapButton(SUIMButton button, Game? game)
     {
         var btn = new StrideButton();
         
-        if (!string.IsNullOrEmpty(button.MouseOverImage))
+        if (!string.IsNullOrEmpty(button.HoverImage))
         {
-            var loaded = ContentLoader.LoadSprite(ContentManager, button.MouseOverImage, game);
+            var loaded = ContentLoader.LoadSprite(ContentManager, button.HoverImage, game);
             if (loaded != null) btn.MouseOverImage = loaded;
         }
-        if (!string.IsNullOrEmpty(button.NotPressedImage))
+        if (!string.IsNullOrEmpty(button.BackgroundImage))
         {
-            var loaded = ContentLoader.LoadSprite(ContentManager, button.NotPressedImage, game);
+            var loaded = ContentLoader.LoadSprite(ContentManager, button.BackgroundImage, game);
             if (loaded != null) btn.NotPressedImage = loaded;
         }
         if (!string.IsNullOrEmpty(button.PressedImage))
@@ -185,7 +211,7 @@ public class Parser
 
     private TextBlock MapText(Text text)
     {
-        var fontSize = text.FontSize != null ? text.ToPixels(UnitValue.Parse(text.FontSize)) : 0f;
+        var fontSize = text.FontSize != null && float.TryParse(text.FontSize.AsSpan()[..^2], out var f) ? f : 0f;
         if (fontSize <= 0f)
         {
             fontSize = 16f; // Default font size if not specified or invalid
@@ -277,9 +303,29 @@ public class Parser
 
     private Stride.UI.Controls.Border MapBorder(SUIM.Parse.Components.Border border, Game? game)
     {
+        var borderThickness = new Thickness();
+        //var borderStyle = BorderStyle.None;
+        var borderColor = Color.Transparent;
+        if (!string.IsNullOrEmpty(border.Thickness))
+        {
+            //todo: medium|thin|thick|initial|inherit;
+            var span = border.Thickness.EndsWith("px") ? border.Thickness.AsSpan()[..^2] : border.Thickness.AsSpan();
+            var value = float.TryParse(span, out var f) ? f : 0f;
+            borderThickness = new Thickness(value, value, value, value);
+        }
+
+        // todo
+        //borderStyle = BorderStyle.Solid;
+
+        if (!string.IsNullOrEmpty(border.Color))
+        {
+            borderColor = ParseColor(border.Color);
+        }
+
         var borderElem = new Stride.UI.Controls.Border
         {
-            BorderThickness = ThicknessToStride(border.Thickness, border)
+            BorderThickness = borderThickness,
+            BorderColor = borderColor,
         };
 
         if (!string.IsNullOrEmpty(border.Color))
@@ -307,32 +353,14 @@ public class Parser
     {
         stride.Name = suim.Id;
         stride.Opacity = suim.Opacity == null ? 1 : Convert.ToSingle(suim.Opacity);
-        var vis = SUIM.Parse.Components.Attributes.Visibility.Parse(suim.Visibility);
-        stride.Visibility = vis switch
-        {
-            SUIM.Parse.Components.Attributes.Visibility.Hidden => Stride.UI.Visibility.Hidden,
-            SUIM.Parse.Components.Attributes.Visibility.Collapsed => Stride.UI.Visibility.Collapsed,
-            _ => Stride.UI.Visibility.Visible,
-        };
 
         // Use calculated dimensions
         stride.SetCanvasAbsolutePosition(new Vector3(
-            FractionalUnit.Sanitize(suim.ActualX),
-            FractionalUnit.Sanitize(suim.ActualY), 0));
-        stride.Width = SanitizeSizeForStride(suim.ActualWidth);
-        stride.Height = SanitizeSizeForStride(suim.ActualHeight);
+            suim.GetLeft(),
+            suim.GetTop(), 0));
+        stride.Width = SanitizeSizeForStride(suim.GetWidth());
+        stride.Height = SanitizeSizeForStride(suim.GetHeight());
 
-        // Use the computed margins from SUIM, which represent the actual margin values applied to the element
-        stride.Margin = new Stride.UI.Thickness(
-            FractionalUnit.Sanitize(suim.ComputedMarginLeft),
-            FractionalUnit.Sanitize(suim.ComputedMarginTop),
-            FractionalUnit.Sanitize(suim.ComputedMarginRight),
-            FractionalUnit.Sanitize(suim.ComputedMarginBottom));
-
-        if (stride is ContentControl cc)
-        {
-            cc.Padding = ThicknessToStride(suim.Padding, suim);
-        }
         if (suim.BackgroundColor != null)
         {
             stride.BackgroundColor = ParseColor(suim.BackgroundColor);
@@ -344,230 +372,17 @@ public class Parser
         }
     }
 
-    private static Stride.UI.Thickness ThicknessToStride(string? thicknessString, SUIMElement suim)
-    {
-        var thickness = SUIM.Parse.Components.Attributes.Thickness.Parse(thicknessString);
-        return new Stride.UI.Thickness(
-            suim.ToPixels(thickness.Left),
-            suim.ToPixels(thickness.Top),
-            suim.ToPixels(thickness.Right),
-            suim.ToPixels(thickness.Bottom));
-    }
-
     private static Color ParseColor(string colorStr)
     {
         var pc = BackendHelpers.ParseColor(colorStr);
         return new Color(pc.R, pc.G, pc.B, pc.A);
     }
     
-    private void TransferBindings(SUIMElement suimElement, StrideUIElement strideElement)
-    {
-        var model = suimElement.GetEffectiveModel();
-        
-        foreach (var binding in suimElement.Bindings)
-        {
-            if (model == null)
-            {
-                if (suimElement.IsComponentRoot || suimElement.Parent?.GetEffectiveModel() == null)
-                    throw new InvalidOperationException($"Binding '{binding.ModelPropertyName}' found on tag '{suimElement.TagName}' but no model context is available.");
-                continue;
-            }
-            SetupBinding(model, binding.ModelPropertyName, binding.TargetPropertyName, strideElement);
-        }
-
-        TransferEvents(suimElement, strideElement);
-    }
-
-    private void TransferEvents(SUIMElement suimElement, StrideUIElement strideElement)
-    {
-        if (suimElement.Events.Count == 0) return;
-        var model = suimElement.GetEffectiveModel();
-
-        foreach (var kvp in suimElement.Events)
-        {
-            var eventName = kvp.Key;
-            var handlerName = kvp.Value;
-
-            if (model == null)
-                throw new InvalidOperationException($"Event '{eventName}' found on tag '{suimElement.TagName}' but no model context is available.");
-
-            // Resolve handler using the effective model for this element (components must be isolated)
-            Delegate? handler = null;
-
-            if (!string.IsNullOrEmpty(handlerName) && handlerName.StartsWith('@'))
-            {
-                var propName = handlerName[1..];
-                if (model is ObservableObject mOO)
-                {
-                    var val = mOO.GetValue(propName);
-                    if (val is Delegate d)
-                    {
-                        handler = d;
-                    }
-                    else if (val is string s)
-                    {
-                        // Try to interpret the string as a handler expression on the component model (or parent proxy)
-                        handler = mOO.GetHandler(s) ?? BackendHelpers.ResolveEventAction(s, (object)model, suimElement) ?? ResolveMethodAsDelegate(s, model);
-                    }
-                }
-            }
-            else
-            {
-                if (model is ObservableObject oo)
-                {
-                    handler = oo.GetHandler(handlerName);
-                }
-                else
-                {
-                    // Try reflection on raw object using shared helper
-                    handler = BackendHelpers.ResolveEventAction(handlerName, (object)model, suimElement);
-                    // If generic resolver didn't find anything, try Stride-specific resolver that understands RoutedEventArgs
-                    handler ??= ResolveMethodAsDelegate(handlerName, model);
-                }
-            }
-
-            if (handler != null)
-            {
-                // Map to Stride event
-                if (string.Equals(eventName, "click", StringComparison.OrdinalIgnoreCase) && strideElement is StrideButton btn)
-                {
-                    BindClickHandler(btn, handler, suimElement);
-                }
-                // Add more event types here as needed
-            }
-        }
-    }
-
-    private void BindClickHandler(StrideButton btn, Delegate handler, SUIMElement suimElement)
-    {
-        // Support multiple handler types for click events
-        if (handler is EventHandler<Stride.UI.Events.RoutedEventArgs> routedHandler)
-        {
-            btn.Click += routedHandler;
-            _clickHandlers[btn] = routedHandler;
-        }
-        else if (handler is EventHandler eh)
-        {
-            EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => eh(s, e);
-            btn.Click += wrappedHandler;
-            _clickHandlers[btn] = wrappedHandler;
-        }
-        else if (handler is Action<SUIMElement> actionWithElement)
-        {
-            EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => actionWithElement(suimElement);
-            btn.Click += wrappedHandler;
-            _clickHandlers[btn] = wrappedHandler;
-        }
-        else if (handler is Action a)
-        {
-            EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => a();
-            btn.Click += wrappedHandler;
-            _clickHandlers[btn] = wrappedHandler;
-        }
-    }
-
-    // Test helper to retrieve a bound click handler (returns null if none)
-    public Delegate? GetBoundClickHandler(StrideButton btn)
-    {
-        return _clickHandlers.TryGetValue(btn, out var d) ? d : null;
-    }
-
-    /// <summary>
-    /// Resolves a method name to a delegate using priority-based resolution.
-    /// Priority: Parameterless -> UIElement parameter -> EventHandler pattern
-    /// </summary>
-    private static Delegate? ResolveMethodAsDelegate(string methodName, dynamic model)
-    {
-        // Keep a Stride-specific variant that supports RoutedEventArgs in addition to the generic helper
-        if (model == null) return null;
-
-        // Cast to object to avoid dynamic dispatch issues
-        object targetObject = model;
-        var methods = targetObject.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
-        var matchingMethods = methods.Where(m => m.Name == methodName).ToList();
-        if (matchingMethods.Count == 0)
-            return null;
-
-        // Try EventHandler<RoutedEventArgs> pattern (Stride specific)
-        var routedHandlerMethod = matchingMethods.FirstOrDefault(m =>
-        {
-            var parms = m.GetParameters();
-            return parms.Length == 2 &&
-                parms[0].ParameterType == typeof(object) &&
-                parms[1].ParameterType == typeof(Stride.UI.Events.RoutedEventArgs);
-        });
-        if (routedHandlerMethod != null)
-        {
-            try { return Delegate.CreateDelegate(typeof(EventHandler<Stride.UI.Events.RoutedEventArgs>), targetObject, routedHandlerMethod); }
-            catch { /* Fall through */ }
-        }
-
-        return null;
-    }
-    
-    private static void SetupBinding(dynamic? model, string modelPropertyName, string targetPropertyName, StrideUIElement strideElement)
-    {
-        if (model == null) return;
-        
-        // 2-way: UI -> model (via proxy)
-        if (model is ObservableObject oo)
-        {
-            if (strideElement is EditText et && (targetPropertyName.Equals("text", StringComparison.OrdinalIgnoreCase) || targetPropertyName.Equals("value", StringComparison.OrdinalIgnoreCase)))
-            {
-                oo.SetProxy(modelPropertyName, () => et.Text, (val) => et.Text = val?.ToString() ?? "");
-                et.TextChanged += (s, e) => oo.NotifyChanged(modelPropertyName);
-                return; // Proxy handles everything
-            }
-            else if (strideElement is ToggleButton tb && (targetPropertyName.Equals("checked", StringComparison.OrdinalIgnoreCase) || targetPropertyName.Equals("value", StringComparison.OrdinalIgnoreCase)))
-            {
-                oo.SetProxy(modelPropertyName, 
-                    () => tb.State == ToggleState.Checked, 
-                    (val) => tb.State = (val is bool b && b) ? ToggleState.Checked : ToggleState.UnChecked);
-                
-                tb.Checked += (s, e) => oo.NotifyChanged(modelPropertyName);
-                tb.Unchecked += (s, e) => oo.NotifyChanged(modelPropertyName);
-                return; // Proxy handles everything
-            }
-        }
-
-        // 1-way fallback (model -> UI)
-        BackendHelpers.SetupPropertyBinding((object?)model, modelPropertyName, newValue => ApplyBindingValue(strideElement, targetPropertyName, newValue));
-    }
-    
-    private static void ApplyBindingValue(StrideUIElement strideElement, string targetPropertyName, object? value)
-    {
-        try
-        {
-            // Handle Text property
-            if (string.Equals(targetPropertyName, "text", StringComparison.OrdinalIgnoreCase) || string.Equals(targetPropertyName, "value", StringComparison.OrdinalIgnoreCase))
-            {
-                if (strideElement is TextBlock tb)
-                    tb.Text = value?.ToString() ?? "";
-                else if (strideElement is EditText et)
-                    et.Text = value?.ToString() ?? "";
-                else if (strideElement is StrideButton btn && btn.Content is TextBlock btnText)
-                    btnText.Text = value?.ToString() ?? "";
-            }
-            // Handle other common properties
-            else if (string.Equals(targetPropertyName, "visibility", StringComparison.OrdinalIgnoreCase))
-            {
-                if (value != null && Enum.TryParse<Stride.UI.Visibility>(value.ToString(), true, out var vis))
-                    strideElement.Visibility = vis;
-            }
-            else if (string.Equals(targetPropertyName, "opacity", StringComparison.OrdinalIgnoreCase))
-            {
-                if (float.TryParse(value?.ToString() ?? "1", out var opacity))
-                    strideElement.Opacity = opacity;
-            }
-        }
-        catch { }
-    }
-
     private static float SanitizeSizeForStride(float value)
     {
-        // Dimensions of MaxValue break Stride UI matrices (infinity)
-        // Dimensions should be resolved to pixels by LayoutEngine, if it's still MaxValue here, it's effectively 0 for rendering
-        if (value == float.MaxValue) return 0;
-        return FractionalUnit.Sanitize(value);
+        if (float.IsNaN(value) || float.IsInfinity(value) || value < 0 || value == float.MaxValue)
+            return 0;
+
+        return value;
     }
 }

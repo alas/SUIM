@@ -7,7 +7,8 @@ public class BackgroundImage() : UIElement(nameof(BackgroundImage))
     public override void SetAttribute(string name, object? value)
     {
         if (name.Equals("source", StringComparison.OrdinalIgnoreCase) || 
-            name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase))
+            name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || 
+            name.Equals("background-image", StringComparison.OrdinalIgnoreCase))
         {
             Source = value as string;
         }
@@ -15,5 +16,16 @@ public class BackgroundImage() : UIElement(nameof(BackgroundImage))
         {
             base.SetAttribute(name, value);
         }
+    }
+
+    public override string? GetAttribute(string name)
+    {
+        if (name.Equals("source", StringComparison.OrdinalIgnoreCase) || 
+            name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || 
+            name.Equals("background-image", StringComparison.OrdinalIgnoreCase))
+        {
+            return Source;
+        }
+        return base.GetAttribute(name);
     }
 }

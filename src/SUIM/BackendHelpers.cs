@@ -13,53 +13,43 @@ using SUIM.Parse.Components;
 /// </summary>
 public static class BackendHelpers
 {
-    public readonly struct ParsedColor
-    {
-        public byte R { get; init; }
-        public byte G { get; init; }
-        public byte B { get; init; }
-        public byte A { get; init; }
-    }
+    public readonly record struct ParsedColor(byte R, byte G, byte B, byte A = 255);
 
     public static ParsedColor ParseColor(string colorStr)
     {
-        if (string.IsNullOrEmpty(colorStr)) return new ParsedColor { R = 255, G = 255, B = 255, A = 255 };
+        if (string.IsNullOrEmpty(colorStr)) return new ParsedColor(255, 255, 255);
 
         if (colorStr.StartsWith('#'))
         {
             var hex = colorStr[1..];
             if (hex.Length == 6)
             {
-                return new ParsedColor
-                {
-                    R = Convert.ToByte(hex[..2], 16),
-                    G = Convert.ToByte(hex.Substring(2, 2), 16),
-                    B = Convert.ToByte(hex.Substring(4, 2), 16),
-                    A = 255
-                };
+                return new ParsedColor(
+                    Convert.ToByte(hex[..2], 16),
+                    Convert.ToByte(hex.Substring(2, 2), 16),
+                    Convert.ToByte(hex.Substring(4, 2), 16));
             }
-            else if (hex.Length == 8)
+            
+            if (hex.Length == 8)
             {
-                return new ParsedColor
-                {
-                    A = Convert.ToByte(hex[..2], 16),
-                    R = Convert.ToByte(hex.Substring(2, 2), 16),
-                    G = Convert.ToByte(hex.Substring(4, 2), 16),
-                    B = Convert.ToByte(hex.Substring(6, 2), 16)
-                };
+                return new ParsedColor(
+                    Convert.ToByte(hex[..2], 16),
+                    Convert.ToByte(hex.Substring(2, 2), 16),
+                    Convert.ToByte(hex.Substring(4, 2), 16),
+                    Convert.ToByte(hex.Substring(6, 2), 16));
             }
         }
 
         // named colors (basic set)
-        if (string.Equals(colorStr, "red", StringComparison.OrdinalIgnoreCase)) return new ParsedColor { R = 255, G = 0, B = 0, A = 255 };
-        if (string.Equals(colorStr, "green", StringComparison.OrdinalIgnoreCase)) return new ParsedColor { R = 0, G = 255, B = 0, A = 255 };
-        if (string.Equals(colorStr, "blue", StringComparison.OrdinalIgnoreCase)) return new ParsedColor { R = 0, G = 0, B = 255, A = 255 };
-        if (string.Equals(colorStr, "black", StringComparison.OrdinalIgnoreCase)) return new ParsedColor { R = 0, G = 0, B = 0, A = 255 };
-        if (string.Equals(colorStr, "yellow", StringComparison.OrdinalIgnoreCase)) return new ParsedColor { R = 255, G = 255, B = 0, A = 255 };
-        if (string.Equals(colorStr, "cyan", StringComparison.OrdinalIgnoreCase)) return new ParsedColor { R = 0, G = 255, B = 255, A = 255 };
-        if (string.Equals(colorStr, "magenta", StringComparison.OrdinalIgnoreCase)) return new ParsedColor { R = 255, G = 0, B = 255, A = 255 };
-        if (string.Equals(colorStr, "transparent", StringComparison.OrdinalIgnoreCase)) return new ParsedColor { R = 0, G = 0, B = 0, A = 0 };
-        if (string.Equals(colorStr, "white", StringComparison.OrdinalIgnoreCase)) return new ParsedColor { R = 255, G = 255, B = 255, A = 255 };
+        if (string.Equals(colorStr, "red", StringComparison.OrdinalIgnoreCase)) return new ParsedColor(255, 0, 0);
+        if (string.Equals(colorStr, "green", StringComparison.OrdinalIgnoreCase)) return new ParsedColor(0, 255, 0);
+        if (string.Equals(colorStr, "blue", StringComparison.OrdinalIgnoreCase)) return new ParsedColor(0, 0, 255);
+        if (string.Equals(colorStr, "black", StringComparison.OrdinalIgnoreCase)) return new ParsedColor(0, 0, 0);
+        if (string.Equals(colorStr, "yellow", StringComparison.OrdinalIgnoreCase)) return new ParsedColor(255, 255, 0);
+        if (string.Equals(colorStr, "cyan", StringComparison.OrdinalIgnoreCase)) return new ParsedColor(0, 255, 255);
+        if (string.Equals(colorStr, "magenta", StringComparison.OrdinalIgnoreCase)) return new ParsedColor(255, 0, 255);
+        if (string.Equals(colorStr, "transparent", StringComparison.OrdinalIgnoreCase)) return new ParsedColor(0, 0, 0, 0);
+        if (string.Equals(colorStr, "white", StringComparison.OrdinalIgnoreCase)) return new ParsedColor(255, 255, 255);
 
         // fallback white
         throw new NotImplementedException($"named color not supported: {colorStr}");

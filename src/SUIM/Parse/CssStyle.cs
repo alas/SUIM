@@ -9,7 +9,7 @@ using SUIM.Parse.Components;
 /// Handles CSS-like style parsing and application to UI elements.
 /// Supports multiple selectors separated by commas and various selector types (tag, class, id, universal).
 /// </summary>
-public static class Style
+public static class CssStyle
 {
     /// <summary>
     /// Parses CSS-like style content and populates the styles dictionary.
@@ -41,7 +41,7 @@ public static class Style
             foreach (System.Text.RegularExpressions.Match propMatch in propMatches)
             {
                 var propName = propMatch.Groups[1].Value.Trim();
-                var propValue = propMatch.Groups[2].Value.Trim().Trim('"');
+                var propValue = propMatch.Groups[2].Value.Trim();
                 properties[propName] = propValue;
             }
 
@@ -50,15 +50,16 @@ public static class Style
                 // Apply the same properties to all selectors, merging with existing properties
                 foreach (var selector in selectors)
                 {
-                    if (!styles.ContainsKey(selector))
+                    if (!styles.TryGetValue(selector, out Dictionary<string, string>? value))
                     {
-                        styles[selector] = new Dictionary<string, string>();
+                        value = new Dictionary<string, string>();
+                        styles[selector] = value;
                     }
 
                     // Merge properties: new properties override existing ones with the same name
                     foreach (var kvp in properties)
                     {
-                        styles[selector][kvp.Key] = kvp.Value;
+                        value[kvp.Key] = kvp.Value;
                     }
                 }
             }
@@ -200,10 +201,6 @@ public static class Style
             if (properties.TryGetValue("width", out var w)) scroll.SetAttribute("width", w);
             if (properties.TryGetValue("height", out var h)) scroll.SetAttribute("height", h);
 
-            // When a style creates a scroll wrapper, the inner element should default to `auto` if it was unspecified.
-            element.Width ??= "auto";
-            element.Height ??= "auto";
-
             scroll.AddChild(element, null);
             element = scroll;
         }
@@ -219,22 +216,7 @@ public static class Style
             {
                 border.SetAttribute(kvp.Key, kvp.Value);
             }
-            // Fallback: also apply explicit width/height from properties if present (defensive)
-            if (properties.TryGetValue("width", out var w)) border.SetAttribute("width", w);
-            if (properties.TryGetValue("height", out var h)) border.SetAttribute("height", h);
 
-            // Ensure numeric width/height in styles are parsed and applied directly (defensive - avoids any SetAttribute parsing quirks)
-            if (properties.TryGetValue("width", out var pw) && !string.IsNullOrWhiteSpace(pw))
-            {
-                border.Width = pw;
-            }
-            if (properties.TryGetValue("height", out var ph) && !string.IsNullOrWhiteSpace(ph))
-            {
-                border.Height = ph;
-            }
-
-            element.Width ??= "auto";
-            element.Height ??= "auto";
             border.AddChild(element, null);
             element = border;
         }
@@ -252,8 +234,6 @@ public static class Style
             if (properties.TryGetValue("width", out var w)) bg.SetAttribute("width", w);
             if (properties.TryGetValue("height", out var h)) bg.SetAttribute("height", h);
 
-            element.Width ??= "auto";
-            element.Height ??= "auto";
             bg.AddChild(element, null);
             element = bg;
         }
@@ -264,12 +244,15 @@ public static class Style
     private static readonly HashSet<string> LayoutAttributeNames = new(StringComparer.OrdinalIgnoreCase)
     {
         "id", "width", "height", "padding", "margin",
-        "justify-self", "align-self",
+        "justify-self", "align-self", "justify-content", "align-content", "justify-items", "align-items",
         "visibility", "opacity", "background", "bg", "class",
-        "left", "top", "z-index", "anchor"
+        "left", "top", "anchor"
     };
 
-    private static bool IsLayoutAttribute(string name) => LayoutAttributeNames.Contains(name);
+    internal static bool IsLayoutAttribute(string name)
+    {
+        return LayoutAttributeNames.Contains(name);
+    }
 }
 
 internal static partial class StyleParserRegexes

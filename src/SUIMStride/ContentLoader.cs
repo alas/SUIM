@@ -20,53 +20,43 @@ public static class ContentLoader
     /// Load an <see cref="ISpriteProvider"/> (typically a <see cref="Sprite"/>) using the provided <see cref="ContentManager"/>.
     /// Returns null if the path is null/empty or loading fails. Results are cached by path.
     /// </summary>
-    public static ISpriteProvider? LoadSprite(ContentManager? contentManager, string? path, Game? game)
+    public static ISpriteProvider? LoadSprite(ContentManager? contentManager, string? sprite, Game? game)
     {
-        if (string.IsNullOrEmpty(path)) return null;
-        if (SpriteCache.TryGetValue(path, out var cached)) return cached;
+        if (string.IsNullOrEmpty(sprite)) return null;
+        if (SpriteCache.TryGetValue(sprite, out var cached)) return cached;
 
         ISpriteProvider? result = null;
 
-        if (!IsImageExtension(path))
+        var isUrl = sprite.StartsWith("url(");
+        if (isUrl && game != null)
+        {
+            try
+            {
+                var path = sprite["url(".Length..^1].Trim('"', '\'');
+                if (File.Exists(path))
+                {
+                    using var stream = File.Open(path, FileMode.Open, FileAccess.Read);
+                    var texture = Texture.Load(game.GraphicsDevice, stream, loadAsSRGB: true);
+                    result = new SpriteFromTexture { Texture = texture };
+                }
+            }
+            catch { }
+        }
+        
+        if (result == null)
         {
             if (contentManager != null)
             {
                 try
                 {
-                    result = contentManager.Load<ISpriteProvider>(path);
+                    result = contentManager.Load<ISpriteProvider>(sprite);
                 }
                 catch { }
             }
         }
 
-        if (result == null && game != null && File.Exists(path))
-        {
-            try
-            {
-                using var stream = File.Open(path, FileMode.Open, FileAccess.Read);
-                var texture = Texture.Load(game.GraphicsDevice, stream, loadAsSRGB: true);
-                result = new SpriteFromTexture { Texture = texture };
-            }
-            catch { }
-        }
-
-        SpriteCache[path] = result;
+        SpriteCache[sprite] = result;
         return result;
-    }
-
-    /// <summary>
-    /// Determines if a path refers to a common image file format.
-    /// </summary>
-    private static bool IsImageExtension(string path)
-    {
-        if (string.IsNullOrEmpty(path)) return false;
-
-        var extension = Path.GetExtension(path).ToLowerInvariant();
-        var imageExtensions = new HashSet<string>
-        {
-            ".png", ".jpg", ".jpeg", ".bmp", ".tga", ".gif", ".webp", ".tif", ".tiff"
-        };
-        return imageExtensions.Contains(extension);
     }
 
     /// <summary>

@@ -1,27 +1,22 @@
 # SUIM 1.0 Technical Specification
 
-## 1. Overview
+## Overview
 
 SUIM aims to reuse existing tags and concepts found in HTML and CSS while also incorporating foundational concepts from WinForms, such as explicit anchoring and docking logic, for desktop-grade application development.
-SUIM aims to be familiar to web developers and winforms developers while also being easy to implement on top of existing layout engines.
+SUIM aims to be familiar to web developers and easy to learn for winforms developers.
 
 ### SUIM officially supports:
 
 #### Layout
 
 * ✅ Custom Layout Tags Based on WinForms Box Model(Dock, Stack, Grid, Overlay)
-* ✅ Flexbox (subset)
+* ✅ Flexbox
 * ❌ Grid (maybe later)
 * ❌ float / clear
 * ❌ position: fixed
 
-####Styling
+#### Styling
 
-* ✅ width / height
-* ✅ margin / padding
-* ✅ gap
-* ✅ colors
-* ✅ fonts
 * ❌ advanced selectors
 * ❌ complex inheritance
 
@@ -32,57 +27,22 @@ SUIM aims to be familiar to web developers and winforms developers while also be
 
 ---
 
-## 2. Layout Models & Philosophy
+## Structural & Layout Tags
 
-### 2.1 The Box Model
+### The <div> Tag
 
-Every element exists within a rectangular box. Spacing is governed by **margin** (external) and **padding** (internal). **Children never expand parents**; parent dimensions are absolute and calculated before children are processed.
+A simple container where children are arranged in a vertical stack by default. It also support flexbox layout.
 
-### 2.2 Layout Alignment
-
-All layout containers support the following flexbox-style properties for positioning and alignment:
-
-* **justify-content**
-* **align-content**
-* **justify-items**
-* **align-items**
-* **justify-self**
-* **align-self**
-
-### 2.3 Anchoring
-
-Inspired by WinForms, **anchor** allows an element to pin itself to one or more edges of its parent container. Anchored elements are removed from standard flow and do not occupy space in stacks or grids. Valid values: `top`, `bottom`, `left`, `right`, or combinations like `top,left` or `left,right,bottom`.
-
-### 2.4 Layout Sizing Logic
-
-Sizing uses **integers** (fixed pixels), **fr units** (fractional/proportional space), **em**, **rem**, or **auto**.
-
-* **Pixels:** Fixed size in pixels. Can be written as `100` or `100px`.
-* **fr (fractional units):** Proportional space distribution (e.g., `1fr`, `2fr`). Equivalent to CSS Grid's `fr` unit.
-* **em:** A multiplier of the parent font size.
-* **rem:** A multiplier of the global root font size.
-* **auto:** Resolves to a pre-defined metric constant (see Section 5.3).
-
-**Default Sizing Rule:** Content tags default to **auto**, Structural & Layout Tags (except <row> and <column>) default to **1fr**.
-
----
-
-## 3. Structural & Layout Tags
-
-### 3.1 The <div> Tag
-
-A coordinate-based container where children can overlap and define explicit positions. It also support flexbox layout.
-
-### 3.2 The <stack> Tag
+### The <stack> Tag
 
 Arranges children sequentially along a single axis.
 
 * **Attributes:** orientation (horizontal, vertical).
 * **Synonyms:**
-* **<vstack>** and **<vbox>**: Equivalent to <stack orientation="vertical">.
-* **<hstack>** and **<hbox>**: Equivalent to <stack orientation="horizontal">.
+* **<vstack>**, **<stackv>**, **<stack-v>** and **<vbox>**: Equivalent to <stack orientation="vertical">.
+* **<hstack>**, **<stackh>**, **<stack-h>** and **<hbox>**: Equivalent to <stack orientation="horizontal">.
 
-### 3.3 The <grid> Tag
+### The <grid> Tag
 
 Divides space into a matrix.
 
@@ -90,56 +50,55 @@ Divides space into a matrix.
 * **Child Logic:** grid.row, grid.column, grid.rowspan, grid.columnspan.
 
 **Example 1: Explicit Attributes**
-<grid columns="100, *" rows="50, *">
-
-<div grid.row="0" grid.column="0" bg="gray" />
-<div grid.row="0" grid.column="1" bg="silver" />
-<div grid.row="1" grid.column="0" grid.columnspan="2" bg="white" />
+<grid columns="100, 500" rows="50, 500">
+	<div grid.row="0" grid.column="0" bg="gray" />
+	<div grid.row="0" grid.column="1" bg="silver" />
+	<div grid.row="1" grid.column="0" grid.columnspan="2" bg="white" />
 </grid>
 
 **Example 2: Using <row>**
 <grid>
-	<row height="2rem">
+	<row height="500px">
 		<div width="100" bg="blue" />
-		<div width="*" bg="green" />
-		<div width="2*" bg="red" />
+		<div width="auto" bg="green" />
+		<div width="auto" bg="red" />
 	</row>
 </grid>
 
 **Example 3: Using <column>**
-<grid columns="200, *">
+<grid columns="200, auto">
 	<column>
 		<div height="100" bg="blue" />
-		<div height="*" bg="green" />
-		<div height="3*" bg="red" />
+		<div height="auto" bg="green" />
+		<div height="auto" bg="red" />
 	</column>
 </grid>
 
-### 3.4 The <dock> Tag
+### The <dock> Tag
 
 Pins children to edges. Mirrors WinForms **DockPanel** behavior.
 
 * **Attributes:** lastchildfill (default true).
 * **Child Logic:** dock.edge (left, right, top, bottom).
 
-### 3.5 The <overlay> Tag
+### The <overlay> Tag
 
-Forces itself to parent size and intercepts all input. **Overlays always render on the highest global layer**, regardless of the z-index of other elements.
+Forces itself to parent size and intercepts all input. **Overlays always render on the highest global layer**.
 
 ---
 
-## 4. Content Tags
+## Content Tags
 
-### 4.1 The <button> Tag
+### The <button> Tag
 
 Interactive element for triggering actions.
 
 * `normal`: `string` - The sprite for the "Idle" state.
 * `hover`: `string` - The sprite for "Hover" state.
 * `pressed`: `string` - The sprite for "Pressed" state.
-* `onClick`: `string` - Method name in the model to call.
+* `onclick`: `string` - Method name in the model to call.
 
-### 4.2 The <input> Tag
+### The <input> Tag
 
 Data entry field.
 
@@ -150,15 +109,15 @@ Data entry field.
 * `min`: `integer` - min for number slider.
 * `max`: `integer` - max for number slider.
 
-### 4.3 The <textarea> Tag
+### The <textarea> Tag
 
 Multi-line text input for long content.
 
-### 4.4 The <select> & <option> Tags
+### The <select> & <option> Tags
 
 Dropdown menu. Supports **multiple** selection attribute.
 
-### 4.5 The <label> Tag
+### The <label> Tag
 
 Text Display.
 
@@ -168,7 +127,7 @@ Text Display.
 * `color`: `Color` - Text color.
 * `wrap`: `bool` - Enable word wrapping.
 
-### 4.5 The <image> Tag
+### The <image> Tag
 
 Graphic Display.
 
@@ -176,7 +135,7 @@ Graphic Display.
 * `stretch`: `enum` - `None`, `Fill`, `Uniform`, `UniformToFill`.
 
 
-## 6. The scroll Attribute & Constraints
+## The scroll Attribute & Constraints
 
 The **scroll** attribute triggers a structural transformation. The tag is wrapped in an outer scroll-viewport (the scroll component), which inherits **all of the tag's styling** (including size, background, borders, and padding). The original tag remains as the direct child of the scroll-viewport, containing all nested children. Example:
 
@@ -202,23 +161,19 @@ Original.suim
 * `Dockpanel (width: 10000, height: 800)`
 * `Label` (Text: "Inventory")
 
-### 6.2 Allowed Variations
+### Allowed Variations
 
 * **scroll="vertical"**: Outer wrapper is a vertical scroll-viewport.
 * **scroll="horizontal"**: Outer wrapper is a horizontal scroll-viewport.
 * **scroll="both"**: Outer wrapper is a horizontal and vertical scroll-viewport.
 
-### 6.3 The "auto" Rule (Experimental)
-
-`auto` resolutions are determined by the engine metric table (using the font information to calculate text sizes) rather than content measurement, ensuring efficiency.
-
-## 7. The border Attribute
+## The border Attribute
 
 The **border** attribute triggers a structural transformation. The tag is wrapped in an outer border-element (the border component). The original tag remains as the direct child of the border, containing all nested children. Example:
 
 Original.suim
 ```xml
-<dock class="myclass">
+<div class="myclass">
 <style>
 .myclass {
 	width: 500;
@@ -227,19 +182,19 @@ Original.suim
 }
 </style>
 	<label value="Inventory" />
-</dock>
+</div>
 
 ```
 
 **Final C# Tree:**
 
 * `Border (Thicknes: 10, Color: "White")`
-* `Dockpanel (width: 10000, height: 800)`
+* `Div (width: 10000, height: 800)`
 * `Label` (Text: "Inventory")
 
 Original.suim
 ```xml
-<dock class="myclass">
+<div class="myclass">
 <style>
 .myclass {
 	width: 500;
@@ -248,67 +203,21 @@ Original.suim
 }
 </style>
 	<label value="Inventory" />
-</dock>
+</div>
 
 ```
 
 **Final C# Tree:**
 
 * `Border (Thicknes: 10 5 0 2, Color: "White")`
-* `Dockpanel (width: 10000, height: 800)`
+* `Div (width: 10000, height: 800)`
 * `Label` (Text: "Inventory")
 
 ---
 
-## 8. Language Grammar & Markup Syntax
+#### Special Formatting Rules for Parser
 
-### A. Primitive Elements & Attributes
-
-Every element in SUIM inherits a set of **Common Attributes** for layout and styling.
-
-#### 1. Common Attributes (Supported by ALL tags)
-
-| Attribute | Type | Description |
-| --- | --- | --- |
-| `id` | `string` | Unique identifier for the element. |
-| `width` | `integer/string` | Fixed pixels (e.g., `100`) or `@variable`. |
-| `height` | `integer/string` | Fixed pixels or `@variable`. |
-| `padding` | `integer/string` | Shorthand for all sides (e.g., `10`). |
-| `margin` | `integer/string` | External spacing (e.g., `5`). |
-| `justify-self` | `enum` | `start`, `center`, `end`. |
-| `justify-items` | `enum` | `start`, `center`, `end`. |
-| `align-self` | `enum` | `start`, `center`, `end`. |
-| `align-items` | `enum` | `start`, `center`, `end`. |
-| `visibility` | `enum/bool` | `visible`, `collapsed`, `hidden`. |
-| `opacity` | `integer` | Transparency `0.0` to `1.0`. |
-| `background` | `string/Color` | Hex code, color name. Alias: bg |
-| `class` | `string` | Space-separated styles. |
-| `x, y` | `integer` | Pixel offset (required for <div> or anchor). |
-| `z-index` | `integer` |  **Global Layering.** Higher values render on top of lower values across the entire application. |
-| `anchor` | `string` | Pin to edges: `top`, `bottom`, `left`, `right`, or combinations (e.g., `top,left`). |
-
-#### 1.2 Common Container Attributes (Supported by ALL Container and Layout tags)
-
-* `gap`: `integer` - Spacing between children on both axis.
-* `row-gap`: `integer` - Spacing between children vertically.
-* `column-gap`: `integer` - Spacing between children horizontally.
-* `clip`: `bool` - If true, children outside bounds are not drawn.
-* `slicewidth`: `integer|integer integer integer integer` - Thickness of the 9-slice border or borders.
-* `scroll`: `both|vertical|horizontal` - Wraps the tag in an outer scroll-container.
-
-
----
-
-#### B. Special Formatting Rules for Parser
-
-1. **Color Formatting:** Supported as Hex (`#FFFFFF`), RGBA (`255,255,255,255`), or named colors (`Red`).
-2. **Size Units:** 
-   * Numbers (e.g., `100` or `100px`) are treated as **Pixels**.
-   * Fractional units (e.g., `1fr`, `2fr`) are treated as **proportional space**.
-   * `Auto` tells the layout engine to use the **MetricTable** to fit content.
-   * `em` and `rem` are font-relative units.
-
-3. **Attribute Precedence:**
+ **Attribute Precedence:**
    When the same property is defined in multiple places, the following precedence applies (highest wins):
    * Inline attributes (e.g., `<div width="100">`) - **Highest priority**
    * ID selector in CSS (e.g., `#myDiv { width: 200; }`)
@@ -316,14 +225,14 @@ Every element in SUIM inherits a set of **Common Attributes** for layout and sty
    * Tag selector in CSS (e.g., `div { width: 120; }`)
    * Universal selector in CSS (e.g., `* { width: 100; }`) - **Lowest priority**
 
-4. **The `@` Prefix:**
+ **The `@` Prefix:**
 * If any attribute starts with `@`, the **Hydrator** must create a `PropertyBinding` instead of a static assignment.
 
 
 ---
 
 
-### C. Control Flow (The `@` Directive)
+### Control Flow (The `@` Directive)
 
 Control flow is resolved during the **Expansion Pass** before the layout engine runs.
 Supported syntax is:
@@ -415,7 +324,7 @@ The parser must clone the inner XML (label in this case) 100 times, i will go fr
 Within the loop, `@i` or `@item` or `@item.Property` acts as a local binding, the engine will call .ToString() if the types dont match and the target type is string, otherwise it will fail.
 
 
-### E. Custom Components (Tags)
+### Custom Components (Tags)
 
 * Any tag not in the primitive list is treated as a file-based component (e.g., `<MyButton />` and `<mybutton />` looks for `MyButton.suim`, everything is case insensitive).
 * Attributes passed to custom tags override the local `<model>`.
@@ -454,43 +363,15 @@ Result in this output:
 ```
 
 
-### F. Data Binding Syntax
+### Data Binding Syntax
 
 * **Static:** `width="100"` (Immediate value)
 * **Dynamic Binding:** `width="@currentWidth"` (Links to a Model Property via Reflection/Getters)
 
----
-
-## 3. The Processing Pipeline
-
-### Phase 1: Expansion (Pre-Processing)
-
-* **Input:** Raw `.suim` XML + Data Model.
-* **Task:** Resolve all `@directives`. Expand custom tags into their internal XML.
-* **Output:** A "Flat XML" string containing only primitive tags and static/binding attributes.
-
-### Phase 2: Hydration (Object Creation)
-
-* **Input:** Flat XML.
-* **Task:** Instantiate C# objects.
-* **Binding:** If an attribute starts with `@`, create a `PropertyBinding` object linking the Model to the UI Element property.
-
-### Phase 3: Layout (Pass)
-
-* **Measurement:** Use `MetricTable` (cached character widths) instead of `MeasureString` for speed.
-* **Vertical Pass:** Calculate `LineHeight` based on font size or Stride's `LineSpacing`.
 
 ---
 
-## 4. Performance Requirements
-
-1. **Zero Garbage Collection:** Avoid string allocations during the Layout Pass.
-2. **Deterministic Measurement:** Character widths must be pre-calculated into a `float[256]` array.
-3. **One-Pass Layout:** Sizes must be calculated in a single walk of the tree.
-
----
-
-## 6. Example Input/Output
+## Example Input/Output
 
 **Input (`Inventory.suim`):**
 
@@ -525,6 +406,19 @@ Result in this output:
 * `Stackpanel (Orientation: "Vertical")`
 * `Label` (Text: "Inventory")
 * `Grid` (Binding: Width -> Model.invWidth)
+
+
+---
+
+## ⚠️ Note: Yoga gotchas
+
+Always set explicit root size (Width, Height)
+
+Use FlexGrow = 1 instead of relying on percentages for fill
+
+Avoid % height deep in the tree unless all ancestors have sizes
+
+If you animate sizes, call CalculateLayout() after changes
 
 
 Wood Image from:

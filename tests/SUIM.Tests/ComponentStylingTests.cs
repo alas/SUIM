@@ -3,7 +3,6 @@ namespace SUIM.Tests;
 using System;
 using System.IO;
 using Xunit;
-using SUIM.Layout;
 using SUIM.Parse;
 using SUIM.Parse.Components;
 
@@ -96,10 +95,12 @@ public class ComponentStylingTests
 
         var parentDiv = (Div)root;
         var c1Comp = (CustomComponent)parentDiv.Children[0];
+        Assert.NotNull(c1Comp);
         var c2Comp = (CustomComponent)parentDiv.Children[1];
 
         var c2Div = (Div)c2Comp.Children[0];
         // Child2 should NOT be green (styles from Child1 should not leak to sibling)
+        Assert.Null(c2Div.Color);
     }
 
     [Fact]
@@ -183,7 +184,7 @@ public class ComponentStylingTests
     {
         // Create a simple button with CSS-style sizing
         var markup = @"
-            <grid>
+            <div>
                 <style>
                     button {
                         width: 200px;
@@ -194,26 +195,27 @@ public class ComponentStylingTests
                 <vstack>
                     <button>Test</button>
                 </vstack>
-            </grid>";
+            </div>";
 
         var (suimElement, _) = MarkupParser.Parse(markup);
+        suimElement.CalculateLayout(500, 500);
 
         // Check that the button has the right width/height attributes
         var vstack = suimElement.Children[0];
         var button = vstack.Children[0];
 
         Assert.NotNull(button);
-        Assert.Equal("200px", button.Width);
-        Assert.Equal("50px", button.Height);
-        Assert.Equal("5px", button.Margin);
+        Assert.Equal(200, button.GetWidth());
+        Assert.Equal(50, button.GetHeight());
+        Assert.Equal(5, Convert.ToSingle(button.GetAttribute("margin-top")));
 
         // Now layout it
-        LayoutEngine.Layout(suimElement, 16, 1280, 720);
+        suimElement.CalculateLayout(1280, 720);
 
         // Check actual dimensions
         var buttonActual = vstack.Children[0];
-        Assert.Equal(200, buttonActual.ActualWidth);
-        Assert.Equal(50, buttonActual.ActualHeight);
+        Assert.Equal(200, buttonActual.GetWidth());
+        Assert.Equal(50, buttonActual.GetHeight());
     }
 
     [Fact]
@@ -246,10 +248,10 @@ public class ComponentStylingTests
 
         // The second button rule should merge with and override the first
         // Expected: width=200px, height=50px, margin=5px, color=red (from first rule, not overridden)
-        Assert.Equal("200px", button.Width);
-        Assert.Equal("50px", button.Height);
-        Assert.Equal("5px", button.Margin);
-        Assert.Equal("red", button.Color);
+        Assert.Equal("200px", button.GetAttribute("width"));
+        Assert.Equal("50px", button.GetAttribute("height"));
+        Assert.Equal(5, Convert.ToSingle(button.GetAttribute("margin-top")));
+        Assert.Equal("red", button.GetAttribute("color"));
     }
 
     [Fact]
@@ -265,7 +267,7 @@ public class ComponentStylingTests
         File.WriteAllText(cssPath, cssContent);
 
         var markup = $@"
-            <grid>
+            <div>
                 <style src=""{Path.GetFileName(cssPath)}"" />
                 <style>
                     button {{
@@ -275,17 +277,18 @@ public class ComponentStylingTests
                     }}
                 </style>
                 <button>Test</button>
-            </grid>";
+            </div>";
 
         var (suimElement, _) = MarkupParser.Parse(markup, basePath: GetTestPath(""));
+        suimElement.CalculateLayout(500, 500);
         var button = suimElement.Children[0];
 
         // External CSS should be merged with inline style
         // Inline style (later) should override CSS file values for width/height
         // Color should come from CSS (not overridden by inline)
-        Assert.Equal("200px", button.Width);
-        Assert.Equal("50px", button.Height);
-        Assert.Equal("5px", button.Margin);
-        Assert.Equal("blue", button.Color);
+        Assert.Equal("200px", button.GetAttribute("width"));
+        Assert.Equal("50px", button.GetAttribute("height"));
+        Assert.Equal(5, Convert.ToSingle(button.GetAttribute("margin-top")));
+        Assert.Equal("blue", button.GetAttribute("color"));
     }
 }
