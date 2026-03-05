@@ -1,5 +1,7 @@
 namespace SUIM.Parse.Components;
 
+using SUIM.Flexbox;
+
 public class Border() : UIElement(nameof(Border))
 {
     public string? Value { get; set; }
@@ -42,5 +44,27 @@ public class Border() : UIElement(nameof(Border))
         {
             base.SetAttribute(name, value);
         }
+    }
+
+    internal override void ApplySUIMLayout()
+    {
+        if (!string.IsNullOrWhiteSpace(Thickness))
+        {
+            var parts = Thickness.Split([' ', '\t'], StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length == 1 && Flex.ParseValueFromString(parts[0], out var all))
+            {
+                Node.StyleSetBorder(Edge.All, all.ValueUnit);
+            }
+            else if (parts.Length == 4)
+            {
+                if (Flex.ParseValueFromString(parts[0], out var top)) Node.StyleSetBorder(Edge.Top, top.ValueUnit);
+                if (Flex.ParseValueFromString(parts[1], out var right)) Node.StyleSetBorder(Edge.Right, right.ValueUnit);
+                if (Flex.ParseValueFromString(parts[2], out var bottom)) Node.StyleSetBorder(Edge.Bottom, bottom.ValueUnit);
+                if (Flex.ParseValueFromString(parts[3], out var left)) Node.StyleSetBorder(Edge.Left, left.ValueUnit);
+            }
+        }
+
+        base.ApplySUIMLayout();
     }
 }
