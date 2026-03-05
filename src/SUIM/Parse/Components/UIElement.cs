@@ -1,7 +1,8 @@
 namespace SUIM.Parse.Components;
 
-using System.Xml.Linq;
 using SUIM.Flexbox;
+using System.Text;
+using System.Xml.Linq;
 
 public abstract class UIElement
 {
@@ -74,6 +75,12 @@ public abstract class UIElement
     
     internal virtual void ApplySUIMLayout()
     {
+        // TODO: Warn about deep percentage heights
+        //if (HasPercentageHeight() && GetDepth() > 3)
+        //{
+        //    Console.WriteLine("WARNING: Percentage heights deep in tree may not work");
+        //}
+
         foreach (var child in Children)
         {
             child.ApplySUIMLayout();
@@ -384,6 +391,20 @@ public abstract class UIElement
         };
 
     #endregion
+
+    public string ToDebugString(int indent = 0)
+    {
+        var sb = new StringBuilder();
+        sb.Append(new string(' ', indent * 2));
+        sb.AppendLine($"{TagName} [{GetWidth()}x{GetHeight()}] @ ({GetLeft()}, {GetTop()})");
+
+        foreach (var child in Children)
+        {
+            sb.Append(child.ToDebugString(indent + 1));
+        }
+
+        return sb.ToString();
+    }
 }
 
 public record BindingDefinition(string TargetPropertyName, string ModelPropertyName);

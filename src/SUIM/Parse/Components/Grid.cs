@@ -14,7 +14,8 @@ public class Grid() : LayoutElement(nameof(Grid))
 
     internal override void ApplySUIMLayout()
     {
-        foreach (var child in Node.Children.ToList())         {
+        foreach (var child in Node.Children.ToList())
+        {
             Flex.RemoveChild(Node, child);
         }
 
@@ -138,17 +139,30 @@ public class Grid() : LayoutElement(nameof(Grid))
 
         if (element != null)
         {
-            var rowAttr = element.Attribute("grid.row");
-            if (rowAttr != null) gridChild.Row = int.Parse(rowAttr.Value);
-            var colAttr = element.Attribute("grid.column");
-            if (colAttr != null) gridChild.Column = int.Parse(colAttr.Value);
-            var rowspanAttr = element.Attribute("grid.rowspan");
-            if (rowspanAttr != null) gridChild.RowSpan = int.Parse(rowspanAttr.Value);
-            var colspanAttr = element.Attribute("grid.columnspan");
-            if (colspanAttr != null) gridChild.ColumnSpan = int.Parse(colspanAttr.Value);
+            gridChild.Row = ParseIntAttribute(element, "grid.row");
+            gridChild.Column = ParseIntAttribute(element, "grid.column");
+            gridChild.RowSpan = ParseIntAttribute(element, "grid.rowspan");
+            gridChild.ColumnSpan = ParseIntAttribute(element, "grid.columnspan");
         }
 
         GridChildren.Add(gridChild);
+    }
+
+    private static int ParseIntAttribute(XElement element, string attributeName, int defaultValue = 0)
+    {
+        var attr = element.Attribute(attributeName);
+        if (attr != null)
+        {
+            if (!int.TryParse(attr.Value, out var row))
+            {
+                throw new ArgumentException($"{attributeName} must be an integer, got '{attr.Value}' on element {element.Name}");
+            }
+
+            return row;
+        }
+
+        // todo: get next available row/column[span] index if not specified, for now just default to 0
+        return defaultValue;
     }
 
     public override void RemoveChild(UIElement child)

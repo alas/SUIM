@@ -9,7 +9,7 @@ SUIM aims to be familiar to web developers and easy to learn for winforms develo
 
 #### Layout
 
-* ✅ Custom Layout Tags Based on WinForms Box Model(Dock, Stack, Grid, Overlay)
+* ✅ Custom Layout Tags Based on WinForms Box Model (Dock, Stack, Grid)
 * ✅ Flexbox
 * ❌ Grid (maybe later)
 * ❌ float / clear
@@ -83,7 +83,7 @@ Pins children to edges. Mirrors WinForms **DockPanel** behavior.
 
 ### The `<overlay>` Tag
 
-Forces itself to parent size and intercepts all input. **Overlays always render on the highest global layer**.
+Forces itself to parent size and intercepts all input.
 
 ---
 
