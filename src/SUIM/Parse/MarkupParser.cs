@@ -1,7 +1,6 @@
 namespace SUIM.Parse;
 
 using System;
-using System.Collections.Generic;
 using System.Xml.Linq;
 using SUIM.Model;
 using SUIM.Parse.Components;
@@ -318,9 +317,11 @@ public static partial class MarkupParser
         // Layout/Structural tags
         if (tag.Equals("div", StringComparison.OrdinalIgnoreCase)) return new Div();
         if (tag.Equals("stack", StringComparison.OrdinalIgnoreCase)) return new Stack();
-        if (tag.Equals("hstack", StringComparison.OrdinalIgnoreCase) || tag.Equals("hbox", StringComparison.OrdinalIgnoreCase)) 
+        if (tag.Equals("hstack", StringComparison.OrdinalIgnoreCase) || tag.Equals("hbox", StringComparison.OrdinalIgnoreCase)
+            || tag.Equals("stackh", StringComparison.OrdinalIgnoreCase) || tag.Equals("stack-h", StringComparison.OrdinalIgnoreCase)) 
             return new Stack { Orientation = Orientation.Horizontal };
-        if (tag.Equals("vstack", StringComparison.OrdinalIgnoreCase) || tag.Equals("vbox", StringComparison.OrdinalIgnoreCase)) 
+        if (tag.Equals("vstack", StringComparison.OrdinalIgnoreCase) || tag.Equals("vbox", StringComparison.OrdinalIgnoreCase)
+            || tag.Equals("stackv", StringComparison.OrdinalIgnoreCase) || tag.Equals("stack-v", StringComparison.OrdinalIgnoreCase)) 
             return new Stack { Orientation = Orientation.Vertical };
         if (tag.Equals("grid", StringComparison.OrdinalIgnoreCase)) return new Grid();
         if (tag.Equals("dock", StringComparison.OrdinalIgnoreCase)) return new Dock();
