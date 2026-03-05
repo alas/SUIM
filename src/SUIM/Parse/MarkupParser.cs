@@ -218,12 +218,12 @@ public static partial class MarkupParser
                             chunks = SplitAtSingleAtTokens(text);
                         }
 
-                        if (chunks.Count > 1)
+                        if (chunks.Count > 0)
                         {
                             // Mixed static text and dynamic tokens: "Hello @name!" -> ["Hello ", "@name", "!"]
                             foreach (var chunk in chunks)
                             {
-                                UIElement textElement = new Text() { Value = chunk };
+                                UIElement textElement = new Text() { Value = chunk, Font = innerElement.Font, FontSize = innerElement.FontSize };
                                 if (chunk.Length > 1 && chunk.StartsWith('@') && !chunk.StartsWith("@@"))
                                 {
                                     var modelPropName = chunk[1..];
@@ -236,27 +236,6 @@ public static partial class MarkupParser
                                 }
 
                                 innerElement.AddChild(textElement, null);
-                            }
-                        }
-                        else if (chunks.Count == 1)
-                        {
-                            var textElement = innerElement is Text t ? t : new Text();
-                            textElement.Value = text;
-                            if (text.Length > 1 && text.StartsWith('@') && !text.StartsWith("@@"))
-                            {
-                                var modelPropName = text[1..];
-                                textElement.Bindings.Add(new BindingDefinition("value", modelPropName));
-                            }
-
-                            UIElement result = textElement;
-                            if (styles != null && styles.Count > 0)
-                            {
-                                result = CssStyle.ApplyToElement(textElement, styles);
-                            }
-
-                            if (innerElement is not Text)
-                            {
-                                innerElement.AddChild(result, null);
                             }
                         }
                     }

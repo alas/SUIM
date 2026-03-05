@@ -9,6 +9,7 @@ using SUIMStride;
 using SUIM.Parse;
 using SUIM.Model;
 using SUIM.Parse.Components;
+using Stride.UI.Panels;
 
 public class ComponentIsolationTests
 {
@@ -27,7 +28,7 @@ public class ComponentIsolationTests
         var componentMarkup = """
             <div id="popuproot">
                 <model>{ "title": "" }</model>
-                <h1 id="thelabel" value="@title"></h1>
+                <h1 id="thelabel">@title</h1>
             </div>
             """;
         File.WriteAllText(compPath, componentMarkup);
@@ -45,12 +46,13 @@ public class ComponentIsolationTests
         var (strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
 
         // Find first TextBlock in the mapped Stride UI tree and assert its text was set from parent model
-        var found = XPath.Find(strideRoot, "thelabel") as Stride.UI.Controls.TextBlock;
-        Assert.NotNull(found);
-        Assert.Equal("HelloWorld", found!.Text);
+        var found = XPath.Find(strideRoot, "thelabel") as Canvas;
+        var text = found?.Children[0] as Stride.UI.Controls.TextBlock;
+        Assert.NotNull(text);
+        Assert.Equal("HelloWorld", text!.Text);
 
         model!.PopupTitle = "Changed";
-        Assert.Equal("Changed", found!.Text);
+        Assert.Equal("Changed", text!.Text);
     }
 
     [Fact]
@@ -78,7 +80,7 @@ public class ComponentIsolationTests
         var (strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
 
         // Find first TextBlock in the mapped Stride UI tree and assert its text was set from parent model
-        var found = XPath.Find(strideRoot, "thelabel") as Stride.UI.Controls.TextBlock;
+        var found = XPath.Find(strideRoot, "thelabel") as Canvas;
         Assert.NotNull(found);
         Assert.Equal(Stride.UI.Visibility.Collapsed, found!.Visibility);
 
@@ -112,7 +114,7 @@ public class ComponentIsolationTests
         var (strideRoot, model) = suim.Parse(markup, new Game(), model: parentModel);
 
         // Find first TextBlock in the mapped Stride UI tree and assert its text was set from parent model
-        var found = XPath.Find(strideRoot, "thelabel") as Stride.UI.Controls.TextBlock;
+        var found = XPath.Find(strideRoot, "thelabel") as Canvas;
         Assert.NotNull(found);
         Assert.Equal(Stride.UI.Visibility.Collapsed, found!.Visibility);
 

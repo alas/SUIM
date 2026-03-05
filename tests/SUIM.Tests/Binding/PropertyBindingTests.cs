@@ -83,13 +83,12 @@ public class PropertyBindingTests
 </grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
-        var button = element.Children.Single() as Button;
-        var h1 = button?.Children.Single() as H1;
+        var t = element.Children.Single()?.Children.Single()?.Children.Single() as Text;
         
-        Assert.NotNull(h1);
-        Assert.Single(h1!.Bindings);
-        Assert.Equal("value", h1.Bindings[0].TargetPropertyName);
-        Assert.Equal("buttonText", h1.Bindings[0].ModelPropertyName);
+        Assert.NotNull(t);
+        Assert.Single(t!.Bindings);
+        Assert.Equal("value", t.Bindings[0].TargetPropertyName);
+        Assert.Equal("buttonText", t.Bindings[0].ModelPropertyName);
     }
 
     [Fact]

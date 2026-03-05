@@ -12,7 +12,7 @@ public class CustomComponentTests
     {
         // 1. Create a dummy .suim file
         var tempFile = Path.GetTempFileName() + ".suim";
-        File.WriteAllText(tempFile, "<stack><h1 value=\"Inside Custom\"></h1></stack>");
+        File.WriteAllText(tempFile, "<stack><h1>Inside Custom</h1></stack>");
 
         try
         {
@@ -33,7 +33,7 @@ public class CustomComponentTests
             var stack = Assert.IsType<Stack>(custom.Children[0]);
             Assert.Single(stack.Children);
             
-            var label = Assert.IsType<H1>(stack.Children[0]);
+            var label = Assert.IsType<Text>(stack.Children[0].Children[0]);
             Assert.Equal("Inside Custom", label.Value);
         }
         finally

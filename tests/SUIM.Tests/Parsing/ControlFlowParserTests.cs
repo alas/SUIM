@@ -61,8 +61,8 @@ else
         var div = (Div)element;
         Assert.Single(div.Children);
         Assert.IsType<H1>(div.Children[0]);
-        var h1 = (H1)div.Children[0];
-        Assert.Equal("True", h1.Value);
+        var t = (Text)div.Children[0].Children[0];
+        Assert.Equal("True", t.Value);
     }
 
     [Fact]
@@ -84,8 +84,8 @@ else
         var div = (Div)element;
         Assert.Single(div.Children);
         Assert.IsType<H1>(div.Children[0]);
-        var h1 = (H1)div.Children[0];
-        Assert.Equal("False", h1.Value);
+        var t = (Text)div.Children[0].Children[0];
+        Assert.Equal("False", t.Value);
     }
 
     [Fact]
@@ -111,8 +111,8 @@ else
         var div = (Div)element;
         Assert.Single(div.Children);
         Assert.IsType<H1>(div.Children[0]);
-        var h1 = (H1)div.Children[0];
-        Assert.Equal("True", h1.Value);
+        var t = (Text)div.Children[0].Children[0];
+        Assert.Equal("True", t.Value);
     }
 
     [Fact]
@@ -142,8 +142,8 @@ else
         var div = (Div)element;
         Assert.Single(div.Children);
         Assert.IsType<H1>(div.Children[0]);
-        var h1 = (H1)div.Children[0];
-        Assert.Equal("FinalElse", h1.Value);
+        var t = (Text)div.Children[0].Children[0];
+        Assert.Equal("FinalElse", t.Value);
     }
 
     [Fact]
@@ -173,8 +173,8 @@ else
         var div = (Div)element;
         Assert.Single(div.Children);
         Assert.IsType<H1>(div.Children[0]);
-        var h1 = (H1)div.Children[0];
-        Assert.Equal("True", h1.Value);
+        var t = (Text)div.Children[0].Children[0];
+        Assert.Equal("True", t.Value);
     }
 
     [Fact]
@@ -240,8 +240,8 @@ else
         for (int i = 0; i < 3; i++)
         {
             Assert.IsType<H1>(stack.Children[i]);
-            var h1 = (H1)stack.Children[i];
-            Assert.Equal(i.ToString(), h1.Value);
+            var t = (Text)stack.Children[i].Children[0];
+            Assert.Equal(i.ToString(), t.Value);
         }
     }
 
@@ -267,8 +267,8 @@ else
         var div = (Div)element;
         Assert.Single(div.Children);
         Assert.IsType<H1>(div.Children[0]);
-        var h1 = (H1)div.Children[0];
-        Assert.Equal("Matched", h1.Value);
+        var t = (Text)div.Children[0].Children[0];
+        Assert.Equal("Matched", t.Value);
     }
 
     [Fact]
@@ -369,15 +369,15 @@ else
 {
     case 100
     {
-        <h1 value=""Hundred""></h1>
+        <h1>Hundred</h1>
     }
     case 500
     {
-        <h1 value=""FiveHundred""></h1>
+        <h1>FiveHundred</h1>
     }
     default
     {
-        <h1 value=""Other""></h1>
+        <h1>Other</h1>
     }
 }
 </div>";
@@ -386,8 +386,8 @@ else
         Assert.IsType<Div>(element);
         var div = (Div)element;
         Assert.Single(div.Children);
-        var label = (H1)div.Children[0];
-        Assert.Equal("FiveHundred", label.Value);
+        var t = (Text)div.Children[0].Children[0];
+        Assert.Equal("FiveHundred", t.Value);
     }
 
     [Fact]
@@ -417,7 +417,7 @@ else
         var markup = @"<stack>
 @foreach item in Collection
 {
-    <h1 value=""@item""></h1>
+    <h1>@item</h1>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -425,7 +425,7 @@ else
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
         Assert.Equal(2, stack.Children.Count);
-        var labels = stack.Children.Cast<H1>();
+        var labels = stack.Children.Cast<H1>().Select(x => x.Children[0]).Cast<Text>().ToList();
         Assert.Equal("item1", labels.ElementAt(0).Value);
         Assert.Equal("item2", labels.ElementAt(1).Value);
     }
@@ -436,7 +436,7 @@ else
         var markup = @"<stack>
 @foreach item in items
 {
-    <h1 value=""@item.Name""></h1>
+    <h1>@item.Name</h1>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -444,7 +444,7 @@ else
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
         Assert.Equal(2, stack.Children.Count);
-        var labels = stack.Children.Cast<H1>();
+        var labels = stack.Children.Cast<H1>().Select(x => x.Children[0]).Cast<Text>().ToList();
         Assert.Equal("Apple", labels.ElementAt(0).Value);
         Assert.Equal("Banana", labels.ElementAt(1).Value);
     }
@@ -455,7 +455,7 @@ else
         var markup = @"<stack>
 @foreach i in 0..3
 {
-    <h1 value=""@i""></h1>
+    <h1>@i</h1>
 }
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -463,7 +463,7 @@ else
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
         Assert.Equal(3, stack.Children.Count);
-        var labels = stack.Children.Cast<H1>();
+        var labels = stack.Children.Cast<H1>().Select(x => x.Children[0]).Cast<Text>().ToList();
         Assert.Equal("0", labels.ElementAt(0).Value);
         Assert.Equal("1", labels.ElementAt(1).Value);
         Assert.Equal("2", labels.ElementAt(2).Value);
@@ -477,11 +477,11 @@ else
         var markup = @"<button>
 @if identifierbool
 {
-    <h1 value=""Click Me""></h1>
+    <h1>Click Me</h1>
 }
 else
 {
-    <h1 value=""Disabled""></h1>
+    <h1>Disabled</h1>
 }
 </button>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -489,7 +489,7 @@ else
         Assert.IsType<Button>(element);
         var button = (Button)element;
         Assert.Single(button.Children);
-        var label = (H1)button.Children[0];
+        var label = (Text)button.Children[0].Children[0];
         Assert.Equal("Click Me", label.Value);
     }
 

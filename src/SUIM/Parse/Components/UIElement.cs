@@ -15,6 +15,10 @@ public abstract class UIElement
     public string? StopClicks { get; set; }
     public string? BackgroundImage { get; set; }
 
+    // Text related properties (for elements that support text)
+    public string? Font { get; set; }
+    public string? FontSize { get; set; }
+
     // Internal properties to the engine - not directly settable via markup attributes
     public string TagName { get; }
     public bool IsComponentRoot { get; set; }
@@ -122,6 +126,14 @@ public abstract class UIElement
         {
             ReadOnly = value as string;
         }
+        else if (name.Equals("font", StringComparison.OrdinalIgnoreCase))
+        {
+            Font = value as string;
+        }
+        else if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase) || name.Equals("font-size", StringComparison.OrdinalIgnoreCase))
+        {
+            FontSize = value as string;
+        }
         else if (name.Contains('.'))
         {
             // ignore parent properties
@@ -158,6 +170,8 @@ public abstract class UIElement
         if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase)) return Opacity;
         if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase)) return (this as IPlaceholder)?.Placeholder;
         if (name.Equals("readonly", StringComparison.OrdinalIgnoreCase)) return ReadOnly;
+        if (name.Equals("font", StringComparison.OrdinalIgnoreCase)) return Font;
+        if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase) || name.Equals("font-size", StringComparison.OrdinalIgnoreCase)) return FontSize;
 
         if (AllProperties.TryGetValue(name, out var normalized))
         {

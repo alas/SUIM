@@ -81,20 +81,43 @@ public class TextArea() : Text(nameof(TextArea)), IPlaceholder
     }
 }
 
-public class P() : Text(nameof(P)) { }
+public class Label() : LayoutElement(nameof(Label))
+{
+    public string? For { get; set; }
 
-public class H1() : Text(nameof(H1)) { }
+    public override void SetAttribute(string name, object? value)
+    {
+        if (name.Equals("for", StringComparison.OrdinalIgnoreCase))
+        {
+            For = value is string s ? s : value?.ToString();
+        }
+        else
+        {
+            base.SetAttribute(name, value);
+        }
+    }
 
-public class H2() : Text(nameof(H2)) { }
+    public override string? GetAttribute(string name)
+    {
+        if (name.Equals("for", StringComparison.OrdinalIgnoreCase)) return For;
+        return base.GetAttribute(name);
+    }
+}
 
-public class H3() : Text(nameof(H3)) { }
+public class P() : UIElement(nameof(P)) { }
 
-public class H4() : Text(nameof(H4)) { }
+public class H1() : UIElement(nameof(H1)) { }
 
-public class H5() : Text(nameof(H5)) { }
+public class H2() : UIElement(nameof(H2)) { }
 
-public class H6() : Text(nameof(H6)) { }
+public class H3() : UIElement(nameof(H3)) { }
 
-public class H7() : Text(nameof(H7)) { }
+public class H4() : UIElement(nameof(H4)) { }
 
-public class H8() : Text(nameof(H8)) { }
+public class H5() : UIElement(nameof(H5)) { }
+
+public class H6() : UIElement(nameof(H6)) { }
+
+public class H7() : UIElement(nameof(H7)) { }
+
+public class H8() : UIElement(nameof(H8)) { }

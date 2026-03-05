@@ -68,7 +68,7 @@ public class MarkupParserTests
         Assert.Equal(2, stack.Children.Count);
         Assert.IsType<H1>(stack.Children[0]);
         Assert.IsType<Button>(stack.Children[1]);
-        var label = (H1)stack.Children[0];
+        var label = (Text)stack.Children[0].Children[0];
         Assert.Equal("Hello", label.Value);
     }
 
@@ -131,11 +131,11 @@ public class MarkupParserTests
     [Fact]
     public void Parse_Label()
     {
-        var markup = "<h1 value=\"Test Label\"></h1>";
+        var markup = "<h1>Test Label</h1>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<H1>(element);
-        var label = (H1)element;
+        var label = (Text)element.Children[0];
         Assert.Equal("Test Label", label.Value);
     }
 
@@ -175,7 +175,7 @@ public class MarkupParserTests
     [Fact]
     public void Parse_NestedElements()
     {
-        var markup = "<stack><div><h1 value=\"Nested\"></h1></div></stack>";
+        var markup = "<stack><div><h1>Nested</h1></div></stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
@@ -183,7 +183,7 @@ public class MarkupParserTests
         Assert.Single(stack.Children);
         var div = (Div)stack.Children[0];
         Assert.Single(div.Children);
-        var label = (H1)div.Children[0];
+        var label = (Text)div.Children[0].Children[0];
         Assert.Equal("Nested", label.Value);
     }
 
@@ -295,16 +295,15 @@ public class MarkupParserTests
     [Fact]
     public void Parse_Label_WithAllAttributes()
     {
-        var markup = "<h1 value=\"Hello\" wrap=\"true\" style=\"font:Arial; fontsize:16; color:#FF0000\"></h1>";
+        var markup = "<h1 style=\"font:Arial; fontsize:16; color:#FF0000\">Hello</h1>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<H1>(element);
         var label = (H1)element;
-        Assert.Equal("Hello", label.Value);
-        Assert.Equal("Arial", label.Font);
-        Assert.Equal(16f, Convert.ToSingle(label.FontSize));
+        Assert.Equal("Hello", ((Text)label.Children[0]).Value);
+        Assert.Equal("Arial", label.GetAttribute("font"));
+        Assert.Equal(16, Convert.ToSingle(label.GetAttribute("fontsize")));
         Assert.Equal("#FF0000", label.Color);
-        Assert.True(label.Wrap);
     }
 
     [Fact]
@@ -552,11 +551,11 @@ public class MarkupParserTests
         var markup = @"<button>
 @if identifierbool
 {
-    <h1 value=""Click Me""></h1>
+    <h1>Click Me</h1>
 }
 else
 {
-    <h1 value=""Disabled""></h1>
+    <h1>Disabled</h1>
 }
 </button>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -564,7 +563,7 @@ else
         Assert.IsType<Button>(element);
         var button = (Button)element;
         Assert.Single(button.Children);
-        var label = (H1)button.Children[0];
+        var label = (Text)button.Children[0].Children[0];
         Assert.Equal("Click Me", label.Value);
     }
 
@@ -943,17 +942,6 @@ else
     // ============== LABEL WITH OPTIONAL TEXT ==============
 
     [Fact]
-    public void Parse_Label_WithoutWrap()
-    {
-        var markup = "<h1 value=\"Test\" wrap=\"false\"></h1>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
-
-        Assert.IsType<H1>(element);
-        var label = (H1)element;
-        Assert.False(label.Wrap);
-    }
-
-    [Fact]
     public void Parse_Label_WithColor()
     {
         var markup = "<label value=\"Colored\" color=\"blue\"></label>";
@@ -1014,7 +1002,7 @@ else
 <stack>
 <div>
 <stack>
-<h1 value=""Deep""></h1>
+<h1>Deep</h1>
 </stack>
 </div>
 </stack>
@@ -1026,7 +1014,7 @@ else
         var stack = (Stack)div.Children[0];
         var innerDiv = (Div)stack.Children[0];
         var innerStack = (Stack)innerDiv.Children[0];
-        var label = (H1)innerStack.Children[0];
+        var label = (Text)innerStack.Children[0].Children[0];
         Assert.Equal("Deep", label.Value);
     }
 
@@ -1037,8 +1025,8 @@ else
     {
         var markup = @"<button>
 <stack>
-<label value=""Icon""></label>
-<label value=""Label""></label>
+<label>Icon</label>
+<label>Label</label>
 </stack>
 </button>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1084,7 +1072,7 @@ else
     {
         var markup = @"<stack>
 Text before
-<h1 value=""Label""></h1>
+<h1>Label</h1>
 Text after
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1099,7 +1087,7 @@ Text after
         
         // Second child: label element
         Assert.IsType<H1>(stack.Children[1]);
-        Assert.Equal("Label", ((H1)stack.Children[1]).Value);
+        Assert.Equal("Label", ((Text)stack.Children[1].Children[0]).Value);
         
         // Third child: text "Text after"
         Assert.IsType<Text>(stack.Children[2]);
@@ -1275,7 +1263,7 @@ Text after
     {
         var markup = @"<div style=""width:300px; height:200px; background:lightgray;"">
 <border thickness=""2"" color=""red"">
-<h1 value=""Bordered Inner Content""></h1>
+<h1>Bordered Inner Content</h1>
 </border>
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1290,7 +1278,7 @@ Text after
         var border = (Border)div.Children[0];
         Assert.Equal("red", border.Color);
         Assert.Single(border.Children);
-        var label = (H1)border.Children[0];
+        var label = (Text)border.Children[0].Children[0];
         Assert.Equal("Bordered Inner Content", label.Value);
     }
 
