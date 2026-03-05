@@ -27,7 +27,7 @@ SUIM aims to be familiar to web developers and easy to learn for winforms develo
 
 ---
 
-## Structural & Layout Tags
+## Structural and Layout Tags
 
 ### The <div> Tag
 
@@ -113,7 +113,7 @@ Data entry field.
 
 Multi-line text input for long content.
 
-### The <select> & <option> Tags
+### The <select> and <option> Tags
 
 Dropdown menu. Supports **multiple** selection attribute.
 
@@ -135,7 +135,7 @@ Graphic Display.
 * `stretch`: `enum` - `None`, `Fill`, `Uniform`, `UniformToFill`.
 
 
-## The scroll Attribute & Constraints
+## The scroll Attribute and Constraints
 
 The **scroll** attribute triggers a structural transformation. The tag is wrapped in an outer scroll-viewport (the scroll component), which inherits **all of the tag's styling** (including size, background, borders, and padding). The original tag remains as the direct child of the scroll-viewport, containing all nested children. Example:
 
