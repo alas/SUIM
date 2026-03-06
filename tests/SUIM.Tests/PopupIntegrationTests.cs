@@ -3,6 +3,7 @@ namespace SUIM.Tests;
 using SUIM.Parse.Components;
 using System.Text;
 using Xunit;
+using static Stride.Graphics.Buffer;
 
 public class PopupIntegrationTests
 {
@@ -28,8 +29,9 @@ public class PopupIntegrationTests
         // Find overlay component
         var overlay = FindOverlay(suimRoot);
         Assert.NotNull(overlay);
+
         var sb = new StringBuilder();
-        GetLayout(overlay, sb);
+        overlay.AppendDebugString(sb);
         Console.WriteLine(sb.ToString());
 
         // Overlay should fill entire screen
@@ -77,15 +79,5 @@ public class PopupIntegrationTests
             if (found != null) return found;
         }
         return null;
-    }
-
-    private static void GetLayout(UIElement element, StringBuilder sb, int indent = 0)
-    {
-        element.AppendDebugString(sb, indent);
-
-        foreach (var child in element.Children)
-        {
-            GetLayout(child, sb, indent + 1);
-        }
     }
 }

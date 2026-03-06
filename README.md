@@ -2,14 +2,32 @@
 
 ## Overview
 
-SUIM aims to reuse existing tags and concepts found in HTML and CSS while also incorporating foundational concepts from WinForms, such as explicit anchoring and docking logic, for desktop-grade application development.
-SUIM aims to be familiar to web developers and easy to learn for winforms developers.
+SUIM combines web-familiar HTML/CSS tags with desktop-oriented layout components for building game and application UIs.
 
-### SUIM officially supports:
+**Design Philosophy:**
+- **HTML-like tags** (`<div>`, `<button>`, `<input>`, etc.) behave like their web counterparts
+- **Desktop layout tags** (`<grid>`, `<dock>`, `<overlay>`, `<stack>`) provide explicit, predictable positioning for complex UIs
+- Flexbox support for flexible layouts
+- CSS-style properties for familiar styling
+
+### Tag Categories
+
+#### Web-Familiar Tags
+These tags behave like their HTML equivalents:
+- `<div>` - Block container, stacks children vertically
+- `<button>`, `<input>`, `<textarea>`, `<select>` - Form controls
+- `<label>`, `<h1>`-`<h8>`, `<p>` - Text elements
+- `<image>` - Graphics display
+
+#### Desktop Layout Tags
+These tags provide explicit layout control:
+- `<grid>` - Matrix layout with explicit row/column placement
+- `<dock>` - Pin children to edges (top, bottom, left, right)
+- `<stack>` - Sequential arrangement along one axis
+- `<overlay>` - Full-screen layer for modals and popups
 
 #### Layout
 
-* ✅ Custom Layout Tags Based on WinForms Box Model (Dock, Stack, Grid)
 * ✅ Flexbox
 * ❌ float / clear
 * ❌ position: fixed
