@@ -1,5 +1,6 @@
 ﻿namespace SUIMStride;
 
+using System.Data;
 using Stride.UI;
 using Stride.UI.Controls;
 using StrideButton = Stride.UI.Controls.Button;
@@ -7,7 +8,6 @@ using StrideUIElement = Stride.UI.UIElement;
 using SUIM;
 using SUIM.Model;
 using SUIMElement = SUIM.Parse.Components.UIElement;
-using System.Data;
 
 internal static class Bindings
 {
