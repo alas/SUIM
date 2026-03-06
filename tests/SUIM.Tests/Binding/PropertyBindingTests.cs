@@ -44,7 +44,7 @@ public class PropertyBindingTests
     [Fact]
     public void Parse_DataBinding_Text_CreatesBindingDefinition()
     {
-        var markup = "<input id=\"username\" name=\"username\" type=\"text\" value=\"@stringValue\" />";
+        var markup = "<input id=\"username\" type=\"text\" value=\"@stringValue\" />";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);

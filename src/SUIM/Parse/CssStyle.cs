@@ -52,7 +52,7 @@ public static class CssStyle
                 {
                     if (!styles.TryGetValue(selector, out Dictionary<string, string>? value))
                     {
-                        value = new Dictionary<string, string>();
+                        value = [];
                         styles[selector] = value;
                     }
 
@@ -70,8 +70,10 @@ public static class CssStyle
     /// Applies styles to an element based on CSS-like precedence rules.
     /// Precedence order: universal (*) < tag < class < id
     /// </summary>
-    internal static UIElement ApplyToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles)
+    internal static UIElement ApplyToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles, string? styleAttribute)
     {
+        var hasStyle = styles?.Count > 0;
+
         var elementTag = element.TagName;
         var elementId = element.GetAttribute("id");
         var elementClass = element.GetAttribute("class");
@@ -80,7 +82,7 @@ public static class CssStyle
         var mergedProperties = new Dictionary<string, string>();
 
         // Universal selector (lowest precedence)
-        if (styles.TryGetValue("*", out var universalProps))
+        if (hasStyle && styles!.TryGetValue("*", out var universalProps))
         {
             foreach (var kvp in universalProps)
             {
@@ -89,7 +91,7 @@ public static class CssStyle
         }
 
         // Tag selector
-        if (styles.TryGetValue(elementTag, out var tagProps))
+        if (hasStyle && styles!.TryGetValue(elementTag, out var tagProps))
         {
             foreach (var kvp in tagProps)
             {
@@ -98,13 +100,13 @@ public static class CssStyle
         }
 
         // Class selector(s) - support multiple space-separated classes
-        if (!string.IsNullOrEmpty(elementClass))
+        if (hasStyle && !string.IsNullOrEmpty(elementClass))
         {
             var classes = elementClass.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             foreach (var className in classes)
             {
                 var classSelector = "." + className.ToLowerInvariant();
-                if (styles.TryGetValue(classSelector, out var classProps))
+                if (styles!.TryGetValue(classSelector, out var classProps))
                 {
                     foreach (var kvp in classProps)
                     {
@@ -114,15 +116,31 @@ public static class CssStyle
             }
         }
 
-        // ID selector (highest precedence)
-        if (!string.IsNullOrEmpty(elementId))
+        // ID selector
+        if (hasStyle && !string.IsNullOrEmpty(elementId))
         {
             var idSelector = "#" + elementId.Trim().ToLowerInvariant();
-            if (styles.TryGetValue(idSelector, out var idProps))
+            if (styles!.TryGetValue(idSelector, out var idProps))
             {
                 foreach (var kvp in idProps)
                 {
                     mergedProperties[kvp.Key] = kvp.Value;
+                }
+            }
+        }
+
+        // Inline style attribute (highest precedence, overrides all)
+        if (styleAttribute != null)
+        {
+            var stylePairs = styleAttribute.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var pair in stylePairs)
+            {
+                var kv = pair.Split(':', 2);
+                if (kv.Length == 2)
+                {
+                    var key = kv[0].Trim();
+                    var val = kv[1].Trim();
+                    mergedProperties[key] = val;
                 }
             }
         }
@@ -140,12 +158,12 @@ public static class CssStyle
     {
         // Extract border and scroll attributes for special handling
         string? borderAttr = null;
-        string? scrollAttr = null;
+        List<string> scrollAttr = [];
         var regularAttrs = new Dictionary<string, string>();
         var wrapperAttrs = new Dictionary<string, string>();
         // Pre-check whether this style will create a wrapper so layout attributes can be routed to it.
         bool willWrapWithBorder = properties.Keys.Any(k => k.Equals("border", StringComparison.OrdinalIgnoreCase));
-        bool willWrapWithScroll = properties.Keys.Any(k => k.Equals("scroll", StringComparison.OrdinalIgnoreCase));
+        bool willWrapWithScroll = properties.Any(x => x.Key.StartsWith("overflow", StringComparison.OrdinalIgnoreCase) && x.Value.Equals("scroll", StringComparison.OrdinalIgnoreCase));
         bool willWrapWithBG = properties.Keys.Any(k => k.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase));
 
         foreach (var kvp in properties)
@@ -157,9 +175,9 @@ public static class CssStyle
             {
                 borderAttr = propValue;
             }
-            else if (propName.Equals("scroll", StringComparison.OrdinalIgnoreCase))
+            else if (propName.StartsWith("overflow", StringComparison.OrdinalIgnoreCase) && propValue.Equals("scroll", StringComparison.OrdinalIgnoreCase))
             {
-                scrollAttr = propValue;
+                scrollAttr.Add(propName);
             }
             else if (propName.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase))
             {
@@ -184,25 +202,33 @@ public static class CssStyle
         }
 
         // Handle scroll wrapper
-        if (!string.IsNullOrEmpty(scrollAttr))
+        if (scrollAttr.Count > 0)
         {
-            var scroll = new Scroll();
-            if (Enum.TryParse<ScrollDirection>(scrollAttr, true, out var dir))
+            var hasScrollX = scrollAttr.Any(x => x.Equals("overflow", StringComparison.OrdinalIgnoreCase)
+                || x.Equals("overflow-x", StringComparison.OrdinalIgnoreCase));
+            var hasScrollY = scrollAttr.Any(x => x.Equals("overflow", StringComparison.OrdinalIgnoreCase)
+                || x.Equals("overflow-y", StringComparison.OrdinalIgnoreCase));
+            if (hasScrollX || hasScrollY)
             {
-                scroll.Direction = dir;
-            }
+                var scroll = new Scroll
+                {
+                    Direction = hasScrollX && hasScrollY
+                        ? ScrollDirection.Both : hasScrollX
+                        ? ScrollDirection.Horizontal : ScrollDirection.Vertical
+                };
 
-            // Apply any layout attributes from the style to the scroll wrapper (width/height etc.)
-            foreach (var kvp in wrapperAttrs)
-            {
-                scroll.SetAttribute(kvp.Key, kvp.Value);
-            }
-            // Fallback: also apply explicit width/height from properties if present (defensive)
-            if (properties.TryGetValue("width", out var w)) scroll.SetAttribute("width", w);
-            if (properties.TryGetValue("height", out var h)) scroll.SetAttribute("height", h);
+                // Apply any layout attributes from the style to the scroll wrapper (width/height etc.)
+                foreach (var kvp in wrapperAttrs)
+                {
+                    scroll.SetAttribute(kvp.Key, kvp.Value);
+                }
+                // Fallback: also apply explicit width/height from properties if present (defensive)
+                if (properties.TryGetValue("width", out var w)) scroll.SetAttribute("width", w);
+                if (properties.TryGetValue("height", out var h)) scroll.SetAttribute("height", h);
 
-            scroll.AddChild(element, null);
-            element = scroll;
+                scroll.AddChild(element, null);
+                element = scroll;
+            }
         }
 
         // Handle border wrapper (must be applied last to wrap scroll if present)

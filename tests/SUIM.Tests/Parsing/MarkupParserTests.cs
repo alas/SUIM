@@ -1133,11 +1133,11 @@ Text after
     [Fact]
     public void Parse_Stack_WithScroll_Vertical()
     {
-        var markup = @"<stack orientation=""vertical"" scroll=""vertical"">
+        var markup = @"<vstack style=""overflow-y:scroll"">
 <label>Item 1</label>
 <label>Item 2</label>
 <label>Item 3</label>
-</stack>";
+</vstack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Scroll>(element);
@@ -1154,10 +1154,10 @@ Text after
     [Fact]
     public void Parse_Stack_WithScroll_Horizontal()
     {
-        var markup = @"<stack orientation=""horizontal"" scroll=""horizontal"">
+        var markup = @"<hstack  style=""overflow-x:scroll"">
 <label>Item 1</label>
 <label>Item 2</label>
-</stack>";
+</hstack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Scroll>(element);
@@ -1174,7 +1174,7 @@ Text after
     [Fact]
     public void Parse_Stack_WithScroll_Both()
     {
-        var markup = @"<stack scroll=""both"">
+        var markup = @"<stack style=""overflow:scroll"">
 <div width=""1000"" height=""800"" />
 </stack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
@@ -1188,13 +1188,41 @@ Text after
     }
 
     [Fact]
-    public void Parse_Stack_WithScroll_WithAllAttributes()
+    public void Parse_Stack_WithScroll_InlineStyle()
     {
-        var markup = @"<stack orientation=""vertical"" scroll=""vertical"" width=""400"" height=""300"" gap=""5"">
+        var markup = @"<vstack style=""overflow-y:scroll; width:400; height:300; gap:5;"" >
 <label>Scrollable Item 1</label>
 <label>Scrollable Item 2</label>
 <label>Scrollable Item 3</label>
-</stack>";
+</vstack>";
+        var (element, _) = MarkupParser.Parse(markup, _model);
+
+        Assert.IsType<Scroll>(element);
+        var scroll = (Scroll)element;
+        Assert.Equal(ScrollDirection.Vertical, scroll.Direction);
+        Assert.Equal("400", scroll.GetAttribute("width"));
+        Assert.Equal("300", scroll.GetAttribute("height"));
+        
+        Assert.Single(scroll.Children);
+        var stack = (Stack)scroll.Children[0];
+        Assert.IsType<Stack>(stack);
+        Assert.Equal(Orientation.Vertical, stack.Orientation);
+        // Inner element should default to `auto` sizing when wrapped by a scroll-viewport
+        Assert.Equal("auto", stack.GetAttribute("width"));
+        Assert.Equal("auto", stack.GetAttribute("height"));
+        // gap is component specific, goes to stack
+        Assert.Equal("5", stack.Gap);
+        Assert.Equal(3, stack.Children.Count);
+    }
+
+    [Fact]
+    public void Parse_Stack_WithScroll_WithAllAttributes()
+    {
+        var markup = @"<vstack style=""overflow-y:scroll"" width=""400"" height=""300"" gap=""5"" >
+<label>Scrollable Item 1</label>
+<label>Scrollable Item 2</label>
+<label>Scrollable Item 3</label>
+</vstack>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Scroll>(element);

@@ -71,7 +71,7 @@ public class TextArea() : Text(nameof(TextArea)), IPlaceholder
     }
 }
 
-public class Label() : LayoutElement(nameof(Label))
+public class Label() : UIElement(nameof(Label))
 {
     public string? For { get; set; }
 

@@ -13,7 +13,7 @@
 			<hstack>
 				<h1>@title</h1>
 			</hstack>
-			<vstack margin="6" scroll="auto" class="centeredcontent">
+			<vstack margin="6" class="centeredcontent todoScroll">
 				<h3>@message</h3>
 			</vstack>
 			<hstack class="hstack2 centeredcontent">

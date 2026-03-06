@@ -97,20 +97,30 @@ public static partial class MarkupParser
         var rootElement = innerElement;
 
         var attributes = element.Attributes().ToList();
-        var scrollAttr = attributes.FirstOrDefault(a => a.Name.LocalName.Equals("scroll", StringComparison.OrdinalIgnoreCase));
+        var scrollAttr = attributes.Where(a => a.Name.LocalName.StartsWith("overflow", StringComparison.OrdinalIgnoreCase)
+            && a.Value.Equals("scroll", StringComparison.OrdinalIgnoreCase)).Select(x => x.Name.LocalName).ToList();
         var borderAttr = attributes.FirstOrDefault(a => a.Name.LocalName.Equals("border", StringComparison.OrdinalIgnoreCase));
         var bgAttr = attributes.FirstOrDefault(a => a.Name.LocalName.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase));
+        var styleAttr = attributes.FirstOrDefault(a => a.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))?.Value;
 
-        if (scrollAttr != null)
+        if (scrollAttr.Count > 0)
         {
-            var scroll = new Scroll();
-            if (Enum.TryParse<ScrollDirection>(scrollAttr.Value, true, out var dir))
+            var hasScrollX = scrollAttr.Any(x => x.Equals("overflow", StringComparison.OrdinalIgnoreCase)
+                    || x.Equals("overflow-x", StringComparison.OrdinalIgnoreCase));
+            var hasScrollY = scrollAttr.Any(x => x.Equals("overflow", StringComparison.OrdinalIgnoreCase)
+                    || x.Equals("overflow-y", StringComparison.OrdinalIgnoreCase));
+            if (hasScrollX || hasScrollY)
             {
-                scroll.Direction = dir;
-            }
+                var scroll = new Scroll
+                {
+                    Direction = hasScrollX && hasScrollY
+                        ? ScrollDirection.Both : hasScrollX
+                        ? ScrollDirection.Horizontal : ScrollDirection.Vertical
+                };
 
-            scroll.AddChild(rootElement, element);
-            rootElement = scroll;
+                scroll.AddChild(rootElement, element);
+                rootElement = scroll;
+            }
         }
 
         if (borderAttr != null)
@@ -217,10 +227,7 @@ public static partial class MarkupParser
                                     textElement.Bindings.Add(new BindingDefinition("value", modelPropName));
                                 }
 
-                                if (styles != null && styles.Count > 0)
-                                {
-                                    textElement = CssStyle.ApplyToElement(textElement, styles);
-                                }
+                                textElement = CssStyle.ApplyToElement(textElement, styles, styleAttr);
 
                                 innerElement.AddChild(textElement, null);
                             }
@@ -244,15 +251,15 @@ public static partial class MarkupParser
             SetAttribute(attr, rootElement, innerElement);
         }
 
-        if (styles != null && styles.Count > 0)
-        {
-            rootElement = CssStyle.ApplyToElement(rootElement, styles);
-        }
+        rootElement = CssStyle.ApplyToElement(rootElement, styles, styleAttr);
 
         foreach (var attr in attributes)
         {
             var name = attr.Name.LocalName;
-            if (name.Equals("scroll", StringComparison.OrdinalIgnoreCase) || name.Equals("border", StringComparison.OrdinalIgnoreCase) || name.Equals("class", StringComparison.OrdinalIgnoreCase)) continue;
+            if (name.Equals("overflow", StringComparison.OrdinalIgnoreCase)
+                || name.Equals("border", StringComparison.OrdinalIgnoreCase)
+                || name.Equals("class", StringComparison.OrdinalIgnoreCase)
+                || name.Equals("style", StringComparison.OrdinalIgnoreCase)) continue;
 
             SetAttribute(attr, rootElement, innerElement);
         }

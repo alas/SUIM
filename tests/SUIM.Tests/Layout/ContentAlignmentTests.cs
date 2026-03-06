@@ -39,8 +39,8 @@ public class ContentAlignmentTests
     {
         var markup = """
             <div style="width:200px; height:200px; align-items:center; display:flex; flex-direction:column">
-                <label style="width:100px; heigh:20px; AlignSelf:flex-end"></label>
-                <label style="width:100px; heigh:20px"></label>
+                <label style="width:100px; height:20px; AlignSelf:flex-end"></label>
+                <label style="width:100px; height:20px"></label>
             </div>
             """;
         var (element, _) = MarkupParser.Parse(markup);
@@ -114,8 +114,6 @@ public class ContentAlignmentTests
         var (element, _) = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
         var label = (Label)element.Children[0];
-
-        // div.justify-items and align-items are Unspecified by default
 
         Assert.Equal(0, label.GetLeft()); // Defaults to Left
         Assert.Equal(0, label.GetTop()); // Defaults to Top

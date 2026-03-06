@@ -121,24 +121,7 @@ public abstract class UIElement
 
     public virtual void SetAttribute(string name, object? value)
     {
-        if (name.Equals("style", StringComparison.OrdinalIgnoreCase))
-        {
-            if (value is string s)
-            {
-                var stylePairs = s.Split(';', StringSplitOptions.RemoveEmptyEntries);
-                foreach (var pair in stylePairs)
-                {
-                    var kv = pair.Split(':', 2);
-                    if (kv.Length == 2)
-                    {
-                        var key = kv[0].Trim();
-                        var val = kv[1].Trim();
-                        SetAttribute(key, val);
-                    }
-                }
-            }
-        }
-        else if (name.Equals("id", StringComparison.OrdinalIgnoreCase))
+        if (name.Equals("id", StringComparison.OrdinalIgnoreCase))
         {
             Id = value as string;
         }
@@ -166,15 +149,23 @@ public abstract class UIElement
         {
             Color = value as string;
         }
-        else if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase))
+        else if (name.Equals("font", StringComparison.OrdinalIgnoreCase))
         {
-            Opacity = value as string;
+            Font = value as string;
+        }
+        else if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase) || name.Equals("font-size", StringComparison.OrdinalIgnoreCase))
+        {
+            FontSize = value as string;
         }
         else if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
         {
             var handlerName = value as string;
             var eventName = name[2..];
             Events[eventName] = handlerName ?? throw new ArgumentException($"Value for attribute '{name}' must be a non-null string.");
+        }
+        else if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase))
+        {
+            Opacity = value as string;
         }
         else if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase))
         {
@@ -183,14 +174,6 @@ public abstract class UIElement
         else if (name.Equals("readonly", StringComparison.OrdinalIgnoreCase))
         {
             ReadOnly = value as string;
-        }
-        else if (name.Equals("font", StringComparison.OrdinalIgnoreCase))
-        {
-            Font = value as string;
-        }
-        else if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase) || name.Equals("font-size", StringComparison.OrdinalIgnoreCase))
-        {
-            FontSize = value as string;
         }
         else if (name.Contains('.'))
         {

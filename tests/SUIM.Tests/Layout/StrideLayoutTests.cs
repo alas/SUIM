@@ -34,7 +34,7 @@ public class StrideLayoutTests
     public void MarkupParser_WithFractionalUnits_CreatesProportionalLayout()
     {
         var markup1 = @"
-            <div style=""display:flex; align-items:flex-start; justify-items:flex-start;"">
+            <div style=""display:flex; align-items:flex-start; justify-content:flex-start;"">
                 <hstack style=""height:auto; flex:1;"">
                     <label style=""height:50; flex:1;""></label>
                     <label style=""height:50; flex:1;""></label>
