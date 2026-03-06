@@ -1,4 +1,4 @@
-﻿<popup>
+﻿<root>
     <model>
 	{
 		"title": "",
@@ -11,10 +11,10 @@
     <overlay visibility="@visibility" class="centeredcontent">
 		<vstack class="wood-panel centeredcontent">
 			<hstack>
-				<h1 value="@title"></h1>
+				<h1>@title</h1>
 			</hstack>
 			<vstack margin="6" scroll="auto" class="centeredcontent">
-				<h3 value="@message"></h3>
+				<h3>@message</h3>
 			</vstack>
 			<hstack class="hstack2 centeredcontent">
 				<button onclick="@onYes">YES</button>
@@ -22,4 +22,4 @@
 			</hstack>
 		</vstack>
     </overlay>
-</popup>
+</root>

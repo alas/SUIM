@@ -237,18 +237,18 @@ public class StrideLayoutTests
                     .overlay { visibility: collapsed; }
                 </style>
                 <vstack  style=""width:400; height:300"">
-                    <label value=""Main UI""></label>
+                    <label>Main UI</label>
                 </vstack>
                 
                 <overlay class=""overlay centeredcontent"" id=""popup"">
                     <div style=""width:360; height:180"">
-                        <label value=""Popup""></label>
+                        <label>Popup</label>
                     </div>
                 </overlay>
                 
                 <overlay class=""overlay centeredcontent"" id=""screenOverlay"">
                     <div>
-                        <label value=""Blocker""></label>
+                        <label>Blocker</label>
                     </div>
                 </overlay>
             </div>";
@@ -290,18 +290,18 @@ public class StrideLayoutTests
         var markup = @"
             <div>
                 <vstack style=""width:400; height:300"">
-                    <label value=""Main UI""></label>
+                    <label>Main UI</label>
                 </vstack>
                 
                 <overlay id=""popup"">
                     <div style=""width:360; height:180"">
-                        <label value=""Popup""></label>
+                        <label>Popup</label>
                     </div>
                 </overlay>
                 
                 <overlay id=""screenOverlay"" style=""visibility:collapsed"">
                     <div>
-                        <label value=""Blocker""></label>
+                        <label>Blocker</label>
                     </div>
                 </overlay>
             </div>";

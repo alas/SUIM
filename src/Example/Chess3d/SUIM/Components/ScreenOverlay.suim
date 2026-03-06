@@ -1,4 +1,4 @@
-<ScreenOverlay>
+<root>
 	<model>
 	{
 		"message": "",
@@ -7,7 +7,7 @@
 	</model>
 	<overlay visibility="@visibility" class="centeredcontent">
 		<div class="centeredcontent">
-			<h3 value="@message"></h3>
+			<h3>@message</h3>
 		</div>
 	</overlay>
-</ScreenOverlay>
+</root>

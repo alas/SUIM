@@ -1,4 +1,4 @@
-<div>
+<root>
 	<model>
 	{
 		// delegates for buttons
@@ -20,11 +20,11 @@
 
 	<vstack class="container">
 		<button onclick="OpenPopup('Quit', 'Are you sure you want to quit?')">Quit</button>
-        <button onclick="OpenPopup('Restart', 'Are you sure you want to start over?')">Restart</button>
-        <button onclick="OpenPopup('Load', 'Load() Not implemented yet!')">Load</button>
-        <button onclick="OpenPopup('Save', 'Save() Not implemented yet!')">Save</button>
-    </vstack>
+		<button onclick="OpenPopup('Restart', 'Are you sure you want to start over?')">Restart</button>
+		<button onclick="OpenPopup('Load', 'Load() Not implemented yet!')">Load</button>
+		<button onclick="OpenPopup('Save', 'Save() Not implemented yet!')">Save</button>
 
-	<Popup title="@PopupTitle" message="@PopupMessage" visibility="@PopupVisibility" onYes="@YesHandler" onNo="@NoHandler" />
-    <ScreenOverlay message="@OverlayMessage" visibility="@OverlayVisibility" />
-</div>
+		<Popup title="@PopupTitle" message="@PopupMessage" visibility="@PopupVisibility" onYes="@YesHandler" onNo="@NoHandler" />
+		<ScreenOverlay message="@OverlayMessage" visibility="@OverlayVisibility" />
+	</vstack>
+</root>

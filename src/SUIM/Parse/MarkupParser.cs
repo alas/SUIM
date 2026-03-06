@@ -19,49 +19,24 @@ public static partial class MarkupParser
         Dictionary<string, Dictionary<string, string>> styles = inheritedStyles != null ? new(inheritedStyles) : [];
         Dictionary<string, Dictionary<string, string>> leakableStyles = inheritedStyles != null ? new(inheritedStyles) : [];
 
-        // Extract model from root children (flexible position)
         model2 = ModelLogic.ExtractModel(root, model2);
 
-        UIElement element;
-        if (componentName != null && string.Equals(root.Name.LocalName, componentName, StringComparison.OrdinalIgnoreCase))
+        // Root tag matches view/component name or "root": bypass redundant wrapper and process real root
+        if (string.Equals(root.Name.LocalName, componentName, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(root.Name.LocalName, "root", StringComparison.OrdinalIgnoreCase))
         {
-            // Root tag matches component name: bypass redundant wrapper and process children
-            element = new CustomComponent(componentName)
+            var styleElements = root.Elements().Where(x => x.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase)).ToList();
+            foreach (var styleElement in styleElements)
             {
-                Model = model2,
-                IsComponentRoot = true
-            };
-
-            foreach (var node in root.Nodes())
-            {
-                if (node is XElement childX && (childX.Name.LocalName.Equals("model", StringComparison.OrdinalIgnoreCase) || childX.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase)))
-                {
-                    ParseStyleInternal(childX, styles, leakableStyles, basePath);
-                    continue;
-                }
-
-                if (node is XText textNode)
-                {
-                    var text = textNode.Value.Trim();
-                    if (!string.IsNullOrEmpty(text))
-                    {
-                        UIElement textElement = new Text { Value = text };
-                        if (styles.Count > 0) textElement = CssStyle.ApplyToElement(textElement, styles);
-                        element.AddChild(textElement, root);
-                    }
-                }
-                else if (node is XElement childE)
-                {
-                    var childElement = ParseElement(childE, styles, leakableStyles, model2, basePath);
-                    if (childElement != null) element.AddChild(childElement, childE);
-                }
+                ParseStyle(styleElement, styles, leakableStyles, basePath);
             }
+
+            root = root.Elements().Single(x => !x.Name.LocalName.Equals("model", StringComparison.OrdinalIgnoreCase)
+                && !x.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase));
         }
-        else
-        {
-            element = ParseElement(root, styles, leakableStyles, model2, basePath)
-                ?? throw new InvalidOperationException("Root element not found.");
-        }
+
+        var element = ParseElement(root, styles, leakableStyles, model2, basePath)
+            ?? throw new InvalidOperationException("Root element not found.");
 
         element.Model = model2;
         if (componentName != null) element.IsComponentRoot = true;
@@ -69,7 +44,20 @@ public static partial class MarkupParser
         return (element, model2);
     }
 
-    private static void ParseStyleInternal(XElement element, Dictionary<string, Dictionary<string, string>> styles, Dictionary<string, Dictionary<string, string>> leakableStyles, string? basePath)
+    public static bool IsBuiltInTag(string tag)
+    {
+        var builtIn = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "div", "stack", "hbox", "vbox", "hstack", "vstack", "stackh", "stackv", "stack-h", "stack-v",
+            "grid", "dock", "overlay", "border", "label", "button", "image", "input", "select", "option",
+            "textarea", "style", "model", "h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8",
+            "root", // virtual container tag
+            "row", "column" // Grid specials
+        };
+        return builtIn.Contains(tag);
+    }
+
+    private static void ParseStyle(XElement element, Dictionary<string, Dictionary<string, string>> styles, Dictionary<string, Dictionary<string, string>> leakableStyles, string? basePath)
     {
         if (element.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))
         {
@@ -102,7 +90,7 @@ public static partial class MarkupParser
         var innerElement = ParseElementTag(element);
         if (innerElement == null)
         {
-            ParseStyleInternal(element, styles, leakableStyles, basePath);
+            ParseStyle(element, styles, leakableStyles, basePath);
             return null;
         }
 
@@ -249,7 +237,9 @@ public static partial class MarkupParser
             }
         }
 
-        foreach (var attr in attributes.Where(x => IsStyleApplicationAttribute(x.Name.LocalName)))
+        // set these 2 first as they are needed for style application
+        HashSet<string> StyleApplicationAttributeNames = new(StringComparer.OrdinalIgnoreCase) { "id", "class" };
+        foreach (var attr in attributes.Where(x => StyleApplicationAttributeNames.Contains(x.Name.LocalName)))
         {
             SetAttribute(attr, rootElement, innerElement);
         }
@@ -298,16 +288,6 @@ public static partial class MarkupParser
             var modelPropName = value[1..];
             target.Bindings.Add(new BindingDefinition(name, modelPropName));
         }
-    }
-
-    private static readonly HashSet<string> StyleApplicationAttributeNames = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "id", "class"
-    };
-
-    private static bool IsStyleApplicationAttribute(string name)
-    {
-        return StyleApplicationAttributeNames.Contains(name);
     }
 
     private static UIElement? ParseElementTag(XElement element)

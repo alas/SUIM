@@ -1,7 +1,6 @@
 namespace SUIM;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SUIM.Parse;
@@ -48,7 +47,7 @@ public partial class SUIMProject(string rootPath)
             foreach (var tag in potentialTags)
             {
                 // Skip built-in tags and already registered tags
-                if (IsBuiltInTag(tag) || ComponentRegistry.IsRegistered(tag)) continue;
+                if (MarkupParser.IsBuiltInTag(tag) || ComponentRegistry.IsRegistered(tag)) continue;
 
                 // Check if a component file exists for this tag
                 string componentPath = Path.Combine(RootPath, "components", $"{tag}.suim");
@@ -61,6 +60,10 @@ public partial class SUIMProject(string rootPath)
                     string componentMarkup = File.ReadAllText(componentPath);
                     ResolveDependencies(componentMarkup);
                 }
+                else
+                {
+                    Console.WriteLine($"Warning: Tag '{tag}' is not a built-in tag and no component file was found for it.");
+                }
             }
         }
         catch (Exception ex)
@@ -68,17 +71,6 @@ public partial class SUIMProject(string rootPath)
             // Log or handle error? For now, just continue if parsing fails.
             Console.WriteLine($"Error resolving dependencies: {ex.Message}");
         }
-    }
-
-    private static bool IsBuiltInTag(string tag)
-    {
-        var builtIn = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "div", "stack", "hstack", "hbox", "vstack", "vbox", "grid", "dock", "overlay", "border",
-            "label", "button", "image", "input", "select", "option", "textarea", "style", "model",
-            "row", "column" // Grid specials
-        };
-        return builtIn.Contains(tag);
     }
 
     [System.Text.RegularExpressions.GeneratedRegex(@"<([a-zA-Z0-9_]+)")]

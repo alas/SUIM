@@ -168,7 +168,7 @@ public class ComponentIsolationTests
         var compPath = GetTestPath("TestComponent.suim");
         var componentMarkup = @"<div id=""compRoot"">
             <model>{ ""compProp"": 123.0 }</model>
-            <label value=""@compProp""></label>
+            <label>@compProp</label>
         </div>";
         File.WriteAllText(compPath, componentMarkup);
 
@@ -209,11 +209,11 @@ public class ComponentIsolationTests
     [Fact]
     public void RootTag_MatchingFilename_BypassesWrapper()
     {
-        var compPath = GetTestPath("TestComp.suim");
         // Arrange
+        var compPath = GetTestPath("TestComp.suim");
         var componentMarkup = @"<TestComp>
             <model>{ ""val"": 10.0 }</model>
-            <label value=""@val""></label>
+            <label>@val</label>
         </TestComp>";
         File.WriteAllText(compPath, componentMarkup);
 
@@ -222,13 +222,9 @@ public class ComponentIsolationTests
         component.Expand(new ObservableObject(), basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         // Assert
-        // component (CustomComponent) -> Div (from TestComp tag) -> Label
         Assert.Single(component.Children);
-        var cc = component.Children[0] as CustomComponent;
-        Assert.NotNull(cc);
-        Assert.Equal("testcomp", cc.TagName);
-        Assert.Single(cc.Children);
-        Assert.IsType<Label>(cc.Children[0]);
+        Assert.IsType<Label>(component.Children[0]);
+        var label = component.Children[0] as Label;
     }
 
     [Fact]
@@ -237,7 +233,7 @@ public class ComponentIsolationTests
         var compPath = GetTestPath("NoModelComp.suim");
         // Arrange
         var componentMarkup = @"<div id=""comp"">
-            <label value=""@missingProp""></label>
+            <label>@missingProp</label>
         </div>";
 
         File.WriteAllText(compPath, componentMarkup);

@@ -398,11 +398,11 @@ else
 {
     case @identifier2
     {
-        <h1 value=""Variable Match""></h1>
+        <h1>Variable Match</h1>
     }
     default
     {
-        <h1 value=""No Match""></h1>
+        <h1>No Match</h1>
     }
 }";
         var expanded = parser.ExpandDirectives(markup);
@@ -501,7 +501,7 @@ else
         var markup = @"<div>
 @if identifierbool3
 {
-    <h1 value=""Should not appear""></h1>
+    <h1>Should not appear</h1>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
