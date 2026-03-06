@@ -23,8 +23,6 @@ public class Parser
     private ContentManager? ContentManager = null;
     private readonly Dictionary<string, SpriteFont> Fonts = [];
     private readonly Dictionary<string, (SUIMElement SuimRoot, StrideUIElement StrideRoot, dynamic? Model)> _parseCache = [];
-    private dynamic? _currentModel;
-    private Game? _game;
     public string? RootPath { get; set; }
 
     public (StrideUIElement StrideRoot, dynamic? Model) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
@@ -65,7 +63,6 @@ public class Parser
             }
         }
 
-        _game = game;
         ContentManager = game.Content;
 
         // Not cached: parse markup, map and store the canonical instance
@@ -96,9 +93,7 @@ public class Parser
         };
         var (suimRoot, model2) = MarkupParser.Parse(markup, model, basePath: basePath, componentName: viewName);
         Layout(suimRoot, game, defaultFontSize, fullscreen);
-        _currentModel = model2;
         var strideRoot = MapElement(suimRoot, game);
-        _currentModel = null;
 
         lock (_parseCache)
         {

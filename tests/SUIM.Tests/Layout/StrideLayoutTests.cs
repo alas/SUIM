@@ -78,7 +78,7 @@ public class StrideLayoutTests
 
             return true;
         }
-    }//align-items: flex-start; 
+    }
 
     [Fact]
     public void MarkupParser_WithPixelUnits_EquivalentToRem_CreatesScaledLayout()

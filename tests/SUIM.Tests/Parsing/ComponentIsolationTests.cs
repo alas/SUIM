@@ -1,4 +1,4 @@
-namespace SUIM.Tests;
+namespace SUIM.Tests.Parsing;
 
 using System;
 using System.IO;
@@ -225,6 +225,9 @@ public class ComponentIsolationTests
         Assert.Single(component.Children);
         Assert.IsType<Label>(component.Children[0]);
         var label = component.Children[0] as Label;
+        Assert.IsType<Text>(label!.Children[0]);
+        var text = label!.Children[0] as Text;
+        Assert.Equal("@val", text!.Value);
     }
 
     [Fact]
