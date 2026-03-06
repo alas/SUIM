@@ -1,9 +1,8 @@
 namespace SUIM.Tests;
 
-using SUIM.Parse.Components;
 using System.Text;
 using Xunit;
-using static Stride.Graphics.Buffer;
+using SUIM.Parse.Components;
 
 public class PopupIntegrationTests
 {
