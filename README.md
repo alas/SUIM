@@ -53,30 +53,30 @@ Arranges children sequentially along a single axis.
 Divides space into a matrix.
 
 * **Attributes:** columns, rows.
-* **Child Logic:** grid.row, grid.column, grid.rowspan, grid.columnspan.
+* **Child Logic:** grid.row, grid.column, grid.rowspan, grid.columnspan, columns and rows start at 0, zero based index.
 
 **Example 1: Explicit Attributes**
 <grid columns="100, 500" rows="50, 500">
-	<div grid.row="0" grid.column="0" bg="gray" />
-	<div grid.row="0" grid.column="1" bg="silver" />
-	<div grid.row="1" grid.column="0" grid.columnspan="2" bg="white" />
+	<div grid.row="0" grid.column="0" bg="gray"></div>
+	<div grid.row="0" grid.column="1" bg="silver"></div>
+	<div grid.row="1" grid.column="0" grid.columnspan="2" bg="white"></div>
 </grid>
 
 **Example 2: Using `<row>`**
 <grid>
 	<row height="500px">
-		<div width="100" bg="blue" />
-		<div width="auto" bg="green" />
-		<div width="auto" bg="red" />
+		<div width="100" bg="blue"></div>
+		<div width="auto" bg="green"></div>
+		<div width="auto" bg="red"></div>
 	</row>
 </grid>
 
 **Example 3: Using `<column>`**
 <grid columns="200, auto">
 	<column>
-		<div height="100" bg="blue" />
-		<div height="auto" bg="green" />
-		<div height="auto" bg="red" />
+		<div height="100" bg="blue"></div>
+		<div height="auto" bg="green"></div>
+		<div height="auto" bg="red"></div>
 	</column>
 </grid>
 
@@ -162,7 +162,7 @@ Original.suim
 	scroll.height: 800;
 }
 </style>
-	<label value="Inventory" />
+	<label value="Inventory"></label>
 </dock>
 
 ```
@@ -193,7 +193,7 @@ Original.suim
 	border: 10 White;
 }
 </style>
-	<label value="Inventory" />
+	<label value="Inventory"></label>
 </div>
 
 ```
@@ -214,7 +214,7 @@ Original.suim
 	border: 10 5 0 2 White;
 }
 </style>
-	<label value="Inventory" />
+	<label value="Inventory"></label>
 </div>
 
 ```
@@ -251,7 +251,7 @@ Supported syntax is:
 
 @if identifierbool
 {
-	<label value="true" />
+	<label value="true"></label>
 }
 
 Produces the label if identifierbool exist in the model with a value of true.
@@ -259,26 +259,26 @@ Produces the label if identifierbool exist in the model with a value of true.
 
 @if identifierbool
 {
-	<label value="true" />
+	<label value="true"></label>
 }
 else
 {
-	<label value="not!" />
+	<label value="not!"></label>
 }
 
 Produces the correct label depending on the value of identifierbool.
 
 @if identifierbool
 {
-	<label value="true" />
+	<label value="true"></label>
 }
 else if identifierbool2
 {
-	<label value="true2" />
+	<label value="true2"></label>
 }
 else
 {
-	<label value="not!" />
+	<label value="not!"></label>
 }
 
 Produces the correct label depending on the values of identifierbool and identifierbool2.
@@ -307,28 +307,28 @@ Produces the correct p tag depending on the values of identifierany and identifi
 
 @for i=0 count=100
 {
-	<label value="@i" />
+	<label value="@i"></label>
 }
 
 The parser must clone the inner XML (label in this case) 100 times, i will go from 0 to 99 (100 different values).
 
 @for i=0 count=100 step=-1
 {
-	<label value="@i" />
+	<label value="@i"></label>
 }
 
 The parser must clone the inner XML (label in this case) 100 times, i will go from 0 to -99 (100 different values, each pass will add -1 to i).
 
 @foreach myitem in Collection
 {
-	<label value="@myitem.Property" />
+	<label value="@myitem.Property"></label>
 }
 
 The parser must clone the inner XML for every item in the `Collection`.
 
 @foreach i in 0..100
 {
-	<label value="@i" />
+	<label value="@i"></label>
 }
 
 The parser must clone the inner XML (label in this case) 100 times, i will go from 0 to 99 (not inclusive end value).
@@ -356,9 +356,9 @@ Inventory.suim
 	<vstack>
 		@if (showTitle)
 		{
-			<label value="Inventory" />
+			<label value="Inventory"></label>
 		}
-		<grid width="@invWidth" />
+		<grid width="@invWidth"></grid>
 	</vstack>
 </inventory>
 
@@ -368,7 +368,7 @@ Result in this output:
 ```xml
 <div>
 	<vstack>
-		<grid width="@invWidth" />
+		<grid width="@invWidth"></grid>
 	</vstack>
 </div>
 
@@ -393,9 +393,9 @@ Result in this output:
 	<vstack>
 		@if (showTitle)
 		{
-			<label value="Inventory" />
+			<label value="Inventory"></label>
 		}
-		<grid width="@invWidth" />
+		<grid width="@invWidth"></grid>
 	</vstack>
 </inventory>
 
@@ -406,8 +406,8 @@ Result in this output:
 ```xml
 <inventory>
 	<vstack>
-		<label value="Inventory" />
-		<grid width="@invWidth" />
+		<label value="Inventory"></label>
+		<grid width="@invWidth"></grid>
 	</vstack>
 </inventory>
 
