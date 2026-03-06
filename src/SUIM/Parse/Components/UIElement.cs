@@ -414,18 +414,15 @@ public abstract class UIElement
 
     #endregion
 
-    public string ToDebugString(int indent = 0)
+    public void AppendDebugString(StringBuilder sb, int indent = 0)
     {
-        var sb = new StringBuilder();
         sb.Append(new string(' ', indent * 2));
-        sb.AppendLine($"{TagName} [{GetWidth()}x{GetHeight()}] @ ({GetLeft()}, {GetTop()})");
+        sb.AppendLine($"{TagName}{(Id != null ? ":" + Id : "")} [{GetWidth()}x{GetHeight()}] @ ({GetLeft()}, {GetTop()}){(this is Text t ? " " + t.Value : "")}");
 
         foreach (var child in Children)
         {
-            sb.Append(child.ToDebugString(indent + 1));
+            child.AppendDebugString(sb, indent + 1);
         }
-
-        return sb.ToString();
     }
 }
 

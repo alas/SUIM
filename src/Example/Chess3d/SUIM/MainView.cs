@@ -25,8 +25,8 @@ public class MainView
                 NoHandler = new Action(UnshowPopup),
             };
 
-        var mapper = new Parser { RootPath = "SUIM" };
-        var (strideRoot, modelResult) = mapper.GetView("MainView", game, model: model);
+        var parser = new Parser { RootPath = "SUIM" };
+        var (strideRoot, modelResult) = parser.GetView("MainView", game, model: model);
         RootElement = strideRoot ?? throw new Exception("Failed to load MainView view.");
         Model = modelResult ?? throw new Exception("Failed to map model.");
         component.Page = new() { RootElement = RootElement };
