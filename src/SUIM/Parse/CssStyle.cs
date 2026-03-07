@@ -130,7 +130,7 @@ public static class CssStyle
             }
         }
 
-        // Inline style attribute (highest precedence, overrides all)
+        // Inline style attribute
         var styleAttribute = attributes?.FirstOrDefault(a => a.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))?.Value;
         if (styleAttribute != null)
         {
@@ -146,22 +146,24 @@ public static class CssStyle
                 }
             }
         }
-        var skipped = new List<string>() { "style", "value", "id", "class" };
-        foreach (var attr in attributes?.Where(x => !skipped.Any(s => x.Name.LocalName.Equals(s, StringComparison.OrdinalIgnoreCase))).ToList() ?? [])
+
+        // Inline sttributes (highest precedence, overrides all)        
+        foreach (var attr in attributes?.Where(x => !ApplyToElement_skipped.Contains(x.Name.LocalName)).ToList() ?? [])
         {
             mergedProperties[attr.Name.LocalName] = attr.Value;
         }
 
         if (mergedProperties.Count <= 0) return element;
 
-        return ApplyPropertiesToElement(element, mergedProperties, attributes);
+        return ApplyPropertiesToElement(element, mergedProperties);
     }
+    private static readonly HashSet<string> ApplyToElement_skipped = new(StringComparer.OrdinalIgnoreCase) { "style", "id", "class" };
 
     /// <summary>
     /// Applies individual style properties to an element, handling special cases like
     /// border, scroll, and background image wrappers.
     /// </summary>
-    private static UIElement ApplyPropertiesToElement(UIElement element, Dictionary<string, string> properties, List<XAttribute>? attributes)
+    private static UIElement ApplyPropertiesToElement(UIElement element, Dictionary<string, string> properties)
     {
         // Extract border and scroll attributes for special handling
         string? borderAttr = null;
@@ -171,7 +173,7 @@ public static class CssStyle
         // Pre-check whether this style will create a wrapper so layout attributes can be routed to it.
         bool willWrapWithBorder = properties.Keys.Any(k => k.Equals("border", StringComparison.OrdinalIgnoreCase));
         bool willWrapWithScroll = properties.Any(x => x.Key.StartsWith("overflow", StringComparison.OrdinalIgnoreCase) && x.Value.Equals("scroll", StringComparison.OrdinalIgnoreCase));
-        bool willWrapWithBG = properties.Keys.Any(k => k.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase));
+        bool willWrapWithBG = properties.Keys.Any(k => k.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || k.Equals("background-image", StringComparison.OrdinalIgnoreCase));
 
         foreach (var kvp in properties)
         {
@@ -186,7 +188,7 @@ public static class CssStyle
             {
                 scrollAttr.Add(propName);
             }
-            else if (propName.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase))
+            else if (propName.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || propName.Equals("background-image", StringComparison.OrdinalIgnoreCase))
             {
                 // Background image attribute will be handled by the wrapper creation
             }
@@ -255,7 +257,7 @@ public static class CssStyle
         }
 
         // Handle BackgroundImage wrapper (applied last to be the outermost wrapper)
-        if (properties.TryGetValue("backgroundimage", out var bgImgAttr))
+        if (properties.TryGetValue("backgroundimage", out var bgImgAttr) || properties.TryGetValue("background-image", out bgImgAttr))
         {
             var bg = new BackgroundImage();
             bg.SetAttribute("backgroundimage", bgImgAttr);
@@ -274,18 +276,18 @@ public static class CssStyle
         return element;
     }
 
-    private static readonly HashSet<string> LayoutAttributeNames = new(StringComparer.OrdinalIgnoreCase)
+    internal static bool IsLayoutAttribute(string name)
+    {
+        return IsLayoutAttribute_names.Contains(name);
+    }
+
+    private static readonly HashSet<string> IsLayoutAttribute_names = new(StringComparer.OrdinalIgnoreCase)
     {
         "id", "width", "height", "padding", "margin",
         "justify-self", "align-self", "justify-content", "align-content", "justify-items", "align-items",
         "visibility", "opacity", "background", "bg", "class",
         "left", "top", "anchor"
     };
-
-    internal static bool IsLayoutAttribute(string name)
-    {
-        return LayoutAttributeNames.Contains(name);
-    }
 }
 
 internal static partial class StyleParserRegexes

@@ -189,9 +189,9 @@ public class Parser
             var loaded = ContentLoader.LoadSprite(ContentManager, button.HoverImage, game);
             if (loaded != null) btn.MouseOverImage = loaded;
         }
-        if (!string.IsNullOrEmpty(button.BackgroundImage))
+        if (!string.IsNullOrEmpty(button.NormalImage))
         {
-            var loaded = ContentLoader.LoadSprite(ContentManager, button.BackgroundImage, game);
+            var loaded = ContentLoader.LoadSprite(ContentManager, button.NormalImage, game);
             if (loaded != null) btn.NotPressedImage = loaded;
         }
         if (!string.IsNullOrEmpty(button.PressedImage))

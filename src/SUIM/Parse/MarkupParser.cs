@@ -186,7 +186,7 @@ public static partial class MarkupParser
                                     textElement.Bindings.Add(new BindingDefinition("value", modelPropName));
                                 }
 
-                                textElement = CssStyle.ApplyToElement(textElement, styles, attributes);
+                                textElement = CssStyle.ApplyToElement(textElement, styles, null);
 
                                 innerElement.AddChild(textElement, null);
                             }

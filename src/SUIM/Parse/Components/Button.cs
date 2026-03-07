@@ -2,25 +2,21 @@ namespace SUIM.Parse.Components;
 
 public class Button() : UIElement(nameof(Button))
 {
-    public string? BackgroundImage { get; set; }
+    public string? NormalImage { get; set; }
     public string? HoverImage { get; set; }
     public string? PressedImage { get; set; }
 
     public override void SetAttribute(string name, object? value)
     {
-        if (name.Equals("notpressedimage", StringComparison.OrdinalIgnoreCase)
-            || name.Equals("normal", StringComparison.OrdinalIgnoreCase)
-            || name.Equals("normal-image", StringComparison.OrdinalIgnoreCase)
-            || name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase)
-            || name.Equals("background-image", StringComparison.OrdinalIgnoreCase))
+        if (IsNormal.Contains(name))
         {
-            BackgroundImage = value as string;
+            NormalImage = value as string;
         }
-        else if (name.Equals("mouseoverimage", StringComparison.OrdinalIgnoreCase) || name.Equals("hover", StringComparison.OrdinalIgnoreCase) || name.Equals("hover-image", StringComparison.OrdinalIgnoreCase))
+        else if (IsHover.Contains(name))
         {
             HoverImage = value as string;
         }
-        else if (name.Equals("pressedimage", StringComparison.OrdinalIgnoreCase) || name.Equals("pressed", StringComparison.OrdinalIgnoreCase) || name.Equals("pressed-image", StringComparison.OrdinalIgnoreCase))
+        else if (IsPressed.Contains(name))
         {
             PressedImage = value as string;
         }
@@ -32,23 +28,14 @@ public class Button() : UIElement(nameof(Button))
 
     public override string? GetAttribute(string name)
     {
-        if (name.Equals("notpressedimage", StringComparison.OrdinalIgnoreCase)
-            || name.Equals("normal", StringComparison.OrdinalIgnoreCase)
-            || name.Equals("normal-image", StringComparison.OrdinalIgnoreCase)
-            || name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase)
-            || name.Equals("background-image", StringComparison.OrdinalIgnoreCase))
-        {
-            return BackgroundImage;
-        }
-        if (name.Equals("mouseoverimage", StringComparison.OrdinalIgnoreCase) || name.Equals("hover", StringComparison.OrdinalIgnoreCase) || name.Equals("hover-image", StringComparison.OrdinalIgnoreCase))
-        {
-            return HoverImage;
-        }
-        if (name.Equals("pressedimage", StringComparison.OrdinalIgnoreCase) || name.Equals("pressed", StringComparison.OrdinalIgnoreCase) || name.Equals("pressed-image", StringComparison.OrdinalIgnoreCase))
-        {
-            return PressedImage;
-        }
+        if (IsNormal.Contains(name)) return NormalImage;
+        if (IsHover.Contains(name)) return HoverImage;
+        if (IsPressed.Contains(name)) return PressedImage;
 
         return base.GetAttribute(name);
     }
+
+    private static readonly HashSet<string> IsNormal = new(StringComparer.OrdinalIgnoreCase) { "notpressedimage", "normal", "normal-image" };
+    private static readonly HashSet<string> IsHover = new(StringComparer.OrdinalIgnoreCase) { "mouseoverimage", "hover", "hover-image" };
+    private static readonly HashSet<string> IsPressed = new(StringComparer.OrdinalIgnoreCase) { "pressedimage", "pressed", "pressed-image" };
 }
