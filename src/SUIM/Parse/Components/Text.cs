@@ -30,15 +30,6 @@ public class Text : UIElement
             base.SetAttribute(name, value);
         }
     }
-
-    public override string? GetAttribute(string name)
-    {
-        if (name.Equals("value", StringComparison.OrdinalIgnoreCase)) return Value;
-        if (name.Equals("wrap", StringComparison.OrdinalIgnoreCase)) return Wrap.ToString();
-        if (name.Equals("font", StringComparison.OrdinalIgnoreCase)) return Parent!.Font;
-        if (name.Equals("font-size", StringComparison.OrdinalIgnoreCase) || name.Equals("fontsize", StringComparison.OrdinalIgnoreCase)) return Parent!.FontSize;
-        return base.GetAttribute(name);
-    }
 }
 
 public class TextArea() : Text(nameof(TextArea)), IPlaceholder
@@ -62,13 +53,6 @@ public class TextArea() : Text(nameof(TextArea)), IPlaceholder
             base.SetAttribute(name, value);
         }
     }
-
-    public override string? GetAttribute(string name)
-    {
-        if (name.Equals("rows", StringComparison.OrdinalIgnoreCase)) return Rows.ToString();
-        if (name.Equals("columns", StringComparison.OrdinalIgnoreCase)) return Columns.ToString();
-        return base.GetAttribute(name);
-    }
 }
 
 public class Label() : UIElement(nameof(Label))
@@ -85,12 +69,6 @@ public class Label() : UIElement(nameof(Label))
         {
             base.SetAttribute(name, value);
         }
-    }
-
-    public override string? GetAttribute(string name)
-    {
-        if (name.Equals("for", StringComparison.OrdinalIgnoreCase)) return For;
-        return base.GetAttribute(name);
     }
 }
 

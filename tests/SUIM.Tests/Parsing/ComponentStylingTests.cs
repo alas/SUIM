@@ -251,7 +251,7 @@ public class ComponentStylingTests
         Assert.Equal("200px", button.GetAttribute("width"));
         Assert.Equal("50px", button.GetAttribute("height"));
         Assert.Equal(5, Convert.ToSingle(button.GetAttribute("margin-top")));
-        Assert.Equal("red", button.GetAttribute("color"));
+        Assert.Equal("red", button.Color);
     }
 
     [Fact]
@@ -289,6 +289,6 @@ public class ComponentStylingTests
         Assert.Equal("200px", button.GetAttribute("width"));
         Assert.Equal("50px", button.GetAttribute("height"));
         Assert.Equal(5, Convert.ToSingle(button.GetAttribute("margin-top")));
-        Assert.Equal("blue", button.GetAttribute("color"));
+        Assert.Equal("blue", button.Color);
     }
 }

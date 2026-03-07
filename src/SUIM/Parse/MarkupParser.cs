@@ -16,8 +16,8 @@ public static partial class MarkupParser
         var doc = XDocument.Parse(expandedMarkup);
         var root = doc.Root!;
 
-        Dictionary<string, Dictionary<string, string>> styles = inheritedStyles != null ? new(inheritedStyles) : [];
-        Dictionary<string, Dictionary<string, string>> leakableStyles = inheritedStyles != null ? new(inheritedStyles) : [];
+        Dictionary<string, Dictionary<string, string>> styles = inheritedStyles != null ? new(inheritedStyles, SpanStringIgnoreCaseComparer.Instance) : [];
+        Dictionary<string, Dictionary<string, string>> leakableStyles = inheritedStyles != null ? new(inheritedStyles, SpanStringIgnoreCaseComparer.Instance) : [];
 
         model2 = ModelLogic.ExtractModel(root, model2);
 

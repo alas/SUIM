@@ -44,13 +44,6 @@ public class Stack : LayoutElement
         }
     }
 
-    public override string? GetAttribute(string name)
-    {
-        if (name.Equals("orientation", StringComparison.OrdinalIgnoreCase)) return Orientation.ToString();
-
-        return base.GetAttribute(name);
-    }
-
     internal override void ApplySUIMLayout()
     {
         if (Gap != null && Flex.ParseValueFromString(Gap, out var gap))

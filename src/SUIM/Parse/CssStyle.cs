@@ -69,21 +69,15 @@ public static class CssStyle
 
     /// <summary>
     /// Applies styles to an element based on CSS-like precedence rules.
-    /// Precedence order: universal (*) < tag < class < id
+    /// Precedence order: universal (*) < tag < class < id < inline style < inline attributes
     /// </summary>
     internal static UIElement ApplyToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles, List<XAttribute>? attributes)
     {
-        var hasStyle = styles?.Count > 0;
-
-        var elementTag = element.TagName;
-        var elementId = element.GetAttribute("id");
-        var elementClass = element.GetAttribute("class");
-
         // Merge styles from all matching selectors in order of precedence (low to high)
         var mergedProperties = new Dictionary<string, string>();
 
         // Universal selector (lowest precedence)
-        if (hasStyle && styles!.TryGetValue("*", out var universalProps))
+        if (styles?.Count > 0 && styles!.TryGetValue("*", out var universalProps))
         {
             foreach (var kvp in universalProps)
             {
@@ -92,7 +86,8 @@ public static class CssStyle
         }
 
         // Tag selector
-        if (hasStyle && styles!.TryGetValue(elementTag, out var tagProps))
+        var elementTag = element.TagName;
+        if (styles?.Count > 0 && styles.TryGetValue(elementTag, out var tagProps))
         {
             foreach (var kvp in tagProps)
             {
@@ -101,13 +96,14 @@ public static class CssStyle
         }
 
         // Class selector(s) - support multiple space-separated classes
-        if (hasStyle && !string.IsNullOrEmpty(elementClass))
+        var elementClass = element.Class;
+        if (styles?.Count > 0 && !string.IsNullOrEmpty(elementClass))
         {
             var classes = elementClass.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             foreach (var className in classes)
             {
-                var classSelector = "." + className.ToLowerInvariant();
-                if (styles!.TryGetValue(classSelector, out var classProps))
+                var classProps = GetProps(styles, mergedProperties, className, '.');
+                if (classProps != null)
                 {
                     foreach (var kvp in classProps)
                     {
@@ -118,10 +114,11 @@ public static class CssStyle
         }
 
         // ID selector
-        if (hasStyle && !string.IsNullOrEmpty(elementId))
+        var elementId = (element.Id ?? "").AsSpan();
+        if (styles?.Count > 0  && !elementId.IsEmpty)
         {
-            var idSelector = "#" + elementId.Trim().ToLowerInvariant();
-            if (styles!.TryGetValue(idSelector, out var idProps))
+            var idProps = GetProps(styles, mergedProperties, elementId, '#');
+            if (idProps != null)
             {
                 foreach (var kvp in idProps)
                 {
@@ -156,6 +153,22 @@ public static class CssStyle
         if (mergedProperties.Count <= 0) return element;
 
         return ApplyPropertiesToElement(element, mergedProperties);
+
+        static Dictionary<string, string>? GetProps(Dictionary<string, Dictionary<string, string>> styles, Dictionary<string, string> mergedProperties, ReadOnlySpan<char> elementId, char prefix)
+        {
+            var trimmed = elementId.Trim();
+            Span<char> selectorBuffer = stackalloc char[trimmed.Length + 1];
+            selectorBuffer[0] = prefix;
+            trimmed.ToLowerInvariant(selectorBuffer[1..]);
+            ReadOnlySpan<char> selector = selectorBuffer;
+            var lookup = styles.GetAlternateLookup<ReadOnlySpan<char>>();
+            if (lookup.TryGetValue(selector, out var props))
+            {
+                return props;
+            }
+
+            return null;
+        }
     }
     private static readonly HashSet<string> ApplyToElement_skipped = new(StringComparer.OrdinalIgnoreCase) { "style", "id", "class" };
 

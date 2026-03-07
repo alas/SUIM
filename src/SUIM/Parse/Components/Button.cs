@@ -26,15 +26,6 @@ public class Button() : UIElement(nameof(Button))
         }
     }
 
-    public override string? GetAttribute(string name)
-    {
-        if (IsNormal.Contains(name)) return NormalImage;
-        if (IsHover.Contains(name)) return HoverImage;
-        if (IsPressed.Contains(name)) return PressedImage;
-
-        return base.GetAttribute(name);
-    }
-
     private static readonly HashSet<string> IsNormal = new(StringComparer.OrdinalIgnoreCase) { "notpressedimage", "normal", "normal-image" };
     private static readonly HashSet<string> IsHover = new(StringComparer.OrdinalIgnoreCase) { "mouseoverimage", "hover", "hover-image" };
     private static readonly HashSet<string> IsPressed = new(StringComparer.OrdinalIgnoreCase) { "pressedimage", "pressed", "pressed-image" };

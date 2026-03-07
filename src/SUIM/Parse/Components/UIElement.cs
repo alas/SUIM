@@ -1,8 +1,8 @@
 namespace SUIM.Parse.Components;
 
-using SUIM.Flexbox;
 using System.Text;
 using System.Xml.Linq;
+using SUIM.Flexbox;
 
 public abstract class UIElement
 {
@@ -88,8 +88,8 @@ public abstract class UIElement
         var attrs = new string[] { "width", "height" };
         foreach (var attr in attrs)
         {
-            var attrValue = GetAttribute(attr);
-            if (attrValue?.Contains('%') == true && GetDepth() > 3)
+            var attrValue = Node.nodeStyle[attr];
+            if (attrValue.Contains('%') == true && GetDepth() > 3)
             {
                 Console.WriteLine($"WARNING: <{TagName}> uses percentage {attr} at depth {GetDepth()}. Deep percentage {attr}s may not work correctly.");
             }
@@ -195,27 +195,11 @@ public abstract class UIElement
         }
     }
 
-    public virtual string? GetAttribute(string name)
+    public string? GetAttribute(string attribute)
     {
-        if (name.Equals("id", StringComparison.OrdinalIgnoreCase)) return Id;
-        if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase)) return Anchor;
-        if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase) || name.Equals("background-color", StringComparison.OrdinalIgnoreCase)) return BackgroundColor;
-        if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) return Class;
-        if (name.Equals("color", StringComparison.OrdinalIgnoreCase)) return Color;
-        if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase)) return Opacity;
-        if (name.Equals("placeholder", StringComparison.OrdinalIgnoreCase)) return (this as IPlaceholder)?.Placeholder;
-        if (name.Equals("readonly", StringComparison.OrdinalIgnoreCase)) return ReadOnly;
-        if (name.Equals("font", StringComparison.OrdinalIgnoreCase)) return Font;
-        if (name.Equals("fontsize", StringComparison.OrdinalIgnoreCase) || name.Equals("font-size", StringComparison.OrdinalIgnoreCase)) return FontSize;
-        if (name.Equals("visibility", StringComparison.OrdinalIgnoreCase)) return Visibility;
+        if (!AllProperties.TryGetValue(attribute, out var normalized)) return null;
 
-        if (AllProperties.TryGetValue(name, out var normalized))
-        {
-            return Node.nodeStyle[normalized];
-        }
-
-        Console.WriteLine($"Not recognized property: ${name}");
-        return null;
+        return Node.nodeStyle[normalized];
     }
 
     public float GetLeft()
@@ -434,16 +418,6 @@ public abstract class LayoutElement(string tagName) : UIElement(tagName)
         {
             base.SetAttribute(name, value);
         }
-    }
-
-    public override string? GetAttribute(string name)
-    {
-        if (name.Equals("gap", StringComparison.OrdinalIgnoreCase)) return Gap;
-        if (name.Equals("row-gap", StringComparison.OrdinalIgnoreCase) || name.Equals("rowgap", StringComparison.OrdinalIgnoreCase)) return RowGap;
-        if (name.Equals("column-gap", StringComparison.OrdinalIgnoreCase) || name.Equals("columngap", StringComparison.OrdinalIgnoreCase)) return ColumnGap;
-        if (name.Equals("clip", StringComparison.OrdinalIgnoreCase)) return Clip.ToString();
-
-        return base.GetAttribute(name);
     }
 }
 

@@ -301,8 +301,8 @@ public class MarkupParserTests
         Assert.IsType<H1>(element);
         var label = (H1)element;
         Assert.Equal("Hello", ((Text)label.Children[0]).Value);
-        Assert.Equal("Arial", label.GetAttribute("font"));
-        Assert.Equal(16, Convert.ToSingle(label.GetAttribute("fontsize")));
+        Assert.Equal("Arial", label.Font);
+        Assert.Equal(16, Convert.ToSingle(label.FontSize));
         Assert.Equal("#FF0000", label.Color);
     }
 
@@ -449,7 +449,7 @@ public class MarkupParserTests
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Equal("hidden", div.GetAttribute("visibility"));
+        Assert.Equal("hidden", div.Visibility);
     }
 
     [Fact]
@@ -1428,7 +1428,7 @@ Text after
     public void ParseStyles_ClassWithBorderAndSizes_AssignsProperties()
     {
         var styleContent = ".myclass { width: 500; height: 400; border: 5 #FF0000; }";
-        var styleDictionary = new Dictionary<string, Dictionary<string, string>>();
+        var styleDictionary = new Dictionary<string, Dictionary<string, string>>(SpanStringIgnoreCaseComparer.Instance);
         CssStyle.Parse(styleContent, styleDictionary);
         Assert.True(styleDictionary.ContainsKey(".myclass"));
         var props = styleDictionary[".myclass"];
