@@ -10,7 +10,7 @@ public class Overlay : LayoutElement
     public Overlay() : base(nameof(Overlay))
     {
         StopClicks = "true";
-        BackgroundColor = "#80000000";
+        BackgroundColor = "#80808000";
 
         Node.StyleSetPositionType(PositionType.Absolute);
         Node.nodeStyle["left"] = "0";
