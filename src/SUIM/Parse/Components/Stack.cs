@@ -24,7 +24,7 @@ public class Stack : LayoutElement
         Node.nodeStyle["justify-content"] = "flex-start";
         Node.nodeStyle["align-items"] = "flex-start";
         Node.nodeStyle["align-self"] = "flex-start";
-        Node.nodeStyle["flex-grow"] = "0";
+        Node.nodeStyle["flex-grow"] = "1";
     }
 
     public override void SetAttribute(string name, object? value)

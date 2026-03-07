@@ -32,9 +32,9 @@ public class CustomComponent(string tagName) : LayoutElement(tagName)
         }
     }
 
-    public void Expand(object? parentModel = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
+    public UIElement? Expand(object? parentModel = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
     {
-        if (string.IsNullOrEmpty(Source)) return;
+        if (string.IsNullOrEmpty(Source)) return null;
 
         var finalPath = Source;
         var fileExists = File.Exists(finalPath);
@@ -162,6 +162,7 @@ public class CustomComponent(string tagName) : LayoutElement(tagName)
         }
 
         ClearChildren();
-        AddChild(element, null);
+        
+        return element;
     }
 }

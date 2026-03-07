@@ -189,8 +189,7 @@ public class ComponentIsolationTests
         // Assert
         var div = root as Div;
         Assert.NotNull(div);
-        var component = div.Children[0] as CustomComponent;
-        Assert.NotNull(component);
+        var component = div.Children[0];
         
         Assert.NotNull(component.Model);
         Assert.NotSame(model, component.Model);
@@ -219,12 +218,11 @@ public class ComponentIsolationTests
 
         // Act
         var component = new CustomComponent("TestComp") { Source = compPath };
-        component.Expand(new ObservableObject(), basePath: AppDomain.CurrentDomain.BaseDirectory);
+        var comp = component.Expand(new ObservableObject(), basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         // Assert
-        Assert.Single(component.Children);
-        Assert.IsType<Label>(component.Children[0]);
-        var label = component.Children[0] as Label;
+        Assert.IsType<Label>(comp);
+        var label = comp as Label;
         Assert.IsType<Text>(label!.Children[0]);
         var text = label!.Children[0] as Text;
         Assert.Equal("@val", text!.Value);

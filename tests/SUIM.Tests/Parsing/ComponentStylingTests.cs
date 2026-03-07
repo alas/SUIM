@@ -34,8 +34,7 @@ public class ComponentStylingTests
         var (root, _) = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         var div = root as Div;
-        var childComp = div!.Children[0] as CustomComponent;
-        var childDiv = childComp!.Children[0] as Div;
+        var childDiv = div!.Children[0] as Div;
 
         // Styles defined in parent should leak to child
         Assert.Equal("blue", childDiv!.BackgroundColor);
@@ -63,8 +62,7 @@ public class ComponentStylingTests
         // Parent should NOT be red
         Assert.Null(parentDiv!.BackgroundColor);
 
-        var childComp = parentDiv.Children[0] as CustomComponent;
-        var childDiv = childComp!.Children[0] as Div;
+        var childDiv = parentDiv!.Children[0] as Div;
         // Child SHOULD be red
         Assert.Equal("red", childDiv!.BackgroundColor);
     }
@@ -94,11 +92,9 @@ public class ComponentStylingTests
         var (root, _) = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         var parentDiv = (Div)root;
-        var c1Comp = (CustomComponent)parentDiv.Children[0];
-        Assert.NotNull(c1Comp);
-        var c2Comp = (CustomComponent)parentDiv.Children[1];
+        Assert.Equal("child1", parentDiv.Children[0].Id);
 
-        var c2Div = (Div)c2Comp.Children[0];
+        var c2Div = (Div)parentDiv.Children[1];
         // Child2 should NOT be green (styles from Child1 should not leak to sibling)
         Assert.Null(c2Div.Color);
     }
@@ -121,8 +117,7 @@ public class ComponentStylingTests
         var (root, _) = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         var div = (Div)root;
-        var childComp = (CustomComponent)div.Children[0];
-        var childDiv = (Div)childComp.Children[0];
+        var childDiv = (Div)div.Children[0];
 
         // Style is scoped, so child should NOT have the background color
         Assert.Null(childDiv.BackgroundColor);
@@ -170,10 +165,7 @@ public class ComponentStylingTests
         var (root, _) = MarkupParser.Parse(gpMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         var gpDiv = (Div)root;
-        var childComp = (CustomComponent)gpDiv.Children[0];
-        // CustomComponent.Children[0] is the expanded element root (which is gcComp if Grandchild is a component)
-        var gcComp = (CustomComponent)childComp.Children[0];
-        var gcDiv = (Div)gcComp.Children[0];
+        var gcDiv = (Div)gpDiv.Children[0];
 
         // Grandparent style should leak all the way to grandchild
         Assert.Equal("cyan", gcDiv.BackgroundColor);

@@ -71,6 +71,12 @@ public abstract class UIElement
     #endregion
 
     #region Layout
+
+    public void CalculateLayout(int parentWidth, int parentHeight, Direction parentDirection = Direction.LTR)
+    {
+        ApplySUIMLayout();
+        Node.CalculateLayout(parentWidth, parentHeight, parentDirection);
+    }
     
     internal virtual void ApplySUIMLayout()
     {
@@ -106,12 +112,6 @@ public abstract class UIElement
             current = current.Parent;
         }
         return depth;
-    }
-
-    public void CalculateLayout(float parentWidth, float parentHeight, Direction parentDirection = Direction.LTR)
-    {
-        ApplySUIMLayout();
-        Node.CalculateLayout(parentWidth, parentHeight, parentDirection);
     }
 
     #endregion

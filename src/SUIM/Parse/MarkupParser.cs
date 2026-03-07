@@ -225,7 +225,7 @@ public static partial class MarkupParser
 
         if (rootElement is CustomComponent custom)
         {
-            custom.Expand(model, leakableStyles, basePath);
+            return custom.Expand(model, leakableStyles, basePath);
         }
 
         return rootElement;

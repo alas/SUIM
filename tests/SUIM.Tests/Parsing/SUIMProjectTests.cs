@@ -41,11 +41,8 @@ public class SUIMProjectTests
             Assert.IsType<Grid>(element);
             Assert.Equal("blue", element.BackgroundColor);
             
-            // Grid -> CustomComponent(CompA) -> CustomComponent(CompA content root: Stack) -> CustomComponent(CompB) -> CustomComponent(CompB content root: Label)
-            var compA = Assert.IsType<CustomComponent>(element.Children[0]);
-            var stack = Assert.IsType<Stack>(compA.Children[0]);
-            var compB = Assert.IsType<CustomComponent>(stack.Children[0]);
-            var label = Assert.IsType<Text>(compB.Children[0].Children[0]);
+            var stack = Assert.IsType<Stack>(element.Children[0]);
+            var label = Assert.IsType<Text>(stack.Children[0].Children[0]);
             
             Assert.Equal("Hello from B", label.Value);
             

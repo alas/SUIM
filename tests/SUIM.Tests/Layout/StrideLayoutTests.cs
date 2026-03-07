@@ -14,7 +14,7 @@ public class StrideLayoutTests
     {
         var markup = @"
             <div style=""display:flex; align-items:flex-start;"">
-                <vstack style=""gap:10; width:auto; height:auto"">
+                <vstack style=""gap:10; width:auto; height:auto; flex-grow:0;"">
                     <label style=""width:100; height:50""></label>
                     <label style=""width:100; height:30""></label>
                 </vstack>
@@ -85,7 +85,7 @@ public class StrideLayoutTests
     {
         var markup = @"
             <div>
-                <vstack style=""gap:0; height:auto; width:auto;"">
+                <vstack style=""gap:0; height:auto; width:auto; flex-grow:0;"">
                     <label style=""width:32px; height:16px;""></label>
                     <label style=""width:16px; height:32px;""></label>
                 </vstack>
@@ -147,7 +147,7 @@ public class StrideLayoutTests
     {
         var markup = @"
             <div>
-                <vstack style=""width:auto; height:auto; align-self:flex-start;"">
+                <vstack style=""width:auto; height:auto; align-self:flex-start; flex-grow:0;"">
                     <label style=""width:32px; height:16px;""></label>
                     <label style=""width:16px; height:32px;""></label>
                 </vstack>

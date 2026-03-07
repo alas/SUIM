@@ -48,6 +48,7 @@ public class LayoutTests
         var stack = new Stack { Orientation = Orientation.Horizontal, Gap = "0" };
         stack.SetAttribute("width", "100%");
         stack.SetAttribute("height", "auto");
+        stack.SetAttribute("flex-grow", "0");
 
         var child1 = new Label();
         child1.SetAttribute("width", "30%");
