@@ -16,10 +16,6 @@ public class Overlay : LayoutElement
         BackgroundColor = "#80000000";
 
         Node.StyleSetPositionType(PositionType.Absolute);
-        //Node.StyleSetPosition(Edge.Left, 0);
-        //Node.StyleSetPosition(Edge.Right, 0);
-        //Node.StyleSetPosition(Edge.Top, 0);
-        //Node.StyleSetPosition(Edge.Bottom, 0);
         Node.nodeStyle["display"] = "flex";
         Node.nodeStyle["justify-content"] = "center";
         Node.nodeStyle["align-items"] = "center";

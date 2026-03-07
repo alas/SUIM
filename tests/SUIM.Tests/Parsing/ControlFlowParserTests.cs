@@ -178,10 +178,10 @@ else
     }
 
     [Fact]
-    public void Parse_ForDirectiveLabel()
+    public void Parse_RangeDirectiveLabel()
     {
         var markup = @"<stack>
-@for i=0 count=3
+@range i=0 count=3
 {
     <label>@i</label>
 }
@@ -201,10 +201,10 @@ else
     }
 
     [Fact]
-    public void Parse_ForDirective()
+    public void Parse_RangeDirective()
     {
         var markup = @"<stack>
-@for i=0 count=3
+@range i=0 count=3
 {
     <label>@i</label>
 }
@@ -224,10 +224,10 @@ else
     }
 
     [Fact]
-    public void Parse_ForDirectiveWithoutModel()
+    public void Parse_RangeDirectiveWithoutModel()
     {
         var markup = @"<stack>
-@for i=0 count=3
+@range i=0 count=3
 {
     <h1>@i</h1>
 }
@@ -293,10 +293,10 @@ else
     // ============== CONTROL FLOW - FOR WITH STEP ==============
 
     [Fact]
-    public void Parse_ForDirective_WithNegativeStep()
+    public void Parse_RangeDirective_WithNegativeStep()
     {
         var markup = @"<stack>
-@for i=2 count=3 step=-1
+@range i=2 count=3 step=-1
 {
     <label>@i</label>
 }
@@ -314,10 +314,10 @@ else
     }
 
     [Fact]
-    public void Parse_ForDirective_WithCustomStep()
+    public void Parse_RangeDirective_WithCustomStep()
     {
         var markup = @"<stack>
-@for i=0 count=3 step=2
+@range i=0 count=3 step=2
 {
     <label>@i</label>
 }

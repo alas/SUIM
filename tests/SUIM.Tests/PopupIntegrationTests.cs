@@ -35,7 +35,7 @@ public class PopupIntegrationTests
 
         // Overlay should fill entire screen
         Assert.Equal(1280, overlay.GetWidth());
-        //Assert.Equal(720, overlay.GetHeight());
+        Assert.Equal(720, overlay.GetHeight());
         Assert.Equal(0, overlay.GetLeft());
         Assert.Equal(0, overlay.GetTop());
         

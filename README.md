@@ -323,14 +323,14 @@ Produces the correct label depending on the values of identifierbool and identif
 
 Produces the correct p tag depending on the values of identifierany and identifier2.
 
-@for i=0 count=100
+@range i=0 count=100
 {
 	<label value="@i"></label>
 }
 
 The parser must clone the inner XML (label in this case) 100 times, i will go from 0 to 99 (100 different values).
 
-@for i=0 count=100 step=-1
+@range i=0 count=100 step=-1
 {
 	<label value="@i"></label>
 }

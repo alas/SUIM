@@ -13,7 +13,7 @@ public class Stack : LayoutElement
         set
         {
             field = value;
-            Node.StyleSetFlexDirection(value == Orientation.Horizontal ? FlexDirection.Row : FlexDirection.Column);
+            Node.nodeStyle["flex-direction"] = value == Orientation.Horizontal ? "row" : "column";
         } } = Orientation.Vertical;
 
     public Stack() : base(nameof(Stack))

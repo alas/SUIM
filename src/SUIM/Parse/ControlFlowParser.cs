@@ -31,9 +31,9 @@ public partial class ControlFlowParser(dynamic model)
                     i += eaten;
                     continue;
                 }
-                else if (IsDirective(markup, i, "for", out _))
+                else if (IsDirective(markup, i, "range", out _))
                 {
-                    var (result, eaten) = ProcessFor(markup, i);
+                    var (result, eaten) = ProcessRange(markup, i);
                     sb.Append(ExpandDirectives(result));
                     i += eaten;
                     continue;
@@ -204,9 +204,9 @@ public partial class ControlFlowParser(dynamic model)
         return (result, (currentIndex - startIndex) + blockLen);
     }
 
-    private static (string result, int eaten) ProcessFor(string markup, int startIndex)
+    private static (string result, int eaten) ProcessRange(string markup, int startIndex)
     {
-        int currentIndex = startIndex + 4; // "@for"
+        int currentIndex = startIndex + 6; // "@range"
         
         // Parse parameters up to '{'
         // Format: i=0 count=100 step=-1
