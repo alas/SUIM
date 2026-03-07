@@ -3,6 +3,7 @@ namespace SUIM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using SUIM.Parse.Components;
 
 /// <summary>
@@ -70,7 +71,7 @@ public static class CssStyle
     /// Applies styles to an element based on CSS-like precedence rules.
     /// Precedence order: universal (*) < tag < class < id
     /// </summary>
-    internal static UIElement ApplyToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles, string? styleAttribute)
+    internal static UIElement ApplyToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles, List<XAttribute>? attributes)
     {
         var hasStyle = styles?.Count > 0;
 
@@ -130,6 +131,7 @@ public static class CssStyle
         }
 
         // Inline style attribute (highest precedence, overrides all)
+        var styleAttribute = attributes?.FirstOrDefault(a => a.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))?.Value;
         if (styleAttribute != null)
         {
             var stylePairs = styleAttribute.Split(';', StringSplitOptions.RemoveEmptyEntries);
@@ -144,17 +146,22 @@ public static class CssStyle
                 }
             }
         }
+        var skipped = new List<string>() { "style", "value", "id", "class" };
+        foreach (var attr in attributes?.Where(x => !skipped.Any(s => x.Name.LocalName.Equals(s, StringComparison.OrdinalIgnoreCase))).ToList() ?? [])
+        {
+            mergedProperties[attr.Name.LocalName] = attr.Value;
+        }
 
         if (mergedProperties.Count <= 0) return element;
 
-        return ApplyPropertiesToElement(element, mergedProperties);
+        return ApplyPropertiesToElement(element, mergedProperties, attributes);
     }
 
     /// <summary>
     /// Applies individual style properties to an element, handling special cases like
     /// border, scroll, and background image wrappers.
     /// </summary>
-    internal static UIElement ApplyPropertiesToElement(UIElement element, Dictionary<string, string> properties)
+    private static UIElement ApplyPropertiesToElement(UIElement element, Dictionary<string, string> properties, List<XAttribute>? attributes)
     {
         // Extract border and scroll attributes for special handling
         string? borderAttr = null;

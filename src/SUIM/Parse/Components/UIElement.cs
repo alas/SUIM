@@ -14,7 +14,6 @@ public abstract class UIElement
     public string? Opacity { get; set; }
     public string? ReadOnly { get; set; }
     public string? StopClicks { get; set; }
-    public string? BackgroundImage { get; set; }
     public string? Visibility { get; set; }
 
     // Text related properties (for elements that support text)
@@ -137,10 +136,6 @@ public abstract class UIElement
         {
             BackgroundColor = value as string ?? value?.ToString();
         }
-        else if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || name.Equals("background-image", StringComparison.OrdinalIgnoreCase))
-        {
-            BackgroundImage = value as string;
-        }
         else if (name.Equals("class", StringComparison.OrdinalIgnoreCase))
         {
             Class = value as string;
@@ -205,7 +200,6 @@ public abstract class UIElement
         if (name.Equals("id", StringComparison.OrdinalIgnoreCase)) return Id;
         if (name.Equals("anchor", StringComparison.OrdinalIgnoreCase)) return Anchor;
         if (name.Equals("bg", StringComparison.OrdinalIgnoreCase) || name.Equals("background", StringComparison.OrdinalIgnoreCase) || name.Equals("backgroundcolor", StringComparison.OrdinalIgnoreCase) || name.Equals("background-color", StringComparison.OrdinalIgnoreCase)) return BackgroundColor;
-        if (name.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || name.Equals("background-image", StringComparison.OrdinalIgnoreCase)) return BackgroundImage;
         if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) return Class;
         if (name.Equals("color", StringComparison.OrdinalIgnoreCase)) return Color;
         if (name.Equals("opacity", StringComparison.OrdinalIgnoreCase)) return Opacity;

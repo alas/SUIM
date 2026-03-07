@@ -97,47 +97,6 @@ public static partial class MarkupParser
         var rootElement = innerElement;
 
         var attributes = element.Attributes().ToList();
-        var scrollAttr = attributes.Where(a => a.Name.LocalName.StartsWith("overflow", StringComparison.OrdinalIgnoreCase)
-            && a.Value.Equals("scroll", StringComparison.OrdinalIgnoreCase)).Select(x => x.Name.LocalName).ToList();
-        var borderAttr = attributes.FirstOrDefault(a => a.Name.LocalName.Equals("border", StringComparison.OrdinalIgnoreCase));
-        var bgAttr = attributes.FirstOrDefault(a => a.Name.LocalName.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase));
-        var styleAttr = attributes.FirstOrDefault(a => a.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase))?.Value;
-
-        if (scrollAttr.Count > 0)
-        {
-            var hasScrollX = scrollAttr.Any(x => x.Equals("overflow", StringComparison.OrdinalIgnoreCase)
-                    || x.Equals("overflow-x", StringComparison.OrdinalIgnoreCase));
-            var hasScrollY = scrollAttr.Any(x => x.Equals("overflow", StringComparison.OrdinalIgnoreCase)
-                    || x.Equals("overflow-y", StringComparison.OrdinalIgnoreCase));
-            if (hasScrollX || hasScrollY)
-            {
-                var scroll = new Scroll
-                {
-                    Direction = hasScrollX && hasScrollY
-                        ? ScrollDirection.Both : hasScrollX
-                        ? ScrollDirection.Horizontal : ScrollDirection.Vertical
-                };
-
-                scroll.AddChild(rootElement, element);
-                rootElement = scroll;
-            }
-        }
-
-        if (borderAttr != null)
-        {
-            var border = new Border();
-            border.SetAttribute("border", borderAttr.Value);
-            border.AddChild(rootElement, element);
-            rootElement = border;
-        }
-
-        if (bgAttr != null)
-        {
-            var bg = new BackgroundImage();
-            bg.SetAttribute("backgroundimage", bgAttr.Value);
-            bg.AddChild(rootElement, element);
-            rootElement = bg;
-        }
 
         // Handle both text nodes and element children
         // Use innerElement for children as it is the content container
@@ -227,7 +186,7 @@ public static partial class MarkupParser
                                     textElement.Bindings.Add(new BindingDefinition("value", modelPropName));
                                 }
 
-                                textElement = CssStyle.ApplyToElement(textElement, styles, styleAttr);
+                                textElement = CssStyle.ApplyToElement(textElement, styles, attributes);
 
                                 innerElement.AddChild(textElement, null);
                             }
@@ -251,7 +210,7 @@ public static partial class MarkupParser
             SetAttribute(attr, rootElement, innerElement);
         }
 
-        rootElement = CssStyle.ApplyToElement(rootElement, styles, styleAttr);
+        rootElement = CssStyle.ApplyToElement(rootElement, styles, attributes);
 
         foreach (var attr in attributes)
         {
