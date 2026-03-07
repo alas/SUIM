@@ -80,7 +80,7 @@ public class ContentAlignmentTests
         // Center horizontal: (500 - 100) / 2 = 200
         Assert.Equal(200, label.GetLeft());
         // Center vertical: (500 - 50) / 2 = 225
-        Assert.Equal(225, label.GetTop()); //fails here, its 0
+        Assert.Equal(225, label.GetTop());
     }
 
     [Fact]

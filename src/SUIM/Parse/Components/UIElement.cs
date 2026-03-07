@@ -207,9 +207,19 @@ public abstract class UIElement
         return Node.LayoutGetLeft();
     }
 
+    public float GetX()
+    {
+        return Node.LayoutGetX();
+    }
+
     public float GetTop()
     {
         return Node.LayoutGetTop();
+    }
+
+    public float GetY()
+    {
+        return Node.LayoutGetY();
     }
 
     public float GetWidth()
@@ -217,9 +227,19 @@ public abstract class UIElement
         return Node.LayoutGetWidth();
     }
 
+    public float GetWidth2()
+    {
+        return Node.Layout.width;
+    }
+
     public float GetHeight()
     {
         return Node.LayoutGetHeight();
+    }
+
+    public float GetHeight2()
+    {
+        return Node.Layout.height;
     }
 
     public dynamic? GetEffectiveModel()
