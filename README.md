@@ -165,6 +165,17 @@ Graphic Display.
 * `stretch`: `enum` - `None`, `Fill`, `Uniform`, `UniformToFill`.
 
 
+## General Attributes (Applied to all tags)
+
+### The `visibility` Attribute
+
+Controls the visibility and layout behavior of an element.
+
+* `visible`: (Default) Element is rendered and occupies space.
+* `hidden`: Element is not rendered but still occupies space.
+* `collapsed`: Element is not rendered and does not occupy space.
+
+
 ## The scroll Attribute and Constraints
 
 The **scroll** attribute triggers a structural transformation. The tag is wrapped in an outer scroll-viewport (the scroll component), which inherits **all of the tag's styling** (including size, background, borders, and padding). The original tag remains as the direct child of the scroll-viewport, containing all nested children. Example:

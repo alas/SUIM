@@ -361,6 +361,26 @@ public class Parser
             stride.BackgroundColor = ParseColor(suim.BackgroundColor);
         }
 
+        if (suim.Visibility != null)
+        {
+            if ("visible".Equals(suim.Visibility, StringComparison.OrdinalIgnoreCase))
+            {
+                stride.Visibility = Visibility.Visible;
+            }
+            else if ("hidden".Equals(suim.Visibility, StringComparison.OrdinalIgnoreCase))
+            {
+                stride.Visibility = Visibility.Hidden;
+            }
+            else if ("collapsed".Equals(suim.Visibility, StringComparison.OrdinalIgnoreCase))
+            {
+                stride.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                throw new NotSupportedException($"Visibility: '{suim.Visibility}'");
+            }
+        }
+
         if (string.Equals(suim.StopClicks, "true", StringComparison.OrdinalIgnoreCase))
         {
             stride.CanBeHitByUser = true;
