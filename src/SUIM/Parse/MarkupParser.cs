@@ -203,57 +203,14 @@ public static partial class MarkupParser
             }
         }
 
-        // set these 2 first as they are needed for style application
-        HashSet<string> StyleApplicationAttributeNames = new(StringComparer.OrdinalIgnoreCase) { "id", "class" };
-        foreach (var attr in attributes.Where(x => StyleApplicationAttributeNames.Contains(x.Name.LocalName)))
-        {
-            SetAttribute(attr, rootElement, innerElement);
-        }
-
         rootElement = CssStyle.ApplyToElement(rootElement, styles, attributes);
-
-        foreach (var attr in attributes)
-        {
-            var name = attr.Name.LocalName;
-            if (name.Equals("overflow", StringComparison.OrdinalIgnoreCase)
-                || name.Equals("border", StringComparison.OrdinalIgnoreCase)
-                || name.Equals("class", StringComparison.OrdinalIgnoreCase)
-                || name.Equals("style", StringComparison.OrdinalIgnoreCase)) continue;
-
-            SetAttribute(attr, rootElement, innerElement);
-        }
-
+        
         if (rootElement is CustomComponent custom)
         {
             return custom.Expand(model, leakableStyles, basePath);
         }
 
         return rootElement;
-    }
-
-    private static void SetAttribute(XAttribute attr, UIElement rootElement, UIElement innerElement)
-    {
-        var name = attr.Name.LocalName;
-        var target = CssStyle.IsLayoutAttribute(name) ? rootElement : innerElement;
-
-        // Store raw attribute for CustomComponent expansion or other metadata
-        var value = attr.Value;
-        target.SetAttribute(name, value);
-
-        if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
-        {
-            // Event Binding: onclick="MethodName()"
-            var handlerName = value;
-            target.Events[name[2..]] = handlerName;
-            return;
-        }
-
-        if (value.StartsWith('@'))
-        {
-            // Dynamic Binding: <grid width="@myVar" />
-            var modelPropName = value[1..];
-            target.Bindings.Add(new BindingDefinition(name, modelPropName));
-        }
     }
 
     private static UIElement? ParseElementTag(XElement element)

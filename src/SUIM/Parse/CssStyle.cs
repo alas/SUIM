@@ -73,7 +73,18 @@ public static class CssStyle
     /// </summary>
     internal static UIElement ApplyToElement(UIElement element, Dictionary<string, Dictionary<string, string>> styles, List<XAttribute>? attributes)
     {
-        // Merge styles from all matching selectors in order of precedence (low to high)
+        // 1. Initial Attributes: Set Id and Class first as they are needed for selector lookups
+        if (attributes != null)
+        {
+            foreach (var attr in attributes)
+            {
+                var name = attr.Name.LocalName;
+                if (name.Equals("id", StringComparison.OrdinalIgnoreCase)) element.Id = attr.Value;
+                else if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) element.Class = attr.Value;
+            }
+        }
+
+        // 2. Merge styles from all matching selectors in order of precedence (low to high)
         var mergedProperties = new Dictionary<string, string>();
 
         // Universal selector (lowest precedence)
@@ -147,10 +158,15 @@ public static class CssStyle
             }
         }
 
-        // Inline sttributes (highest precedence, overrides all)        
-        foreach (var attr in attributes?.Where(x => !ApplyToElement_skipped.Contains(x.Name.LocalName)).ToList() ?? [])
+        // Inline attributes (highest precedence, overrides all)
+        if (attributes != null)
         {
-            mergedProperties[attr.Name.LocalName] = attr.Value;
+            foreach (var attr in attributes)
+            {
+                var name = attr.Name.LocalName;
+                if (ApplyToElement_skipped.Contains(name)) continue;
+                mergedProperties[name] = attr.Value;
+            }
         }
 
         if (mergedProperties.Count <= 0) return element;
@@ -186,6 +202,7 @@ public static class CssStyle
         List<string> scrollAttr = [];
         var regularAttrs = new Dictionary<string, string>();
         var wrapperAttrs = new Dictionary<string, string>();
+
         // Pre-check whether this style will create a wrapper so layout attributes can be routed to it.
         bool willWrapWithBorder = properties.Keys.Any(k => k.Equals("border", StringComparison.OrdinalIgnoreCase));
         bool willWrapWithScroll = properties.Any(x => x.Key.StartsWith("overflow", StringComparison.OrdinalIgnoreCase) && x.Value.Equals("scroll", StringComparison.OrdinalIgnoreCase));
@@ -220,10 +237,25 @@ public static class CssStyle
             }
         }
 
+        // Helper to handle SetAttribute with bindings and events
+        void ApplyToTarget(UIElement target, string name, string value)
+        {
+            target.SetAttribute(name, value);
+
+            if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
+            {
+                target.Events[name[2..]] = value;
+            }
+            else if (value.StartsWith('@') && !value.StartsWith("@@"))
+            {
+                target.Bindings.Add(new BindingDefinition(name, value[1..]));
+            }
+        }
+
         // Apply regular attributes to the element (inner)
         foreach (var kvp in regularAttrs)
         {
-            element.SetAttribute(kvp.Key, kvp.Value);
+            ApplyToTarget(element, kvp.Key, kvp.Value);
         }
 
         // Handle scroll wrapper
@@ -245,11 +277,11 @@ public static class CssStyle
                 // Apply any layout attributes from the style to the scroll wrapper (width/height etc.)
                 foreach (var kvp in wrapperAttrs)
                 {
-                    scroll.SetAttribute(kvp.Key, kvp.Value);
+                    ApplyToTarget(scroll, kvp.Key, kvp.Value);
                 }
                 // Fallback: also apply explicit width/height from properties if present (defensive)
-                if (properties.TryGetValue("width", out var w)) scroll.SetAttribute("width", w);
-                if (properties.TryGetValue("height", out var h)) scroll.SetAttribute("height", h);
+                if (properties.TryGetValue("width", out var w)) ApplyToTarget(scroll, "width", w);
+                if (properties.TryGetValue("height", out var h)) ApplyToTarget(scroll, "height", h);
 
                 element.SetAttribute("width", scroll.ScrollX);
                 element.SetAttribute("height", scroll.ScrollY);
@@ -263,12 +295,12 @@ public static class CssStyle
         if (element is not Border && !string.IsNullOrEmpty(borderAttr))
         {
             var border = new Border();
-            border.SetAttribute("border", borderAttr);
+            ApplyToTarget(border, "border", borderAttr);
 
             // Apply any layout attributes from the style to the border wrapper (width/height etc.)
             foreach (var kvp in wrapperAttrs)
             {
-                border.SetAttribute(kvp.Key, kvp.Value);
+                ApplyToTarget(border, kvp.Key, kvp.Value);
             }
 
             border.AddChild(element, null);
@@ -279,14 +311,14 @@ public static class CssStyle
         if (element is not BackgroundImage && (properties.TryGetValue("backgroundimage", out var bgImgAttr) || properties.TryGetValue("background-image", out bgImgAttr)))
         {
             var bg = new BackgroundImage();
-            bg.SetAttribute("backgroundimage", bgImgAttr);
+            ApplyToTarget(bg, "backgroundimage", bgImgAttr!);
 
             foreach (var kvp in wrapperAttrs)
             {
-                bg.SetAttribute(kvp.Key, kvp.Value);
+                ApplyToTarget(bg, kvp.Key, kvp.Value);
             }
-            if (properties.TryGetValue("width", out var w)) bg.SetAttribute("width", w);
-            if (properties.TryGetValue("height", out var h)) bg.SetAttribute("height", h);
+            if (properties.TryGetValue("width", out var w)) ApplyToTarget(bg, "width", w);
+            if (properties.TryGetValue("height", out var h)) ApplyToTarget(bg, "height", h);
 
             bg.AddChild(element, null);
             element = bg;

@@ -361,7 +361,7 @@ public class Parser
             stride.BackgroundColor = ParseColor(suim.BackgroundColor);
         }
 
-        if (suim.Visibility != null)
+        if (suim.Visibility != null && !suim.Visibility.StartsWith('@'))
         {
             if ("visible".Equals(suim.Visibility, StringComparison.OrdinalIgnoreCase))
             {
