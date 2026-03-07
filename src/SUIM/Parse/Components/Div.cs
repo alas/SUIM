@@ -10,8 +10,8 @@ public class Div : LayoutElement
 {
     public Div() : base(nameof(Div))
     {
-        Node.StyleSetDisplay(Display.Flex);
-        Node.StyleSetFlexDirection(FlexDirection.Column);
-        Node.StyleSetAlignItems(Align.Stretch);
+        Node.nodeStyle["display"] = "flex";
+        Node.nodeStyle["flex-direction"] = "column";
+        Node.nodeStyle["align-items"] = "stretch";
     }
 }

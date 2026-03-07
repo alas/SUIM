@@ -9,18 +9,19 @@ public class Overlay : LayoutElement
 {
     public Overlay() : base(nameof(Overlay))
     {
+        Node.nodeStyle["width"] = "100%";
+        Node.nodeStyle["height"] = "100%";
+
         StopClicks = "true";
         BackgroundColor = "#80000000";
 
         Node.StyleSetPositionType(PositionType.Absolute);
-        Node.StyleSetPosition(Edge.Left, 0);
-        Node.StyleSetPosition(Edge.Right, 0);
-        Node.StyleSetPosition(Edge.Top, 0);
-        Node.StyleSetPosition(Edge.Bottom, 0);
-        Node.StyleSetWidthPercent(100);
-        Node.StyleSetHeightPercent(100);
-        Node.StyleSetDisplay(Display.Flex);
-        Node.StyleSetJustifyContent(Justify.Center);
-        Node.StyleSetAlignItems(Align.Center);
+        //Node.StyleSetPosition(Edge.Left, 0);
+        //Node.StyleSetPosition(Edge.Right, 0);
+        //Node.StyleSetPosition(Edge.Top, 0);
+        //Node.StyleSetPosition(Edge.Bottom, 0);
+        Node.nodeStyle["display"] = "flex";
+        Node.nodeStyle["justify-content"] = "center";
+        Node.nodeStyle["align-items"] = "center";
     }
 }

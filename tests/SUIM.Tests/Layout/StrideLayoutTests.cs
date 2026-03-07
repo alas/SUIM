@@ -85,7 +85,7 @@ public class StrideLayoutTests
     {
         var markup = @"
             <div>
-                <vstack style=""gap:0; height:auto;"">
+                <vstack style=""gap:0; height:auto; width:auto;"">
                     <label style=""width:32px; height:16px;""></label>
                     <label style=""width:16px; height:32px;""></label>
                 </vstack>
@@ -97,16 +97,16 @@ public class StrideLayoutTests
         Assert.Equal(200, element.GetWidth());
         Assert.Equal(200, element.GetHeight());
 
-        var div = (Stack)element.Children[0];
-        Assert.Equal("auto", div.GetAttribute("height"));
-        Assert.Equal(32, div.GetWidth());
-        Assert.Equal(48, div.GetHeight());
+        var vstack = (Stack)element.Children[0];
+        Assert.Equal("auto", vstack.GetAttribute("height"));
+        Assert.Equal(32, vstack.GetWidth());
+        Assert.Equal(48, vstack.GetHeight());
 
-        var label1 = (Label)div.Children[0];
+        var label1 = (Label)vstack.Children[0];
         Assert.Equal(32, label1.GetWidth());
         Assert.Equal(16, label1.GetHeight());
 
-        var label2 = (Label)div.Children[1];
+        var label2 = (Label)vstack.Children[1];
         Assert.Equal(16, label2.GetWidth());
         Assert.Equal(32, label2.GetHeight());
     }
@@ -116,11 +116,11 @@ public class StrideLayoutTests
     {
         var markup = @"
             <div>
-                <vstack style=""gap:0; align-self:flex-start; flex:1;"">
+                <vstack style=""gap:0; align-self:flex-start; flex:1; width: auto; height: auto;"">
                     <label style=""width:32px; height:16px;""></label>
                     <label style=""width:16px; height:32px;""></label>
                 </vstack>
-            </div>";
+            </div>";//
 
         var (element, _) = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
@@ -128,16 +128,16 @@ public class StrideLayoutTests
         Assert.Equal(200, element.GetWidth());
         Assert.Equal(200, element.GetHeight());
 
-        var div = (Stack)element.Children[0];
-        Assert.Equal("auto", div.GetAttribute("height"));
-        Assert.Equal(32, div.GetWidth());
-        Assert.Equal(200, div.GetHeight()); // 16 + 32
+        var vstack = (Stack)element.Children[0];
+        Assert.Equal("auto", vstack.GetAttribute("height"));
+        Assert.Equal(32, vstack.GetWidth());
+        Assert.Equal(200, vstack.GetHeight()); // 16 + 32
 
-        var label1 = (Label)div.Children[0];
+        var label1 = (Label)vstack.Children[0];
         Assert.Equal(32, label1.GetWidth());
         Assert.Equal(16, label1.GetHeight());
 
-        var label2 = (Label)div.Children[1];
+        var label2 = (Label)vstack.Children[1];
         Assert.Equal(16, label2.GetWidth());
         Assert.Equal(32, label2.GetHeight());
     }

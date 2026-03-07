@@ -251,6 +251,9 @@ public static class CssStyle
                 if (properties.TryGetValue("width", out var w)) scroll.SetAttribute("width", w);
                 if (properties.TryGetValue("height", out var h)) scroll.SetAttribute("height", h);
 
+                element.SetAttribute("width", scroll.ScrollX);
+                element.SetAttribute("height", scroll.ScrollY);
+
                 scroll.AddChild(element, null);
                 element = scroll;
             }
