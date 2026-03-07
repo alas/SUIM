@@ -227,7 +227,7 @@ public static class CssStyle
         }
 
         // Handle scroll wrapper
-        if (scrollAttr.Count > 0)
+        if (element is not Scroll && scrollAttr.Count > 0)
         {
             var hasScrollX = scrollAttr.Any(x => x.Equals("overflow", StringComparison.OrdinalIgnoreCase)
                 || x.Equals("overflow-x", StringComparison.OrdinalIgnoreCase));
@@ -260,7 +260,7 @@ public static class CssStyle
         }
 
         // Handle border wrapper (must be applied last to wrap scroll if present)
-        if (!string.IsNullOrEmpty(borderAttr))
+        if (element is not Border && !string.IsNullOrEmpty(borderAttr))
         {
             var border = new Border();
             border.SetAttribute("border", borderAttr);
@@ -276,7 +276,7 @@ public static class CssStyle
         }
 
         // Handle BackgroundImage wrapper (applied last to be the outermost wrapper)
-        if (properties.TryGetValue("backgroundimage", out var bgImgAttr) || properties.TryGetValue("background-image", out bgImgAttr))
+        if (element is not BackgroundImage && (properties.TryGetValue("backgroundimage", out var bgImgAttr) || properties.TryGetValue("background-image", out bgImgAttr)))
         {
             var bg = new BackgroundImage();
             bg.SetAttribute("backgroundimage", bgImgAttr);
