@@ -99,9 +99,12 @@ public static class CssStyle
         var elementClass = element.Class;
         if (styles?.Count > 0 && !string.IsNullOrEmpty(elementClass))
         {
-            var classes = elementClass.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            foreach (var className in classes)
+            var classes = elementClass.AsSpan().Split(' ');
+            foreach (var segment in classes)
             {
+                var className = elementClass.AsSpan()[segment].Trim();
+                if (className.IsEmpty) continue;
+
                 var classProps = GetProps(styles, mergedProperties, className, '.');
                 if (classProps != null)
                 {
