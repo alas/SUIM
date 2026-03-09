@@ -9,6 +9,8 @@ public class PopupIntegrationTests
     [Fact]
     public void MainView_ButtonsHaveWidthFromCSS()
     {
+        const int TOTAL_WIDTH = 1280;
+        const int TOTAL_HEIGHT = 720;
         var rootPath = "..\\..\\..\\..\\..\\src\\Example\\Chess3d\\SUIM";
         var project = new SUIMProject(rootPath);
         var project_views_path = Path.Combine(rootPath, "views", "MainView.suim");
@@ -23,7 +25,7 @@ public class PopupIntegrationTests
         model.PopupMessage = "Test Message";
         model.PopupVisibility = "visible";
 
-        suimRoot.CalculateLayout(1280, 720);
+        suimRoot.CalculateLayout(TOTAL_WIDTH, TOTAL_HEIGHT);
 
         // Find overlay component
         var overlay = FindOverlay(suimRoot);
@@ -44,18 +46,18 @@ public class PopupIntegrationTests
         Assert.NotNull(popupContent);
         
         // Content should be centered horizontally
-        var contentX = popupContent.GetX();
+        var contentLeft = popupContent.GetLeft();
         var contentWidth = popupContent.GetWidth();
-        var expectedX = (1280 - contentWidth) / 2;
-        Assert.True(Math.Abs(contentX - expectedX) < 5, 
-            $"Content should be horizontally centered. Expected X ~{expectedX}, got {contentX}");
+        var expectedLeft = (TOTAL_WIDTH - contentWidth) / 2;
+        Assert.True(Math.Abs(contentLeft - expectedLeft) < 5, 
+            $"Content should be horizontally centered. Expected X ~{expectedLeft}, got {contentLeft}");
         
         // Content should be centered vertically
-        var contentY = popupContent.GetY();
+        var contentTop = popupContent.GetTop();
         var contentHeight = popupContent.GetHeight();
-        var expectedY = (720 - contentHeight) / 2;
-        Assert.True(Math.Abs(contentY - expectedY) < 5,
-            $"Content should be vertically centered. Expected Y ~{expectedY}, got {contentY}");
+        var expectedTop = (TOTAL_HEIGHT - contentHeight) / 2;
+        Assert.True(Math.Abs(contentTop - expectedTop) < 5,
+            $"Content should be vertically centered. Expected Y ~{expectedTop}, got {contentTop}");
     }
     
     private static Overlay? FindOverlay(UIElement root)

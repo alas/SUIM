@@ -1,7 +1,11 @@
 namespace SUIM.Parse.Components;
 
-public class Button() : UIElement(nameof(Button))
+using SUIM.Flexbox;
+
+public class Button() : UIElement(nameof(Button)), IMeasureFunc
 {
+    public static MeasureFunc? MeasureFunc { get; set; } = null;
+
     public string? NormalImage { get; set; }
     public string? HoverImage { get; set; }
     public string? PressedImage { get; set; }
@@ -10,6 +14,7 @@ public class Button() : UIElement(nameof(Button))
     {
         if (IsNormal.Contains(name))
         {
+            Node.SetMeasureFunc(MeasureFunc);
             NormalImage = value as string;
         }
         else if (IsHover.Contains(name))

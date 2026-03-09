@@ -1,18 +1,17 @@
 namespace SUIM.Parse.Components;
 
+using SUIM.Flexbox;
+
 public class Text : UIElement
 {
-    public static Flexbox.MeasureFunc? MeasureFunc = null;
+    public static MeasureFunc? MeasureFunc { get; set; } = null;
 
     public string? Value { get; set; }
     public bool Wrap { get; set; }
 
     public Text(string? tagName = null) : base(tagName ?? nameof(Text))
     {
-        if (MeasureFunc != null)
-        {
-            Node.SetMeasureFunc(MeasureFunc);
-        }
+        Node.SetMeasureFunc(MeasureFunc);
     }
 
     public override void SetAttribute(string name, object? value)

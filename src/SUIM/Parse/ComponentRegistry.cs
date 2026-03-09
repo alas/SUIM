@@ -34,7 +34,9 @@ public static class ComponentRegistry
 
         if (_fileRegistrations.TryGetValue(tag, out var filePath))
         {
-            return new CustomComponent(tag) { Source = filePath };
+            var result = new CustomComponent(tag);
+            result.SetAttribute("source", filePath);
+            return result;
         }
 
         throw new NotSupportedException($"Unknown custom tag: {tag}");

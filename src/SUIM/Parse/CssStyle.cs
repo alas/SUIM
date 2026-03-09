@@ -79,8 +79,8 @@ public static class CssStyle
             foreach (var attr in attributes)
             {
                 var name = attr.Name.LocalName;
-                if (name.Equals("id", StringComparison.OrdinalIgnoreCase)) element.Id = attr.Value;
-                else if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) element.Class = attr.Value;
+                if (name.Equals("id", StringComparison.OrdinalIgnoreCase)) element.SetAttribute("id", attr.Value);
+                else if (name.Equals("class", StringComparison.OrdinalIgnoreCase)) element.SetAttribute("class", attr.Value);
             }
         }
 
@@ -206,7 +206,6 @@ public static class CssStyle
         // Pre-check whether this style will create a wrapper so layout attributes can be routed to it.
         bool willWrapWithBorder = properties.Keys.Any(k => k.Equals("border", StringComparison.OrdinalIgnoreCase));
         bool willWrapWithScroll = properties.Any(x => x.Key.StartsWith("overflow", StringComparison.OrdinalIgnoreCase) && x.Value.Equals("scroll", StringComparison.OrdinalIgnoreCase));
-        bool willWrapWithBG = properties.Keys.Any(k => k.Equals("backgroundimage", StringComparison.OrdinalIgnoreCase) || k.Equals("background-image", StringComparison.OrdinalIgnoreCase));
 
         foreach (var kvp in properties)
         {
@@ -225,7 +224,7 @@ public static class CssStyle
             {
                 // Background image attribute will be handled by the wrapper creation
             }
-            else if ((willWrapWithBorder || willWrapWithScroll || willWrapWithBG) && IsLayoutAttribute(propName))
+            else if ((willWrapWithBorder || willWrapWithScroll) && IsLayoutAttribute(propName))
             {
                 // If a style defines layout attributes for an element that will be wrapped (border/scroll/bg),
                 // apply those layout attributes to the wrapper instead of the inner element.
@@ -238,7 +237,7 @@ public static class CssStyle
         }
 
         // Helper to handle SetAttribute with bindings and events
-        void ApplyToTarget(UIElement target, string name, string value)
+        static void ApplyToTarget(UIElement target, string name, string value)
         {
             target.SetAttribute(name, value);
 
@@ -256,6 +255,16 @@ public static class CssStyle
         foreach (var kvp in regularAttrs)
         {
             ApplyToTarget(element, kvp.Key, kvp.Value);
+        }
+
+        // Handle BackgroundImage, it is applied first to be the inserted as the first child of the node,
+        // BackgroundImage fills the entire space occupied by its parent and its removed from the layout calculation by setting its position style as absolute
+        if (element is not BackgroundImage && (properties.TryGetValue("backgroundimage", out var bgImgAttr) || properties.TryGetValue("background-image", out bgImgAttr)))
+        {
+            var bg = new BackgroundImage();
+            ApplyToTarget(bg, "backgroundimage", bgImgAttr!);
+
+            element.AddChild(bg, null);
         }
 
         // Handle scroll wrapper
@@ -305,23 +314,6 @@ public static class CssStyle
 
             border.AddChild(element, null);
             element = border;
-        }
-
-        // Handle BackgroundImage wrapper (applied last to be the outermost wrapper)
-        if (element is not BackgroundImage && (properties.TryGetValue("backgroundimage", out var bgImgAttr) || properties.TryGetValue("background-image", out bgImgAttr)))
-        {
-            var bg = new BackgroundImage();
-            ApplyToTarget(bg, "backgroundimage", bgImgAttr!);
-
-            foreach (var kvp in wrapperAttrs)
-            {
-                ApplyToTarget(bg, kvp.Key, kvp.Value);
-            }
-            if (properties.TryGetValue("width", out var w)) ApplyToTarget(bg, "width", w);
-            if (properties.TryGetValue("height", out var h)) ApplyToTarget(bg, "height", h);
-
-            bg.AddChild(element, null);
-            element = bg;
         }
 
         return element;

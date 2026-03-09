@@ -2042,22 +2042,22 @@ Text after
         var markup = "<div backgroundimage=\"test.png\" width=\"100\" height=\"100\" />";
         var (element, _) = MarkupParser.Parse(markup);
 
-        // Should be wrapped in BackgroundImage
-        Assert.IsType<BackgroundImage>(element);
-        var bg = (BackgroundImage)element;
+        // Inner element should be Div
+        Assert.IsType<Div>(element);
+        Assert.Single(element.Children);
+        var div = (Div)element;
+        // Width/Height on inner element should have been set to auto by the wrapper logic
+        Assert.Equal("100", div.GetAttribute("width"));
+        Assert.Equal("100", div.GetAttribute("height"));
+
+        // Should have BackgroundImage as first child
+        Assert.IsType<BackgroundImage>(element.Children[0]);
+        var bg = (BackgroundImage)element.Children[0];
         Assert.Equal("test.png", bg.Source);
         
         // Layout properties should be on the wrapper
-        Assert.Equal("100", bg.GetAttribute("width"));
-        Assert.Equal("100", bg.GetAttribute("height"));
-
-        // Inner element should be Div
-        Assert.Single(bg.Children);
-        Assert.IsType<Div>(bg.Children[0]);
-        var div = (Div)bg.Children[0];
-        // Width/Height on inner element should have been set to auto by the wrapper logic
-        Assert.Equal("auto", div.GetAttribute("width"));
-        Assert.Equal("auto", div.GetAttribute("height"));
+        Assert.Equal("100%", bg.GetAttribute("width"));
+        Assert.Equal("100%", bg.GetAttribute("height"));
     }
 
     [Fact]
@@ -2084,10 +2084,13 @@ Text after
 </grid>";
         var (element, _) = MarkupParser.Parse(markup);
 
-        var bg = element.Children.Single() as BackgroundImage;
+        var div = element.Children.Single() as Div;
+        Assert.NotNull(div);
+        Assert.Equal("200", div.GetAttribute("width"));
+        var bg = div.Children.Single() as BackgroundImage;
         Assert.NotNull(bg);
         Assert.Equal("style.png", bg.Source);
-        Assert.Equal("200", bg.GetAttribute("width"));
+        Assert.Equal("100%", bg.GetAttribute("width"));
     }
 }
 

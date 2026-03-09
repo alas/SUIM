@@ -29,7 +29,6 @@ public class Dock : UIElement
         }
     }
 
-
     #region Children
 
     public override void AddChild(UIElement child, XElement? element)

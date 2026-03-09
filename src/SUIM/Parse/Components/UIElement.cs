@@ -114,6 +114,19 @@ public abstract class UIElement
         return depth;
     }
 
+    protected static void FillParent(Node node)
+    {
+        node.StyleSetPositionType(PositionType.Absolute);
+        node.nodeStyle["left"] = "0";
+        node.nodeStyle["right"] = "0";
+        node.nodeStyle["top"] = "0";
+        node.nodeStyle["bottom"] = "0";
+        node.nodeStyle["width"] = "100%";
+        node.nodeStyle["height"] = "100%";
+        node.nodeStyle["display"] = "flex";
+        node.nodeStyle["flex-grow"] = "1";
+    }
+
     #endregion
 
     #region Attributes
@@ -441,7 +454,12 @@ public abstract class LayoutElement(string tagName) : UIElement(tagName)
     }
 }
 
-public interface IPlaceholder
+public interface IPlaceholder //: UIElement
 {
     string? Placeholder { get; set; }
+}
+
+public interface IMeasureFunc //: UIElement
+{
+    static MeasureFunc? MeasureFunc { get; set; }
 }

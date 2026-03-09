@@ -264,7 +264,7 @@ public partial class Flex
     }
 
     // SetMeasureFunc sets measure function
-    internal static void SetMeasureFunc(Node node, MeasureFunc measureFunc)
+    internal static void SetMeasureFunc(Node node, MeasureFunc? measureFunc)
     {
         if (measureFunc == null)
         {

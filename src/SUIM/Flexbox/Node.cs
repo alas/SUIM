@@ -203,7 +203,7 @@ public partial class Node
 
     #region other props
 
-    public void SetMeasureFunc(MeasureFunc measureFunc)
+    public void SetMeasureFunc(MeasureFunc? measureFunc)
     {
         Flex.SetMeasureFunc(this, measureFunc);
     }

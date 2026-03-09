@@ -11,16 +11,7 @@ public class Overlay : LayoutElement
     {
         StopClicks = "true";
         BackgroundColor = "#80808000";
-
-        Node.StyleSetPositionType(PositionType.Absolute);
-        Node.nodeStyle["left"] = "0";
-        Node.nodeStyle["right"] = "0";
-        Node.nodeStyle["top"] = "0";
-        Node.nodeStyle["bottom"] = "0";
-        Node.nodeStyle["width"] = "100%";
-        Node.nodeStyle["height"] = "100%";
-        Node.nodeStyle["display"] = "flex";
-        Node.nodeStyle["flex-grow"] = "1";
+        FillParent(Node);
         Node.nodeStyle["justify-content"] = "center";
         Node.nodeStyle["align-items"] = "center";
     }

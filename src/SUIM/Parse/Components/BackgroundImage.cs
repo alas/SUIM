@@ -1,8 +1,13 @@
 namespace SUIM.Parse.Components;
 
-public class BackgroundImage() : UIElement(nameof(BackgroundImage))
+public class BackgroundImage : UIElement
 {
     public string? Source { get; set; }
+
+    public BackgroundImage() : base(nameof(BackgroundImage))
+    {
+        FillParent(Node);
+    }
 
     public override void SetAttribute(string name, object? value)
     {

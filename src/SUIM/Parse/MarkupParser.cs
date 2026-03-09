@@ -117,8 +117,15 @@ public static partial class MarkupParser
                     int colIdx = 0;
                     foreach (var child in node.Elements())
                     {
-                        child.SetAttributeValue("grid.row", rowIndex.ToString());
-                        child.SetAttributeValue("grid.column", colIdx.ToString());
+                        if (!child.Attributes("grid.row").Any())
+                        {
+                            child.SetAttributeValue("grid.row", rowIndex.ToString());
+                        }
+
+                        if (!child.Attributes("grid.column").Any())
+                        {
+                            child.SetAttributeValue("grid.column", colIdx.ToString());
+                        }
                         var childElement = ParseElement(child, styles, leakableStyles, model, basePath);
                         if (childElement == null) continue;
 
@@ -139,8 +146,16 @@ public static partial class MarkupParser
                     int rowIdx = 0;
                     foreach (var child in node.Elements())
                     {
-                        child.SetAttributeValue("grid.column", columnIndex.ToString());
-                        child.SetAttributeValue("grid.row", rowIdx.ToString());
+
+                        if (!child.Attributes("grid.column").Any())
+                        {
+                            child.SetAttributeValue("grid.column", columnIndex.ToString());
+                        }
+
+                        if (!child.Attributes("grid.row").Any())
+                        {
+                            child.SetAttributeValue("grid.row", rowIdx.ToString());
+                        }
                         var childElement = ParseElement(child, styles, leakableStyles, model, basePath);
                         if (childElement == null) continue;
 
@@ -179,16 +194,19 @@ public static partial class MarkupParser
                             // Mixed static text and dynamic tokens: "Hello @name!" -> ["Hello ", "@name", "!"]
                             foreach (var chunk in chunks)
                             {
-                                UIElement textElement = new Text() { Value = chunk, Font = innerElement.Font, FontSize = innerElement.FontSize };
+                                var textElement = new Text();
+                                textElement.SetAttribute("value", chunk);
+                                textElement.SetAttribute("font", innerElement.Font);
+                                textElement.SetAttribute("font-size", innerElement.FontSize);
                                 if (chunk.Length > 1 && chunk.StartsWith('@') && !chunk.StartsWith("@@"))
                                 {
                                     var modelPropName = chunk[1..];
                                     textElement.Bindings.Add(new BindingDefinition("value", modelPropName));
                                 }
 
-                                textElement = CssStyle.ApplyToElement(textElement, styles, null);
+                                var uiElement = CssStyle.ApplyToElement(textElement, styles, null);
 
-                                innerElement.AddChild(textElement, null);
+                                innerElement.AddChild(uiElement, null);
                             }
                         }
                     }
