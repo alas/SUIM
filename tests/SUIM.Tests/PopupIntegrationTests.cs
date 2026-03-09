@@ -73,7 +73,7 @@ public class PopupIntegrationTests
     
     private static UIElement? FindPopupContent(UIElement root)
     {
-        if (root.Class?.Contains("wood-panel") == true) return root;
+        if (root.Class?.Contains("window") == true) return root;
         foreach (var child in root.Children)
         {
             var found = FindPopupContent(child);

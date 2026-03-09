@@ -1,7 +1,6 @@
 namespace SUIM.Parse.Components;
 
 using System;
-using System.Reflection;
 using SUIM.Parse;
 
 public abstract class UIComponent(string tagName) : UIElement(tagName)
@@ -53,42 +52,12 @@ public abstract class UIComponent(string tagName) : UIElement(tagName)
         foreach (var evt in element.Events)
         {
             var eventName = evt.Key.ToLowerInvariant();
-            var methodName = evt.Value;
+            var expression = evt.Value;
             
-            // Find method on THIS component instance
-            var method = this.GetType().GetMethod(methodName, 
-                BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.IgnoreCase);
-            
-            if (method != null)
+            var handler = EventHandlerResolver.ResolveHandler(this, expression, element);
+            if (handler != null)
             {
-                try
-                {
-                    Delegate? d = null;
-                    var parameters = method.GetParameters();
-                    
-                    if (parameters.Length == 0)
-                    {
-                        d = Delegate.CreateDelegate(typeof(Action), this, method);
-                    }
-                    else if (parameters.Length == 1)
-                    {
-                        d = Delegate.CreateDelegate(typeof(Action<object?>), this, method);
-                    }
-                    else
-                    {
-                        // Fallback for other signatures if needed, though Actions are standard for events
-                        d = method.CreateDelegate(typeof(Delegate), this);
-                    }
-                    
-                    if (d != null)
-                    {
-                        element.ResolvedEvents[eventName] = d;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error binding event '{eventName}' to method '{methodName}': {ex.Message}");
-                }
+                element.ResolvedEvents[eventName] = handler;
             }
         }
 
