@@ -4,28 +4,10 @@ using System;
 using System.IO;
 using System.Linq;
 using SUIM.Parse;
-using SUIM.Parse.Components;
 
 public partial class SUIMProject(string rootPath)
 {
     public string RootPath { get; } = rootPath;
-
-    public (UIElement, dynamic?) GetView(string viewName, object? model = null)
-    {
-        string viewPath = Path.Combine(RootPath, "views", $"{viewName}.suim");
-        if (!File.Exists(viewPath))
-        {
-            throw new FileNotFoundException($"View file not found: {viewPath}");
-        }
-
-        string markup = File.ReadAllText(viewPath);
-        
-        // 1. Recursively resolve and register dependencies
-        ResolveDependencies(markup);
-
-        // 2. Parse the view
-        return MarkupParser.Parse(markup, model, basePath: RootPath);
-    }
 
     public void ResolveDependencies(string markup)
     {

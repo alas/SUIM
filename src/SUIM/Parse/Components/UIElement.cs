@@ -29,6 +29,7 @@ public abstract class UIElement
     public dynamic? Model { get; set; }
     public Dictionary<string, string> Events { get; set; } = [];
     internal Node Node { get; }
+    public Dictionary<string, Delegate> ResolvedEvents { get; } = [];
 
     public UIElement(string tagName)
     {
@@ -227,20 +228,10 @@ public abstract class UIElement
     {
         return Node.LayoutGetLeft();
     }
-
-    public float GetX()
-    {
-        return Node.LayoutGetX();
-    }
-
+    
     public float GetTop()
     {
         return Node.LayoutGetTop();
-    }
-
-    public float GetY()
-    {
-        return Node.LayoutGetY();
     }
 
     public float GetWidth()
@@ -248,19 +239,9 @@ public abstract class UIElement
         return Node.LayoutGetWidth();
     }
 
-    public float GetWidth2()
-    {
-        return Node.Layout.width;
-    }
-
     public float GetHeight()
     {
         return Node.LayoutGetHeight();
-    }
-
-    public float GetHeight2()
-    {
-        return Node.Layout.height;
     }
 
     public dynamic? GetEffectiveModel()
@@ -413,6 +394,27 @@ public abstract class UIElement
             // Direction
             { "direction",                                      "direction" },
         };
+
+    #endregion
+
+    #region Events
+
+    public void TriggerEvent(string eventName, object? parameter = null)
+    {
+        if (ResolvedEvents.TryGetValue(eventName.ToLowerInvariant(), out var handler))
+        {
+            try
+            {
+                if (handler is Action action) action();
+                else if (handler is Action<object?> paramAction) paramAction(parameter);
+                else handler.DynamicInvoke(parameter);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error triggering event '{eventName}': {ex.Message}");
+            }
+        }
+    }
 
     #endregion
 
