@@ -34,7 +34,7 @@ public static class ComponentRegistry
 
         if (_fileRegistrations.TryGetValue(tag, out var filePath))
         {
-            var result = new CustomComponent(tag);
+            var result = new VirtualComponent(tag);
             result.SetAttribute("source", filePath);
             return result;
         }

@@ -5,7 +5,7 @@ using Xunit;
 using SUIM.Parse;
 using SUIM.Parse.Components;
 
-public class CustomComponentTests
+public class VirtualComponentTests
 {
     [Fact]
     public void Parse_CustomTag_ExpandsFromFile()

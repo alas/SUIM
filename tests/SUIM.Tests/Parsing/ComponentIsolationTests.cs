@@ -217,7 +217,7 @@ public class ComponentIsolationTests
         File.WriteAllText(compPath, componentMarkup);
 
         // Act
-        var component = new CustomComponent("TestComp") { Source = compPath };
+        var component = new VirtualComponent("TestComp") { Source = compPath };
         var comp = component.Expand(new ObservableObject(), basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         // Assert

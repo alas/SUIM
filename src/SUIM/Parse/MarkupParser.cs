@@ -223,7 +223,7 @@ public static partial class MarkupParser
 
         rootElement = CssStyle.ApplyToElement(rootElement, styles, attributes);
         
-        if (rootElement is CustomComponent custom)
+        if (rootElement is VirtualComponent custom)
         {
             return custom.Expand(model, leakableStyles, basePath);
         }

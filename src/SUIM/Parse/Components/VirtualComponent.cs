@@ -5,7 +5,11 @@ using System.IO;
 using SUIM.Model;
 using SUIM.Parse;
 
-public class CustomComponent(string tagName) : LayoutElement(tagName)
+/// <summary>
+/// A helper class for Tags that will get replaced by markup
+/// </summary>
+/// <param name="tagName"></param>
+public sealed class VirtualComponent(string tagName) : LayoutElement(tagName)
 {
     public string? Source { get; set; }
     public Dictionary<string, object?> Attributes { get; } = [];

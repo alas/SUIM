@@ -3,6 +3,10 @@ namespace SUIM.Parse.Components;
 using System;
 using SUIM.Parse;
 
+/// <summary>
+/// Base class for SUIM Components with Code Behind
+/// </summary>
+/// <param name="tagName"></param>
 public abstract class UIComponent(string tagName) : UIElement(tagName)
 {
     public void LoadMarkup(string markup, object? model = null)
