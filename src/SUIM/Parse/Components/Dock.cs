@@ -3,19 +3,13 @@ namespace SUIM.Parse.Components;
 using System.Xml.Linq;
 using SUIM.Flexbox;
 
-public class Dock : UIElement
+public class Dock() : UIElement(nameof(Dock))
 {
     public string? LastChildFill { get; set; } = "true";
     public List<DockChild> DockChildren { get; } = [];
 
     private bool _isStructureBuilt = false;
     private readonly List<Node> _wrapperNodes = [];
-
-    public Dock() : base(nameof(Dock))
-    {
-        Node.nodeStyle["width"] = "100%";
-        Node.nodeStyle["height"] = "100%";
-    }
 
     public override void SetAttribute(string name, object? value)
     {

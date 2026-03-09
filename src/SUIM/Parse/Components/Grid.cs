@@ -4,7 +4,7 @@ using System;
 using System.Xml.Linq;
 using SUIM.Flexbox;
 
-public class Grid : LayoutElement
+public class Grid() : LayoutElement(nameof(Grid))
 {
     public string? Columns { get; set; }
     public string? Rows { get; set; }
@@ -12,12 +12,6 @@ public class Grid : LayoutElement
     private bool _isStructureBuilt = false;
     private readonly List<Node> _rowNodes = [];
     private readonly List<Node> _cellNodes = [];
-
-    public Grid() : base(nameof(Grid))
-    {
-        Node.nodeStyle["width"] = "100%";
-        Node.nodeStyle["height"] = "100%";
-    }
 
     #region ApplySUIMLayout
 
