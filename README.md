@@ -61,7 +61,7 @@ Equivalent to a CSS block-like flex container:
 Arranges children sequentially along a single axis.
 
 * **Attributes:** orientation (horizontal, vertical), gap.
-* **Gap behavior (current):** `gap` is emulated with child margins during layout (first child gets zero margin on the stacking axis). This matches spacing intent until native Yoga gap support is fully relied on.
+* **Gap behavior (current):** `gap` is emulated with child margins during layout (first child gets zero margin on the stacking axis). This matches spacing intent until native layout engine gap support is fully relied on.
 * **Synonyms:**
 * **`<vstack>`**, **`<stackv>`**, **`<stack-v>`** and **`<vbox>`**: Equivalent to `<stack orientation="vertical">`.
 * **`<hstack>`**, **`<stackh>`**, **`<stack-h>`** and **`<hbox>`**: Equivalent to `<stack orientation="horizontal">`.
@@ -439,6 +439,7 @@ Result in this output:
 
 ## ⚠️ Note: Yoga gotchas
 
+* Layout is calculated using an internal copy of a c# port of Yoga from: https://github.com/ru-ace/Flexbox, its based on an old version of Yoga that doesn't support Gap natively.  It is under BSD License so those files follow that license.  In the future this library will either be updated to a more recent version port or another layout engine that support flexbox and CSS Grid like Taffy, which is written in Rust and would need to be ported to c#, it is also under MIT license wich aligns better with the spirit of this engine.
 * Root sizing:
   In SUIM, layout is calculated with the current viewport size. If root width/height are omitted, the root will generally fill the viewport.
   If you need a smaller root, set explicit `width` and `height`.
