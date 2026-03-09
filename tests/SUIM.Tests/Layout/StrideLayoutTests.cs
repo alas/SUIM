@@ -98,7 +98,7 @@ public class StrideLayoutTests
         Assert.Equal(200, element.GetHeight());
 
         var vstack = (Stack)element.Children[0];
-        Assert.Equal(32, vstack.GetWidth());
+        Assert.Equal(200, vstack.GetWidth());
         Assert.Equal(48, vstack.GetHeight());
 
         var label1 = (Label)vstack.Children[0];

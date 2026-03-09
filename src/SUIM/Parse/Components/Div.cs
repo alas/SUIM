@@ -4,7 +4,7 @@ using SUIM.Flexbox;
 
 /// <summary>
 /// A simple container where children are arranged in a vertical stack by default.
-/// Equivalent to a CSS block-level element (display: flex; flex-direction: column; align-items:stretch;).
+/// Equivalent to a CSS block-level element (display: flex; flex-direction: column;).
 /// </summary>
 public class Div : LayoutElement
 {
@@ -12,6 +12,5 @@ public class Div : LayoutElement
     {
         Node.nodeStyle["display"] = "flex";
         Node.nodeStyle["flex-direction"] = "column";
-        Node.nodeStyle["align-items"] = "stretch";
     }
 }
