@@ -1,4 +1,4 @@
-namespace SUIM;
+namespace SUIM.Parse;
 
 using System.Collections;
 using System.Text;
@@ -6,6 +6,43 @@ using System.Text.RegularExpressions;
 
 public partial class ControlFlowParser(dynamic model)
 {
+    private readonly Stack<IDictionary<string, object?>> _scopes = CreateInitialScope(model);
+
+    private static Stack<IDictionary<string, object?>> CreateInitialScope(dynamic model)
+    {
+        var stack = new Stack<IDictionary<string, object?>>();
+        var dict = new Dictionary<string, object?>();
+        
+        if (model is Model.ObservableObject oo)
+        {
+            var propertiesField = typeof(Model.ObservableObject).GetField("_properties", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (propertiesField?.GetValue(oo) is Dictionary<string, object?> props)
+            {
+                foreach (var kvp in props) dict[kvp.Key] = kvp.Value;
+            }
+        }
+        else if (model != null)
+        {
+            foreach (var prop in model.GetType().GetProperties())
+            {
+                if (prop.CanRead) dict[prop.Name] = prop.GetValue(model);
+            }
+        }
+        
+        stack.Push(dict);
+        return stack;
+    }
+
+    private IDictionary<string, object?> GetCurrentScope()
+    {
+        var merged = new Dictionary<string, object?>();
+        foreach (var scope in _scopes.Reverse())
+        {
+            foreach (var kvp in scope) merged[kvp.Key] = kvp.Value;
+        }
+        return merged;
+    }
+
     public string ExpandDirectives(string markup)
     {
         var sb = new StringBuilder();
@@ -44,7 +81,36 @@ public partial class ControlFlowParser(dynamic model)
             i++;
         }
 
-        return sb.ToString();
+        return InterpolateVariables(sb.ToString());
+    }
+
+    private string InterpolateVariables(string template)
+    {
+        // Replace @Variable or @Variable.Property with scoped values
+        // ONLY if they are from a local scope (not the root model scope)
+        return Regex.Replace(template, @"@(\w+)(\.(\w+))?", match =>
+        {
+            var ident = match.Groups[1].Value;
+            if (IsLocalVariable(ident))
+            {
+                var result = GetValue(match.Value);
+                return result?.ToString() ?? string.Empty;
+            }
+            return match.Value;
+        });
+    }
+
+    private bool IsLocalVariable(string name)
+    {
+        if (_scopes.Count <= 1) return false;
+        
+        // Check all scopes except the bottom one (the model)
+        var list = _scopes.ToList(); // Top is 0, Bottom is Count-1
+        for (int i = 0; i < list.Count - 1; i++)
+        {
+            if (list[i].ContainsKey(name)) return true;
+        }
+        return false;
     }
 
     private static bool IsDirective(string markup, int index, string directive)
@@ -54,9 +120,9 @@ public partial class ControlFlowParser(dynamic model)
         // precise match "@directive"
         if (markup.Substring(index + 1, directive.Length) == directive)
         {
-            // check boundary: next char should be space or { or something valid
+            // check boundary: next char should be space or ( or { or something valid
             char next = index + 1 + directive.Length < markup.Length ? markup[index + 1 + directive.Length] : '\0';
-            if (char.IsWhiteSpace(next) || next == '{')
+            if (char.IsWhiteSpace(next) || next == '(' || next == '{')
             {
                 return true;
             }
@@ -73,7 +139,6 @@ public partial class ControlFlowParser(dynamic model)
         
         // 2. Get Block
         var (trueBlock, blockLen) = ExtractBlock(markup, currentIndex);
-        _ = (currentIndex - startIndex) + blockLen;
 
         bool conditionMet = EvaluateCondition(condition);
         string result = conditionMet ? trueBlock : string.Empty;
@@ -156,23 +221,28 @@ public partial class ControlFlowParser(dynamic model)
             if (IsKeyword(blockBody, i, "case"))
             {
                 int valStart = i + 4;
-                var caseValueStr = ExtractCondition(blockBody, ref valStart); // re-use extract condition to get value until {
-                 // Remove any trailing whitespace/brace handling from ExtractCondition if it over-consumed? 
-                 // Actually ExtractCondition consumes until '{', which is perfect.
-                 // But ExtractCondition returns trimmed string.
-                 
+                valStart = SkipWhitespace(blockBody, valStart);
+                
+                // Read until '{'
+                int valEnd = valStart;
+                while (valEnd < len && blockBody[valEnd] != '{')
+                {
+                    valEnd++;
+                }
+                var caseValueStr = blockBody[valStart..valEnd].Trim();
+                
                 // Validate value
                 var caseValue = ParseValue(caseValueStr);
 
-                var (caseContent, caseLen) = ExtractBlock(blockBody, valStart);
+                var (caseContent, caseLen) = ExtractBlock(blockBody, valEnd);
                 
                 if (!matched && Equals(switchVal, caseValue))
                 {
                     result = caseContent;
                     matched = true;
                 }
-                
-                i = valStart + caseLen;
+
+                i = valEnd + caseLen;
             }
             else if (IsKeyword(blockBody, i, "default"))
             {
@@ -199,14 +269,16 @@ public partial class ControlFlowParser(dynamic model)
     {
         int currentIndex = startIndex + 8; // "@foreach"
         
-        // Parse: var in collection
-        int blockStart = markup.IndexOf('{', currentIndex);
-        string header = markup[currentIndex..blockStart].Trim();
+        // Parse: (var in collection)
+        var header = ExtractCondition(markup, ref currentIndex);
+        
         var parts = MyRegex().Split(header);
-        var varName = parts[0];
-        var collectionName = parts[1];
+        if (parts.Length < 2) throw new Exception("Invalid @foreach syntax. Expected (var in collection)");
+        
+        var varName = parts[0].Trim();
+        var collectionName = parts[1].Trim();
 
-        var (blockContent, blockLen) = ExtractBlock(markup, blockStart);
+        var (blockContent, blockLen) = ExtractBlock(markup, currentIndex);
 
         IEnumerable items;
         if (collectionName.Contains(".."))
@@ -224,10 +296,13 @@ public partial class ControlFlowParser(dynamic model)
         var sb = new StringBuilder();
         foreach (var item in items)
         {
-             sb.Append(ReplaceVariables(blockContent, varName, item));
+             // Push local scope
+             _scopes.Push(new Dictionary<string, object?> { [varName] = item });
+             sb.Append(ExpandDirectives(blockContent));
+             _scopes.Pop();
         }
 
-        return (sb.ToString(), (blockStart - startIndex) + blockLen);
+        return (sb.ToString(), currentIndex + blockLen - startIndex);
     }
     
     // --- Helpers ---
@@ -235,12 +310,24 @@ public partial class ControlFlowParser(dynamic model)
     private static string ExtractCondition(string markup, ref int index)
     {
         index = SkipWhitespace(markup, index);
-        int start = index;
-        while (index < markup.Length && markup[index] != '{')
+        if (index >= markup.Length || markup[index] != '(')
         {
+            throw new InvalidOperationException("Directives must use parentheses, e.g., @if (condition).");
+        }
+
+        int start = index + 1;
+        int balance = 1;
+        index++;
+        while (index < markup.Length && balance > 0)
+        {
+            if (markup[index] == '(') balance++;
+            else if (markup[index] == ')') balance--;
             index++;
         }
-        return markup[start..index].Trim();
+
+        if (balance > 0) throw new InvalidOperationException("Unbalanced parentheses in directive condition.");
+
+        return markup[start..(index - 1)].Trim();
     }
 
     private static (string content, int totalLen) ExtractBlock(string markup, int startIndex)
@@ -305,11 +392,10 @@ public partial class ControlFlowParser(dynamic model)
     {
         if (string.IsNullOrWhiteSpace(condition)) return false;
         
-        // Remove parens if present
-        if (condition.StartsWith('(') && condition.EndsWith(')'))
-             condition = condition[1..^1];
-
-        return model.GetValue(condition) is bool b && b;
+        var evaluator = new ExpressionEvaluator(GetCurrentScope());
+        var result = evaluator.Evaluate(condition);
+        
+        return result is bool b && b;
     }
 
     private object? GetValue(string key)
@@ -317,7 +403,8 @@ public partial class ControlFlowParser(dynamic model)
         if (string.IsNullOrWhiteSpace(key)) return null;
         if (key.StartsWith('@')) key = key[1..];
         
-        return model.GetValue(key);
+        var evaluator = new ExpressionEvaluator(GetCurrentScope());
+        return evaluator.Evaluate(key);
     }
 
     private object? ParseValue(string val)
@@ -325,29 +412,9 @@ public partial class ControlFlowParser(dynamic model)
         if (val.StartsWith('@')) return GetValue(val);
         if (int.TryParse(val, out int i)) return i;
         if (val.StartsWith('"') && val.EndsWith('"')) return val.Trim('"');
-        return val; // fallback string
-    }
-
-    private static string ReplaceVariables(string template, string varName, object item)
-    {
-        // Simple regex replace for @var.Prop or @var
-        // Same logic as before is okay for basic variable replacement
-        // But need to be careful not to replace inside other directives if nested? 
-        // The Recursion happens *after* this anyway.
         
-        return Regex.Replace(template, $@"@{Regex.Escape(varName)}(\.(\w+))?", match =>
-        {
-            if (match.Groups[2].Success)
-            {
-                var propName = match.Groups[2].Value;
-                var prop = item.GetType().GetProperty(propName);
-                if (prop != null)
-                {
-                    return prop.GetValue(item)?.ToString() ?? string.Empty;
-                }
-            }
-            return item.ToString() ?? string.Empty;
-        });
+        var evaluator = new ExpressionEvaluator(GetCurrentScope());
+        return evaluator.Evaluate(val);
     }
 
     [GeneratedRegex(@"\s+in\s+")]

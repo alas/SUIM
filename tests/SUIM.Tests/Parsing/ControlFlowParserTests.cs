@@ -26,7 +26,7 @@ public class ControlFlowParserTests
     public void Parse_IfDirective_True()
     {
         var markup = @"<div>
-@if identifierbool
+@if (identifierbool)
 {
     <label>True</label>
 }
@@ -46,7 +46,7 @@ public class ControlFlowParserTests
     public void Parse_IfElseDirective_True()
     {
         var markup = @"<div>
-@if identifierbool2
+@if (identifierbool2)
 {
     <h1>True</h1>
 }
@@ -69,7 +69,7 @@ else
     public void Parse_IfElseDirective_False()
     {
         var markup = @"<div>
-@if identifierbool3
+@if (identifierbool3)
 {
     <h1>True</h1>
 }
@@ -92,11 +92,11 @@ else
     public void Parse_IfElseIfElseDirective_True()
     {
         var markup = @"<div>
-@if identifierbool3
+@if (identifierbool3)
 {
     <h1>False</h1>
 }
-else if identifierbool3
+else if (identifierbool3)
 {
     <h1>False</h1>
 }
@@ -119,15 +119,15 @@ else
     public void Parse_IfElseIfElseIfElseDirective_FinalElse()
     {
         var markup = @"<div>
-@if identifierbool3
+@if (identifierbool3)
 {
     <h1>False</h1>
 }
-else if identifierbool3
+else if (identifierbool3)
 {
     <h1>False</h1>
 }
-else if identifierbool3
+else if (identifierbool3)
 {
     <h1>False</h1>
 }
@@ -150,15 +150,15 @@ else
     public void Parse_IfElseIfElseIfElseDirective_True()
     {
         var markup = @"<div>
-@if identifierbool3
+@if (identifierbool3)
 {
     <h1>False</h1>
 }
-else if identifierbool3
+else if (identifierbool3)
 {
     <h1>False</h1>
 }
-else if identifierbool2
+else if (identifierbool2)
 {
     <h1>True</h1>
 }
@@ -181,7 +181,7 @@ else
     public void Parse_ForeachNegativeRange()
     {
         var markup = @"<stack>
-@foreach i in -100..200
+@foreach (i in -100..200)
 {
     <label>@i</label>
 }
@@ -203,7 +203,7 @@ else
     public void Parse_SwitchDirective()
     {
         var markup = @"<div>
-@switch identifierany
+@switch (identifierany)
 {
     case 500
     {
@@ -229,7 +229,7 @@ else
     public void ControlFlow_SwitchDirective()
     {
         var parser = new ControlFlowParser(Create(_model));
-        var markup = @"@switch identifierany
+        var markup = @"@switch (identifierany)
 {
     case 500
     {
@@ -250,7 +250,7 @@ else
     public void Parse_SwitchDirective_WithStringCase()
     {
         var markup = @"<div>
-@switch stringValue
+@switch (stringValue)
 {
     case ""test""
     {
@@ -276,7 +276,7 @@ else
     public void Parse_SwitchDirective_WithMultipleCases()
     {
         var markup = @"<div>
-@switch identifierany
+@switch (identifierany)
 {
     case 100
     {
@@ -305,7 +305,7 @@ else
     public void ControlFlow_SwitchDirective_WithVariableCase()
     {
         var parser = new ControlFlowParser(Create(_model));
-        var markup = @"@switch identifierany
+        var markup = @"@switch (identifierany)
 {
     case @identifier2
     {
@@ -326,7 +326,7 @@ else
     public void Parse_ForEach_WithCollection()
     {
         var markup = @"<stack>
-@foreach item in Collection
+@foreach (item in Collection)
 {
     <h1>@item</h1>
 }
@@ -345,7 +345,7 @@ else
     public void Parse_ForEach_WithCollectionProperty()
     {
         var markup = @"<stack>
-@foreach item in items
+@foreach (item in items)
 {
     <h1>@item.Name</h1>
 }
@@ -364,7 +364,7 @@ else
     public void Parse_ForEach_WithRange()
     {
         var markup = @"<stack>
-@foreach i in 0..3
+@foreach (i in 0..3)
 {
     <h1>@i</h1>
 }
@@ -386,7 +386,7 @@ else
     public void Parse_ControlFlow_IfWithin_Button()
     {
         var markup = @"<button>
-@if identifierbool
+@if (identifierbool)
 {
     <h1>Click Me</h1>
 }
@@ -404,22 +404,56 @@ else
         Assert.Equal("Click Me", label.Value);
     }
 
-    // ============== CONTROL FLOW - IF WITHOUT ELSE ==============
-
     [Fact]
-    public void Parse_IfDirective_False_NoElement()
+    public void Parse_IfExpression()
     {
         var markup = @"<div>
-@if identifierbool3
+@if (numericValue > 40 && stringValue == ""test"")
 {
-    <h1>Should not appear</h1>
+    <label>Complex Expression True</label>
 }
 </div>";
         var (element, _) = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
-        Assert.Empty(div.Children);
+        Assert.Single(div.Children);
+        var label = (Label)div.Children[0];
+        var text = (Text)label.Children[0];
+        Assert.Equal("Complex Expression True", text.Value);
+    }
+
+    [Fact]
+    public void Parse_NestedForeach_ScopedVariables()
+    {
+        var model = new {
+            Categories = new[] {
+                new { Name = "Fruit", Items = new[] { "Apple", "Banana" } },
+                new { Name = "Veg", Items = new[] { "Carrot" } }
+            }
+        };
+
+        var markup = @"<stack>
+@foreach (cat in Categories)
+{
+    <label>@cat.Name</label>
+    @foreach (item in cat.Items)
+    {
+        <label>@item</label>
+    }
+}
+</stack>";
+        var (element, _) = MarkupParser.Parse(markup, model);
+
+        Assert.IsType<Stack>(element);
+        var stack = (Stack)element;
+        // Fruit, Apple, Banana, Veg, Carrot = 5 labels
+        Assert.Equal(5, stack.Children.Count);
+        Assert.Equal("Fruit", ((Text)((Label)stack.Children[0]).Children[0]).Value);
+        Assert.Equal("Apple", ((Text)((Label)stack.Children[1]).Children[0]).Value);
+        Assert.Equal("Banana", ((Text)((Label)stack.Children[2]).Children[0]).Value);
+        Assert.Equal("Veg", ((Text)((Label)stack.Children[3]).Children[0]).Value);
+        Assert.Equal("Carrot", ((Text)((Label)stack.Children[4]).Children[0]).Value);
     }
 
     private static dynamic Create(object model)
@@ -429,3 +463,4 @@ else
         return observable;
     }
 }
+

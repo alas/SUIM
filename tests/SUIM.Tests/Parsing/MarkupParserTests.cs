@@ -549,7 +549,7 @@ public class MarkupParserTests
     public void Parse_ControlFlow_IfWithin_Button()
     {
         var markup = @"<button>
-@if identifierbool
+@if (identifierbool)
 {
     <h1>Click Me</h1>
 }
