@@ -181,7 +181,7 @@ else
     public void Parse_ForeachNegativeRange()
     {
         var markup = @"<stack>
-@foreach (i in -100..200)
+@foreach (var    i in -100..200)
 {
     <label>@i</label>
 }
@@ -326,7 +326,7 @@ else
     public void Parse_ForEach_WithCollection()
     {
         var markup = @"<stack>
-@foreach (item in Collection)
+@foreach (var item in Collection)
 {
     <h1>@item</h1>
 }
@@ -345,7 +345,7 @@ else
     public void Parse_ForEach_WithCollectionProperty()
     {
         var markup = @"<stack>
-@foreach (item in items)
+@foreach (var item in items)
 {
     <h1>@item.Name</h1>
 }
@@ -364,7 +364,7 @@ else
     public void Parse_ForEach_WithRange()
     {
         var markup = @"<stack>
-@foreach (i in 0..3)
+@foreach (var  i in 0..3)
 {
     <h1>@i</h1>
 }
@@ -434,10 +434,10 @@ else
         };
 
         var markup = @"<stack>
-@foreach (cat in Categories)
+@foreach (       var  cat in Categories)
 {
     <label>@cat.Name</label>
-    @foreach (item in cat.Items)
+    @foreach ( var   item   in         cat.Items    )
     {
         <label>@item</label>
     }
@@ -454,6 +454,64 @@ else
         Assert.Equal("Banana", ((Text)((Label)stack.Children[2]).Children[0]).Value);
         Assert.Equal("Veg", ((Text)((Label)stack.Children[3]).Children[0]).Value);
         Assert.Equal("Carrot", ((Text)((Label)stack.Children[4]).Children[0]).Value);
+    }
+
+    [Fact]
+    public void Parse_ForEach_WithVar()
+    {
+        var markup = @"<stack>
+@foreach (var   item in Collection)
+{
+    <h1>@item</h1>
+}
+</stack>";
+        var (element, _) = MarkupParser.Parse(markup, _model);
+
+        Assert.IsType<Stack>(element);
+        var stack = (Stack)element;
+        Assert.Equal(2, stack.Children.Count);
+        var labels = stack.Children.Cast<H1>().Select(x => x.Children[0]).Cast<Text>().ToList();
+        Assert.Equal("item1", labels.ElementAt(0).Value);
+        Assert.Equal("item2", labels.ElementAt(1).Value);
+    }
+
+    [Fact]
+    public void Parse_For_Simple()
+    {
+        var markup = @"<stack>
+@for (var i=0; i < 5; i++)
+{
+    <label>@i</label>
+}
+</stack>";
+        var (element, _) = MarkupParser.Parse(markup, _model);
+
+        Assert.IsType<Stack>(element);
+        var stack = (Stack)element;
+        Assert.Equal(5, stack.Children.Count);
+        for (int i = 0; i < 5; i++)
+        {
+            var label = (Label)stack.Children[i];
+            Assert.Equal(i.ToString(), ((Text)label.Children[0]).Value);
+        }
+    }
+
+    [Fact]
+    public void Parse_For_CustomStep()
+    {
+        var markup = @"<stack>
+@for (var i=0; i < 10; i = i + 2)
+{
+    <label>@i</label>
+}
+</stack>";
+        var (element, _) = MarkupParser.Parse(markup, _model);
+
+        Assert.IsType<Stack>(element);
+        var stack = (Stack)element;
+        Assert.Equal(5, stack.Children.Count); // 0, 2, 4, 6, 8
+        Assert.Equal("0", ((Text)((Label)stack.Children[0]).Children[0]).Value);
+        Assert.Equal("8", ((Text)((Label)stack.Children[4]).Children[0]).Value);
     }
 
     private static dynamic Create(object model)

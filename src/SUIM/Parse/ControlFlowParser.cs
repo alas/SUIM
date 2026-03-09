@@ -75,6 +75,13 @@ public partial class ControlFlowParser(dynamic model)
                     i += eaten;
                     continue;
                 }
+                else if (IsDirective(markup, i, "for"))
+                {
+                    var (result, eaten) = ProcessFor(markup, i);
+                    sb.Append(ExpandDirectives(result));
+                    i += eaten;
+                    continue;
+                }
             }
 
             sb.Append(markup[i]);
@@ -269,11 +276,15 @@ public partial class ControlFlowParser(dynamic model)
     {
         int currentIndex = startIndex + 8; // "@foreach"
         
-        // Parse: (var in collection)
+        // Parse: (var i in collection)
         var header = ExtractCondition(markup, ref currentIndex);
         
+        // Handle 'var ' prefix
+        if (header.StartsWith("var") && char.IsWhiteSpace(header[3])) header = header[4..].Trim();
+        else throw new Exception("Invalid @foreach syntax. Expected (var item in collection)");
+
         var parts = MyRegex().Split(header);
-        if (parts.Length < 2) throw new Exception("Invalid @foreach syntax. Expected (var in collection)");
+        if (parts.Length < 2) throw new Exception("Invalid @foreach syntax. Expected (var item in collection)");
         
         var varName = parts[0].Trim();
         var collectionName = parts[1].Trim();
@@ -303,6 +314,69 @@ public partial class ControlFlowParser(dynamic model)
         }
 
         return (sb.ToString(), currentIndex + blockLen - startIndex);
+    }
+
+    private (string result, int eaten) ProcessFor(string markup, int startIndex)
+    {
+        int currentIndex = startIndex + 4; // "@for"
+        var header = ExtractCondition(markup, ref currentIndex);
+        
+        // (var i=0; i < 100; i++)
+        var parts = header.Split(';');
+        if (parts.Length != 3) throw new Exception("Invalid @for syntax. Expected (init; condition; step)");
+
+        var initPart = parts[0].Trim();
+        var conditionPart = parts[1].Trim();
+        var stepPart = parts[2].Trim();
+
+        // Init: var i=0
+        if (initPart.StartsWith("var") && char.IsWhiteSpace(initPart[3])) initPart = initPart[4..];
+        else throw new Exception("Invalid @for initialization. Expected 'var i = value'");
+        var initMatch = Regex.Match(initPart, @"^(\w+)\s*=\s*(.*)$");
+        if (!initMatch.Success) throw new Exception("Invalid @for initialization. Expected 'var i = value'");
+
+        var varName = initMatch.Groups[1].Value;
+        var startValue = ParseValue(initMatch.Groups[2].Value);
+
+        var (blockContent, blockLen) = ExtractBlock(markup, currentIndex);
+        var sb = new StringBuilder();
+
+        _scopes.Push(new Dictionary<string, object?> { [varName] = startValue });
+        try
+        {
+            while (EvaluateCondition(conditionPart))
+            {
+                sb.Append(ExpandDirectives(blockContent));
+
+                // Step: i++, i--, i = i + 1
+                var currentValue = _scopes.Peek()[varName];
+                var nextValue = EvaluateStep(varName, stepPart, currentValue);
+                _scopes.Peek()[varName] = nextValue;
+            }
+        }
+        finally
+        {
+            _scopes.Pop();
+        }
+
+        return (sb.ToString(), currentIndex + blockLen - startIndex);
+    }
+
+    private object? EvaluateStep(string varName, string step, object? current)
+    {
+        if (step == $"{varName}++") return Convert.ToDouble(current) + 1;
+        if (step == $"{varName}--") return Convert.ToDouble(current) - 1;
+        
+        // Handle i = i + 1 or similar
+        var match = Regex.Match(step, $@"^{varName}\s*=\s*(.*)$");
+        if (match.Success)
+        {
+            var expr = match.Groups[1].Value;
+            var evaluator = new ExpressionEvaluator(GetCurrentScope());
+            return evaluator.Evaluate(expr);
+        }
+
+        throw new Exception($"Unsupported @for step expression: {step}");
     }
     
     // --- Helpers ---
