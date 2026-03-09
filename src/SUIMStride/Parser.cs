@@ -66,7 +66,7 @@ public class Parser
         ContentManager = game.Content;
 
         // Not cached: parse markup, map and store the canonical instance
-        Text.MeasureFunc = (Node node, float width, MeasureMode widthMode, float height, MeasureMode heightMode) =>
+        Text.MeasureFunc = (node, width, widthMode, height, heightMode) =>
         {
             var text = (Text)node.Context!;
             var fontSize = text.FontSize != null && float.TryParse(text.FontSize.AsSpan()[..^2], out var f) ? f : 0f;
@@ -92,7 +92,7 @@ public class Parser
             return new Size(0, 0);
         };
         var (suimRoot, model2) = MarkupParser.Parse(markup, model, basePath: basePath, componentName: viewName);
-        Layout(suimRoot, game, defaultFontSize, fullscreen);
+        Layout(suimRoot, game, fullscreen);
         var strideRoot = MapElement(suimRoot, game);
 
         lock (_parseCache)
@@ -103,7 +103,7 @@ public class Parser
         return (strideRoot, model2);
     }
 
-    private static void Layout(SUIMElement root, Game game, int defaultFontSize, bool fullscreen)
+    private static void Layout(SUIMElement root, Game game, bool fullscreen)
     {
         int preferredWidth;
         int preferredHeight;

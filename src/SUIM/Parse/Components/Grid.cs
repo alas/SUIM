@@ -39,8 +39,8 @@ public class Grid : LayoutElement
         Node.StyleSetDisplay(Display.Flex);
         Node.StyleSetFlexDirection(FlexDirection.Column);
 
-        var columnDefs = ParseUnits(Columns, Value.UndefinedValue);
-        var rowDefs = ParseUnits(Rows, Value.UndefinedValue);
+        var columnDefs = ParseUnits(Columns);
+        var rowDefs = ParseUnits(Rows);
 
         int columnCount = columnDefs.Length > 0 ? columnDefs.Length : 1;
         int rowCount = rowDefs.Length > 0 ? rowDefs.Length : 1;
@@ -142,7 +142,7 @@ public class Grid : LayoutElement
         }
     }
 
-    public static Value[] ParseUnits(string? unitsString, Value totalSize)
+    public static Value[] ParseUnits(string? unitsString)
     {
         if (string.IsNullOrWhiteSpace(unitsString))
             return [];

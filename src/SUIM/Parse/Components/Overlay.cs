@@ -11,7 +11,7 @@ public class Overlay : LayoutElement
     {
         StopClicks = "true";
         BackgroundColor = "#80808000";
-        FillParent(Node);
+        FillParent();
         Node.nodeStyle["justify-content"] = "center";
         Node.nodeStyle["align-items"] = "center";
     }

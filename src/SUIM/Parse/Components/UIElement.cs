@@ -41,6 +41,14 @@ public abstract class UIElement
 
     #region Children
 
+    public virtual void InsertChild(UIElement child, int idx, XElement? element)
+    {
+        child.Parent = this;
+        Children.Insert(idx, child);
+
+        Node.InsertChild(child.Node, idx);
+    }
+
     public virtual void AddChild(UIElement child, XElement? element)
     {
         child.Parent = this;
@@ -114,17 +122,17 @@ public abstract class UIElement
         return depth;
     }
 
-    protected static void FillParent(Node node)
+    public void FillParent()
     {
-        node.StyleSetPositionType(PositionType.Absolute);
-        node.nodeStyle["left"] = "0";
-        node.nodeStyle["right"] = "0";
-        node.nodeStyle["top"] = "0";
-        node.nodeStyle["bottom"] = "0";
-        node.nodeStyle["width"] = "100%";
-        node.nodeStyle["height"] = "100%";
-        node.nodeStyle["display"] = "flex";
-        node.nodeStyle["flex-grow"] = "1";
+        Node.StyleSetPositionType(PositionType.Absolute);
+        Node.nodeStyle["width"] = "100%";
+        Node.nodeStyle["height"] = "100%";
+        Node.nodeStyle["left"] = "0";
+        Node.nodeStyle["right"] = "0";
+        Node.nodeStyle["top"] = "0";
+        Node.nodeStyle["bottom"] = "0";
+        Node.nodeStyle["display"] = "flex";
+        Node.nodeStyle["flex-grow"] = "1";
     }
 
     #endregion

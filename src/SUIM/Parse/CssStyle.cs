@@ -20,6 +20,7 @@ public static class CssStyle
     /// </summary>
     public static void Parse(string styleContent, Dictionary<string, Dictionary<string, string>> styles)
     {        
+        styleContent = StyleParserRegexes.CommentRegex().Replace(styleContent, "");
         var selectorRegex = StyleParserRegexes.SelectorRegex();
         var matches = selectorRegex.Matches(styleContent);
 
@@ -264,7 +265,7 @@ public static class CssStyle
             var bg = new BackgroundImage();
             ApplyToTarget(bg, "backgroundimage", bgImgAttr!);
 
-            element.AddChild(bg, null);
+            element.InsertChild(bg, 0, null);
         }
 
         // Handle scroll wrapper
@@ -335,6 +336,9 @@ public static class CssStyle
 
 internal static partial class StyleParserRegexes
 {
+    [System.Text.RegularExpressions.GeneratedRegex(@"/\*.*?\*/", System.Text.RegularExpressions.RegexOptions.Singleline)]
+    internal static partial System.Text.RegularExpressions.Regex CommentRegex();
+    
     [System.Text.RegularExpressions.GeneratedRegex(@"([#.]?[a-zA-Z0-9_*\-,\s]+)\s*\{([^}]*)\}")]
     internal static partial System.Text.RegularExpressions.Regex SelectorRegex();
     

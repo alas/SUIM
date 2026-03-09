@@ -21,7 +21,7 @@ button {
     height: 220px;
     gap: 8px;
     padding: 12px;
-    /*background-image: url(Assets/seamless-texture-wood-old-oak-small2.jpg);*/
+    background-image: url(Assets/seamless-texture-wood-old-oak-small2.jpg);
 }
 .hstack2 {
     gap: 10px;

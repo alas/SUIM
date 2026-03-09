@@ -6,7 +6,7 @@ public class BackgroundImage : UIElement
 
     public BackgroundImage() : base(nameof(BackgroundImage))
     {
-        FillParent(Node);
+        FillParent();
     }
 
     public override void SetAttribute(string name, object? value)

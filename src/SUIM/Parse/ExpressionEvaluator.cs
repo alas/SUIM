@@ -5,15 +5,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-public class ExpressionEvaluator
+public class ExpressionEvaluator(IDictionary<string, object?> scope)
 {
-    private readonly IDictionary<string, object?> _scope;
-
-    public ExpressionEvaluator(IDictionary<string, object?> scope)
-    {
-        _scope = scope;
-    }
-
     public object? Evaluate(string expression)
     {
         if (string.IsNullOrWhiteSpace(expression)) return null;
@@ -23,7 +16,7 @@ public class ExpressionEvaluator
         return EvaluateRPN(rpn);
     }
 
-    private List<Token> Tokenize(string expression)
+    private static List<Token> Tokenize(string expression)
     {
         var tokens = new List<Token>();
         int i = 0;
@@ -111,7 +104,7 @@ public class ExpressionEvaluator
         return tokens;
     }
 
-    private bool Match(string s, ref int i, string pattern)
+    private static bool Match(string s, ref int i, string pattern)
     {
         if (i + pattern.Length <= s.Length && s.Substring(i, pattern.Length) == pattern)
         {
@@ -121,7 +114,7 @@ public class ExpressionEvaluator
         return false;
     }
 
-    private List<Token> ShuntingYard(List<Token> tokens)
+    private static List<Token> ShuntingYard(List<Token> tokens)
     {
         var output = new List<Token>();
         var operators = new Stack<Token>();
@@ -223,9 +216,8 @@ public class ExpressionEvaluator
         
         // Handle dot-notation for basic property access
         var parts = identifier.Split('.');
-        object? current = null;
-        
-        if (_scope.TryGetValue(parts[0], out current))
+
+        if (scope.TryGetValue(parts[0], out object? current))
         {
             for (int i = 1; i < parts.Length; i++)
             {
@@ -248,24 +240,24 @@ public class ExpressionEvaluator
         return null;
     }
 
-    private object? ExecuteOperator(object? left, string op, object? right)
+    private static object? ExecuteOperator(object? left, string op, object? right)
     {
-        switch (op)
+        return op switch
         {
-            case "+": return Convert.ToDouble(left) + Convert.ToDouble(right);
-            case "-": return Convert.ToDouble(left) - Convert.ToDouble(right);
-            case "*": return Convert.ToDouble(left) * Convert.ToDouble(right);
-            case "/": return Convert.ToDouble(left) / Convert.ToDouble(right);
-            case "==": return Equals(left, right);
-            case "!=": return !Equals(left, right);
-            case "<": return Convert.ToDouble(left) < Convert.ToDouble(right);
-            case ">": return Convert.ToDouble(left) > Convert.ToDouble(right);
-            case "<=": return Convert.ToDouble(left) <= Convert.ToDouble(right);
-            case ">=": return Convert.ToDouble(left) >= Convert.ToDouble(right);
-            case "&&": return (left is bool lb && lb) && (right is bool rb && rb);
-            case "||": return (left is bool lo && lo) || (right is bool ro && ro);
-            default: throw new Exception($"Unknown operator: {op}");
-        }
+            "+" => Convert.ToDouble(left) + Convert.ToDouble(right),
+            "-" => Convert.ToDouble(left) - Convert.ToDouble(right),
+            "*" => Convert.ToDouble(left) * Convert.ToDouble(right),
+            "/" => Convert.ToDouble(left) / Convert.ToDouble(right),
+            "==" => Equals(left, right),
+            "!=" => !Equals(left, right),
+            "<" => Convert.ToDouble(left) < Convert.ToDouble(right),
+            ">" => Convert.ToDouble(left) > Convert.ToDouble(right),
+            "<=" => Convert.ToDouble(left) <= Convert.ToDouble(right),
+            ">=" => Convert.ToDouble(left) >= Convert.ToDouble(right),
+            "&&" => (left is bool lb && lb) && (right is bool rb && rb),
+            "||" => (left is bool lo && lo) || (right is bool ro && ro),
+            _ => throw new Exception($"Unknown operator: {op}"),
+        };
     }
 
     private enum TokenType { Literal, Identifier, Operator, OpenParen, CloseParen }

@@ -33,7 +33,7 @@ public partial class ControlFlowParser(dynamic model)
         return stack;
     }
 
-    private IDictionary<string, object?> GetCurrentScope()
+    private Dictionary<string, object?> GetCurrentScope()
     {
         var merged = new Dictionary<string, object?>();
         foreach (var scope in _scopes.Reverse())
@@ -95,7 +95,7 @@ public partial class ControlFlowParser(dynamic model)
     {
         // Replace @Variable or @Variable.Property with scoped values
         // ONLY if they are from a local scope (not the root model scope)
-        return Regex.Replace(template, @"@(\w+)(\.(\w+))?", match =>
+        return MyRegex2().Replace(template, match =>
         {
             var ident = match.Groups[1].Value;
             if (IsLocalVariable(ident))
@@ -332,7 +332,7 @@ public partial class ControlFlowParser(dynamic model)
         // Init: var i=0
         if (initPart.StartsWith("var") && char.IsWhiteSpace(initPart[3])) initPart = initPart[4..];
         else throw new Exception("Invalid @for initialization. Expected 'var i = value'");
-        var initMatch = Regex.Match(initPart, @"^(\w+)\s*=\s*(.*)$");
+        var initMatch = MyRegex3().Match(initPart);
         if (!initMatch.Success) throw new Exception("Invalid @for initialization. Expected 'var i = value'");
 
         var varName = initMatch.Groups[1].Value;
@@ -496,4 +496,8 @@ public partial class ControlFlowParser(dynamic model)
 
     [GeneratedRegex(@"(\w+)=(-?\d+)")]
     private static partial Regex MyRegex1();
+    [GeneratedRegex(@"@(\w+)(\.(\w+))?")]
+    private static partial Regex MyRegex2();
+    [GeneratedRegex(@"^(\w+)\s*=\s*(.*)$")]
+    private static partial Regex MyRegex3();
 }

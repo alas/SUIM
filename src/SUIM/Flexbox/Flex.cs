@@ -3249,7 +3249,9 @@ public partial class Flex
 
 
 
+#pragma warning disable IDE0060 // Remove unused parameter
     internal static void Log(Node node, LogLevel level, string format, params object[] args)
+#pragma warning restore IDE0060 // Remove unused parameter
     {
         Console.WriteLine(format, args);
     }
@@ -3262,7 +3264,9 @@ public partial class Flex
         }
     }
 
+#pragma warning disable IDE0060 // Remove unused parameter
     internal static void AssertWithNode(Node node, bool cond, string format, params object[] args)
+#pragma warning restore IDE0060 // Remove unused parameter
     {
         AssertCond(cond, format, args);
     }
