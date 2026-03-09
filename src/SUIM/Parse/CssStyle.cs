@@ -207,6 +207,7 @@ public static class CssStyle
         // Pre-check whether this style will create a wrapper so layout attributes can be routed to it.
         bool willWrapWithBorder = properties.Keys.Any(k => k.Equals("border", StringComparison.OrdinalIgnoreCase));
         bool willWrapWithScroll = properties.Any(x => x.Key.StartsWith("overflow", StringComparison.OrdinalIgnoreCase) && x.Value.Equals("scroll", StringComparison.OrdinalIgnoreCase));
+        bool willWrap = willWrapWithBorder || willWrapWithScroll;
 
         foreach (var kvp in properties)
         {
@@ -225,7 +226,7 @@ public static class CssStyle
             {
                 // Background image attribute will be handled by the wrapper creation
             }
-            else if ((willWrapWithBorder || willWrapWithScroll) && IsLayoutAttribute(propName))
+            else if (willWrap && IsLayoutAttribute(propName))
             {
                 // If a style defines layout attributes for an element that will be wrapped (border/scroll/bg),
                 // apply those layout attributes to the wrapper instead of the inner element.

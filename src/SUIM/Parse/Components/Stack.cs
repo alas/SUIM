@@ -18,13 +18,9 @@ public class Stack : LayoutElement
 
     public Stack() : base(nameof(Stack))
     {
-        Node.nodeStyle["width"] = "100%";
-        Node.nodeStyle["height"] = "100%";
         Node.nodeStyle["display"] = "flex";
         Node.nodeStyle["justify-content"] = "flex-start";
         Node.nodeStyle["align-items"] = "flex-start";
-        Node.nodeStyle["align-self"] = "flex-start";
-        Node.nodeStyle["flex-grow"] = "1";
     }
 
     public override void SetAttribute(string name, object? value)

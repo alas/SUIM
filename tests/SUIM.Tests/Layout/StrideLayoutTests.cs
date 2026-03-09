@@ -98,7 +98,6 @@ public class StrideLayoutTests
         Assert.Equal(200, element.GetHeight());
 
         var vstack = (Stack)element.Children[0];
-        Assert.Equal("auto", vstack.GetAttribute("height"));
         Assert.Equal(32, vstack.GetWidth());
         Assert.Equal(48, vstack.GetHeight());
 
