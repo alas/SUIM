@@ -3,23 +3,46 @@
 	{
 		"title": "",
 		"message": "",
+		"visibility": null,
 		"onYes": null,
 		"onNo": null,
-		"visibility": null
+		"onClose": null
 	}
 	</model>
-    <overlay visibility="@visibility" class="centeredcontent">
-		<vstack class="wood-panel centeredcontent">
-			<hstack>
+	<style>
+	.window {
+		width: 500px;
+		height: 220px;
+		padding: 12px;
+		background-image: url(Assets/seamless-texture-wood-old-oak-small2.jpg);
+	}
+	.title {
+		justify-content: space-between;
+		align-items: center;
+	}
+	.content {
+		margin: 6px;
+		flex-grow: 1;
+		justify-content: center;
+	}
+	.buttons {
+		gap: 10;
+		justify-content: space-between;
+	}
+	</style>
+    <overlay visibility="@visibility">
+		<dock class="window">
+			<hstack class="title" >
 				<h1>@title</h1>
+				<button onclick="@onClose" width="30" height="30">X</button>
 			</hstack>
-			<vstack margin="6" class="centeredcontent todoScroll">
+			<vstack class="content">
 				<h3>@message</h3>
 			</vstack>
-			<hstack class="hstack2 centeredcontent">
+			<hstack class="buttons">
 				<button onclick="@onYes">YES</button>
 				<button onclick="@onNo">NO</button>
 			</hstack>
-		</vstack>
+		</dock>
     </overlay>
 </root>
