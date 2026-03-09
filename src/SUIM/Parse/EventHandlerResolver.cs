@@ -152,40 +152,54 @@ public static class EventHandlerResolver
     {
         if (string.IsNullOrWhiteSpace(argsStr)) return [];
 
-        // Simple comma split (doesn't handle commas inside strings or nested parens, 
-        // but sufficient for basic SUIM usage as seen in existing codebase)
-        var parts = argsStr.Split(',');
-        var result = new object?[parts.Length];
+        var parts = SplitArguments(argsStr);
+        var result = new object?[parts.Count];
 
-        for (int i = 0; i < parts.Length; i++)
+        var scope = new Dictionary<string, object?>();
+        if (context != null) scope["this"] = context;
+        
+        var evaluator = new ExpressionEvaluator([scope]);
+
+        for (int i = 0; i < parts.Count; i++)
         {
-            var p = parts[i].Trim();
-            if (p.Equals("this", StringComparison.OrdinalIgnoreCase))
-            {
-                result[i] = context;
-            }
-            else if ((p.StartsWith('\'') && p.EndsWith('\'')) || (p.StartsWith('"') && p.EndsWith('"')))
-            {
-                result[i] = p[1..^1];
-            }
-            else if (bool.TryParse(p, out var b))
-            {
-                result[i] = b;
-            }
-            else if (int.TryParse(p, out var n))
-            {
-                result[i] = n;
-            }
-            else if (float.TryParse(p, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var f))
-            {
-                result[i] = f;
-            }
-            else
-            {
-                result[i] = p; // Fallback to raw string if not literal
-            }
+            result[i] = evaluator.Evaluate(parts[i]);
         }
 
         return result;
+    }
+
+    private static List<string> SplitArguments(string argsStr)
+    {
+        var parts = new List<string>();
+        int start = 0;
+        int balance = 0;
+        bool inQuote = false;
+        char quoteChar = '\0';
+
+        for (int i = 0; i < argsStr.Length; i++)
+        {
+            char c = argsStr[i];
+            if (!inQuote && (c == '\'' || c == '"'))
+            {
+                inQuote = true;
+                quoteChar = c;
+            }
+            else if (inQuote && c == quoteChar)
+            {
+                inQuote = false;
+            }
+            else if (!inQuote)
+            {
+                if (c == '(') balance++;
+                else if (c == ')') balance--;
+                else if (c == ',' && balance == 0)
+                {
+                    parts.Add(argsStr[start..i].Trim());
+                    start = i + 1;
+                }
+            }
+        }
+        parts.Add(argsStr[start..].Trim());
+        return parts;
     }
 }

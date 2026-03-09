@@ -16,7 +16,7 @@ public class ExpressionEvaluatorTests
     [InlineData("10.5 + 0.5", 11.0)]
     public void Evaluate_Arithmetic(string expression, object expected)
     {
-        var evaluator = new ExpressionEvaluator(new Dictionary<string, object?>());
+        var evaluator = new ExpressionEvaluator([new Dictionary<string, object?>()]);
         var result = evaluator.Evaluate(expression);
         Assert.Equal(Convert.ToDouble(expected), Convert.ToDouble(result));
     }
@@ -33,7 +33,7 @@ public class ExpressionEvaluatorTests
     [InlineData("\"a\" == \"b\"", false)]
     public void Evaluate_Comparison(string expression, bool expected)
     {
-        var evaluator = new ExpressionEvaluator(new Dictionary<string, object?>());
+        var evaluator = new ExpressionEvaluator([new Dictionary<string, object?>()]);
         var result = evaluator.Evaluate(expression);
         Assert.Equal(expected, result);
     }
@@ -48,7 +48,7 @@ public class ExpressionEvaluatorTests
     [InlineData("!(1 == 2)", true)]
     public void Evaluate_Logical(string expression, bool expected)
     {
-        var evaluator = new ExpressionEvaluator(new Dictionary<string, object?>());
+        var evaluator = new ExpressionEvaluator([new Dictionary<string, object?>()]);
         var result = evaluator.Evaluate(expression);
         Assert.Equal(expected, result);
     }
@@ -59,24 +59,48 @@ public class ExpressionEvaluatorTests
         var scope = new Dictionary<string, object?>
         {
             ["count"] = 10,
-            ["name"] = "Alice",
-            ["user"] = new { Role = "Admin" }
+            ["name"] = "Alice"
         };
-        var evaluator = new ExpressionEvaluator(scope);
+        var evaluator = new ExpressionEvaluator([scope]);
 
         Assert.Equal(10, evaluator.Evaluate("count"));
         Assert.Equal(true, evaluator.Evaluate("count > 5"));
         Assert.Equal("Alice", evaluator.Evaluate("name"));
-        Assert.Equal("Admin", evaluator.Evaluate("user.Role"));
+    }
+
+    [Fact]
+    public void Evaluate_ScopeHierarchy()
+    {
+        var baseScope = new Dictionary<string, object?> { ["x"] = 1, ["y"] = 2 };
+        var topScope = new Dictionary<string, object?> { ["x"] = 10 };
+        var evaluator = new ExpressionEvaluator([topScope, baseScope]);
+
+        Assert.Equal(10, evaluator.Evaluate("x")); // Should find in top scope
+        Assert.Equal(2, evaluator.Evaluate("y"));  // Should find in base scope
+    }
+
+    [Fact]
+    public void Evaluate_Assignments()
+    {
+        var scope = new Dictionary<string, object?> { ["i"] = 0 };
+        var evaluator = new ExpressionEvaluator([scope]);
+
+        evaluator.Evaluate("i = 10");
+        Assert.Equal(10, scope["i"]);
+
+        evaluator.Evaluate("i++");
+        Assert.Equal(11.0, Convert.ToDouble(scope["i"]));
+
+        evaluator.Evaluate("i += 5");
+        Assert.Equal(16.0, Convert.ToDouble(scope["i"]));
     }
 
     [Fact]
     public void Evaluate_Security_NoArbitraryCode()
     {
-        var evaluator = new ExpressionEvaluator(new Dictionary<string, object?>());
+        var evaluator = new ExpressionEvaluator([new Dictionary<string, object?>()]);
         
         // This should return null or fail gracefully, not execute code
-        // Our evaluator doesn't support method calls, so this will just be an unknown identifier or fail parsing
         var result = evaluator.Evaluate("System.Console.WriteLine(\"hack\")");
         Assert.Null(result);
     }

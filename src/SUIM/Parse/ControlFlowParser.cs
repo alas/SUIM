@@ -32,17 +32,6 @@ public partial class ControlFlowParser(dynamic model)
         stack.Push(dict);
         return stack;
     }
-
-    private Dictionary<string, object?> GetCurrentScope()
-    {
-        var merged = new Dictionary<string, object?>();
-        foreach (var scope in _scopes.Reverse())
-        {
-            foreach (var kvp in scope) merged[kvp.Key] = kvp.Value;
-        }
-        return merged;
-    }
-
     public string ExpandDirectives(string markup)
     {
         var sb = new StringBuilder();
@@ -93,14 +82,17 @@ public partial class ControlFlowParser(dynamic model)
 
     private string InterpolateVariables(string template)
     {
-        // Replace @Variable or @Variable.Property with scoped values
-        // ONLY if they are from a local scope (not the root model scope)
+        // Replace @Expression with evaluated result ONLY if it's a local variable
         return MyRegex2().Replace(template, match =>
         {
             var ident = match.Groups[1].Value;
             if (IsLocalVariable(ident))
             {
-                var result = GetValue(match.Value);
+                var expr = match.Value;
+                if (expr.StartsWith('@')) expr = expr[1..];
+                
+                var evaluator = new ExpressionEvaluator(_scopes);
+                var result = evaluator.Evaluate(expr);
                 return result?.ToString() ?? string.Empty;
             }
             return match.Value;
@@ -291,18 +283,8 @@ public partial class ControlFlowParser(dynamic model)
 
         var (blockContent, blockLen) = ExtractBlock(markup, currentIndex);
 
-        IEnumerable items;
-        if (collectionName.Contains(".."))
-        {
-             var rangeParts = collectionName.Split("..");
-             int start = int.Parse(rangeParts[0]);
-             int end = int.Parse(rangeParts[1]);
-             items = Enumerable.Range(start, end - start).Cast<object>();
-        }
-        else
-        {
-            items = GetValue(collectionName) as IEnumerable ?? Array.Empty<object>();
-        }
+        var itemsEvaluator = new ExpressionEvaluator(_scopes);
+        var items = itemsEvaluator.Evaluate(collectionName) as IEnumerable ?? Array.Empty<object>();
 
         var sb = new StringBuilder();
         foreach (var item in items)
@@ -329,29 +311,22 @@ public partial class ControlFlowParser(dynamic model)
         var conditionPart = parts[1].Trim();
         var stepPart = parts[2].Trim();
 
-        // Init: var i=0
-        if (initPart.StartsWith("var") && char.IsWhiteSpace(initPart[3])) initPart = initPart[4..];
-        else throw new Exception("Invalid @for initialization. Expected 'var i = value'");
-        var initMatch = MyRegex3().Match(initPart);
-        if (!initMatch.Success) throw new Exception("Invalid @for initialization. Expected 'var i = value'");
-
-        var varName = initMatch.Groups[1].Value;
-        var startValue = ParseValue(initMatch.Groups[2].Value);
-
         var (blockContent, blockLen) = ExtractBlock(markup, currentIndex);
         var sb = new StringBuilder();
 
-        _scopes.Push(new Dictionary<string, object?> { [varName] = startValue });
+        // Push a fresh scope for the for-loop variables
+        var loopScope = new Dictionary<string, object?>();
+        _scopes.Push(loopScope);
+
         try
         {
+            var evaluator = new ExpressionEvaluator(_scopes);
+            evaluator.Evaluate(initPart);
+
             while (EvaluateCondition(conditionPart))
             {
                 sb.Append(ExpandDirectives(blockContent));
-
-                // Step: i++, i--, i = i + 1
-                var currentValue = _scopes.Peek()[varName];
-                var nextValue = EvaluateStep(varName, stepPart, currentValue);
-                _scopes.Peek()[varName] = nextValue;
+                evaluator.Evaluate(stepPart);
             }
         }
         finally
@@ -362,22 +337,6 @@ public partial class ControlFlowParser(dynamic model)
         return (sb.ToString(), currentIndex + blockLen - startIndex);
     }
 
-    private object? EvaluateStep(string varName, string step, object? current)
-    {
-        if (step == $"{varName}++") return Convert.ToDouble(current) + 1;
-        if (step == $"{varName}--") return Convert.ToDouble(current) - 1;
-        
-        // Handle i = i + 1 or similar
-        var match = Regex.Match(step, $@"^{varName}\s*=\s*(.*)$");
-        if (match.Success)
-        {
-            var expr = match.Groups[1].Value;
-            var evaluator = new ExpressionEvaluator(GetCurrentScope());
-            return evaluator.Evaluate(expr);
-        }
-
-        throw new Exception($"Unsupported @for step expression: {step}");
-    }
     
     // --- Helpers ---
 
@@ -466,7 +425,7 @@ public partial class ControlFlowParser(dynamic model)
     {
         if (string.IsNullOrWhiteSpace(condition)) return false;
         
-        var evaluator = new ExpressionEvaluator(GetCurrentScope());
+        var evaluator = new ExpressionEvaluator(_scopes);
         var result = evaluator.Evaluate(condition);
         
         return result is bool b && b;
@@ -477,7 +436,7 @@ public partial class ControlFlowParser(dynamic model)
         if (string.IsNullOrWhiteSpace(key)) return null;
         if (key.StartsWith('@')) key = key[1..];
         
-        var evaluator = new ExpressionEvaluator(GetCurrentScope());
+        var evaluator = new ExpressionEvaluator(_scopes);
         return evaluator.Evaluate(key);
     }
 
@@ -487,7 +446,7 @@ public partial class ControlFlowParser(dynamic model)
         if (int.TryParse(val, out int i)) return i;
         if (val.StartsWith('"') && val.EndsWith('"')) return val.Trim('"');
         
-        var evaluator = new ExpressionEvaluator(GetCurrentScope());
+        var evaluator = new ExpressionEvaluator(_scopes);
         return evaluator.Evaluate(val);
     }
 
