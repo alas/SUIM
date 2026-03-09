@@ -334,20 +334,6 @@ Produces the correct label depending on the values of identifierbool and identif
 
 Produces the correct p tag depending on the values of identifierany and identifier2.
 
-@range i=0 count=100
-{
-	<label value="@i"></label>
-}
-
-The parser must clone the inner XML (label in this case) 100 times, i will go from 0 to 99 (100 different values).
-
-@range i=0 count=100 step=-1
-{
-	<label value="@i"></label>
-}
-
-The parser must clone the inner XML (label in this case) 100 times, i will go from 0 to -99 (100 different values, each pass will add -1 to i).
-
 @foreach myitem in Collection
 {
 	<label value="@myitem.Property"></label>

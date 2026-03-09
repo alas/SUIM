@@ -17,28 +17,21 @@ public partial class ControlFlowParser(dynamic model)
             if (markup[i] == '@')
             {
                 // Potential directive
-                if (IsDirective(markup, i, "if", out _))
+                if (IsDirective(markup, i, "if"))
                 {
                     var (result, eaten) = ProcessIf(markup, i);
                     sb.Append(ExpandDirectives(result)); // Recurse for nested blocks
                     i += eaten;
                     continue;
                 }
-                else if (IsDirective(markup, i, "switch", out _))
+                else if (IsDirective(markup, i, "switch"))
                 {
                     var (result, eaten) = ProcessSwitch(markup, i);
                     sb.Append(ExpandDirectives(result));
                     i += eaten;
                     continue;
                 }
-                else if (IsDirective(markup, i, "range", out _))
-                {
-                    var (result, eaten) = ProcessRange(markup, i);
-                    sb.Append(ExpandDirectives(result));
-                    i += eaten;
-                    continue;
-                }
-                else if (IsDirective(markup, i, "foreach", out _))
+                else if (IsDirective(markup, i, "foreach"))
                 {
                     var (result, eaten) = ProcessForeach(markup, i);
                     sb.Append(ExpandDirectives(result));
@@ -54,9 +47,8 @@ public partial class ControlFlowParser(dynamic model)
         return sb.ToString();
     }
 
-    private static bool IsDirective(string markup, int index, string directive, out int length)
+    private static bool IsDirective(string markup, int index, string directive)
     {
-        length = 0;
         if (index + 1 + directive.Length > markup.Length) return false;
         
         // precise match "@directive"
@@ -66,7 +58,6 @@ public partial class ControlFlowParser(dynamic model)
             char next = index + 1 + directive.Length < markup.Length ? markup[index + 1 + directive.Length] : '\0';
             if (char.IsWhiteSpace(next) || next == '{')
             {
-                length = 1 + directive.Length; // @ + directive
                 return true;
             }
         }
@@ -202,35 +193,6 @@ public partial class ControlFlowParser(dynamic model)
         }
 
         return (result, (currentIndex - startIndex) + blockLen);
-    }
-
-    private static (string result, int eaten) ProcessRange(string markup, int startIndex)
-    {
-        int currentIndex = startIndex + 6; // "@range"
-        
-        // Parse parameters up to '{'
-        // Format: i=0 count=100 step=-1
-        int blockStart = markup.IndexOf('{', currentIndex);
-        if (blockStart == -1) return (markup, 0); // Invalid
-
-        string paramStr = markup[currentIndex..blockStart];
-        var parameters = ParseParams(paramStr);
-
-        var (blockContent, blockLen) = ExtractBlock(markup, blockStart);
-
-        string varName = parameters.Keys.FirstOrDefault(k => k != "count" && k != "step") ?? "i";
-        int startVal = int.Parse(parameters.TryGetValue(varName, out string? value) ? value : "0");
-        int count = int.Parse(parameters.TryGetValue("count", out var c) ? c : "0");
-        int step = int.Parse(parameters.TryGetValue("step", out var s) ? s : "1");
-
-        var sb = new StringBuilder();
-        for (int i = 0; i < count; i++)
-        {
-            int val = startVal + (i * step);
-            sb.Append(blockContent.Replace($"@{varName}", val.ToString()));
-        }
-
-        return (sb.ToString(), (blockStart - startIndex) + blockLen);
     }
 
     private (string result, int eaten) ProcessForeach(string markup, int startIndex)

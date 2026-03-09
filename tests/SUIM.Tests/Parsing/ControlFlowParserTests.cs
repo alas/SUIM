@@ -178,10 +178,10 @@ else
     }
 
     [Fact]
-    public void Parse_RangeDirectiveLabel()
+    public void Parse_ForeachNegativeRange()
     {
         var markup = @"<stack>
-@range i=0 count=3
+@foreach i in -100..200
 {
     <label>@i</label>
 }
@@ -190,59 +190,13 @@ else
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
-        Assert.Equal(3, stack.Children.Count);
-        for (int i = 0; i < 3; i++)
-        {
-            Assert.IsType<Label>(stack.Children[i]);
-            var label = (Label)stack.Children[i];
-            var text = (Text)label.Children[0];
-            Assert.Equal(i.ToString(), text.Value);
-        }
-    }
+        Assert.Equal(300, stack.Children.Count);
+        
+        var firstLabel = (Label)stack.Children[0];
+        Assert.Equal("-100", ((Text)firstLabel.Children[0]).Value);
 
-    [Fact]
-    public void Parse_RangeDirective()
-    {
-        var markup = @"<stack>
-@range i=0 count=3
-{
-    <label>@i</label>
-}
-</stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
-
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
-        Assert.Equal(3, stack.Children.Count);
-        for (int i = 0; i < 3; i++)
-        {
-            Assert.IsType<Label>(stack.Children[i]);
-            var label = (Label)stack.Children[i];
-            var text = (Text)label.Children[0];
-            Assert.Equal(i.ToString(), text.Value);
-        }
-    }
-
-    [Fact]
-    public void Parse_RangeDirectiveWithoutModel()
-    {
-        var markup = @"<stack>
-@range i=0 count=3
-{
-    <h1>@i</h1>
-}
-</stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
-
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
-        Assert.Equal(3, stack.Children.Count);
-        for (int i = 0; i < 3; i++)
-        {
-            Assert.IsType<H1>(stack.Children[i]);
-            var t = (Text)stack.Children[i].Children[0];
-            Assert.Equal(i.ToString(), t.Value);
-        }
+        var lastLabel = (Label)stack.Children[299];
+        Assert.Equal("199", ((Text)lastLabel.Children[0]).Value);
     }
 
     [Fact]
@@ -288,49 +242,6 @@ else
 }";
         var expanded = parser.ExpandDirectives(markup);
         Assert.Equal("<label>Matched</label>", expanded.Trim());
-    }
-
-    // ============== CONTROL FLOW - FOR WITH STEP ==============
-
-    [Fact]
-    public void Parse_RangeDirective_WithNegativeStep()
-    {
-        var markup = @"<stack>
-@range i=2 count=3 step=-1
-{
-    <label>@i</label>
-}
-</stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
-
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
-        Assert.Equal(3, stack.Children.Count);
-        // Should contain: 2, 1, 0
-        var labels = stack.Children.Cast<Label>();
-        Assert.Equal("2", ((Text)labels.ElementAt(0).Children[0]).Value);
-        Assert.Equal("1", ((Text)labels.ElementAt(1).Children[0]).Value);
-        Assert.Equal("0", ((Text)labels.ElementAt(2).Children[0]).Value);
-    }
-
-    [Fact]
-    public void Parse_RangeDirective_WithCustomStep()
-    {
-        var markup = @"<stack>
-@range i=0 count=3 step=2
-{
-    <label>@i</label>
-}
-</stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
-
-        Assert.IsType<Stack>(element);
-        var stack = (Stack)element;
-        Assert.Equal(3, stack.Children.Count);
-        var labels = stack.Children.Cast<Label>();
-        Assert.Equal("0", ((Text)labels.ElementAt(0).Children[0]).Value);
-        Assert.Equal("2", ((Text)labels.ElementAt(1).Children[0]).Value);
-        Assert.Equal("4", ((Text)labels.ElementAt(2).Children[0]).Value);
     }
 
     // ============== CONTROL FLOW - SWITCH WITH STRING ==============
