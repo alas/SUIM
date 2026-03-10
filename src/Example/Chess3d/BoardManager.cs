@@ -10,8 +10,10 @@ using Stride.Engine;
 using Stride.Input;
 using Stride.Physics;
 using Stride.Rendering;
+using global::SUIM.Parse;
+using SUIMStride;
 using Chess3d.ChessLogic;
-using Chess3d.SUIM;
+using Chess3d.SUIM.Views;
 
 public class BoardManager : SyncScript
 {
@@ -32,14 +34,22 @@ public class BoardManager : SyncScript
         Instance = this;
 
         InitBoard();
+        CreateUI();
+    }
 
+    public void CreateUI()
+    {
         var uiComponent = Entity.GetOrCreate<UIComponent>();
-        _ = new MainView((Game)Game, uiComponent);
+        ComponentRegistry.Register<SUIM.Components.Popup>("SUIM", false);
+        ComponentRegistry.Register<MainView>("SUIM", true);
+        var parser = new Parser { RootPath = "SUIM" };
+        var mainview = new MainView() { Game = (Game)Game };
+        var (strideRoot, _) = parser.GetView("MainView", (Game)Game);
+        uiComponent.Page = new() { RootElement = strideRoot };
     }
 
     public override void Update()
-    {
-        TrySelectPiece();
+    {        TrySelectPiece();
 
         DragPiece();
 

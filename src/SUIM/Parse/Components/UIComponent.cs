@@ -8,9 +8,17 @@ using SUIM.Parse;
 /// <param name="tagName"></param>
 public abstract class UIComponent(string tagName) : UIElement(tagName)
 {
-    public void LoadMarkup(string markup, object? model = null)
+    public void LoadViewOrComponent(string root, bool isView, string name)
     {
-        var (root, componentModel) = MarkupParser.Parse(markup, model);
+        var path = Path.Combine(root, isView ? "views" : "components", $"{name}.suim");
+
+        if (!File.Exists(path)) throw new FileNotFoundException($"Markup file not found: {path}");
+        LoadMarkup(File.ReadAllText(path));
+    }
+
+    public void LoadMarkup(string markup)
+    {
+        var (root, componentModel) = MarkupParser.Parse(markup);
         this.Model = componentModel;
         
         // Add all children from the parsed root to this component

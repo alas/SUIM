@@ -39,6 +39,16 @@ internal static class Bindings
             var eventName = kvp.Key;
             var handlerName = kvp.Value;
 
+            // Prefer resolved handlers (e.g., component code-behind) when available
+            if (suimElement.ResolvedEvents.TryGetValue(eventName.ToLowerInvariant(), out var resolvedHandler))
+            {
+                if (string.Equals(eventName, "click", StringComparison.OrdinalIgnoreCase) && strideElement is StrideButton resolvedBtn)
+                {
+                    BindClickHandler(resolvedBtn, resolvedHandler, suimElement, clickHandlers);
+                }
+                continue;
+            }
+
             if (model == null)
                 throw new InvalidOperationException($"Event '{eventName}' found on tag '{suimElement.TagName}' but no model context is available.");
 
@@ -203,14 +213,19 @@ internal static class Bindings
             // Handle other common properties
             else if (string.Equals(targetPropertyName, "visibility", StringComparison.OrdinalIgnoreCase))
             {
-                if (value != null && Enum.TryParse<Visibility>(value.ToString(), true, out var vis))
-                    strideElement.Visibility = vis;
-                else
+                if (value != null)
                 {
-                    var ex = new DataException("Could not parse 'visibility' binding.");
-                    ex.Data["Type"] = strideElement.GetType().Name;
-                    ex.Data["Data"] = value;
-                    throw ex;
+                    if (Enum.TryParse<Visibility>(value.ToString(), true, out var vis))
+                    {
+                        strideElement.Visibility = vis;
+                    }
+                    else
+                    {
+                        var ex = new DataException("Could not parse 'visibility' binding.");
+                        ex.Data["Type"] = strideElement.GetType().Name;
+                        ex.Data["Data"] = value;
+                        throw ex;
+                    }
                 }
             }
             else if (string.Equals(targetPropertyName, "opacity", StringComparison.OrdinalIgnoreCase))
@@ -224,6 +239,10 @@ internal static class Bindings
                     ex.Data["Data"] = value;
                     throw ex;
                 }
+            }
+            else
+            {
+                throw new NotSupportedException($"targetPropertyName:{targetPropertyName} value:{value}");
             }
         }
         catch (Exception ex)

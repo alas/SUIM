@@ -4,14 +4,15 @@ using SUIMComponent = global::SUIM.Parse.Components.UIComponent;
 
 public class Popup() : SUIMComponent(nameof(Popup))
 {
-    protected override void InitializeComponent()
+    public void OnYesInternal()
     {
+        Model!.onYes?.Invoke();
     }
 
     public void OnClosingInternal()
     {
-        var onClosingHandler = Model!.onClosing;
-        var cancel = onClosingHandler != null && onClosingHandler();
+        var handler = Model!.onClosing;
+        var cancel = handler != null && handler();
         if (!cancel)
         {
             Model.visibility = "collapsed";
@@ -20,14 +21,14 @@ public class Popup() : SUIMComponent(nameof(Popup))
 
     public void OnNoInternal()
     {
-        var onNoHandler = Model!.onNo;
-        if (onNoHandler == null)
+        var handler = Model!.onNo;
+        if (handler != null)
         {
-            Model.visibility = "collapsed";
+            handler();
         }
         else
         {
-            onNoHandler();
+            Model.visibility = "collapsed";
         }
     }
 }

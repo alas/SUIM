@@ -46,7 +46,7 @@
 				<h3>@message</h3>
 			</vstack>
 			<hstack class="buttoncontainer">
-				<button onclick="@onYes">YES</button>
+				<button onclick="OnYesInternal()">YES</button>
 				<button onclick="OnNoInternal()">NO</button>
 			</hstack>
 		</dock>

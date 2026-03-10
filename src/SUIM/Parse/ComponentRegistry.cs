@@ -19,11 +19,12 @@ public static class ComponentRegistry
         _factoryRegistrations[tag] = factory;
     }
 
-    public static void Register<T>() where T : UIComponent, new()
+    public static void Register<T>(string rootPath, bool isView) where T : UIComponent, new()
     {
-        ComponentRegistry.Register(nameof(T), () => {
+        var typename = typeof(T).Name;
+        Register(typename, () => {
             var component = new T();
-            component.LoadMarkup(nameof(T), component);
+            component.LoadViewOrComponent(rootPath, isView, typename);
             return component;
         });
     }
