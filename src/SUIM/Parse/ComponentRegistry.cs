@@ -19,6 +19,15 @@ public static class ComponentRegistry
         _factoryRegistrations[tag] = factory;
     }
 
+    public static void Register<T>() where T : UIComponent, new()
+    {
+        ComponentRegistry.Register(nameof(T), () => {
+            var component = new T();
+            component.LoadMarkup(nameof(T), component);
+            return component;
+        });
+    }
+
     public static bool IsRegistered(string tag)
     {
         return _fileRegistrations.ContainsKey(tag) || _factoryRegistrations.ContainsKey(tag);

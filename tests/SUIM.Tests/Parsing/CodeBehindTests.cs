@@ -1,8 +1,8 @@
 namespace SUIM.Tests.Parsing;
 
-using Xunit;
-using SUIM.Parse;
 using SUIM.Parse.Components;
+using SUIMStride;
+using Xunit;
 
 public class CodeBehindTests
 {
@@ -11,13 +11,11 @@ public class CodeBehindTests
         public bool Clicked { get; private set; }
         public object? ClickParam { get; private set; }
         public int IntParam { get; private set; }
-        public Button? MyButton { get; private set; }
 
         public MyTestComponent() : base("MyTestComponent") { }
 
         protected override void InitializeComponent()
         {
-            MyButton = FindElement<Button>("btn1");
         }
 
         public void OnClick()
@@ -57,15 +55,14 @@ public class CodeBehindTests
         var btn1 = component.FindElement<Button>("btn1");
         btn1.TriggerEvent("click");
         Assert.Equal("hello", component.ClickParam);
-
+        
         var btn2 = component.FindElement<Button>("btn2");
         btn2.TriggerEvent("click");
         Assert.Equal(42, component.IntParam);
         Assert.Equal("world", component.ClickParam);
-
+        
         var btn3 = component.FindElement<Button>("btn3");
         btn3.TriggerEvent("click");
         Assert.Equal("btn3", component.ClickParam);
     }
-
 }

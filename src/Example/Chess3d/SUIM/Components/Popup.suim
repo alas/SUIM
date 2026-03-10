@@ -6,26 +6,32 @@
 		"visibility": null,
 		"onYes": null,
 		"onNo": null,
-		"onClose": null
+		"onClosing": null
 	}
 	</model>
 	<style>
 	.window {
 		width: 500px;
-		height: 220px;
+		height: 330px;
 		padding: 12px;
 		background-image: url(Assets/seamless-texture-wood-old-oak-small2.jpg);
 	}
 	.title {
+		width: 100%;
+		flex-grow: 1;
 		justify-content: space-between;
 		align-items: center;
 	}
 	.content {
+		width: 100%;
+		height: 100%;
 		margin: 6px;
 		flex-grow: 1;
 		justify-content: center;
 	}
-	.buttons {
+	.buttoncontainer {
+		width: 100%;
+		height: auto;
 		gap: 10;
 		justify-content: space-between;
 	}
@@ -34,14 +40,14 @@
 		<dock class="window">
 			<hstack class="title" >
 				<h1>@title</h1>
-				<button onclick="@onClose" width="30" height="30">X</button>
+				<button onclick="OnClosingInternal()" width="30" height="30">X</button>
 			</hstack>
 			<vstack class="content">
 				<h3>@message</h3>
 			</vstack>
-			<hstack class="buttons">
+			<hstack class="buttoncontainer">
 				<button onclick="@onYes">YES</button>
-				<button onclick="@onNo">NO</button>
+				<button onclick="OnNoInternal()">NO</button>
 			</hstack>
 		</dock>
     </overlay>

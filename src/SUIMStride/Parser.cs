@@ -27,16 +27,26 @@ public class Parser
 
     public (StrideUIElement StrideRoot, dynamic? Model) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
-        if (string.IsNullOrEmpty(RootPath)) throw new InvalidOperationException("RootPath must be set before calling GetView.");
+        return GetNamed(true, viewName, game, defaultFontSize, fullscreen, model, createNewInstance);
+    }
+
+    public (StrideUIElement StrideRoot, dynamic? Model) GetComponent(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
+    {
+        return GetNamed(false, viewName, game, defaultFontSize, fullscreen, model, createNewInstance);
+    }
+
+    private (StrideUIElement StrideRoot, dynamic? Model) GetNamed(bool isView, string name, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance)
+    {
+        if (string.IsNullOrEmpty(RootPath)) throw new InvalidOperationException("RootPath must be set before calling.");
         
         var project = new SUIMProject(RootPath);
-        var viewPath = Path.Combine(RootPath, "views", $"{viewName}.suim");
+        var viewPath = Path.Combine(RootPath, isView ? "views" : "components", $"{name}.suim");
         if (!File.Exists(viewPath)) throw new FileNotFoundException($"View not found: {viewPath}");
 
         var markup = File.ReadAllText(viewPath);
         project.ResolveDependencies(markup);
 
-        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath, viewName);
+        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath, name);
     }
 
     public (StrideUIElement StrideRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)

@@ -1,6 +1,5 @@
 namespace SUIM.Parse.Components;
 
-using System;
 using SUIM.Parse;
 
 /// <summary>
@@ -25,30 +24,6 @@ public abstract class UIComponent(string tagName) : UIElement(tagName)
         InitializeComponent();
     }
 
-    public void LoadMarkupFromFile(string path, object? model = null)
-    {
-        if (!File.Exists(path)) throw new FileNotFoundException($"Markup file not found: {path}");
-        LoadMarkup(File.ReadAllText(path), model);
-    }
-
-    public T? FindElement<T>(string id) where T : UIElement
-    {
-        return FindElementRecursive<T>(this, id);
-    }
-
-    private T? FindElementRecursive<T>(UIElement element, string id) where T : UIElement
-    {
-        if (string.Equals(element.Id, id, StringComparison.OrdinalIgnoreCase) && element is T t) return t;
-        
-        foreach (var child in element.Children)
-        {
-            var found = FindElementRecursive<T>(child, id);
-            if (found != null) return found;
-        }
-        
-        return null;
-    }
-
     protected virtual void InitializeComponent() { }
 
     private void BindEventsRecursive(UIElement element)
@@ -69,5 +44,23 @@ public abstract class UIComponent(string tagName) : UIElement(tagName)
         {
             BindEventsRecursive(child);
         }
+    }
+
+    public T? FindElement<T>(string id) where T : UIElement
+    {
+        return FindElementRecursive<T>(this, id);
+    }
+
+    private T? FindElementRecursive<T>(UIElement element, string id) where T : UIElement
+    {
+        if (string.Equals(element.Id, id, StringComparison.OrdinalIgnoreCase) && element is T t) return t;
+
+        foreach (var child in element.Children)
+        {
+            var found = FindElementRecursive<T>(child, id);
+            if (found != null) return found;
+        }
+
+        return null;
     }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Threading.Tasks;
 using Stride.Engine;
 using Stride.UI;
+using global::SUIM.Parse;
 using SUIMStride;
 
 public class MainView
@@ -25,6 +26,7 @@ public class MainView
                 NoHandler = new Action(UnshowPopup),
             };
 
+        ComponentRegistry.Register<Components.Popup>();
         var parser = new Parser { RootPath = "SUIM" };
         var (strideRoot, modelResult) = parser.GetView("MainView", game, model: model);
         RootElement = strideRoot ?? throw new Exception("Failed to load MainView view.");
