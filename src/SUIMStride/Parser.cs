@@ -99,12 +99,6 @@ public class Parser
         };
         var (suimRoot, model2) = MarkupParser.Parse(markup, model, basePath: basePath, componentName: viewName);
 
-        if (model2 == null)
-        {
-            var oo = new SUIM.Model.ObservableObject();
-            suimRoot.Model = model2 = oo;
-        }
-
         if (!string.IsNullOrWhiteSpace(viewName) && ComponentRegistry.IsRegisteredFactory(viewName))
         {
             var codeBehind = (SUIM.Parse.Components.UIComponent)ComponentRegistry.Create(viewName, true);

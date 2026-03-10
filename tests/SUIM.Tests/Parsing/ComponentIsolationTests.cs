@@ -242,30 +242,4 @@ public class ComponentIsolationTests
         var text = label!.Children[0] as Text;
         Assert.Equal("@val", text!.Value);
     }
-
-    [Fact]
-    public void NestedBinding_ThrowsException_IfModelMissingInComponent()
-    {
-        var compPath = GetTestPath("NoModelComp.suim");
-        // Arrange
-        var componentMarkup = @"<div id=""comp"">
-            <label>@missingProp</label>
-        </div>";
-
-        File.WriteAllText(compPath, componentMarkup);
-        var tagName = "NoModelComp_" + Guid.NewGuid().ToString("N");
-        ComponentRegistry.Register(tagName, compPath);
-
-        var suim = new Parser
-        {
-            RootPath = AppDomain.CurrentDomain.BaseDirectory
-        };
-        var markup = $"<{tagName} />";
-
-        // Act & Assert
-        var ex = Assert.Throws<InvalidOperationException>(() => {
-            var (root, _) = suim.Parse(markup, new Game());
-        });
-        Assert.Contains("no model context is available", ex.Message);
-    }
 }

@@ -19,7 +19,7 @@ public static partial class MarkupParser
         Dictionary<string, Dictionary<string, string>> styles = inheritedStyles != null ? new(inheritedStyles, SpanStringIgnoreCaseComparer.Instance) : [];
         Dictionary<string, Dictionary<string, string>> leakableStyles = inheritedStyles != null ? new(inheritedStyles, SpanStringIgnoreCaseComparer.Instance) : [];
 
-        model2 = ModelLogic.ExtractModel(root, model2);
+        model2 = ModelLogic.ExtractModel(root, model2) ?? new ObservableObject();
 
         // Root tag matches view/component name or "root": bypass redundant wrapper and process real root
         if (string.Equals(root.Name.LocalName, componentName, StringComparison.OrdinalIgnoreCase)
