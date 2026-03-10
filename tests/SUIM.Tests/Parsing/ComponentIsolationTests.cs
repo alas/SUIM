@@ -4,7 +4,6 @@ using System;
 using System.IO;
 using Xunit;
 using Stride.Engine;
-using Stride.UI.Events;
 using Stride.UI.Panels;
 using SUIM.Parse;
 using SUIM.Model;
