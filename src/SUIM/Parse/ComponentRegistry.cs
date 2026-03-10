@@ -6,27 +6,23 @@ using SUIM.Parse.Components;
 
 public static class ComponentRegistry
 {
-    private static readonly Dictionary<string, string> _fileRegistrations = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly Dictionary<string, Func<UIElement>> _factoryRegistrations = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<string, (bool, string)> _fileRegistrations = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<string, (bool, Func<UIElement>)> _factoryRegistrations = new(StringComparer.OrdinalIgnoreCase);
 
-    public static void Register(string tag, string filePath)
+    public static void Register(string tag, bool isView, string filePath)
     {
-        _fileRegistrations[tag] = filePath;
+        _fileRegistrations[tag] = (isView, filePath);
     }
 
-    public static void Register(string tag, Func<UIElement> factory)
+    public static void Register(string tag, bool isView, Func<UIElement> factory)
     {
-        _factoryRegistrations[tag] = factory;
+        _factoryRegistrations[tag] = (isView, factory);
     }
 
-    public static void Register<T>(string rootPath, bool isView) where T : UIComponent, new()
+    public static void Register<T>(bool isView) where T : UIComponent, new()
     {
-        var typename = typeof(T).Name;
-        Register(typename, () => {
-            var component = new T();
-            component.LoadViewOrComponent(rootPath, isView, typename);
-            return component;
-        });
+        var name = typeof(T).Name;
+        Register(name, isView, () => new T());
     }
 
     public static bool IsRegistered(string tag)
@@ -36,15 +32,20 @@ public static class ComponentRegistry
 
     public static UIElement Create(string tag)
     {
-        if (_factoryRegistrations.TryGetValue(tag, out var factory))
+        if (_factoryRegistrations.TryGetValue(tag, out var data))
         {
-            var element = factory();
+            var element = data.Item2();
+            if (element is VirtualComponent vc)
+            {
+                vc.IsView = data.Item1;
+            }
             return element;
         }
 
-        if (_fileRegistrations.TryGetValue(tag, out var filePath))
+        if (_fileRegistrations.TryGetValue(tag, out var data2))
         {
             var result = new VirtualComponent(tag);
+            var filePath = data2.Item2;
             result.SetAttribute("source", filePath);
             return result;
         }

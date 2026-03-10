@@ -9,10 +9,11 @@ using SUIM.Parse;
 /// A helper class for Tags that will get replaced by markup
 /// </summary>
 /// <param name="tagName"></param>
-public sealed class VirtualComponent(string tagName) : LayoutElement(tagName)
+public class VirtualComponent(string tagName) : LayoutElement(tagName)
 {
     public string? Source { get; set; }
     public Dictionary<string, object?> Attributes { get; } = [];
+    public bool IsView { get; set; }
 
     public override void SetAttribute(string name, object? value)
     {
@@ -36,7 +37,7 @@ public sealed class VirtualComponent(string tagName) : LayoutElement(tagName)
         }
     }
 
-    public UIElement? Expand(object? parentModel = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
+    public virtual UIElement? Expand(object? parentModel = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
     {
         if (string.IsNullOrEmpty(Source)) return null;
 
@@ -44,7 +45,8 @@ public sealed class VirtualComponent(string tagName) : LayoutElement(tagName)
         var fileExists = File.Exists(finalPath);
         if (!fileExists && !Path.IsPathRooted(finalPath) && !string.IsNullOrEmpty(basePath))
         {
-            finalPath = Path.Combine(basePath, "components", Source);
+            var crumPath = IsView ? "views" : "components";
+            finalPath = Path.Combine(basePath, crumPath, Source);
             fileExists = fileExists || File.Exists(finalPath);
             if (!File.Exists(finalPath))
             {

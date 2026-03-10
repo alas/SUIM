@@ -22,7 +22,7 @@ public class ComponentStylingTests
         var childPath = GetTestPath("ChildComp.suim");
         var childMarkup = @"<div id=""childLabel"" class=""highlight"" />";
         File.WriteAllText(childPath, childMarkup);
-        ComponentRegistry.Register("ChildComp", childPath);
+        ComponentRegistry.Register("ChildComp", false, childPath);
 
         var parentMarkup = @"<div id=""parent"">
             <style>
@@ -50,7 +50,7 @@ public class ComponentStylingTests
             </style>
         </div>";
         File.WriteAllText(childPath, childMarkup);
-        ComponentRegistry.Register("ChildCompUp", childPath);
+        ComponentRegistry.Register("ChildCompUp", true, childPath);
 
         var parentMarkup = @"<div id=""parent"">
             <ChildCompUp />
@@ -77,12 +77,12 @@ public class ComponentStylingTests
             </style>
         </div>";
         File.WriteAllText(child1Path, child1Markup);
-        ComponentRegistry.Register("Child1", child1Path);
+        ComponentRegistry.Register("Child1", false, child1Path);
 
         var child2Path = GetTestPath("Child2.suim");
         var child2Markup = @"<div id=""child2"" class=""siblingStyle"" />";
         File.WriteAllText(child2Path, child2Markup);
-        ComponentRegistry.Register("Child2", child2Path);
+        ComponentRegistry.Register("Child2", false, child2Path);
 
         var parentMarkup = @"<div id=""parent"">
             <Child1 />
@@ -105,7 +105,7 @@ public class ComponentStylingTests
         var childPath = GetTestPath("ChildCompScoped.suim");
         var childMarkup = @"<div id=""childLabel"" class=""scopedHighlight"" />";
         File.WriteAllText(childPath, childMarkup);
-        ComponentRegistry.Register("ChildCompScoped", childPath);
+        ComponentRegistry.Register("ChildCompScoped", false, childPath);
 
         var parentMarkup = @"<div id=""parent"">
             <style scoped=""true"">
@@ -148,12 +148,12 @@ public class ComponentStylingTests
         var grandchildPath = GetTestPath("Grandchild.suim");
         var grandchildMarkup = @"<div id=""gc"" class=""gpStyle"" />";
         File.WriteAllText(grandchildPath, grandchildMarkup);
-        ComponentRegistry.Register("Grandchild", grandchildPath);
+        ComponentRegistry.Register("Grandchild", false, grandchildPath);
 
         var childPath = GetTestPath("ChildForGP.suim");
         var childMarkup = @"<Grandchild />";
         File.WriteAllText(childPath, childMarkup);
-        ComponentRegistry.Register("ChildForGP", childPath);
+        ComponentRegistry.Register("ChildForGP", false, childPath);
 
         var gpMarkup = @"<div id=""gp"">
             <style>

@@ -17,7 +17,7 @@ public class VirtualComponentTests
         try
         {
             // 2. Register the custom tag
-            ComponentRegistry.Register("MyCustomTag", tempFile);
+            ComponentRegistry.Register("MyCustomTag", false, tempFile);
 
             // 3. Parse markup using the custom tag
             var markup = "<grid><MyCustomTag /></grid>";
@@ -43,7 +43,7 @@ public class VirtualComponentTests
     public void Programmatic_Instantiation_Works()
     {
         // 1. Register a factory
-        ComponentRegistry.Register("FactoryTag", () => new Stack { Id = "programmatic" });
+        ComponentRegistry.Register("FactoryTag", false, () => new Stack { Id = "programmatic" });
 
         // 2. Instantiate via registry
         var element = ComponentRegistry.Create("FactoryTag");

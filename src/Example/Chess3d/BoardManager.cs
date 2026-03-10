@@ -40,10 +40,9 @@ public class BoardManager : SyncScript
     public void CreateUI()
     {
         var uiComponent = Entity.GetOrCreate<UIComponent>();
-        ComponentRegistry.Register<SUIM.Components.Popup>("SUIM", false);
-        ComponentRegistry.Register<MainView>("SUIM", true);
+        ComponentRegistry.Register<SUIM.Components.Popup>(false);
+        ComponentRegistry.Register<MainView>(true);
         var parser = new Parser { RootPath = "SUIM" };
-        var mainview = new MainView() { Game = (Game)Game };
         var (strideRoot, _) = parser.GetView("MainView", (Game)Game);
         uiComponent.Page = new() { RootElement = strideRoot };
     }

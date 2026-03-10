@@ -43,7 +43,7 @@ public class ComponentIsolationTests
             """;
         File.WriteAllText(compPath, componentMarkup);
 
-        ComponentRegistry.Register("PopupTestComp", compPath);
+        ComponentRegistry.Register("PopupTestComp", true, compPath);
 
         var markup = "<div><PopupTestComp title=\"@PopupTitle\" /></div>";
 
@@ -77,7 +77,7 @@ public class ComponentIsolationTests
             """;
         File.WriteAllText(compPath, componentMarkup);
 
-        ComponentRegistry.Register("PopupTestComp", compPath);
+        ComponentRegistry.Register("PopupTestComp", true, compPath);
 
         var markup = "<div><PopupTestComp labelvisibility=\"@LabelVisibility\" /></div>";
 
@@ -111,7 +111,7 @@ public class ComponentIsolationTests
             """;
         File.WriteAllText(compPath, componentMarkup);
 
-        ComponentRegistry.Register("PopupTestComp", compPath);
+        ComponentRegistry.Register("PopupTestComp", true, compPath);
 
         var markup = "<div><model>{ \"LabelVisibility\": \"none\" }</model><PopupTestComp labelvisibility=\"@LabelVisibility\" /></div>";
 
@@ -144,7 +144,7 @@ public class ComponentIsolationTests
             """;
         File.WriteAllText(compPath, componentMarkup);
 
-        ComponentRegistry.Register("PopupTestComp", compPath);
+        ComponentRegistry.Register("PopupTestComp", true, compPath);
 
         var markup = @"<div><PopupTestComp onbuttonclick=""MyHandler()"" /></div>";
 
@@ -188,7 +188,7 @@ public class ComponentIsolationTests
         File.WriteAllText(compPath, componentMarkup);
 
         // Register the custom tag with absolute path
-        ComponentRegistry.Register("TestComponent", compPath);
+        ComponentRegistry.Register("TestComponent", true, compPath);
 
         // Arrange
         var markup = @"<div id=""root"">
@@ -254,7 +254,7 @@ public class ComponentIsolationTests
 
         File.WriteAllText(compPath, componentMarkup);
         var tagName = "NoModelComp_" + Guid.NewGuid().ToString("N");
-        ComponentRegistry.Register(tagName, compPath);
+        ComponentRegistry.Register(tagName, true, compPath);
 
         var suim = new Parser
         {

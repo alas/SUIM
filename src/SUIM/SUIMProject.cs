@@ -36,7 +36,7 @@ public partial class SUIMProject(string rootPath)
                 if (File.Exists(componentPath))
                 {
                     // Register the component
-                    ComponentRegistry.Register(tag, componentPath);
+                    ComponentRegistry.Register(tag, false, componentPath);
 
                     // Recursively resolve dependencies for this component
                     string componentMarkup = File.ReadAllText(componentPath);

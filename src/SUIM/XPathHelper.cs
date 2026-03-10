@@ -43,7 +43,8 @@ public static class XPathHelper
             {
                 try
                 {
-                    var nameProp = c.GetType().GetProperty("Name", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+                    var nameProp = c.GetType().GetProperty("Name", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)
+                        ?? c.GetType().GetProperty("Id", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
                     var cName = nameProp?.GetValue(c)?.ToString();
                     if (!string.IsNullOrEmpty(cName) && string.Equals(cName, name, StringComparison.OrdinalIgnoreCase))
                     {
@@ -74,7 +75,8 @@ public static class XPathHelper
         // Check root itself
         try
         {
-            var nameProp = root.GetType().GetProperty("Name", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            var nameProp = root.GetType().GetProperty("Name", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)
+                ?? root.GetType().GetProperty("Id", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
             var rName = nameProp?.GetValue(root)?.ToString();
             if (!string.IsNullOrEmpty(rName) && string.Equals(rName, name, StringComparison.OrdinalIgnoreCase)) return root;
         }
