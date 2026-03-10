@@ -1,16 +1,4 @@
 <root>
-	<model>
-	{
-		// popup data
-		"PopupTitle": null,
-		"PopupMessage": null,
-		"PopupVisibility": "collapsed",
-
-		// overlay data
-		"OverlayMessage": null,
-		"OverlayVisibility": "collapsed"
-	}
-	</model>
     <style src="Styles/Main.css" />
 
 	<vstack class="container">
