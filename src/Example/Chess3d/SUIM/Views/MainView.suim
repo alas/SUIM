@@ -1,4 +1,10 @@
 <root>
+	<model>
+	{
+		"PopupVisibility": "collapsed",
+		"OverlayVisibility": "collapsed"
+	}
+	</model>
     <style src="Styles/Main.css" />
 
 	<vstack class="container">
