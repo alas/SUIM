@@ -48,6 +48,7 @@ public class CodeBehindTests
         var component = new MyTestComponent();
         var (rootElement, _) = MarkupParser.Parse(markup);
         component.Children.Add(rootElement);
+        var result = component.Expand();
 
         var btn1 = XPathHelper.FindElementByPath(component, "btn1") as UIElement;
         btn1!.TriggerEvent("click");
