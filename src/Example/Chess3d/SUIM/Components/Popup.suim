@@ -1,9 +1,6 @@
 ﻿<root>
     <model>
 	{
-		"title": "",
-		"message": "",
-		"visibility": null,
 		"onYes": null,
 		"onNo": null,
 		"onClosing": null
