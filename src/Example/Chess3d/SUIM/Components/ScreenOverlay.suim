@@ -1,10 +1,4 @@
 <root>
-	<model>
-	{
-		"message": "",
-		"visibility": null
-	}
-	</model>
 	<overlay visibility="@visibility" class="centeredcontent">
 		<div class="centeredcontent">
 			<h3>@message</h3>
