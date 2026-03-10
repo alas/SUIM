@@ -7,13 +7,11 @@ using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
-using StrideButton = Stride.UI.Controls.Button;
 using StrideUIElement = Stride.UI.UIElement;
 using SUIM;
 using SUIM.Flexbox;
 using SUIM.Parse;
 using SUIM.Parse.Components;
-using SUIMButton = SUIM.Parse.Components.Button;
 using SUIMElement = SUIM.Parse.Components.UIElement;
 
 public class Parser
@@ -138,11 +136,11 @@ public class Parser
     {
         lock (_parseCache)
         {
-            foreach (var entry in _parseCache.Values)
+            foreach (var (SuimRoot, StrideRoot, _) in _parseCache.Values)
             {
-                if (ReferenceEquals(entry.StrideRoot, strideRoot))
+                if (ReferenceEquals(StrideRoot, strideRoot))
                 {
-                    return entry.SuimRoot;
+                    return SuimRoot;
                 }
             }
         }
@@ -158,7 +156,7 @@ public class Parser
     {
         StrideUIElement strideElement = element switch
         {
-            SUIMButton b => MapButton(b, game),
+            SUIM.Parse.Components.Button b => MapButton(b, game),
             Text t => MapText(t),
             Input i => MapInput(i),
             SUIM.Parse.Components.Image img => MapImage(img, game),
@@ -199,9 +197,9 @@ public class Parser
         return strideElement;
     }
 
-    private StrideButton MapButton(SUIMButton button, Game? game)
+    private Stride.UI.Controls.Button MapButton(SUIM.Parse.Components.Button button, Game? game)
     {
-        var btn = new StrideButton();
+        var btn = new Stride.UI.Controls.Button();
         
         if (!string.IsNullOrEmpty(button.HoverImage))
         {
