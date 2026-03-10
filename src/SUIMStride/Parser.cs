@@ -7,11 +7,12 @@ using Stride.Graphics;
 using Stride.UI;
 using Stride.UI.Controls;
 using Stride.UI.Panels;
-using StrideUIElement = Stride.UI.UIElement;
 using SUIM;
 using SUIM.Flexbox;
 using SUIM.Parse;
 using SUIM.Parse.Components;
+using System.Xml.Linq;
+using StrideUIElement = Stride.UI.UIElement;
 using SUIMElement = SUIM.Parse.Components.UIElement;
 
 public class Parser
@@ -98,6 +99,15 @@ public class Parser
             return new Size(0, 0);
         };
         var (suimRoot, model2) = MarkupParser.Parse(markup, model, basePath: basePath, componentName: viewName);
+
+        if (!string.IsNullOrWhiteSpace(viewName) && ComponentRegistry.IsRegisteredFactory(viewName))
+        {
+            var codeBehind = (SUIM.Parse.Components.UIComponent)ComponentRegistry.Create(viewName, true);
+
+            codeBehind.Model = model2;
+            codeBehind.BindEventsToTree(suimRoot);
+        }
+
         Layout(suimRoot, game, fullscreen);
         var strideRoot = MapElement(suimRoot, game);
 

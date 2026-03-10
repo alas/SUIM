@@ -14,6 +14,11 @@ public abstract class UIComponent(string tagName) : VirtualComponent(tagName)
         return base.Expand(parentModel, inheritedStyles, basePath);
     }
 
+    public void BindEventsToTree(UIElement root)
+    {
+        BindEventsRecursive(root);
+    }
+
     private void BindEventsRecursive(UIElement element)
     {
         foreach (var evt in element.Events)
