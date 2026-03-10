@@ -171,6 +171,8 @@ internal static class Bindings
 
     private static void ApplyBindingValue(StrideUIElement strideElement, string targetPropertyName, object? value)
     {
+        if (value is string s && s[0] == '@' && s[1] != '@') return;
+
         try
         {
             // Handle Text property
