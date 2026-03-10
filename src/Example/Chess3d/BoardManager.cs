@@ -48,7 +48,8 @@ public class BoardManager : SyncScript
     }
 
     public override void Update()
-    {        TrySelectPiece();
+    {
+        TrySelectPiece();
 
         DragPiece();
 
