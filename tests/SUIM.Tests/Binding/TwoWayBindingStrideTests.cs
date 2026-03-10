@@ -32,9 +32,8 @@ public class TwoWayBindingStrideTests
         // We can't easily trigger Stride events without a full sync, 
         // but we can verify the proxy itself via the model.
         
-        var oo = model as ObservableObject;
         // The proxy getter should return the current value from the widget
-        Assert.Equal("updated", oo.GetValue("myText"));
+        Assert.Equal("updated", model.GetValue("myText"));
     }
 
     [Fact]
@@ -53,11 +52,20 @@ public class TwoWayBindingStrideTests
         // Act
         tb.State = ToggleState.Checked;
         
-        var oo = model as ObservableObject;
         // The proxy getter should return true because tb.State == Checked
-        Assert.Equal(true, oo.GetValue("myBool"));
+        Assert.Equal(true, model.GetValue("myBool"));
         
         tb.State = ToggleState.UnChecked;
-        Assert.Equal(false, oo.GetValue("myBool"));
+        Assert.Equal(false, model.GetValue("myBool"));
+
+        model.SetValue("myBool", true);
+        Assert.Equal(ToggleState.Checked, tb.State);
+
+        dynamic dyn = model;
+        dyn.myBool = false;
+        Assert.Equal(ToggleState.UnChecked, tb.State);
+
+        dyn.myBool = true;
+        Assert.Equal(ToggleState.Checked, tb.State);
     }
 }
