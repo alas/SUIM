@@ -22,13 +22,13 @@ public abstract class UIElement
 
     // Internal properties to the engine - not directly settable via markup attributes
     public string TagName { get; }
+    internal Node Node { get; }
     public bool IsComponentRoot { get; set; }
     public UIElement? Parent { get; set; }
     public List<UIElement> Children { get; } = [];
-    public List<BindingDefinition> Bindings { get; } = [];
     public dynamic? Model { get; set; }
+    public List<BindingDefinition> Bindings { get; } = [];
     public Dictionary<string, string> Events { get; set; } = [];
-    internal Node Node { get; }
     public Dictionary<string, Delegate> ResolvedEvents { get; } = [];
 
     public UIElement(string tagName)

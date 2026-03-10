@@ -77,6 +77,27 @@ internal static class Bindings
                 if (model is ObservableObject oo)
                 {
                     handler = oo.GetHandler(handlerName);
+
+                    // Fallback: if the handler is stored as a model value (delegate) and was called with args
+                    if (handler == null)
+                    {
+                        var open = handlerName.IndexOf('(');
+                        var close = handlerName.LastIndexOf(')');
+                        if (open > 0 && close > open)
+                        {
+                            var methodName = handlerName[..open].Trim();
+                            var argsStr = handlerName.Substring(open + 1, close - open - 1).Trim();
+                            var args = SUIM.Parse.EventHandlerResolver.ParseArguments(argsStr, suimElement);
+                            if (oo.GetValue(methodName) is Delegate d)
+                            {
+                                handler = new Action(() => d.DynamicInvoke(args));
+                            }
+                        }
+                        else if (oo.GetValue(handlerName) is Delegate d)
+                        {
+                            handler = d;
+                        }
+                    }
                 }
                 else
                 {

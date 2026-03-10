@@ -60,7 +60,6 @@ public sealed class VirtualComponent(string tagName) : LayoutElement(tagName)
         var (element, componentModel) = MarkupParser.Parse(markup, null, inheritedStyles, basePath, componentName);
         
         this.Model = componentModel;
-        this.IsComponentRoot = true;
 
         // Map attributes from this tag to the component model
         if (componentModel is ObservableObject oo)
