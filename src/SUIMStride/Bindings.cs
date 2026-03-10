@@ -11,7 +11,7 @@ using SUIMElement = SUIM.Parse.Components.UIElement;
 
 internal static class Bindings
 {
-    public static void TransferBindings(SUIMElement suimElement, StrideUIElement strideElement, Dictionary<StrideButton, Delegate> clickHandlers)
+    public static void TransferBindings(SUIMElement suimElement, StrideUIElement strideElement)
     {
         var model = suimElement.GetEffectiveModel();
 
@@ -26,10 +26,10 @@ internal static class Bindings
             SetupBinding(model, binding.ModelPropertyName, binding.TargetPropertyName, strideElement);
         }
 
-        TransferEvents(suimElement, strideElement, clickHandlers);
+        TransferEvents(suimElement, strideElement);
     }
 
-    private static void TransferEvents(SUIMElement suimElement, StrideUIElement strideElement, Dictionary<StrideButton, Delegate> clickHandlers)
+    private static void TransferEvents(SUIMElement suimElement, StrideUIElement strideElement)
     {
         if (suimElement.Events.Count == 0) return;
         var model = suimElement.GetEffectiveModel();
@@ -38,13 +38,14 @@ internal static class Bindings
         {
             var eventName = kvp.Key;
             var handlerName = kvp.Value;
+            var eventKey = eventName.ToLowerInvariant();
 
             // Prefer resolved handlers (e.g., component code-behind) when available
-            if (suimElement.ResolvedEvents.TryGetValue(eventName.ToLowerInvariant(), out var resolvedHandler))
+            if (suimElement.ResolvedEvents.TryGetValue(eventKey, out var resolvedHandler))
             {
                 if (string.Equals(eventName, "click", StringComparison.OrdinalIgnoreCase) && strideElement is StrideButton resolvedBtn)
                 {
-                    BindClickHandler(resolvedBtn, resolvedHandler, suimElement, clickHandlers);
+                    BindClickHandler(resolvedBtn, resolvedHandler, suimElement);
                 }
                 continue;
             }
@@ -54,97 +55,55 @@ internal static class Bindings
 
             // Resolve handler using the effective model for this element (components must be isolated)
             Delegate? handler = null;
+            if (!string.IsNullOrWhiteSpace(handlerName))
+            {
+                // Unified inline handler resolution (supports @prop, method names, and calls with args)
+                handler = SUIM.Parse.EventHandlerResolver.ResolveHandler(model, handlerName, suimElement);
 
-            if (!string.IsNullOrEmpty(handlerName) && handlerName.StartsWith('@'))
-            {
-                var propName = handlerName[1..];
-                if (model is ObservableObject mOO)
+                if (handler == null && model is ObservableObject oo)
                 {
-                    var val = mOO.GetValue(propName);
-                    if (val is Delegate d)
-                    {
-                        handler = d;
-                    }
-                    else if (val is string s)
-                    {
-                        // Try to interpret the string as a handler expression on the component model (or parent proxy)
-                        handler = mOO.GetHandler(s) ?? BackendHelpers.ResolveEventAction(s, (object)model, suimElement) ?? ResolveMethodAsDelegate(s, model);
-                    }
-                }
-            }
-            else
-            {
-                if (model is ObservableObject oo)
-                {
+                    // Fallback to code-behind methods on the source object
                     handler = oo.GetHandler(handlerName);
+                }
 
-                    // Fallback: if the handler is stored as a model value (delegate) and was called with args
-                    if (handler == null)
-                    {
-                        var open = handlerName.IndexOf('(');
-                        var close = handlerName.LastIndexOf(')');
-                        if (open > 0 && close > open)
-                        {
-                            var methodName = handlerName[..open].Trim();
-                            var argsStr = handlerName.Substring(open + 1, close - open - 1).Trim();
-                            var args = SUIM.Parse.EventHandlerResolver.ParseArguments(argsStr, suimElement);
-                            if (oo.GetValue(methodName) is Delegate d)
-                            {
-                                handler = new Action(() => d.DynamicInvoke(args));
-                            }
-                        }
-                        else if (oo.GetValue(handlerName) is Delegate d)
-                        {
-                            handler = d;
-                        }
-                    }
-                }
-                else
-                {
-                    // Try reflection on raw object using shared helper
-                    handler = BackendHelpers.ResolveEventAction(handlerName, (object)model, suimElement);
-                    // If generic resolver didn't find anything, try Stride-specific resolver that understands RoutedEventArgs
-                    handler ??= ResolveMethodAsDelegate(handlerName, model);
-                }
+                // If generic resolver didn't find anything, try Stride-specific resolver that understands RoutedEventArgs
+                handler ??= ResolveMethodAsDelegate(handlerName, model);
             }
 
             if (handler != null)
             {
+                suimElement.ResolvedEvents[eventKey] = handler;
                 // Map to Stride event
                 if (string.Equals(eventName, "click", StringComparison.OrdinalIgnoreCase) && strideElement is StrideButton btn)
                 {
-                    BindClickHandler(btn, handler, suimElement, clickHandlers);
+                    BindClickHandler(btn, handler, suimElement);
                 }
                 // Add more event types here as needed
             }
         }
     }
 
-    private static void BindClickHandler(StrideButton btn, Delegate handler, SUIMElement suimElement, Dictionary<StrideButton, Delegate> clickHandlers)
+    private static void BindClickHandler(StrideButton btn, Delegate handler, SUIMElement suimElement)
     {
         // Support multiple handler types for click events
         if (handler is EventHandler<Stride.UI.Events.RoutedEventArgs> routedHandler)
         {
             btn.Click += routedHandler;
-            clickHandlers[btn] = routedHandler;
         }
         else if (handler is EventHandler eh)
         {
             EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => eh(s, e);
             btn.Click += wrappedHandler;
-            clickHandlers[btn] = wrappedHandler;
         }
         else if (handler is Action<SUIMElement> actionWithElement)
         {
             EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => actionWithElement(suimElement);
             btn.Click += wrappedHandler;
-            clickHandlers[btn] = wrappedHandler;
         }
         else if (handler is Action a)
         {
             EventHandler<Stride.UI.Events.RoutedEventArgs> wrappedHandler = (s, e) => a();
             btn.Click += wrappedHandler;
-            clickHandlers[btn] = wrappedHandler;
         }
     }
 

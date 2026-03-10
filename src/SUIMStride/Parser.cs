@@ -18,8 +18,6 @@ using SUIMElement = SUIM.Parse.Components.UIElement;
 
 public class Parser
 {
-    // Test hook: keep track of click handlers bound to Stride Buttons so tests can simulate clicks.
-    private readonly Dictionary<StrideButton, Delegate> _clickHandlers = [];
     private ContentManager? ContentManager = null;
     private readonly Dictionary<string, SpriteFont> Fonts = [];
     private readonly Dictionary<string, (SUIMElement SuimRoot, StrideUIElement StrideRoot, dynamic? Model)> _parseCache = [];
@@ -135,10 +133,21 @@ public class Parser
         root.CalculateLayout(preferredWidth, preferredHeight);
     }
 
-    // Test helper to retrieve a bound click handler (returns null if none)
-    public Delegate? GetBoundClickHandler(StrideButton btn)
+    // Test/helper: retrieve the SUIM root for a mapped Stride tree
+    public SUIMElement? GetSuimRootFor(StrideUIElement strideRoot)
     {
-        return _clickHandlers.TryGetValue(btn, out var d) ? d : null;
+        lock (_parseCache)
+        {
+            foreach (var entry in _parseCache.Values)
+            {
+                if (ReferenceEquals(entry.StrideRoot, strideRoot))
+                {
+                    return entry.SuimRoot;
+                }
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -160,7 +169,7 @@ public class Parser
 
         ApplyCommonProperties(element, strideElement);
         
-        Bindings.TransferBindings(element, strideElement, _clickHandlers);
+        Bindings.TransferBindings(element, strideElement);
 
         // Handle Children for generic containers if not already handled
         if (strideElement is Panel panel && element.Children.Count > 0)

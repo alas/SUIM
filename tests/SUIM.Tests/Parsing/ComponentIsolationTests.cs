@@ -21,6 +21,17 @@ public class ComponentIsolationTests
         return path;
     }
 
+    private static UIElement? FindSuimById(UIElement root, string id)
+    {
+        if (string.Equals(root.Id, id, StringComparison.OrdinalIgnoreCase)) return root;
+        foreach (var child in root.Children)
+        {
+            var found = FindSuimById(child, id);
+            if (found != null) return found;
+        }
+        return null;
+    }
+
     [Fact]
     public void Component_Attribute_Binding_Propagates_To_Internal_Label()
     {
@@ -154,11 +165,16 @@ public class ComponentIsolationTests
 
         var found = XPath.Find(strideRoot, "thebutton") as Stride.UI.Controls.Button;
         Assert.NotNull(found);
-        // simulate click by invoking the bound handler (test hook)
-        var handler = suim.GetBoundClickHandler(found!);
+
+        var suimRoot = suim.GetSuimRootFor(strideRoot);
+        Assert.NotNull(suimRoot);
+        var suimButton = FindSuimById(suimRoot!, "thebutton");
+        Assert.NotNull(suimButton);
+
+        // simulate click by invoking the resolved handler stored on the SUIM element
+        Assert.True(suimButton!.ResolvedEvents.TryGetValue("click", out var handler));
         Assert.NotNull(handler);
-        // Invoke as RoutedEvent handler
-        handler!.DynamicInvoke(found, new RoutedEventArgs());
+        suimButton.TriggerEvent("click", found);
         Assert.True(called);
     }
 
