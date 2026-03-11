@@ -247,9 +247,9 @@ public static class CssStyle
             {
                 target.Events[name[2..]] = value;
             }
-            else if (value.StartsWith('@') && !value.StartsWith("@@"))
+            else
             {
-                target.Bindings.Add(new BindingDefinition(name, value[1..]));
+                SUIM.Binding.BindingExpression.TryAddBinding(target, name, value);
             }
         }
 

@@ -206,9 +206,8 @@ public static partial class MarkupParser
                                 textElement.SetAttribute("value", chunk);
                                 textElement.SetAttribute("font", innerElement.Font);
                                 textElement.SetAttribute("font-size", innerElement.FontSize);
-                                if (chunk.Length > 1 && chunk.StartsWith('@') && !chunk.StartsWith("@@"))
+                                if (SUIM.Binding.BindingExpression.TryGetModelPropertyName(chunk, out var modelPropName))
                                 {
-                                    var modelPropName = chunk[1..];
                                     textElement.Bindings.Add(new BindingDefinition("value", modelPropName));
                                 }
 

@@ -76,12 +76,11 @@ public class VirtualComponent(string tagName) : LayoutElement(tagName)
 
                 if (attr.Value is string val)
                 {
-                    if (val.StartsWith('@'))
+                    if (SUIM.Binding.BindingExpression.TryGetModelPropertyName(val, out var parentPropName))
                     {
                         // Binding to parent model property
                         if (parentModel is ObservableObject parentOO)
                         {
-                            var parentPropName = val[1..];
                             // Preserve the component's initial value as a fallback when the parent doesn't provide a value yet.
                             var initialValue = oo.GetValue(name);
                             oo.SetProxy(name, () =>

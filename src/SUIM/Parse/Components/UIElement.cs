@@ -198,7 +198,7 @@ public abstract class UIElement
         }
         else if (value is string s)
         {
-            if (s.StartsWith('@'))
+            if (SUIM.Binding.BindingExpression.IsBindingValue(s))
             {
                 // ignore
             }
