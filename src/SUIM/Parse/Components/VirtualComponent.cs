@@ -37,7 +37,7 @@ public class VirtualComponent(string tagName) : LayoutElement(tagName)
         }
     }
 
-    public virtual UIElement? Expand(object? parentModel = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
+    public UIElement? Expand(object? parentModel = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
     {
         EventHandlerResolver.BindEventsRecursive(this, this);
 
