@@ -8,14 +8,14 @@ using SUIM.Parse.Components;
 
 public static class EventHandlerResolver
 {
-    public static void BindEventsRecursive(UIElement element, object target)
+    public static void BindEventsRecursive(UIElement element, object target, Binding.EventBindingOptions? options = null)
     {
         foreach (var evt in element.Events)
         {
             var eventName = evt.Key.ToLowerInvariant();
             var expression = evt.Value;
 
-            var handler = ResolveHandler(target, expression, element);
+            var handler = ResolveHandler(target, expression, element, options);
             if (handler != null)
             {
                 element.ResolvedEvents[eventName] = handler;
@@ -28,7 +28,7 @@ public static class EventHandlerResolver
         }
     }
 
-    public static Delegate? ResolveHandler(object target, string expression, UIElement? context = null)
+    public static Delegate? ResolveHandler(object target, string expression, UIElement? context = null, Binding.EventBindingOptions? options = null)
     {
         if (target == null || string.IsNullOrWhiteSpace(expression)) return null;
 
@@ -144,6 +144,26 @@ public static class EventHandlerResolver
         if (eventHandlerMethod != null)
         {
             return CreateDelegate(eventHandlerMethod, target, typeof(EventHandler));
+        }
+
+        // 3b. Extra EventArgs patterns (backend-specific)
+        if (options?.ExtraEventArgsTypes != null)
+        {
+            foreach (var argsType in options.ExtraEventArgsTypes)
+            {
+                var extraArgsMethod = matchingMethods.FirstOrDefault(m =>
+                {
+                    var parms = m.GetParameters();
+                    return parms.Length == 2
+                        && parms[0].ParameterType == typeof(object)
+                        && parms[1].ParameterType == argsType;
+                });
+                if (extraArgsMethod != null)
+                {
+                    var delegateType = typeof(EventHandler<>).MakeGenericType(argsType);
+                    return CreateDelegate(extraArgsMethod, target, delegateType);
+                }
+            }
         }
 
         // 4. Single parameter Action<object?>

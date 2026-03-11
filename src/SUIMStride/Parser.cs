@@ -9,6 +9,7 @@ using Stride.UI.Controls;
 using Stride.UI.Panels;
 using StrideUIElement = Stride.UI.UIElement;
 using SUIM;
+using SUIM.Binding;
 using SUIM.Flexbox;
 using SUIM.Parse;
 using SUIM.Parse.Components;
@@ -166,7 +167,7 @@ public class Parser
 
         ApplyCommonProperties(element, strideElement);
         
-        Bindings.TransferBindings(element, strideElement);
+        BindingEngine.ApplyBindings(element, strideElement, StrideBindingAdapter.Instance);
 
         // Handle Children for generic containers if not already handled
         if (strideElement is Panel panel && element.Children.Count > 0)

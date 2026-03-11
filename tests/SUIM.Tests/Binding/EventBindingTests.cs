@@ -1,9 +1,10 @@
 namespace SUIM.Tests.Binding;
 
-using Xunit;
 using SUIM;
+using SUIM.Model;
 using SUIM.Parse;
 using SUIM.Parse.Components;
+using Xunit;
 
 public class EventBindingTests
 {
@@ -142,7 +143,7 @@ public class EventBindingTests
         var element = new Button { Id = "testBtn" };
         var expression = "MyFunction(this, 'clicked')";
         
-        var handler = BackendHelpers.ResolveEventAction(expression, model, element);
+        var handler = EventHandlerResolver.ResolveHandler(model, expression, element);
         
         Assert.NotNull(handler);
         Assert.IsType<Action>(handler);
@@ -160,7 +161,7 @@ public class EventBindingTests
         var element = new Button();
         var expression = "MultiArgs('hello', 42, true)";
         
-        var handler = BackendHelpers.ResolveEventAction(expression, model, element);
+        var handler = EventHandlerResolver.ResolveHandler(model, expression, element);
         
         Assert.NotNull(handler);
         ((Action)handler).Invoke();
@@ -178,7 +179,7 @@ public class EventBindingTests
         var element = new Button();
         var expression = "DelegateHandler('from delegate')";
         
-        var handler = BackendHelpers.ResolveEventAction(expression, model, element);
+        var handler = EventHandlerResolver.ResolveHandler(model, expression, element);
         
         Assert.NotNull(handler);
         ((Action)handler).Invoke();
@@ -193,7 +194,7 @@ public class EventBindingTests
         var element = new Button();
         var expression = "MyFunction"; // Missing (...)
         
-        var handler = BackendHelpers.ResolveEventAction(expression, model, element);
+        var handler = EventHandlerResolver.ResolveHandler(model, expression, element);
         
         Assert.Null(handler);
     }
