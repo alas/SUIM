@@ -22,6 +22,16 @@ public static partial class BindingText
         });
     }
 
+    public static Parse.Components.Text CreateTextElement(string chunk, string? font, string? fontSize)
+    {
+        var textElement = new Parse.Components.Text();
+        textElement.SetAttribute("value", chunk);
+        textElement.SetAttribute("font", font);
+        textElement.SetAttribute("font-size", fontSize);
+        BindingExpression.TryAddBinding(textElement, "value", chunk);
+        return textElement;
+    }
+
     public static List<string> SplitAtSingleAtTokens(ReadOnlySpan<char> input)
     {
         var result = new List<string>();
@@ -82,6 +92,6 @@ public static partial class BindingText
 
 internal static partial class BindingTextRegexes
 {
-    [GeneratedRegex(@"@(\w+)(\.(\w+))?")]
+    [GeneratedRegex(@"(?<!@)@(\w+)(\.(\w+))?")]
     internal static partial Regex LocalTokenRegex();
 }

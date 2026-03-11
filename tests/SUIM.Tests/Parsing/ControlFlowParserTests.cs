@@ -200,6 +200,25 @@ else
     }
 
     [Fact]
+    public void Parse_ControlFlowInterpolation_RespectsDoubleAt()
+    {
+        var markup = @"<div>
+@foreach (var i in 1..3)
+{
+    <label>@@i @i</label>
+}
+</div>";
+        var element = MarkupParser.Parse(markup, _model);
+
+        var div = Assert.IsType<Div>(element);
+        Assert.NotEmpty(div.Children);
+
+        var firstLabel = Assert.IsType<Label>(div.Children[0]);
+        var text = Assert.IsType<Text>(firstLabel.Children[0]);
+        Assert.Equal("@@i 1", text.Value);
+    }
+
+    [Fact]
     public void Parse_SwitchDirective()
     {
         var markup = @"<div>

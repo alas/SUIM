@@ -202,11 +202,7 @@ public static partial class MarkupParser
                             // Mixed static text and dynamic tokens: "Hello @name!" -> ["Hello ", "@name", "!"]
                             foreach (var chunk in chunks)
                             {
-                                var textElement = new Text();
-                                textElement.SetAttribute("value", chunk);
-                                textElement.SetAttribute("font", innerElement.Font);
-                                textElement.SetAttribute("font-size", innerElement.FontSize);
-                                SUIM.Binding.BindingExpression.TryAddBinding(textElement, "value", chunk);
+                                var textElement = SUIM.Binding.BindingText.CreateTextElement(chunk, innerElement.Font, innerElement.FontSize);
 
                                 var uiElement = CssStyle.ApplyToElement(textElement, styles, null);
 
