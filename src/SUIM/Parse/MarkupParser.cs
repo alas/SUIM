@@ -43,10 +43,10 @@ public static partial class MarkupParser
 
         if (!string.IsNullOrWhiteSpace(componentName) && ComponentRegistry.IsRegisteredFactory(componentName))
         {
-            var codeBehind = (VirtualComponent)ComponentRegistry.Create(componentName, true);
+            var codeBehind = ComponentRegistry.Create(componentName, true);
 
             codeBehind.Model = model2;
-            return codeBehind.Expand(element);
+            EventHandlerResolver.BindEventsRecursive(element, codeBehind);
         }
 
         return element;

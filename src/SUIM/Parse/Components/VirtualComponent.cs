@@ -6,7 +6,7 @@ using SUIM.Model;
 using SUIM.Parse;
 
 /// <summary>
-/// A helper class for Tags that will get replaced by markup
+/// A helper class for Tags that will get replaced by markup and can have code behind
 /// </summary>
 /// <param name="tagName"></param>
 public class VirtualComponent(string tagName) : LayoutElement(tagName)
@@ -39,8 +39,6 @@ public class VirtualComponent(string tagName) : LayoutElement(tagName)
 
     public UIElement? Expand(object? parentModel = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
     {
-        EventHandlerResolver.BindEventsRecursive(this, this);
-
         if (string.IsNullOrEmpty(Source)) return null;
 
         var finalPath = Source;

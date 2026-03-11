@@ -1,8 +1,9 @@
 namespace SUIM.Tests.Parsing;
 
-using Xunit;
+using SUIM.Model;
 using SUIM.Parse;
 using SUIM.Parse.Components;
+using Xunit;
 
 public class CodeBehindTests
 {
@@ -48,7 +49,7 @@ public class CodeBehindTests
         var component = new MyTestComponent();
         var rootElement = MarkupParser.Parse(markup);
         component.Children.Add(rootElement);
-        var result = component.Expand();
+        EventHandlerResolver.BindEventsRecursive(rootElement, component);
 
         var btn1 = XPathHelper.FindElementByPath(component, "btn1") as UIElement;
         btn1!.TriggerEvent("click");
