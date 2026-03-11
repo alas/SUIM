@@ -238,25 +238,6 @@ public static class CssStyle
             }
         }
 
-        // Helper to handle SetAttribute with bindings and events
-        static void ApplyToTarget(UIElement target, string name, string value)
-        {
-            var isBinding = SUIM.Binding.BindingExpression.IsBindingValue(value);
-            if (!isBinding)
-            {
-                target.SetAttribute(name, value);
-            }
-
-            if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
-            {
-                target.Events[name[2..]] = value;
-            }
-            else if (isBinding)
-            {
-                SUIM.Binding.BindingExpression.TryAddBinding(target, name, value);
-            }
-        }
-
         // Apply regular attributes to the element (inner)
         foreach (var kvp in regularAttrs)
         {
@@ -323,6 +304,12 @@ public static class CssStyle
         }
 
         return element;
+
+        // Helper to handle SetAttribute with bindings and events
+        static void ApplyToTarget(UIElement target, string name, string value)
+        {
+            SUIM.Binding.BindingExpression.ApplyAttribute(target, name, value);
+        }
     }
 
     internal static bool IsLayoutAttribute(string name)

@@ -4,6 +4,26 @@ using SUIM.Parse.Components;
 
 public static class BindingExpression
 {
+    public static void ApplyAttribute(UIElement target, string name, string value)
+    {
+        var isBinding = IsBindingValue(value);
+        if (!isBinding)
+        {
+            target.SetAttribute(name, value);
+        }
+
+        if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
+        {
+            target.Events[name[2..]] = value;
+            return;
+        }
+
+        if (isBinding)
+        {
+            TryAddBinding(target, name, value);
+        }
+    }
+
     public static bool IsBindingValue(string? value)
     {
         return !string.IsNullOrEmpty(value) && value!.Length > 1 && value[0] == '@' && value[1] != '@';
