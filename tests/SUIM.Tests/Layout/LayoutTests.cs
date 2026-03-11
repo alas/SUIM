@@ -18,7 +18,7 @@ public class LayoutTests
             </vstack>
         </div>
         """;
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
         var vstack = element.Children[0];
 
@@ -32,7 +32,7 @@ public class LayoutTests
     public void Parse_Size_FractionalUnits()
     {
         var markup = "<div style=\"width:100%; height:50%\"></div>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var div = element;
         Assert.Equal("100%", div.GetAttribute("width"));

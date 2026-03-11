@@ -6,7 +6,7 @@ using SUIM.Parse.Components;
 
 public class CodeBehindTests
 {
-    public class MyTestComponent : UIComponent
+    public class MyTestComponent : VirtualComponent
     {
         public bool Clicked { get; private set; }
         public object? ClickParam { get; private set; }
@@ -46,7 +46,7 @@ public class CodeBehindTests
 </stack>";
 
         var component = new MyTestComponent();
-        var (rootElement, _) = MarkupParser.Parse(markup);
+        var rootElement = MarkupParser.Parse(markup);
         component.Children.Add(rootElement);
         var result = component.Expand();
 

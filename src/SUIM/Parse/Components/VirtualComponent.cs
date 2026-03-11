@@ -39,6 +39,8 @@ public class VirtualComponent(string tagName) : LayoutElement(tagName)
 
     public virtual UIElement? Expand(object? parentModel = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
     {
+        EventHandlerResolver.BindEventsRecursive(this, this);
+
         if (string.IsNullOrEmpty(Source)) return null;
 
         var finalPath = Source;
@@ -59,12 +61,12 @@ public class VirtualComponent(string tagName) : LayoutElement(tagName)
 
         string componentName = Path.GetFileNameWithoutExtension(finalPath);
         string markup = File.ReadAllText(finalPath);
-        var (element, componentModel) = MarkupParser.Parse(markup, null, inheritedStyles, basePath, componentName);
+        var element = MarkupParser.Parse(markup, null, inheritedStyles, basePath, componentName);
         
-        this.Model = componentModel;
+        Model = element.Model;
 
         // Map attributes from this tag to the component model
-        if (componentModel is ObservableObject oo)
+        if (Model is ObservableObject oo)
         {
             foreach (var attr in Attributes)
             {
@@ -133,7 +135,7 @@ public class VirtualComponent(string tagName) : LayoutElement(tagName)
                 var compProp = binding.TargetPropertyName;
                 var parentProp = binding.ModelPropertyName;
 
-                if (parentModel is ObservableObject parentOO && componentModel is ObservableObject compOO)
+                if (parentModel is ObservableObject parentOO && Model is ObservableObject compOO)
                 {
                     // Create a proxy on the component model that forwards to the parent property
                     compOO.SetProxy(compProp, () => parentOO.GetValue(parentProp), (v) => parentOO.SetValue(parentProp, v));
@@ -151,7 +153,7 @@ public class VirtualComponent(string tagName) : LayoutElement(tagName)
                         catch { }
                     };
                 }
-                else if (parentModel != null && componentModel is ObservableObject compOO2)
+                else if (parentModel != null && Model is ObservableObject compOO2)
                 {
                     // Parent is a plain object: use reflection-based proxy
                     compOO2.SetProxy(compProp, () => parentModel.GetType().GetProperty(parentProp)?.GetValue(parentModel), (v) =>

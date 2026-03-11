@@ -27,7 +27,7 @@ public class MarkupParserTests
     public void Parse_DivWithAttributes()
     {
         var markup = "<div id=\"main\" style=\"width:100px; height:200px; justify-content:center; align-items:flex-start; margin:10px; padding:5px; background:blue;\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -45,7 +45,7 @@ public class MarkupParserTests
     public void Parse_StackVertical()
     {
         var markup = "<stack orientation=\"vertical\" gap=\"10\"><div /><div /></stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -60,7 +60,7 @@ public class MarkupParserTests
     public void Parse_StackHorizontal()
     {
         var markup = "<stack orientation=\"horizontal\"><h1>Hello</h1><button /></stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -80,7 +80,7 @@ public class MarkupParserTests
 <div grid.row=""0"" grid.column=""1"" bg=""silver"" />
 <div grid.row=""1"" grid.column=""0"" grid.columnspan=""2"" bg=""white"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Grid>(element);
         var grid = (Grid)element;
@@ -105,7 +105,7 @@ public class MarkupParserTests
 <div dock.edge=""top"" />
 <div />
 </dock>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Dock>(element);
         var dock = (Dock)element;
@@ -121,7 +121,7 @@ public class MarkupParserTests
     public void Parse_Overlay()
     {
         var markup = "<overlay><div /><div /></overlay>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Overlay>(element);
         var overlay = (Overlay)element;
@@ -132,7 +132,7 @@ public class MarkupParserTests
     public void Parse_Label()
     {
         var markup = "<h1>Test Label</h1>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<H1>(element);
         var label = (Text)element.Children[0];
@@ -143,7 +143,7 @@ public class MarkupParserTests
     public void Parse_Button()
     {
         var markup = "<button><label>Click me</label></button>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Button>(element);
         var button = (Button)element;
@@ -176,7 +176,7 @@ public class MarkupParserTests
     public void Parse_NestedElements()
     {
         var markup = "<stack><div><h1>Nested</h1></div></stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -191,7 +191,7 @@ public class MarkupParserTests
     public void Parse_AnchorAttribute_Top()
     {
         var markup = "<div anchor=\"top\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -202,7 +202,7 @@ public class MarkupParserTests
     public void Parse_AnchorAttribute_Left()
     {
         var markup = "<div anchor=\"left\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -215,7 +215,7 @@ public class MarkupParserTests
         var markup = @"<grid>
 <div grid.row=""0"" grid.column=""0"" grid.rowspan=""2"" grid.columnspan=""2"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Grid>(element);
         var grid = (Grid)element;
@@ -233,7 +233,7 @@ public class MarkupParserTests
         var markup = @"<dock>
 <div dock.edge=""LEFT"" />
 </dock>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Dock>(element);
         var dock = (Dock)element;
@@ -247,7 +247,7 @@ public class MarkupParserTests
     public void Parse_Button_WithSprites()
     {
         var markup = "<button>idle_sprite</button>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Button>(element);
         var button = (Button)element;
@@ -259,7 +259,7 @@ public class MarkupParserTests
     public void Parse_Input_TextType()
     {
         var markup = "<input type=\"text\" placeholder=\"Enter name\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -271,7 +271,7 @@ public class MarkupParserTests
     public void Parse_Input_NumberType_WithMinMax()
     {
         var markup = "<input type=\"number\" min=\"0\" max=\"100\" step=\"5\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -285,7 +285,7 @@ public class MarkupParserTests
     public void Parse_Input_WithMask()
     {
         var markup = "<input type=\"text\" mask=\"[0-9]{3}-[0-9]{3}-[0-9]{4}\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -296,7 +296,7 @@ public class MarkupParserTests
     public void Parse_Label_WithAllAttributes()
     {
         var markup = "<h1 style=\"font:Arial; fontsize:16; color:#FF0000\">Hello</h1>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<H1>(element);
         var label = (H1)element;
@@ -310,7 +310,7 @@ public class MarkupParserTests
     public void Parse_Image_WithStretch()
     {
         var markup = "<image source=\"mysprite\" stretch=\"uniform\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Image>(element);
         var image = (Image)element;
@@ -325,7 +325,7 @@ public class MarkupParserTests
 <option value=""val1"">Option 1</option>
 <option value=""val2"">Option 2</option>
 </select>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Select>(element);
         var select = (Select)element;
@@ -337,7 +337,7 @@ public class MarkupParserTests
     public void Parse_Select_WithMultiple()
     {
         var markup = "<select multiple=\"true\"><option>Opt1</option><option>Opt2</option></select>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Select>(element);
         var select = (Select)element;
@@ -348,7 +348,7 @@ public class MarkupParserTests
     public void Parse_Textarea()
     {
         var markup = "<textarea id=\"notes\" width=\"300\" height=\"200\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<TextArea>(element);
         var textarea = (TextArea)element;
@@ -363,7 +363,7 @@ public class MarkupParserTests
     public void Parse_VStack_Synonym()
     {
         var markup = "<vstack><div /><div /></vstack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -375,7 +375,7 @@ public class MarkupParserTests
     public void Parse_VBox_Synonym()
     {
         var markup = "<vbox><label>A</label><label>B</label></vbox>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -386,7 +386,7 @@ public class MarkupParserTests
     public void Parse_HStack_Synonym()
     {
         var markup = "<hstack><div /><div /></hstack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -398,7 +398,7 @@ public class MarkupParserTests
     public void Parse_HBox_Synonym()
     {
         var markup = "<hbox><label>X</label><label>Y</label></hbox>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -416,7 +416,7 @@ public class MarkupParserTests
     <div width=""100%"" bg=""green"" />
 </row>
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Grid>(element);
         var grid = (Grid)element;
@@ -432,7 +432,7 @@ public class MarkupParserTests
     <div height=""100%"" bg=""green"" />
 </column>
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Grid>(element);
         var grid = (Grid)element;
@@ -445,7 +445,7 @@ public class MarkupParserTests
     public void Parse_Visibility_Attribute()
     {
         var markup = "<div visibility=\"hidden\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -456,7 +456,7 @@ public class MarkupParserTests
     public void Parse_Opacity_Attribute()
     {
         var markup = "<div style=\"opacity:0.5;\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -467,7 +467,7 @@ public class MarkupParserTests
     public void Parse_XY_Positioning()
     {
         var markup = "<div style=\"left:50; top:100; width:200; height:150;\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -479,7 +479,7 @@ public class MarkupParserTests
     public void Parse_Clip_Attribute()
     {
         var markup = "<stack clip=\"true\"><div /></stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -490,7 +490,7 @@ public class MarkupParserTests
     public void Parse_Spacing_SingleValue()
     {
         var markup = "<stack gap=\"10\"><div /><div /></stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -501,7 +501,7 @@ public class MarkupParserTests
     public void Parse_Class_Attribute()
     {
         var markup = "<div class=\"primary secondary\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -520,7 +520,7 @@ public class MarkupParserTests
 </stack>
 <div grid.row=""1"" grid.column=""0"" grid.columnspan=""2"" bg=""lightgray"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Grid>(element);
         var grid = (Grid)element;
@@ -537,7 +537,7 @@ public class MarkupParserTests
 <div dock.edge=""bottom"" height=""30"" />
 <div bg=""white"" />
 </dock>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Dock>(element);
         var dock = (Dock)element;
@@ -558,7 +558,7 @@ else
     <h1>Disabled</h1>
 }
 </button>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Button>(element);
         var button = (Button)element;
@@ -573,7 +573,7 @@ else
     public void Parse_Color_Hex()
     {
         var markup = "<div bg=\"#FF0000\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -584,7 +584,7 @@ else
     public void Parse_Color_RGBA()
     {
         var markup = "<div bg=\"255,0,0,255\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -595,7 +595,7 @@ else
     public void Parse_Color_Named()
     {
         var markup = "<div bg=\"Red\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -608,7 +608,7 @@ else
     public void Parse_Size_Pixels()
     {
         var markup = "<div width=\"100\" height=\"200\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -620,7 +620,7 @@ else
     public void Parse_Size_PixelsPx()
     {
         var markup = "<div width=\"100px\" height=\"200px\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -632,7 +632,7 @@ else
     public void Parse_Size_Auto()
     {
         var markup = "<label width=\"auto\">Auto</label>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
         var label = (Label)element;
@@ -645,7 +645,7 @@ else
     public void Parse_Input_EmailType()
     {
         var markup = "<input type=\"email\" placeholder=\"your@email.com\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -656,7 +656,7 @@ else
     public void Parse_Input_UrlType()
     {
         var markup = "<input type=\"url\" placeholder=\"https://example.com\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -667,7 +667,7 @@ else
     public void Parse_Input_PasswordType()
     {
         var markup = "<input type=\"password\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -678,7 +678,7 @@ else
     public void Parse_Input_DateType()
     {
         var markup = "<input type=\"date\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -689,7 +689,7 @@ else
     public void Parse_Input_TimeType()
     {
         var markup = "<input type=\"time\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -700,7 +700,7 @@ else
     public void Parse_Input_DatetimeLocalType()
     {
         var markup = "<input type=\"datetime-local\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -711,7 +711,7 @@ else
     public void Parse_Input_RangeType()
     {
         var markup = "<input type=\"range\" min=\"0\" max=\"100\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -722,7 +722,7 @@ else
     public void Parse_Input_CheckboxType()
     {
         var markup = "<input type=\"checkbox\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -733,7 +733,7 @@ else
     public void Parse_Input_RadioType()
     {
         var markup = "<input type=\"radio\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -746,7 +746,7 @@ else
     public void Parse_Textarea_WithPlaceholder()
     {
         var markup = "<textarea placeholder=\"Enter description\" rows=\"5\" columns=\"40\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<TextArea>(element);
         var textarea = (TextArea)element;
@@ -761,7 +761,7 @@ else
     public void Parse_Option_Element()
     {
         var markup = "<option value=\"test-value\">Test Label</option>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Option>(element);
         var option = (Option)element;
@@ -777,7 +777,7 @@ else
     public void Parse_Image_Stretch_None()
     {
         var markup = "<image source=\"sprite\" stretch=\"none\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Image>(element);
         var image = (Image)element;
@@ -788,7 +788,7 @@ else
     public void Parse_Image_Stretch_Fill()
     {
         var markup = "<image source=\"sprite\" stretch=\"fill\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Image>(element);
         var image = (Image)element;
@@ -799,7 +799,7 @@ else
     public void Parse_Image_Stretch_UniformToFill()
     {
         var markup = "<image source=\"sprite\" stretch=\"uniformtofill\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Image>(element);
         var image = (Image)element;
@@ -812,7 +812,7 @@ else
     public void Parse_Anchor_Top()
     {
         var markup = "<div anchor=\"Top\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -823,7 +823,7 @@ else
     public void Parse_Anchor_Bottom()
     {
         var markup = "<div anchor=\"Bottom\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -834,7 +834,7 @@ else
     public void Parse_Anchor_Right()
     {
         var markup = "<div anchor=\"Right\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -845,7 +845,7 @@ else
     public void Parse_Anchor_Left()
     {
         var markup = "<div anchor=\"Left\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -856,7 +856,7 @@ else
     public void Parse_Anchor_None()
     {
         var markup = "<div anchor=\"None\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -872,7 +872,7 @@ else
 <div dock.edge=""bottom"" height=""50"" />
 <div />
 </dock>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Dock>(element);
         var dock = (Dock)element;
@@ -886,7 +886,7 @@ else
 <div dock.edge=""left"" width=""50"" />
 <div bg=""white"" />
 </dock>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Dock>(element);
         var dock = (Dock)element;
@@ -899,7 +899,7 @@ else
     public void Parse_Opacity_FullyOpaque()
     {
         var markup = "<div opacity=\"1.0\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -910,7 +910,7 @@ else
     public void Parse_Opacity_FullyTransparent()
     {
         var markup = "<div opacity=\"0.0\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -921,7 +921,7 @@ else
     public void Parse_Opacity_PartialTransparency()
     {
         var markup = "<div opacity=\"0.75\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -932,7 +932,7 @@ else
     public void Parse_MultipleClasses()
     {
         var markup = "<div class=\"primary secondary large\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -945,7 +945,7 @@ else
     public void Parse_Label_WithColor()
     {
         var markup = "<label color=\"blue\">Colored</label>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Label>(element);
         var label = (Label)element;
@@ -958,7 +958,7 @@ else
     public void Parse_Visibility_Visible()
     {
         var markup = "<div style=\"visibility: visible;\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -969,7 +969,7 @@ else
     public void Parse_Visibility_Collapsed()
     {
         var markup = "<div style=\"visibility: hidden;\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -984,7 +984,7 @@ else
         var markup = @"<grid>
 <div grid.row=""0"" grid.column=""0"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Grid>(element);
         var grid = (Grid)element;
@@ -1007,7 +1007,7 @@ else
 </div>
 </stack>
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1029,7 +1029,7 @@ else
 <label>Label</label>
 </stack>
 </button>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Button>(element);
         var button = (Button)element;
@@ -1044,7 +1044,7 @@ else
     public void Parse_Input_WithValue()
     {
         var markup = "<input type=\"text\" value=\"default-value\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -1057,7 +1057,7 @@ else
     public void Parse_PlainText_CreatesLabel()
     {
         var markup = "<div>Simple text</div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1075,7 +1075,7 @@ Text before
 <h1>Label</h1>
 Text after
 </stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Stack>(element);
         var stack = (Stack)element;
@@ -1101,7 +1101,7 @@ Text after
             Multi-line
             text content
         </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1119,7 +1119,7 @@ Text after
             <label>Only label</label>
             
         </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1138,7 +1138,7 @@ Text after
 <label>Item 2</label>
 <label>Item 3</label>
 </vstack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Scroll>(element);
         var scroll = (Scroll)element;
@@ -1158,7 +1158,7 @@ Text after
 <label>Item 1</label>
 <label>Item 2</label>
 </hstack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Scroll>(element);
         var scroll = (Scroll)element;
@@ -1177,7 +1177,7 @@ Text after
         var markup = @"<stack style=""overflow:scroll"">
 <div width=""1000"" height=""800"" />
 </stack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Scroll>(element);
         var scroll = (Scroll)element;
@@ -1195,7 +1195,7 @@ Text after
 <label>Scrollable Item 2</label>
 <label>Scrollable Item 3</label>
 </vstack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Scroll>(element);
         var scroll = (Scroll)element;
@@ -1223,7 +1223,7 @@ Text after
 <label>Scrollable Item 2</label>
 <label>Scrollable Item 3</label>
 </vstack>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Scroll>(element);
         var scroll = (Scroll)element;
@@ -1249,7 +1249,7 @@ Text after
         var markup = @"<border value=""2 solid #FF0000"">
 <label>Bordered Content</label>
 </border>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Border>(element);
         var border = (Border)element;
@@ -1263,7 +1263,7 @@ Text after
         var markup = @"<border thickness=""10"" color=""blue"">
 <div width=""200"" height=""100"" />
 </border>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Border>(element);
         var border = (Border)element;
@@ -1278,7 +1278,7 @@ Text after
         var markup = @"<border thickness=""6"" color=""green"">
 <label>Border Test</label>
 </border>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Border>(element);
         var border = (Border)element;
@@ -1294,7 +1294,7 @@ Text after
 <h1>Bordered Inner Content</h1>
 </border>
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -1316,7 +1316,7 @@ Text after
         var markup = @"<border thickness=""1"">
 <div width=""100"" />
 </border>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Border>(element);
         var border = (Border)element;
@@ -1330,7 +1330,7 @@ Text after
         var markup = @"<div width=""300"" height=""200"" bg=""lightgray"" border=""2 solid red"">
 <label>Bordered Div</label>
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Border>(element);
         var border = (Border)element;
@@ -1375,7 +1375,7 @@ Text after
         var markup = @"<div width=""500"" height=""400"" border=""5 solid #FF0000"">
 <label>Bordered Content</label>
 </div>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Border>(element);
         var border = (Border)element;
@@ -1404,7 +1404,7 @@ Text after
                     <label>Bordered Content</label>
                 </div>
             </grid>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         var border = element?.Children.Single() as Border;
         Assert.NotNull(border);
@@ -1443,7 +1443,7 @@ Text after
     public void Parse_Grid_WithDivElement()
     {
         var markup = @"<grid><div /></grid>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element!.Children.Single());
     }
@@ -1455,7 +1455,7 @@ Text after
     <style>.class { width: 100; }</style>
     <div width=""200"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         var div = element?.Children.Single() as Div;
         Assert.Equal("200", div?.GetAttribute("width"));
@@ -1468,7 +1468,7 @@ Text after
     <model></model>
     <div width=""150"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         var div = element?.Children.Single() as Div;
         Assert.Equal("150", div?.GetAttribute("width"));
@@ -1485,7 +1485,7 @@ Text after
         <label>Item 2</label>
     </stack>
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         var stack = element?.Children.Single() as Stack;
         Assert.Equal(Orientation.Vertical, stack!.Orientation);
@@ -1500,7 +1500,7 @@ Text after
 <style>.button { color: red; }</style>
     <label>Click</label>
 </button>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Button>(element);
         var button = (Button)element;
@@ -1516,7 +1516,7 @@ Text after
     <div grid.row=""0"" grid.column=""0"" bg=""blue"" />
     <div grid.row=""0"" grid.column=""1"" bg=""red"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Grid>(element);
         var grid = (Grid)element;
@@ -1534,7 +1534,8 @@ Text after
     <model>{ ""name"": ""John"", ""age"": 30 }</model>
     <div />
 </grid>";
-        var (_, model) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
+        var model = element.Model;
 
         Assert.NotNull(model);
         Assert.Equal("John", model!.name);
@@ -1549,7 +1550,8 @@ Text after
     <div />
 </grid>";
         var providedModel = new { firstName = "Jane", age = 25 };
-        var (_, model) = MarkupParser.Parse(markup, providedModel);
+        var element = MarkupParser.Parse(markup, providedModel);
+        var model = element.Model;
 
         Assert.NotNull(model);
         // From provided model
@@ -1566,7 +1568,8 @@ Text after
     <model>{ ""title"": ""Hello World"", ""description"": ""Test"" }</model>
     <label>@title</label>
 </grid>";
-        var (element, model) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
+        var model = element.Model;
 
         Assert.NotNull(model);
         Assert.Equal("Hello World", model!.title);
@@ -1588,7 +1591,8 @@ Text after
     <model>{ ""width"": 500, ""height"": 300 }</model>
     <div width=""@width"" height=""@height"" />
 </grid>";
-        var (_, model) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
+        var model = element.Model;
 
         Assert.NotNull(model);
         Assert.Equal(500, model!.width);
@@ -1602,7 +1606,8 @@ Text after
     <model>{ ""isVisible"": true, ""isEnabled"": false }</model>
     <div />
 </grid>";
-        var (_, model) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
+        var model = element.Model;
 
         Assert.NotNull(model);
         Assert.True(model!.isVisible);
@@ -1616,7 +1621,8 @@ Text after
     <model>{ ""items"": [1, 2, 3], ""names"": [""Alice"", ""Bob""] }</model>
     <div />
 </grid>";
-        var (_, model) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
+        var model = element.Model;
 
         Assert.NotNull(model);
         
@@ -1636,7 +1642,8 @@ Text after
     <model>{ ""value"": null }</model>
     <div />
 </grid>";
-        var (_, model) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
+        var model = element.Model;
 
         Assert.NotNull(model);
         Assert.Null(model!.value);
@@ -1649,7 +1656,8 @@ Text after
     <model>{ }</model>
     <div />
 </grid>";
-        var (_, model) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
+        var model = element.Model;
 
         // Should create an observable object even if empty
         Assert.NotNull(model);
@@ -1662,7 +1670,8 @@ Text after
         var markup = @"<grid>
     <div />
 </grid>";
-        var (_, model) = MarkupParser.Parse(markup, providedModel);
+        var element = MarkupParser.Parse(markup, providedModel);
+        var model = element.Model;
 
         // Should only have provided model properties
         Assert.NotNull(model);
@@ -1687,7 +1696,8 @@ Text after
     <model>{ ""user"": { ""name"": ""John"", ""age"": 30 }, ""settings"": { ""theme"": ""dark"" } }</model>
     <div />
 </grid>";
-        var (_, model) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
+        var model = element.Model;
 
         Assert.NotNull(model);
         var user = model!.user;
@@ -1704,7 +1714,8 @@ Text after
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
     <button><label>@buttonText</label></button>
 </grid>";
-        var (element, model) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
+        var model = element.Model;
 
         var button = element?.Children.Single() as Button;
         Assert.NotNull(button);
@@ -1730,7 +1741,8 @@ Text after
     <model>{ ""newProp"": ""new"" }</model>
     <div />
 </grid>";
-        var (_, model) = MarkupParser.Parse(markup, providedModel);
+        var element = MarkupParser.Parse(markup, providedModel);
+        var model = element.Model;
 
         Assert.NotNull(model);
         Assert.Equal("value", model!.existing);
@@ -1744,7 +1756,8 @@ Text after
     <model>{ ""str"": ""text"", ""num"": 123, ""bool"": true, ""arr"": [1, 2], ""obj"": { ""key"": ""val"" }, ""nil"": null }</model>
     <div />
 </grid>";
-        var (_, model) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
+        var model = element.Model;
 
         Assert.NotNull(model);
         Assert.Equal("text", model!.str);
@@ -1769,7 +1782,7 @@ Text after
     </style>
     <div class=""header"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
@@ -1786,7 +1799,7 @@ Text after
     </style>
     <div id=""main"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
@@ -1803,7 +1816,7 @@ Text after
     </style>
     <div />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
@@ -1820,7 +1833,7 @@ Text after
     </style>
     <stack><div></div><label></label></stack>
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var stack = element.Children.Single() as Stack;
         Assert.NotNull(stack);
@@ -1847,7 +1860,7 @@ Text after
     </style>
     <div class=""container"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
@@ -1868,7 +1881,7 @@ Text after
     </style>
     <div id=""unique"" class=""special"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
@@ -1888,7 +1901,7 @@ Text after
     </style>
     <div class=""highlight"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
@@ -1904,7 +1917,7 @@ Text after
     </style>
     <stack><label></label><button></button></stack>
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var stack = element.Children.Single() as Stack;
         Assert.NotNull(stack);
@@ -1925,7 +1938,7 @@ Text after
     </style>
     <div class=""header_other"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
@@ -1938,7 +1951,7 @@ Text after
     public void Parse_Style_DirectRootWithoutWrapper()
     {
         var markup = @"<div padding=""5"" margin=""10"" />";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var div = (Div)element;
         Assert.Equal(5, Convert.ToSingle(div.GetAttribute("padding-top")));
@@ -1949,7 +1962,7 @@ Text after
     public void Parse_Style_WrapperWithOnlyVisualRoot()
     {
         var markup = @"<grid><div padding=""5"" /></grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
@@ -1966,7 +1979,8 @@ Text after
     </style>
     <div />
 </grid>";
-        var (element, model) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
+        var model = element.Model;
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
@@ -1986,7 +2000,7 @@ Text after
     </style>
     <div id=""submit"" class=""btn"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
@@ -2004,7 +2018,7 @@ Text after
     </style>
     <div class=""card"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);
@@ -2017,7 +2031,7 @@ Text after
     public void Parse_Img_Alias()
     {
         var markup = "<img source=\"test.png\" />";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         Assert.IsType<Image>(element);
         var img = (Image)element;
@@ -2028,7 +2042,7 @@ Text after
     public void Parse_Bg_Alias()
     {
         var markup = "<bg source=\"test.png\"><div /></bg>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         Assert.IsType<BackgroundImage>(element);
         var bg = (BackgroundImage)element;
@@ -2040,7 +2054,7 @@ Text after
     public void Parse_BackgroundImage_AttributeWrapping()
     {
         var markup = "<div backgroundimage=\"test.png\" width=\"100\" height=\"100\" />";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         // Inner element should be Div
         Assert.IsType<Div>(element);
@@ -2064,7 +2078,7 @@ Text after
     public void Parse_Button_ImageProperties()
     {
         var markup = "<button style=\"hover-image:url(hover.png); normal-image:url(idle.png); pressedimage:url(down.png);\" />";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         Assert.IsType<Button>(element);
         var btn = (Button)element;
@@ -2082,7 +2096,7 @@ Text after
     </style>
     <div class=""with-bg"" />
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var div = element.Children.Single() as Div;
         Assert.NotNull(div);

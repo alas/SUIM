@@ -199,7 +199,7 @@ public class ComponentIsolationTests
         model.SetValue("rootProp", "hello");
 
         // Act
-        var (root, _) = MarkupParser.Parse(markup, model, basePath: AppDomain.CurrentDomain.BaseDirectory);
+        var root = MarkupParser.Parse(markup, model, basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         // Assert
         var div = root as Div;

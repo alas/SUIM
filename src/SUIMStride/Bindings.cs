@@ -58,7 +58,7 @@ internal static class Bindings
             if (!string.IsNullOrWhiteSpace(handlerName))
             {
                 // Unified inline handler resolution (supports @prop, method names, and calls with args)
-                handler = SUIM.Parse.EventHandlerResolver.ResolveHandler(model, handlerName, suimElement);
+                handler = EventHandlerResolver.ResolveHandler(model, handlerName, suimElement);
 
                 if (handler == null && model is ObservableObject oo)
                 {

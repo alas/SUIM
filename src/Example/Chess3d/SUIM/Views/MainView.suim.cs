@@ -2,7 +2,7 @@
 
 using System.Threading.Tasks;
 using Stride.Engine;
-using SUIMComponent = global::SUIM.Parse.Components.UIComponent;
+using SUIMComponent = global::SUIM.Parse.Components.VirtualComponent;
 
 public class MainView() : SUIMComponent(nameof(MainView))
 {

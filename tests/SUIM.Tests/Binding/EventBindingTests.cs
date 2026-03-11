@@ -29,7 +29,7 @@ public class EventBindingTests
         var model = new TestModel();
         var markup = @"<button id=""btn"" onclick=""OnClick()"" />";
         
-        var (root, _) = MarkupParser.Parse(markup, model);
+        var root = MarkupParser.Parse(markup, model);
         
         Assert.NotNull(root);
         Assert.IsType<Button>(root);
@@ -43,7 +43,7 @@ public class EventBindingTests
         var model = new TestModel();
         var markup = @"<button id=""testBtn"" onclick=""OnMessage(this)"" />";
         
-        var (root, _) = MarkupParser.Parse(markup, model);
+        var root = MarkupParser.Parse(markup, model);
         
         Assert.NotNull(root);
         
@@ -103,7 +103,7 @@ public class EventBindingTests
         var model = new TestModelWithOverloading();
         var markup = @"<button id=""quitBtn"" onclick=""QuitHandler()"" />";
         
-        var (root, _) = MarkupParser.Parse(markup, model);
+        var root = MarkupParser.Parse(markup, model);
         
         Assert.NotNull(root);
         Assert.IsType<Button>(root);

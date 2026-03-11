@@ -26,7 +26,7 @@ public class PropertyBindingTests
     public void Parse_DataBinding_Width_CreatesBindingDefinition()
     {
         var markup = "<div width=\"@currentWidth\" height=\"100\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Div>(element);
         var div = (Div)element;
@@ -45,7 +45,7 @@ public class PropertyBindingTests
     public void Parse_DataBinding_Text_CreatesBindingDefinition()
     {
         var markup = "<input id=\"username\" type=\"text\" value=\"@stringValue\" />";
-        var (element, _) = MarkupParser.Parse(markup, _model);
+        var element = MarkupParser.Parse(markup, _model);
 
         Assert.IsType<Input>(element);
         var input = (Input)element;
@@ -63,7 +63,7 @@ public class PropertyBindingTests
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
     <button><input type=""text"" value=""@buttonText"" /></button>
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var button = element.Children.Single() as Button;
         var input = button?.Children.Single() as Input;
@@ -81,7 +81,7 @@ public class PropertyBindingTests
     <model>{ ""buttonText"": ""Click Me"", ""count"": 42 }</model>
     <button><h1>@buttonText</h1></button>
 </grid>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var t = element.Children.Single()?.Children.Single()?.Children.Single() as Text;
         
@@ -95,7 +95,7 @@ public class PropertyBindingTests
     public void Parse_Suim_ModelProperties_CreatesBindingsText()
     {
         var markup = @"<div>@buttonText</div>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         var t = element.Children.Single() as Text;
 
@@ -109,7 +109,7 @@ public class PropertyBindingTests
     public void Parse_Suim_ModelProperties_CreatesBindingsText2()
     {
         var markup = @"<div>@buttonText1 @buttonText2</div>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         Assert.Equal(3, element.Children.Count);
 
@@ -141,7 +141,7 @@ public class PropertyBindingTests
     public void Parse_Suim_ModelProperties_CreatesBindingsText3()
     {
         var markup = @"<div>@buttonText1 @@text @buttonText2</div>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         Assert.Equal(3, element.Children.Count);
 
@@ -173,7 +173,7 @@ public class PropertyBindingTests
     public void Parse_Suim_ModelProperties_CreatesBindingsText4()
     {
         var markup = @"<h1>@@lol @buttonText1 @@text @buttonText2 @ ytytyt @@ytytyt @@</h1>";
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
 
         Assert.Equal(5, element.Children.Count);
 

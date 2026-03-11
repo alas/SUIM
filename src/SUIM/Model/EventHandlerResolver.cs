@@ -1,12 +1,33 @@
-namespace SUIM.Parse;
+namespace SUIM.Model;
 
 using System;
 using System.Linq;
 using System.Reflection;
+using SUIM.Parse;
 using SUIM.Parse.Components;
 
 public static class EventHandlerResolver
 {
+    public static void BindEventsRecursive(UIElement element, object target)
+    {
+        foreach (var evt in element.Events)
+        {
+            var eventName = evt.Key.ToLowerInvariant();
+            var expression = evt.Value;
+
+            var handler = ResolveHandler(target, expression, element);
+            if (handler != null)
+            {
+                element.ResolvedEvents[eventName] = handler;
+            }
+        }
+
+        foreach (var child in element.Children)
+        {
+            BindEventsRecursive(child, target);
+        }
+    }
+
     public static Delegate? ResolveHandler(object target, string expression, UIElement? context = null)
     {
         if (target == null || string.IsNullOrWhiteSpace(expression)) return null;
@@ -30,8 +51,7 @@ public static class EventHandlerResolver
         var prop = target.GetType().GetProperty(methodName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
         if (prop != null && typeof(Delegate).IsAssignableFrom(prop.PropertyType))
         {
-            var pd = prop.GetValue(target) as Delegate;
-            if (pd != null)
+            if (prop.GetValue(target) is Delegate pd)
             {
                 if (argsStr == null) return pd;
                 var args = ParseArguments(argsStr, context);
@@ -40,7 +60,7 @@ public static class EventHandlerResolver
         }
 
         // 2. Check for ObservableObject properties (special case since it's dynamic)
-        if (target is SUIM.Model.ObservableObject oo)
+        if (target is ObservableObject oo)
         {
             var val = oo.GetValue(methodName);
             if (val is Delegate pd)
@@ -117,9 +137,9 @@ public static class EventHandlerResolver
         var eventHandlerMethod = matchingMethods.FirstOrDefault(m =>
         {
             var parms = m.GetParameters();
-            return parms.Length == 2 &&
-                parms[0].ParameterType == typeof(object) &&
-                typeof(EventArgs).IsAssignableFrom(parms[1].ParameterType);
+            return parms.Length == 2
+                && parms[0].ParameterType == typeof(object)
+                && typeof(EventArgs).IsAssignableFrom(parms[1].ParameterType);
         });
         if (eventHandlerMethod != null)
         {

@@ -1,6 +1,6 @@
 ﻿namespace Chess3d.SUIM.Components;
 
-using SUIMComponent = global::SUIM.Parse.Components.UIComponent;
+using SUIMComponent = global::SUIM.Parse.Components.VirtualComponent;
 
 public class Popup() : SUIMComponent(nameof(Popup))
 {

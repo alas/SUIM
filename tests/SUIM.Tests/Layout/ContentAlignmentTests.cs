@@ -16,7 +16,7 @@ public class ContentAlignmentTests
                 <label style="width:100px; height:20px;">text</label>
             </div>
             """;
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
         var label1 = (Label)element.Children[0];
         var label2 = (Label)element.Children[1];
@@ -43,7 +43,7 @@ public class ContentAlignmentTests
                 <label style="width:100px; height:20px"></label>
             </div>
             """;
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
         var label1 = (Label)element.Children[0];
         var label2 = (Label)element.Children[1]; // Should use parent Center
@@ -73,7 +73,7 @@ public class ContentAlignmentTests
                 <label style="width:100px; height:50px;"></label>
             </overlay>
             """;
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(500, 500);
         var label = (Label)element.Children[0];
         
@@ -91,7 +91,7 @@ public class ContentAlignmentTests
                 <label style="width:100px; height:20px"></label>
             </div>
             """;
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
         var label = (Label)element.Children[0];
 
@@ -111,7 +111,7 @@ public class ContentAlignmentTests
                 <label style="width:100px; height:20px"></label>
             </div>
             """;
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
         var label = (Label)element.Children[0];
 

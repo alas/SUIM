@@ -21,7 +21,7 @@ public class VirtualComponentTests
 
             // 3. Parse markup using the custom tag
             var markup = "<grid><MyCustomTag /></grid>";
-            var (element, _) = MarkupParser.Parse(markup);
+            var element = MarkupParser.Parse(markup);
 
             // 4. Verify expansion
             Assert.IsType<Grid>(element);

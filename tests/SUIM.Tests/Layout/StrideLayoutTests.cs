@@ -20,7 +20,7 @@ public class StrideLayoutTests
                 </vstack>
             </div>";
             
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
         var stack = (Stack)element.Children[0];
 
@@ -50,7 +50,7 @@ public class StrideLayoutTests
 
         var trees = new[] { markup1, markup2 }.Select(markup =>
         {
-            var (element, _) = MarkupParser.Parse(markup);
+            var element = MarkupParser.Parse(markup);
             element.CalculateLayout(300, 100);
             var stack = element.Children[0];
 
@@ -91,7 +91,7 @@ public class StrideLayoutTests
                 </vstack>
             </div>";
             
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
         
         Assert.Equal(200, element.GetWidth());
@@ -121,7 +121,7 @@ public class StrideLayoutTests
                 </vstack>
             </div>";//
 
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
         
         Assert.Equal(200, element.GetWidth());
@@ -152,7 +152,7 @@ public class StrideLayoutTests
                 </vstack>
             </div>";
 
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(200, 200);
 
         var stack = (Stack)element.Children[0];
@@ -191,7 +191,7 @@ public class StrideLayoutTests
                 </vstack>
             </hstack>";
 
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(640, 480);
 
         Assert.Equal(640, element.GetWidth());
@@ -252,7 +252,7 @@ public class StrideLayoutTests
                 </overlay>
             </div>";
         
-        var (root, _) = MarkupParser.Parse(markup);
+        var root = MarkupParser.Parse(markup);
         root.CalculateLayout(1280, 720);
         
         // Root grid should measure to 1280x720 (available space with no explicit size)
@@ -306,7 +306,7 @@ public class StrideLayoutTests
             </div>";
         
         // Parse and layout in SUIM
-        var (suimRoot, _) = MarkupParser.Parse(markup);
+        var suimRoot = MarkupParser.Parse(markup);
         suimRoot.CalculateLayout(1280, 720);
         
         // Map to Stride

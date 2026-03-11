@@ -3,9 +3,11 @@ namespace SUIM.Tests;
 using System.Text;
 using Xunit;
 using Stride.Engine;
-using SUIM.Model;
+using SUIM.Parse;
 using SUIM.Parse.Components;
 using SUIMStride;
+using Chess3d.SUIM.Components;
+using Chess3d.SUIM.Views;
 
 public class PopupIntegrationTests
 {
@@ -14,34 +16,13 @@ public class PopupIntegrationTests
     {
         const int TOTAL_WIDTH = 1280;
         const int TOTAL_HEIGHT = 720;
-        var rootPath = "..\\..\\..\\..\\..\\src\\Example\\Chess3d\\SUIM";
-        var project = new SUIMProject(rootPath);
-        var projectViewsPath = Path.Combine(rootPath, "views", "MainView.suim");
-
-        var markup = File.ReadAllText(projectViewsPath);
-        project.ResolveDependencies(markup);
-
-        var model = new ObservableObject();
-        model.SetValue("PopupTitle", "");
-        model.SetValue("PopupMessage", "");
-        model.SetValue("PopupVisibility", "collapsed");
-        model.SetValue("OverlayMessage", "");
-        model.SetValue("OverlayVisibility", "collapsed");
-
-        model.SetValue("OpenPopup", new Action<string, string>((title, message) =>
-        {
-            model.SetValue("PopupTitle", title);
-            model.SetValue("PopupMessage", message);
-            model.SetValue("PopupVisibility", "visible");
-        }));
-        model.SetValue("ClosePopup", new Action(() =>
-        {
-            model.SetValue("PopupVisibility", "collapsed");
-        }));
 
         var game = new Game();
-        var parser = new Parser { RootPath = rootPath };
-        var (strideRoot, _) = parser.GetView("MainView", game, model: model);
+        ComponentRegistry.Register<Popup>();
+        ComponentRegistry.Register(nameof(MainView), () => new MainView() { Game = game });
+        var parser = new Parser { RootPath = "..\\..\\..\\..\\..\\src\\Example\\Chess3d\\SUIM" };
+        var (strideRoot, model) = parser.GetView("MainView", game);
+
         var suimRoot = parser.GetSuimRootFor(strideRoot);
         Assert.NotNull(suimRoot);
 
@@ -80,7 +61,7 @@ public class PopupIntegrationTests
             $"Content should be vertically centered. Expected Y ~{expectedTop}, got {contentTop}");
 
         // Overlay should be hidden at start
-        Assert.Equal("collapsed", model.GetValue("PopupVisibility"));
+        Assert.Equal("collapsed", model!.GetValue("PopupVisibility"));
 
         // Click "Restart" -> open popup
         var restartButton = FindButtonByText(suimRoot, "Restart");

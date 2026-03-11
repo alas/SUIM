@@ -31,7 +31,7 @@ public class ComponentStylingTests
             <ChildComp />
         </div>";
 
-        var (root, _) = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
+        var root = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         var div = root as Div;
         var childDiv = div!.Children[0] as Div;
@@ -56,7 +56,7 @@ public class ComponentStylingTests
             <ChildCompUp />
         </div>";
 
-        var (root, _) = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
+        var root = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         var parentDiv = root as Div;
         // Parent should NOT be red
@@ -89,7 +89,7 @@ public class ComponentStylingTests
             <Child2 />
         </div>";
 
-        var (root, _) = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
+        var root = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         var parentDiv = (Div)root;
         Assert.Equal("child1", parentDiv.Children[0].Id);
@@ -114,7 +114,7 @@ public class ComponentStylingTests
             <ChildCompScoped />
         </div>";
 
-        var (root, _) = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
+        var root = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         var div = (Div)root;
         var childDiv = (Div)div.Children[0];
@@ -133,7 +133,7 @@ public class ComponentStylingTests
             <div id=""local"" class=""localHighlight"" />
         </div>";
 
-        var (root, _) = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
+        var root = MarkupParser.Parse(parentMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         var div = (Div)root;
         var localDiv = (Div)div.Children[0];
@@ -162,7 +162,7 @@ public class ComponentStylingTests
             <ChildForGP />
         </div>";
 
-        var (root, _) = MarkupParser.Parse(gpMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
+        var root = MarkupParser.Parse(gpMarkup, basePath: AppDomain.CurrentDomain.BaseDirectory);
 
         var gpDiv = (Div)root;
         var gcDiv = (Div)gpDiv.Children[0];
@@ -189,11 +189,11 @@ public class ComponentStylingTests
                 </vstack>
             </div>";
 
-        var (suimElement, _) = MarkupParser.Parse(markup);
-        suimElement.CalculateLayout(500, 500);
+        var root = MarkupParser.Parse(markup);
+        root.CalculateLayout(500, 500);
 
         // Check that the button has the right width/height attributes
-        var vstack = suimElement.Children[0];
+        var vstack = root.Children[0];
         var button = vstack.Children[0];
 
         Assert.NotNull(button);
@@ -202,7 +202,7 @@ public class ComponentStylingTests
         Assert.Equal(5, Convert.ToSingle(button.GetAttribute("margin-top")));
 
         // Now layout it
-        suimElement.CalculateLayout(1280, 720);
+        root.CalculateLayout(1280, 720);
 
         // Check actual dimensions
         var buttonActual = vstack.Children[0];
@@ -235,8 +235,8 @@ public class ComponentStylingTests
                 <button>Test</button>
             </grid>";
 
-        var (suimElement, _) = MarkupParser.Parse(markup);
-        var button = suimElement.Children[0];
+        var root = MarkupParser.Parse(markup);
+        var button = root.Children[0];
 
         // The second button rule should merge with and override the first
         // Expected: width=200px, height=50px, margin=5px, color=red (from first rule, not overridden)
@@ -271,9 +271,9 @@ public class ComponentStylingTests
                 <button>Test</button>
             </div>";
 
-        var (suimElement, _) = MarkupParser.Parse(markup, basePath: GetTestPath(""));
-        suimElement.CalculateLayout(500, 500);
-        var button = suimElement.Children[0];
+        var root = MarkupParser.Parse(markup, basePath: GetTestPath(""));
+        root.CalculateLayout(500, 500);
+        var button = root.Children[0];
 
         // External CSS should be merged with inline style
         // Inline style (later) should override CSS file values for width/height

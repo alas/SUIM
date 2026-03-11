@@ -66,7 +66,7 @@ public class EventHandlerStrideTests
         var model = new TestModel();
 
         // Act
-        var (root, _) = MarkupParser.Parse(markup, model);
+        var root = MarkupParser.Parse(markup, model);
 
         // Assert
         Assert.IsType<Button>(root);
@@ -85,7 +85,7 @@ public class EventHandlerStrideTests
         var model = new TestModel();
 
         // Act
-        var (root, _) = MarkupParser.Parse(markup, model);
+        var root = MarkupParser.Parse(markup, model);
 
         // Assert
         Assert.True(root.Events.Count > 0);
@@ -104,7 +104,7 @@ public class EventHandlerStrideTests
         var model = new TestModel();
 
         // Act
-        var (root, _) = MarkupParser.Parse(markup, model);
+        var root = MarkupParser.Parse(markup, model);
 
         // Assert
         var button = root as Button;
@@ -196,7 +196,7 @@ public class EventHandlerStrideTests
         var model = new TestModel();
 
         // Act
-        var (root, _) = MarkupParser.Parse(markup, model);
+        var root = MarkupParser.Parse(markup, model);
 
         // Assert
         Assert.NotNull(root);
@@ -267,7 +267,7 @@ public class EventHandlerStrideTests
         var model = new TestModel();
         
         // First parse to SUIM
-        var (suimRoot, _) = MarkupParser.Parse(markup, model);
+        var suimRoot = MarkupParser.Parse(markup, model);
         Assert.True(suimRoot.Events.ContainsKey("click"));
         
         // Then convert to Stride via SUIMStride
@@ -344,7 +344,7 @@ public class EventHandlerStrideTests
         var model = new TestModel();
 
         // Act
-        var (root, _) = MarkupParser.Parse(markup, model);
+        var root = MarkupParser.Parse(markup, model);
 
         // Assert
         var stack = root as Stack;

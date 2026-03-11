@@ -3,7 +3,6 @@ namespace SUIM.Model;
 using System.ComponentModel;
 using System.Dynamic;
 using System.Reflection;
-using SUIM.Parse;
 
 public class ObservableObject : DynamicObject, INotifyPropertyChanged
 {

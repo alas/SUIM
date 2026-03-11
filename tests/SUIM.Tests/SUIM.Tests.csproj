@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Example\Chess3d\Chess3d.csproj" />
     <ProjectReference Include="..\..\src\SUIM\SUIM.csproj" />
     <ProjectReference Include="..\..\src\SUIMStride\SUIMStride.csproj" />
   </ItemGroup>

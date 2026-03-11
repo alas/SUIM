@@ -97,25 +97,17 @@ public class Parser
             }
             return new Size(0, 0);
         };
-        var (suimRoot, model2) = MarkupParser.Parse(markup, model, basePath: basePath, componentName: viewName);
-
-        if (!string.IsNullOrWhiteSpace(viewName) && ComponentRegistry.IsRegisteredFactory(viewName))
-        {
-            var codeBehind = (SUIM.Parse.Components.UIComponent)ComponentRegistry.Create(viewName, true);
-
-            codeBehind.Model = model2;
-            codeBehind.BindEventsToTree(suimRoot);
-        }
+        var suimRoot = MarkupParser.Parse(markup, model, basePath: basePath, componentName: viewName);
 
         Layout(suimRoot, game, fullscreen);
         var strideRoot = MapElement(suimRoot, game);
 
         lock (_parseCache)
         {
-            _parseCache[markup] = (suimRoot, strideRoot, model2);
+            _parseCache[markup] = (suimRoot, strideRoot, suimRoot.Model);
         }
 
-        return (strideRoot, model2);
+        return (strideRoot, suimRoot.Model);
     }
 
     private static void Layout(SUIMElement root, Game game, bool fullscreen)

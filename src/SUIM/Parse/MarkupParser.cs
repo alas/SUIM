@@ -7,7 +7,7 @@ using SUIM.Parse.Components;
 
 public static partial class MarkupParser
 {
-    public static (UIElement, dynamic?) Parse(string markup, object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null, string? componentName = null)
+    public static UIElement Parse(string markup, object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null, string? componentName = null)
     {
         dynamic? model2 = model == null ? null : ModelLogic.Create(model);
         var controlFlowParser = new ControlFlowParser(model2);
@@ -41,7 +41,15 @@ public static partial class MarkupParser
         element.Model = model2;
         if (componentName != null) element.IsComponentRoot = true;
 
-        return (element, model2);
+        if (!string.IsNullOrWhiteSpace(componentName) && ComponentRegistry.IsRegisteredFactory(componentName))
+        {
+            var codeBehind = (VirtualComponent)ComponentRegistry.Create(componentName, true);
+
+            codeBehind.Model = model2;
+            return codeBehind.Expand(element);
+        }
+
+        return element;
     }
 
     public static bool IsBuiltInTag(string tag)

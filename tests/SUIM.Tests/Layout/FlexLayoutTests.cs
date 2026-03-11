@@ -15,7 +15,7 @@ public class FlexLayoutTests
             <div style="height:50px; flex: 1;"></div>
         </div>
         """;//-grow: 1; flex-shrink: 1; flex-basis: 0%;
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(300, 100);
         var child1 = (Div)element.Children[0];
         var child2 = (Div)element.Children[1];
@@ -33,7 +33,7 @@ public class FlexLayoutTests
                 <div style="width:100px; height:50px"></div>
             </div>
             """;
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(300, 100);
         var child1 = (Div)element.Children[0];
 
@@ -49,7 +49,7 @@ public class FlexLayoutTests
                 <div style="width:50px; height:50px"></div>
             </div>
             """;
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(300, 100);
         var child1 = (Div)element.Children[0];
         var child2 = (Div)element.Children[1];
@@ -66,7 +66,7 @@ public class FlexLayoutTests
                 <div style="width:100px; height:auto"></div>
             </div>
             """;
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(300, 100);
         var child1 = element.Children[0]; // Height is auto/none
         
@@ -82,7 +82,7 @@ public class FlexLayoutTests
                 <div style="width:50px; flex: 1;"></div>
             </div>
             """;
-        var (element, _) = MarkupParser.Parse(markup);
+        var element = MarkupParser.Parse(markup);
         element.CalculateLayout(100, 300);
         var child1 = (Div)element.Children[0];
         var child2 = (Div)element.Children[1];

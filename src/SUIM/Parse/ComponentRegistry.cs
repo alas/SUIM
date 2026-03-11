@@ -19,7 +19,7 @@ public static class ComponentRegistry
         _factoryRegistrations[tag] = factory;
     }
 
-    public static void Register<T>() where T : UIComponent, new()
+    public static void Register<T>() where T : VirtualComponent, new()
     {
         var name = typeof(T).Name;
         Register(name, () => new T());
