@@ -41,7 +41,7 @@ public class VirtualComponent(string tagName) : LayoutElement(tagName)
         }
     }
 
-    public UIElement? Expand(object parentModel, string? basePath, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null)
+    public UIElement? Expand(dynamic parentModel, string? basePath, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null)
     {
         var source = Source ?? $"{GetType().Name}.suim";
 

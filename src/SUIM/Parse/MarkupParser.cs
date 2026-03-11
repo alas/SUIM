@@ -19,7 +19,7 @@ public static partial class MarkupParser
         Dictionary<string, Dictionary<string, string>> styles = inheritedStyles != null ? new(inheritedStyles, SpanStringIgnoreCaseComparer.Instance) : [];
         Dictionary<string, Dictionary<string, string>> leakableStyles = inheritedStyles != null ? new(inheritedStyles, SpanStringIgnoreCaseComparer.Instance) : [];
 
-        model2 = ModelLogic.ExtractModel(root, model2) ?? new ObservableObject();
+        dynamic model3 = ModelLogic.ExtractModel(root, model2) ?? new ObservableObject();
 
         // Root tag matches view/component name or "root": bypass redundant wrapper and process real root
         if (string.Equals(root.Name.LocalName, componentName, StringComparison.OrdinalIgnoreCase)
@@ -35,17 +35,17 @@ public static partial class MarkupParser
                 && !x.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase));
         }
 
-        var element = ParseElement(root, styles, leakableStyles, model2, basePath)
+        var element = ParseElement(root, styles, leakableStyles, model3, basePath)
             ?? throw new InvalidOperationException("Root element not found.");
 
-        element.Model = model2;
+        element.Model = model3;
         if (componentName != null) element.IsComponentRoot = true;
 
         if (!string.IsNullOrWhiteSpace(componentName) && ComponentRegistry.IsRegisteredFactory(componentName))
         {
             var codeBehind = ComponentRegistry.Create(componentName, true, isView);
 
-            codeBehind.Model = model2;
+            codeBehind.Model = model3;
             EventHandlerResolver.BindEventsRecursive(element, codeBehind);
         }
 
@@ -93,7 +93,7 @@ public static partial class MarkupParser
         }
     }
 
-    private static UIElement? ParseElement(XElement element, Dictionary<string, Dictionary<string, string>> styles, Dictionary<string, Dictionary<string, string>> leakableStyles, dynamic? model, string? basePath)
+    private static UIElement? ParseElement(XElement element, Dictionary<string, Dictionary<string, string>> styles, Dictionary<string, Dictionary<string, string>> leakableStyles, dynamic model, string? basePath)
     {
         var innerElement = ParseElementTag(element);
         if (innerElement == null)

@@ -6,13 +6,13 @@ using SUIM.Parse.Components;
 
 public static class ComponentBindingMapper
 {
-    public static void ApplyBindings(VirtualComponent component, object? parentModel)
+    public static void ApplyBindings(VirtualComponent component, dynamic parentModel)
     {
         ApplyAttributeBindings(component, parentModel);
         ApplyExplicitBindings(component, parentModel);
     }
 
-    private static void ApplyAttributeBindings(VirtualComponent component, object? parentModel)
+    private static void ApplyAttributeBindings(VirtualComponent component, dynamic parentModel)
     {
         if (component.Model is not ObservableObject oo) return;
 
@@ -73,7 +73,7 @@ public static class ComponentBindingMapper
         }
     }
 
-    private static void ApplyExplicitBindings(VirtualComponent component, object? parentModel)
+    private static void ApplyExplicitBindings(VirtualComponent component, dynamic parentModel)
     {
         if (component.Bindings.Count == 0) return;
 
@@ -100,7 +100,7 @@ public static class ComponentBindingMapper
                     catch { }
                 };
             }
-            else if (parentModel != null && component.Model is ObservableObject compOO2)
+            else if (component.Model is ObservableObject compOO2)
             {
                 // Parent is a plain object: use reflection-based proxy
                 compOO2.SetProxy(compProp, () => parentModel.GetType().GetProperty(parentProp)?.GetValue(parentModel), v =>
