@@ -35,14 +35,12 @@ public class Parser
     {
         if (string.IsNullOrEmpty(RootPath)) throw new InvalidOperationException("RootPath must be set before calling.");
         
-        var project = new SUIMProject(RootPath);
-        var viewPath = Path.Combine(RootPath, isView ? "views" : "components", $"{name}.suim");
-        if (!File.Exists(viewPath)) throw new FileNotFoundException($"View not found: {viewPath}");
+        var path = Path.Combine(RootPath, isView ? "views" : "components", $"{name}.suim");
+        if (!File.Exists(path)) throw new FileNotFoundException($"View not found: {path}");
 
-        var markup = File.ReadAllText(viewPath);
-        project.ResolveDependencies(markup);
+        var markup = File.ReadAllText(path);
 
-        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath, name);
+        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath, name, isView);
     }
 
     public (StrideUIElement StrideRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
@@ -50,7 +48,7 @@ public class Parser
         return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, null);
     }
 
-    private (StrideUIElement StrideRoot, dynamic? Model) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null)
+    private (StrideUIElement StrideRoot, dynamic? Model) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null, bool isView = false)
     {
         ArgumentNullException.ThrowIfNull(markup);
 
@@ -97,7 +95,7 @@ public class Parser
             }
             return new Size(0, 0);
         };
-        var suimRoot = MarkupParser.Parse(markup, model, basePath: basePath, componentName: viewName);
+        var suimRoot = MarkupParser.Parse(markup, model, basePath: basePath, componentName: viewName, isView: isView);
 
         Layout(suimRoot, game, fullscreen);
         var strideRoot = MapElement(suimRoot, game);

@@ -21,7 +21,11 @@ public class VirtualComponent(string tagName) : LayoutElement(tagName)
         {
             Source = value as string;
         }
-        else
+        else if (name.Equals("isview", StringComparison.OrdinalIgnoreCase))
+        {
+            IsView = value is bool b ? b : Convert.ToBoolean(value);
+        }
+        else 
         {
             // Preserve as regular attribute for components or custom usage
             Attributes[name] = value;
@@ -39,26 +43,26 @@ public class VirtualComponent(string tagName) : LayoutElement(tagName)
 
     public UIElement? Expand(object? parentModel = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null)
     {
-        if (string.IsNullOrEmpty(Source)) return null;
+        var source = Source ?? $"{GetType().Name}.suim";
 
-        var finalPath = Source;
+        var finalPath = source;
         var fileExists = File.Exists(finalPath);
         if (!fileExists && !Path.IsPathRooted(finalPath) && !string.IsNullOrEmpty(basePath))
         {
             var crumPath = IsView ? "views" : "components";
-            finalPath = Path.Combine(basePath, crumPath, Source);
-            fileExists = fileExists || File.Exists(finalPath);
-            if (!File.Exists(finalPath))
+            finalPath = Path.Combine(basePath, crumPath, source);
+            fileExists = File.Exists(finalPath);
+            if (!fileExists)
             {
-                finalPath = Path.Combine(basePath, Source);
-                fileExists = fileExists || File.Exists(finalPath);
+                finalPath = Path.Combine(basePath, source);
+                fileExists = File.Exists(finalPath);
             }
         }
 
         if (!fileExists) throw new FileNotFoundException($"SUIM markup file not found: {finalPath}");
 
-        string componentName = Path.GetFileNameWithoutExtension(finalPath);
-        string markup = File.ReadAllText(finalPath);
+        var componentName = Path.GetFileNameWithoutExtension(finalPath);
+        var markup = File.ReadAllText(finalPath);
         var element = MarkupParser.Parse(markup, null, inheritedStyles, basePath, componentName);
         
         Model = element.Model;

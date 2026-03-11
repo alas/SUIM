@@ -18,9 +18,11 @@ public class PopupIntegrationTests
         const int TOTAL_HEIGHT = 720;
 
         var game = new Game();
+        var rootPath = "..\\..\\..\\..\\..\\src\\Example\\Chess3d\\SUIM";
+        ComponentRegistry.Register("ScreenOverlay", rootPath: rootPath);
         ComponentRegistry.Register<Popup>();
         ComponentRegistry.Register(nameof(MainView), () => new MainView() { Game = game });
-        var parser = new Parser { RootPath = "..\\..\\..\\..\\..\\src\\Example\\Chess3d\\SUIM" };
+        var parser = new Parser { RootPath = rootPath };
         var (strideRoot, model) = parser.GetView("MainView", game);
 
         var suimRoot = parser.GetSuimRootFor(strideRoot);

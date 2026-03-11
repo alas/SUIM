@@ -7,7 +7,7 @@ using SUIM.Parse.Components;
 
 public static partial class MarkupParser
 {
-    public static UIElement Parse(string markup, object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null, string? componentName = null)
+    public static UIElement Parse(string markup, object? model = null, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, string? basePath = null, string? componentName = null, bool isView = false)
     {
         dynamic? model2 = model == null ? null : ModelLogic.Create(model);
         var controlFlowParser = new ControlFlowParser(model2);
@@ -43,7 +43,7 @@ public static partial class MarkupParser
 
         if (!string.IsNullOrWhiteSpace(componentName) && ComponentRegistry.IsRegisteredFactory(componentName))
         {
-            var codeBehind = ComponentRegistry.Create(componentName, true);
+            var codeBehind = ComponentRegistry.Create(componentName, true, isView);
 
             codeBehind.Model = model2;
             EventHandlerResolver.BindEventsRecursive(element, codeBehind);
@@ -283,7 +283,7 @@ public static partial class MarkupParser
         // Custom tags
         if (ComponentRegistry.IsRegistered(tag))
         {
-            return ComponentRegistry.Create(tag);
+            return ComponentRegistry.Create(tag, false, false);
         }
 
         throw new NotSupportedException($"Unknown tag: {element.Name.LocalName}");

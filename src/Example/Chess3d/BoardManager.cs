@@ -1,19 +1,20 @@
 namespace Chess3d;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Chess3d.ChessLogic;
+using Chess3d.SUIM.Views;
+using global::SUIM.Parse;
 using Stride.BepuPhysics;
 using Stride.BepuPhysics.Definitions.Colliders;
 using Stride.Core.Mathematics;
 using Stride.Engine;
+using Stride.Games;
 using Stride.Input;
 using Stride.Physics;
 using Stride.Rendering;
-using global::SUIM.Parse;
 using SUIMStride;
-using Chess3d.ChessLogic;
-using Chess3d.SUIM.Views;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public class BoardManager : SyncScript
 {
@@ -40,10 +41,14 @@ public class BoardManager : SyncScript
     public void CreateUI()
     {
         var uiComponent = Entity.GetOrCreate<UIComponent>();
+        var rootPath = "SUIM";
+        ComponentRegistry.Register("ScreenOverlay", rootPath: rootPath);
         ComponentRegistry.Register<SUIM.Components.Popup>();
         ComponentRegistry.Register(nameof(MainView), () => new MainView() { Game = (Game)Game });
-        var parser = new Parser { RootPath = "SUIM" };
+
+        var parser = new Parser { RootPath = rootPath };
         var (strideRoot, _) = parser.GetView("MainView", (Game)Game);
+
         uiComponent.Page = new() { RootElement = strideRoot };
     }
 
