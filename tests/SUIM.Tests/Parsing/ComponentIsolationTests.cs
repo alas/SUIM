@@ -233,7 +233,7 @@ public class ComponentIsolationTests
 
         // Act
         var component = new VirtualComponent("TestComp") { Source = compPath };
-        var comp = component.Expand(new ObservableObject(), basePath: AppDomain.CurrentDomain.BaseDirectory);
+        var comp = component.Expand(new ObservableObject(), AppDomain.CurrentDomain.BaseDirectory);
 
         // Assert
         Assert.IsType<Label>(comp);

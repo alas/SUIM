@@ -22,34 +22,19 @@ public class Parser
     private readonly Dictionary<string, (SUIMElement SuimRoot, StrideUIElement StrideRoot, dynamic? Model)> _parseCache = [];
     public string? RootPath { get; set; }
 
-    public (StrideUIElement StrideRoot, dynamic? Model) GetView(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
-    {
-        return GetNamed(true, viewName, game, defaultFontSize, fullscreen, model, createNewInstance);
-    }
-
-    public (StrideUIElement StrideRoot, dynamic? Model) GetComponent(string viewName, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
-    {
-        return GetNamed(false, viewName, game, defaultFontSize, fullscreen, model, createNewInstance);
-    }
-
-    private (StrideUIElement StrideRoot, dynamic? Model) GetNamed(bool isView, string name, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance)
+    public (StrideUIElement StrideRoot, dynamic? Model) GetView(string name, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
     {
         if (string.IsNullOrEmpty(RootPath)) throw new InvalidOperationException("RootPath must be set before calling.");
         
-        var path = Path.Combine(RootPath, isView ? "views" : "components", $"{name}.suim");
+        var path = Path.Combine(RootPath, "views", $"{name}.suim");
         if (!File.Exists(path)) throw new FileNotFoundException($"View not found: {path}");
 
         var markup = File.ReadAllText(path);
 
-        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath, name, isView);
+        return Parse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, RootPath, name, true);
     }
 
-    public (StrideUIElement StrideRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false)
-    {
-        return DoParse(markup, game, defaultFontSize, fullscreen, model, createNewInstance, null);
-    }
-
-    private (StrideUIElement StrideRoot, dynamic? Model) DoParse(string markup, Game game, int defaultFontSize, bool fullscreen, object? model, bool createNewInstance, string? basePath, string? viewName = null, bool isView = false)
+    public (StrideUIElement StrideRoot, dynamic? Model) Parse(string markup, Game game, int defaultFontSize = 16, bool fullscreen = false, object? model = null, bool createNewInstance = false, string? basePath = null, string? viewName = null, bool isView = false)
     {
         ArgumentNullException.ThrowIfNull(markup);
 

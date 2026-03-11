@@ -188,7 +188,7 @@ public static class EventHandlerResolver
         }
     }
 
-    public static object?[] ParseArguments(string argsStr, UIElement? context = null)
+    private static object?[] ParseArguments(string argsStr, UIElement? context = null)
     {
         if (string.IsNullOrWhiteSpace(argsStr)) return [];
 
