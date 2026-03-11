@@ -1,20 +1,19 @@
 namespace Chess3d;
 
-using Chess3d.ChessLogic;
-using Chess3d.SUIM.Views;
-using global::SUIM.Parse;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Stride.BepuPhysics;
 using Stride.BepuPhysics.Definitions.Colliders;
 using Stride.Core.Mathematics;
 using Stride.Engine;
-using Stride.Games;
 using Stride.Input;
 using Stride.Physics;
 using Stride.Rendering;
+using global::SUIM.Parse;
 using SUIMStride;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Chess3d.ChessLogic;
+using Chess3d.SUIM.Views;
 
 public class BoardManager : SyncScript
 {
@@ -35,6 +34,7 @@ public class BoardManager : SyncScript
         Instance = this;
 
         InitBoard();
+
         CreateUI();
     }
 
