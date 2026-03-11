@@ -83,20 +83,14 @@ public partial class ControlFlowParser(dynamic model)
     private string InterpolateVariables(string template)
     {
         // Replace @Expression with evaluated result ONLY if it's a local variable
-        return MyRegex2().Replace(template, match =>
-        {
-            var ident = match.Groups[1].Value;
-            if (IsLocalVariable(ident))
+        return SUIM.Binding.BindingText.InterpolateLocalVariables(
+            template,
+            IsLocalVariable,
+            expr =>
             {
-                var expr = match.Value;
-                if (expr.StartsWith('@')) expr = expr[1..];
-                
                 var evaluator = new ExpressionEvaluator(_scopes);
-                var result = evaluator.Evaluate(expr);
-                return result?.ToString() ?? string.Empty;
-            }
-            return match.Value;
-        });
+                return evaluator.Evaluate(expr);
+            });
     }
 
     private bool IsLocalVariable(string name)
@@ -455,8 +449,6 @@ public partial class ControlFlowParser(dynamic model)
 
     [GeneratedRegex(@"(\w+)=(-?\d+)")]
     private static partial Regex MyRegex1();
-    [GeneratedRegex(@"@(\w+)(\.(\w+))?")]
-    private static partial Regex MyRegex2();
     [GeneratedRegex(@"^(\w+)\s*=\s*(.*)$")]
     private static partial Regex MyRegex3();
 }

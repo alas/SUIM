@@ -241,13 +241,17 @@ public static class CssStyle
         // Helper to handle SetAttribute with bindings and events
         static void ApplyToTarget(UIElement target, string name, string value)
         {
-            target.SetAttribute(name, value);
+            var isBinding = SUIM.Binding.BindingExpression.IsBindingValue(value);
+            if (!isBinding)
+            {
+                target.SetAttribute(name, value);
+            }
 
             if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase))
             {
                 target.Events[name[2..]] = value;
             }
-            else
+            else if (isBinding)
             {
                 SUIM.Binding.BindingExpression.TryAddBinding(target, name, value);
             }
