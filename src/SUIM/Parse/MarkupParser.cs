@@ -48,6 +48,11 @@ public static partial class MarkupParser
         element.Model = model3;
         if (componentName != null) element.IsComponentRoot = true;
 
+        if (codeBehind != null)
+        {
+            EventHandlerResolver.BindEventsRecursive(element, codeBehind);
+        }
+
         return element;
     }
 

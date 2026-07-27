@@ -64,4 +64,29 @@ public class CodeBehindTests
         btn3!.TriggerEvent("click");
         Assert.Equal("btn3", component.ClickParam);
     }
+
+    [Fact]
+    public void ViewCodeBehind_ResolvesClickHandlers_WhenParsingMarkup()
+    {
+        var createdView = new TestView();
+        ComponentRegistry.Register("ViewCodeBehindTest", () => createdView);
+
+        var markup = @"<root><button id=""btn"" onclick=""OnClick()"" /></root>";
+
+        var root = MarkupParser.Parse(markup, componentName: "ViewCodeBehindTest");
+        var button = root as Button;
+
+        button!.TriggerEvent("click");
+
+        Assert.True(createdView.Clicked);
+    }
+
+    public class TestView : VirtualComponent
+    {
+        public bool Clicked { get; private set; }
+
+        public TestView() : base(nameof(TestView)) { }
+
+        public void OnClick() => Clicked = true;
+    }
 }
