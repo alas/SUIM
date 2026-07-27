@@ -6,37 +6,13 @@ public class Popup() : SUIMComponent(nameof(Popup))
 {
     public void OnYesInternal()
     {
-        if (Model!.onYes is Action action)
-        {
-            action();
-        }
-        else if (Model.onYes is Action<SUIMComponent> actionComp)
-        {
-            actionComp(this);
-        }
-        else if (Model.onYes is Action<object?> actionObj)
-        {
-            actionObj(this);
-        }
+        Model!.onYes?.Invoke();
     }
 
     public void OnClosingInternal()
     {
         var handler = Model!.onClosing;
-        var cancel = false;
-        if (handler is Func<bool> f)
-        {
-            cancel = f();
-        }
-        else if (handler is Func<SUIMComponent, bool> fcomp)
-        {
-            cancel = fcomp(this);
-        }
-        else if (handler is Func<object?, bool> fobj)
-        {
-            cancel = fobj(this);
-        }
-
+        var cancel = handler != null && handler();
         if (!cancel)
         {
             Model.visibility = "collapsed";
@@ -45,24 +21,12 @@ public class Popup() : SUIMComponent(nameof(Popup))
 
     public void OnNoInternal()
     {
-        var handled = false;
-        if (Model!.onNo is Action action)
+        var handler = Model!.onNo;
+        if (handler != null)
         {
-            action();
-            handled = true;
+            handler();
         }
-        else if (Model.onNo is Action<SUIMComponent> actionComp)
-        {
-            actionComp(this);
-            handled = true;
-        }
-        else if (Model.onNo is Action<object?> actionObj)
-        {
-            actionObj(this);
-            handled = true;
-        }
-
-        if (!handled)
+        else
         {
             Model.visibility = "collapsed";
         }
