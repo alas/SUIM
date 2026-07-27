@@ -21,6 +21,13 @@ public static partial class MarkupParser
 
         dynamic model3 = ModelLogic.ExtractModel(root, model2) ?? new ObservableObject();
 
+        UIElement? codeBehind = null;
+        if (!string.IsNullOrWhiteSpace(componentName) && ComponentRegistry.IsRegisteredFactory(componentName))
+        {
+            codeBehind = ComponentRegistry.Create(componentName, true, isView);
+            codeBehind.Model = model3;
+        }
+
         // Root tag matches view/component name or "root": bypass redundant wrapper and process real root
         if (string.Equals(root.Name.LocalName, componentName, StringComparison.OrdinalIgnoreCase)
             || string.Equals(root.Name.LocalName, "root", StringComparison.OrdinalIgnoreCase))
@@ -35,19 +42,11 @@ public static partial class MarkupParser
                 && !x.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase));
         }
 
-        var element = ParseElement(root, styles, leakableStyles, model3, basePath)
+        var element = ParseElement(root, styles, leakableStyles, model3, basePath, codeBehind)
             ?? throw new InvalidOperationException("Root element not found.");
 
         element.Model = model3;
         if (componentName != null) element.IsComponentRoot = true;
-
-        if (!string.IsNullOrWhiteSpace(componentName) && ComponentRegistry.IsRegisteredFactory(componentName))
-        {
-            var codeBehind = ComponentRegistry.Create(componentName, true, isView);
-
-            codeBehind.Model = model3;
-            EventHandlerResolver.BindEventsRecursive(element, codeBehind);
-        }
 
         return element;
     }
@@ -93,7 +92,7 @@ public static partial class MarkupParser
         }
     }
 
-    private static UIElement? ParseElement(XElement element, Dictionary<string, Dictionary<string, string>> styles, Dictionary<string, Dictionary<string, string>> leakableStyles, dynamic model, string? basePath)
+    private static UIElement? ParseElement(XElement element, Dictionary<string, Dictionary<string, string>> styles, Dictionary<string, Dictionary<string, string>> leakableStyles, dynamic model, string? basePath, UIElement? codeBehind)
     {
         var innerElement = ParseElementTag(element);
         if (innerElement == null)
@@ -134,7 +133,7 @@ public static partial class MarkupParser
                         {
                             child.SetAttributeValue("grid.column", colIdx.ToString());
                         }
-                        var childElement = ParseElement(child, styles, leakableStyles, model, basePath);
+                        var childElement = ParseElement(child, styles, leakableStyles, model, basePath, codeBehind);
                         if (childElement == null) continue;
 
                         grid.AddChild(childElement, child);
@@ -164,7 +163,7 @@ public static partial class MarkupParser
                         {
                             child.SetAttributeValue("grid.row", rowIdx.ToString());
                         }
-                        var childElement = ParseElement(child, styles, leakableStyles, model, basePath);
+                        var childElement = ParseElement(child, styles, leakableStyles, model, basePath, codeBehind);
                         if (childElement == null) continue;
 
                         grid.AddChild(childElement, child);
@@ -175,7 +174,7 @@ public static partial class MarkupParser
                 }
                 else
                 {
-                    var childElement = ParseElement(node, styles, leakableStyles, model, basePath);
+                    var childElement = ParseElement(node, styles, leakableStyles, model, basePath, codeBehind);
                     if (childElement == null) continue;
 
                     grid.AddChild(childElement, node);
@@ -213,7 +212,7 @@ public static partial class MarkupParser
                 }
                 else if (node is XElement childXElement)
                 {
-                    var childElement = ParseElement(childXElement, styles, leakableStyles, model, basePath);
+                    var childElement = ParseElement(childXElement, styles, leakableStyles, model, basePath, codeBehind);
                     if (childElement == null) continue;
 
                     innerElement.AddChild(childElement, childXElement);
@@ -222,10 +221,10 @@ public static partial class MarkupParser
         }
 
         rootElement = CssStyle.ApplyToElement(rootElement, styles, attributes);
-        
+
         if (rootElement is VirtualComponent custom)
         {
-            return custom.Expand(model, basePath, leakableStyles);
+            return custom.Expand(model, basePath, leakableStyles, codeBehind);
         }
 
         return rootElement;

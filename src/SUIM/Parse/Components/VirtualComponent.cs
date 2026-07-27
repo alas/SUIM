@@ -3,6 +3,7 @@ namespace SUIM.Parse.Components;
 using System;
 using System.IO;
 using SUIM.Binding;
+using SUIM.Model;
 using SUIM.Parse;
 
 /// <summary>
@@ -41,8 +42,13 @@ public class VirtualComponent(string tagName) : LayoutElement(tagName)
         }
     }
 
-    public UIElement? Expand(dynamic parentModel, string? basePath, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null)
+    public UIElement? Expand(dynamic parentModel, string? basePath, Dictionary<string, Dictionary<string, string>>? inheritedStyles = null, object? codeBehind = null)
     {
+        if (codeBehind != null)
+        {
+            EventHandlerResolver.ResolveComponentEvents(this, codeBehind);
+        }
+
         var source = Source ?? $"{GetType().Name}.suim";
 
         var finalPath = source;
@@ -68,7 +74,7 @@ public class VirtualComponent(string tagName) : LayoutElement(tagName)
         Model = element.Model;
 
         // Map attributes and bindings from this tag to the component model
-        ComponentBindingMapper.ApplyBindings(this, parentModel);
+        ComponentBindingMapper.ApplyBindings(this, parentModel, codeBehind);
 
         ClearChildren();
         

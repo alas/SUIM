@@ -8,14 +8,31 @@ using SUIM.Parse.Components;
 
 public static class EventHandlerResolver
 {
-    public static void BindEventsRecursive(UIElement element, object target, Binding.EventBindingOptions? options = null)
+    public static void ResolveComponentEvents(VirtualComponent component, object? codeBehind)
+    {
+        BindEventsRecursive(component, codeBehind);
+        if (codeBehind == null || component.Events.Count == 0) return;
+
+        foreach (var evt in component.Events)
+        {
+            var eventName = evt.Key.ToLowerInvariant();
+            var expression = evt.Value;
+            var handler = ResolveHandler(codeBehind, expression, component);
+            if (handler != null)
+            {
+                component.ResolvedEvents[eventName] = handler;
+            }
+        }
+    }
+
+    public static void BindEventsRecursive(UIElement element, object? target)
     {
         foreach (var evt in element.Events)
         {
             var eventName = evt.Key.ToLowerInvariant();
             var expression = evt.Value;
 
-            var handler = ResolveHandler(target, expression, element, options);
+            var handler = ResolveHandler(target, expression, element);
             if (handler != null)
             {
                 element.ResolvedEvents[eventName] = handler;
@@ -28,7 +45,7 @@ public static class EventHandlerResolver
         }
     }
 
-    public static Delegate? ResolveHandler(object target, string expression, UIElement? context = null, Binding.EventBindingOptions? options = null)
+    public static Delegate? ResolveHandler(object? target, string expression, UIElement? context = null, Binding.EventBindingOptions? options = null)
     {
         if (target == null || string.IsNullOrWhiteSpace(expression)) return null;
 

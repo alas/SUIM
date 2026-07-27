@@ -1,18 +1,18 @@
 namespace SUIM.Binding;
 
-using System.Linq;
 using SUIM.Model;
 using SUIM.Parse.Components;
+using System.Linq;
 
 public static class ComponentBindingMapper
 {
-    public static void ApplyBindings(VirtualComponent component, dynamic parentModel)
+    public static void ApplyBindings(VirtualComponent component, dynamic parentModel, object? codeBehind = null)
     {
-        ApplyAttributeBindings(component, parentModel);
-        ApplyExplicitBindings(component, parentModel);
+        ApplyAttributeBindings(component, parentModel, codeBehind);
+        ApplyExplicitBindings(component, parentModel, codeBehind);
     }
 
-    private static void ApplyAttributeBindings(VirtualComponent component, dynamic parentModel)
+    private static void ApplyAttributeBindings(VirtualComponent component, dynamic parentModel, object? codeBehind = null)
     {
         if (component.Model is not ObservableObject oo) return;
 
@@ -22,7 +22,12 @@ public static class ComponentBindingMapper
 
             if (attr.Value is string val)
             {
-                if (BindingExpression.TryGetModelPropertyName(val, out var parentPropName))
+                if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase)
+                    && component.ResolvedEvents.TryGetValue(name[2..].ToLowerInvariant(), out var resolvedHandler))
+                {
+                    oo.SetValue(name, resolvedHandler);
+                }
+                else if (BindingExpression.TryGetModelPropertyName(val, out var parentPropName))
                 {
                     // Binding to parent model property
                     if (parentModel is ObservableObject parentOO)
@@ -55,11 +60,19 @@ public static class ComponentBindingMapper
                         oo.SetValue(name, attr.Value);
                     }
                 }
-                else if (val.Contains('(') && parentModel is ObservableObject parentOO2)
+                else if (val.Contains('('))
                 {
-                    // Attribute looks like a method call expression (e.g. "MyHandler()") coming from parent.
-                    // Create a proxy that resolves to a Delegate from the parent model so component internals can invoke it.
-                    oo.SetProxy(name, () => parentOO2.GetHandler(val), null);
+                    var handler = EventHandlerResolver.ResolveHandler(codeBehind, val, component);
+                    if (handler != null)
+                    {
+                        oo.SetValue(name, handler);
+                    }
+                    else if (parentModel is ObservableObject parentOO2)
+                    {
+                        // Attribute looks like a method call expression (e.g. "MyHandler()") coming from parent.
+                        // Create a proxy that resolves to a Delegate from the parent model so component internals can invoke it.
+                        oo.SetValue(name, parentOO2.GetHandler(val));
+                    }
                 }
                 else
                 {
@@ -73,7 +86,7 @@ public static class ComponentBindingMapper
         }
     }
 
-    private static void ApplyExplicitBindings(VirtualComponent component, dynamic parentModel)
+    private static void ApplyExplicitBindings(VirtualComponent component, dynamic parentModel, object? codeBehind = null)
     {
         if (component.Bindings.Count == 0) return;
 
